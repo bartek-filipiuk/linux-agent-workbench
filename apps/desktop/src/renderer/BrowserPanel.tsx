@@ -14,7 +14,8 @@ export function BrowserPanel({ status }: { status: BrowserStatus }) {
   const frameCount = useRef(0);
 
   useEffect(() => {
-    if (status.url && status.state === "ready") setUrl(status.url);
+    // Mirror real navigations into the bar; a fresh profile starts on about:blank, which is not worth showing.
+    if (status.url && status.state === "ready" && status.url !== "about:blank") setUrl(status.url);
   }, [status.url, status.state]);
 
   useEffect(() => {

@@ -45,7 +45,8 @@ export class BrowserSessionManager extends EventEmitter {
       } catch {}
       const spawn = this.deps.spawn ?? nodeSpawn;
       const child = spawn(process.execPath, [this.deps.workerEntry], {
-        env: { PATH: process.env.PATH ?? "", HOME: process.env.HOME ?? "", LAW_BROWSER_SOCKET: socketPath, LAW_BROWSER_PROFILE: this.deps.profileDir },
+        // Inside an Electron utilityProcess execPath is Electron itself; ELECTRON_RUN_AS_NODE makes it behave as plain Node.
+        env: { PATH: process.env.PATH ?? "", HOME: process.env.HOME ?? "", ELECTRON_RUN_AS_NODE: "1", LAW_BROWSER_SOCKET: socketPath, LAW_BROWSER_PROFILE: this.deps.profileDir },
         stdio: ["ignore", "inherit", "inherit"],
       });
       this.child = child;
