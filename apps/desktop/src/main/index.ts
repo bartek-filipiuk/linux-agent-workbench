@@ -4,7 +4,9 @@ import os from "node:os";
 import path from "node:path";
 import type { AgentdToMain, MainToAgentd, SessionStatus } from "@law/agentd";
 import { parseEnvFile } from "./env-file";
+import { execFileSync } from "node:child_process";
 import { resolveApiKey, stripEnvKey, type KeyStore } from "./key-store";
+import { RingBuffer, redact } from "./redact";
 import { readSettings, writeSettings, type Settings } from "./settings";
 
 type AgentdStatus =
@@ -21,6 +23,36 @@ type LeaseState = { surface: "terminal" | "browser"; owner: "agent" | "human"; r
 let leases: Record<"terminal" | "browser", LeaseState> = { terminal: { surface: "terminal", owner: "human" }, browser: { surface: "browser", owner: "human" } };
 let browser: { state: string; url?: string; title?: string; message?: string } = { state: "idle" };
 let keyInfo: { keyStore: KeyStore; keyBackend: string } = { keyStore: "none", keyBackend: "unknown" };
+const agentdLog = new RingBuffer(500);
+
+function sh(cmd: string, args: string[]): string {
+  try {
+    return execFileSync(cmd, args, { encoding: "utf8", timeout: 10_000 }).trim();
+  } catch (e) {
+    return `(${cmd} failed: ${e instanceof Error ? e.message.split("\n")[0] : String(e)})`;
+  }
+}
+
+/** Versions, images, containers, settings without the key and the agentd log tail; every line redacted. */
+function writeDiagnostics(): string {
+  const dir = path.join(path.dirname(dbPath()), "diagnostics");
+  fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
+  const file = path.join(dir, `law-diagnostics-${new Date().toISOString().replace(/[:.]/g, "-")}.txt`);
+  const { openaiKeyEncrypted: _k, ...settingsNoKey } = settings;
+  const sections: [string, string][] = [
+    ["versions", `app ${app.getVersion()}\nelectron ${process.versions.electron}\nnode ${process.versions.node}\n${sh("podman", ["--version"])}\n${sh("uname", ["-sr"])}`],
+    ["images", `terminal ${readImageId("terminal") ?? "missing"}\nbrowser ${readImageId("browser") ?? "missing"}`],
+    ["containers", sh("podman", ["ps", "-a", "--filter", "label=law.app=1", "--format", "{{.Names}} {{.Status}} {{.Image}}"])],
+    ["settings", JSON.stringify(settingsNoKey, null, 2)],
+    ["key", `store ${keyInfo.keyStore}, backend ${keyInfo.keyBackend}`],
+    ["state", `${dbPath()} ${fs.existsSync(dbPath()) ? `${fs.statSync(dbPath()).size} bytes` : "missing"}; agentd ${status.type}${status.type === "agentd.ready" ? ` schema ${status.schemaVersion}` : ""}`],
+    ["session", JSON.stringify({ ...session, browser: browser.state, leases: { terminal: leases.terminal.owner, browser: leases.browser.owner } })],
+    ["agentd log (last 500 lines)", agentdLog.text()],
+  ];
+  const text = sections.map(([title, body]) => `== ${title} ==\n${body}\n`).join("\n");
+  fs.writeFileSync(file, redact(text), { mode: 0o600 });
+  return file;
+}
 
 const repoRoot = () => path.resolve(__dirname, "..", "..", "..", "..");
 const settingsFile = () => path.join(app.getPath("userData"), "settings.json");
@@ -126,7 +158,10 @@ function startAgentd() {
   if (!apiKey) return onAgentd({ type: "agentd.error", message: "OPENAI_API_KEY missing: put it in .env once; it is moved to the OS keyring on the next start" });
   if (!imageId) return onAgentd({ type: "agentd.error", message: "images/terminal/image.json missing; run pnpm images:build" });
   const entry = path.join(repoRoot(), "services", "agentd", "dist", "main.js");
-  const child = utilityProcess.fork(entry, [], { serviceName: "agentd", stdio: "inherit" });
+  const child = utilityProcess.fork(entry, [], { serviceName: "agentd", stdio: "pipe" });
+  // Mirror agentd's output to ours and keep a tail for the diagnostics file.
+  child.stdout?.on("data", (d: Buffer) => { process.stdout.write(d); agentdLog.push(d.toString()); });
+  child.stderr?.on("data", (d: Buffer) => { process.stderr.write(d); agentdLog.push(d.toString()); });
   const { port1, port2 } = new MessageChannelMain();
   child.postMessage({ type: "port" }, [port1]);
   port = port2;
@@ -200,6 +235,7 @@ ipcMain.handle("browser:navigate", (_e, url: unknown) => {
 ipcMain.on("browser:input", (_e, event: unknown) => {
   if (event && typeof event === "object") toAgentd({ type: "browser.input", event: event as never });
 });
+ipcMain.handle("diagnostics:write", () => writeDiagnostics());
 ipcMain.handle("run:restore", (_e, runId: unknown) => {
   if (typeof runId === "string" && runId) toAgentd({ type: "run.restore", runId });
 });

@@ -214,6 +214,20 @@ export class PodmanRuntime {
     await this.exec(["rm", "-f", "--ignore", name]);
   }
 
+  /** Running containers started by this app, with the session id from their label. */
+  async listApp(): Promise<{ name: string; sessionId: string }[]> {
+    const { stdout } = await this.exec(["ps", "--filter", "label=law.app=1", "--format", '{{.Names}} {{index .Labels "law.session"}}']);
+    return stdout
+      .split("\n")
+      .map((l) => l.trim().split(/\s+/))
+      .filter((p) => p.length === 2 && p[0])
+      .map(([name, sessionId]) => ({ name: name!, sessionId: sessionId! }));
+  }
+
+  async stop(name: string): Promise<void> {
+    await this.exec(["stop", "-t", "5", name]);
+  }
+
   async execIn(name: string, args: string[]): Promise<void> {
     await this.exec(["exec", name, ...args]);
   }

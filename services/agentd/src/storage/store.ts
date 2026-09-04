@@ -166,6 +166,26 @@ export class Store {
     return rows.length;
   }
 
+  /** Deletes runs that ended before `cutoff` with everything that hangs off them, and egress rows older than it. */
+  pruneOlderThan(cutoff: number): { runs: number; egress: number } {
+    const runs = this.db.prepare(`SELECT id FROM runs WHERE ended_at IS NOT NULL AND ended_at < ?`).all(cutoff) as { id: string }[];
+    this.db.exec("BEGIN");
+    try {
+      for (const { id } of runs) {
+        for (const table of ["run_events", "tool_calls", "approvals", "provider_usage"]) {
+          this.db.prepare(`DELETE FROM ${table} WHERE run_id = ?`).run(id);
+        }
+        this.db.prepare(`DELETE FROM runs WHERE id = ?`).run(id);
+      }
+      const egress = this.db.prepare(`DELETE FROM egress_log WHERE ts < ?`).run(cutoff).changes;
+      this.db.exec("COMMIT");
+      return { runs: runs.length, egress: Number(egress) };
+    } catch (e) {
+      this.db.exec("ROLLBACK");
+      throw e;
+    }
+  }
+
   close(): void {
     this.db.close();
   }

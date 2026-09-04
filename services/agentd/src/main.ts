@@ -50,6 +50,7 @@ parentPort.once("message", (e) => {
             }),
       }),
     post: (m) => port.postMessage(m),
+    podman: new PodmanRuntime(),
   });
   port.on("message", ({ data }) => {
     daemon.handle(data).catch((err) => port.postMessage({ type: "agentd.error", message: err instanceof Error ? err.message : String(err) }));

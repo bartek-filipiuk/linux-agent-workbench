@@ -44,6 +44,8 @@ export { isPrivateHost, isPrivateIp } from "./policy/private-address.js";
 export { EgressProxy, parseTarget } from "./egress/proxy.js";
 export type { EgressDecision, EgressLogEntry, EgressProxyOptions } from "./egress/proxy.js";
 export { SessionEgress, egressSocketPaths } from "./egress/session-egress.js";
+export { markSessionUsed, lastUsedAt, stopOrphans } from "./maintenance/orphans.js";
+export type { ContainerLister } from "./maintenance/orphans.js";
 export type { BrowserClassification, BrowserPolicyDeps, DomainMode } from "./policy/browser-policy.js";
 export { BROWSER_TOOLS, browserExecutor } from "./tools/browser-tools.js";
 export { terminalExecutor } from "./tools/terminal-tools.js";

@@ -8,6 +8,10 @@ import { RunController } from "./orchestrator/run-controller.js";
 import { Lease, LeasePolicy, type LeaseOwner, type Surface } from "./policy/lease.js";
 import { BrowserActionPolicy, type DomainMode } from "./policy/browser-policy.js";
 import { SessionEgress } from "./egress/session-egress.js";
+import { markSessionUsed, stopOrphans, type ContainerLister } from "./maintenance/orphans.js";
+
+const RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
+const LAST_USED_INTERVAL_MS = 30 * 60 * 1000;
 import { browserExecutor } from "./tools/browser-tools.js";
 import { terminalExecutor } from "./tools/terminal-tools.js";
 import { composeExecutors } from "./provider/types.js";
@@ -104,6 +108,8 @@ export type DaemonDeps = {
   makeBrowser?: (ctx: BrowserContext) => BrowserSessionManager;
   makeAdapter: (model: string, apiKey: string) => ModelAdapter;
   post: (msg: AgentdToMain) => void;
+  /** For startup maintenance (stopping week-old containers); tests leave it out. */
+  podman?: ContainerLister;
 };
 
 const TERMINAL: ReadonlySet<RunState> = new Set(["completed", "stopped", "failed", "budget_exceeded", "interrupted"]);
@@ -123,6 +129,7 @@ export class Daemon {
   private browserImageId: string | undefined;
   private runtimeRoot = "";
   private egress: SessionEgress | undefined;
+  private lastUsedTimer: NodeJS.Timeout | undefined;
 
   constructor(private readonly deps: DaemonDeps) {
     for (const [surface, lease] of [["terminal", this.lease], ["browser", this.browserLease]] as const) {
@@ -175,9 +182,26 @@ export class Daemon {
               if (!e.allowed) console.error(`[agentd] egress denied ${e.host}:${e.port}: ${e.reason}`);
             },
           });
+          // Startup maintenance: forget month-old runs, stop containers nobody used for a week.
+          try {
+            const pruned = store.pruneOlderThan(Date.now() - RETENTION_MS);
+            if (pruned.runs || pruned.egress) console.error(`[agentd] pruned ${pruned.runs} runs and ${pruned.egress} egress rows older than 30 days`);
+          } catch (e) {
+            console.error(`[agentd] retention failed: ${e instanceof Error ? e.message : String(e)}`);
+          }
+          if (this.deps.podman) {
+            stopOrphans(this.deps.podman, msg.runtimeRoot)
+              .then((names) => names.length && console.error(`[agentd] stopped idle containers: ${names.join(", ")}`))
+              .catch((e) => console.error(`[agentd] orphan cleanup failed: ${e instanceof Error ? e.message : String(e)}`));
+          }
           this.manager.on("status", (s: SessionStatus) => {
             if (s.state === "starting" && s.sessionId) {
-              this.egress?.ensure(s.sessionId, s.networkMode ?? "open").catch((e) => console.error(`[agentd] egress proxy failed: ${e instanceof Error ? e.message : String(e)}`));
+              const sessionId = s.sessionId;
+              this.egress?.ensure(sessionId, s.networkMode ?? "open").catch((e) => console.error(`[agentd] egress proxy failed: ${e instanceof Error ? e.message : String(e)}`));
+              markSessionUsed(msg.runtimeRoot, sessionId);
+              clearInterval(this.lastUsedTimer);
+              this.lastUsedTimer = setInterval(() => markSessionUsed(msg.runtimeRoot, sessionId), LAST_USED_INTERVAL_MS);
+              this.lastUsedTimer.unref();
             }
             if (s.state === "ready" && s.sessionId) this.ensureBrowserManager(s.sessionId, s.networkMode ?? "open");
             if (s.state !== "ready" || !this.manager?.worker || !this.gate) return;
@@ -197,6 +221,8 @@ export class Daemon {
       case "session.stop":
         this.run?.stop();
         await this.egress?.close();
+        clearInterval(this.lastUsedTimer);
+        if (this.manager?.status.sessionId) markSessionUsed(this.runtimeRoot, this.manager.status.sessionId);
         if (msg.destroy) {
           await this.browser?.destroy();
           this.browser = undefined;

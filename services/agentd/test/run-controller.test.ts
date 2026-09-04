@@ -30,6 +30,22 @@ const input = (workspaceId: string) => ({ workspaceId, goal: "list files", netwo
 const toolResultsOf = (i: unknown) => (i as { toolResults: { callId: string; output: string }[] }).toolResults;
 
 describe("RunController", () => {
+  it("never persists a tool result's image, only its text", async () => {
+    const { ws, store, worker } = await setup();
+    const tools = {
+      specs: [{ name: "peek", description: "peek", parameters: { type: "object", properties: {} } }],
+      execute: async () => ({ output: JSON.stringify({ seen: "heading" }), imageJpegBase64: "QUJDREVGR0hJSktMTU5PUA==" }),
+    };
+    const adapter = new FakeModelAdapter([{ toolCalls: [{ name: "peek", args: {} }] }, { text: "done" }]);
+    const rc = new RunController({ store, adapter, worker, tools }, input(ws));
+    const out = await rc.start();
+    expect(out.state).toBe("completed");
+    const call = store.listToolCalls(out.runId)[0]!;
+    expect(call.output_json).toBe(JSON.stringify({ seen: "heading" }));
+    const everything = [...store.listEvents(out.runId).map((e) => JSON.stringify(e.payload)), call.output_json].join("\n");
+    expect(everything).not.toContain("QUJDREVGR0hJSktMTU5PUA");
+  });
+
   it("runs a scripted session to completion and persists everything", async () => {
     const { ws, store, worker, fw } = await setup();
     const adapter = new FakeModelAdapter([

@@ -69,6 +69,22 @@ describe("Store", () => {
     b.close();
   });
 
+  it("prunes finished runs older than the cutoff with their child rows and old egress entries", () => {
+    const s = mkStore();
+    const oldRun = mkRun(s);
+    s.beginToolCall(oldRun, { callId: "c1", name: "terminal_observe", args: {} });
+    s.recordUsage(oldRun, { responseId: "r1", inputTokens: 1, outputTokens: 1, costUsd: 0 });
+    s.setRunState(oldRun, "completed", "final");
+    const liveRun = mkRun(s);
+    s.logEgress("sess", { host: "example.com", port: 443, allowed: true });
+    const future = Date.now() + 60_000;
+    expect(s.pruneOlderThan(future)).toEqual({ runs: 1, egress: 1 });
+    expect(s.getRun(oldRun)).toBeUndefined();
+    expect(s.listToolCalls(oldRun)).toEqual([]);
+    expect(s.listEvents(oldRun)).toEqual([]);
+    expect(s.getRun(liveRun)?.state).toBe("running"); // never ended, never pruned
+  });
+
   it("accumulates totals and usage", () => {
     const s = mkStore();
     const runId = mkRun(s);

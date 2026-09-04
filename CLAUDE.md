@@ -6,7 +6,7 @@
 
 ### Architektura
 - `packages/protocol` — Zod schemas + framed Unix-socket protocol (u32 len, u8 kind: 0 JSON, 1 PTY out, 2 keys, 3 browser JPEG frame). `FramedConnection` in `src/node/connection.ts`.
-- `services/agentd` — the daemon (Electron utilityProcess). `ipc.ts` (`Daemon`) routes main-process messages; `orchestrator/run-controller.ts` runs the model loop; `policy/*` decides what a tool call may do; `session/*` owns the podman containers; `egress/*` is the HTTP proxy the containers use for all network traffic; `storage/store.ts` is SQLite (node:sqlite, WAL).
+- `services/agentd` — the daemon (Electron utilityProcess). `ipc.ts` (`Daemon`) routes main-process messages; `orchestrator/run-controller.ts` runs the model loop; `policy/*` decides what a tool call may do; `session/*` owns the podman containers; `egress/*` is the HTTP proxy the containers use for all network traffic; `maintenance/*` is startup cleanup (idle containers); `storage/store.ts` is SQLite (node:sqlite, WAL).
 - `services/terminal-worker` — node-pty + tmux inside `law-terminal-<session>`; bash gate (`images/terminal/gate.cjs` → `gate.sock` → agentd `gate.check`).
 - `services/browser-worker` — Playwright Chromium inside `law-browser-<session>`; screencast frames, DOM-walk observation, ref-based actions.
 - `apps/desktop` — Electron 44 + React 19 + xterm.js; `main/index.ts` spawns agentd and forwards IPC, `renderer/*` is the UI.
@@ -35,6 +35,7 @@
 - reCAPTCHA and similar widgets live in cross-origin iframes; observation walks frames, bounds are page coordinates.
 - Containers run with `--network none`; a tool that ignores `HTTPS_PROXY` has no network at all. ssh works only through the shipped `ProxyCommand`.
 - Never type into the user's live Claude Code session in the sandbox terminal.
+- The OpenAI key lives in the OS keyring (`settings.json` → `openaiKeyEncrypted` via safeStorage); `.env` keeps only model and prices after the first start.
 
 ### Jak dodać feature
 - New model tool: spec + executor in `services/agentd/src/tools/`, `previewOf` label, a policy if it has side effects, a test with a fake manager.

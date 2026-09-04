@@ -36,7 +36,7 @@ html, body, #root { height: 100%; }
 .btn:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--human); outline-offset: 2px; }
 .btn:disabled { opacity: 0.4; cursor: default; }
 .btn.danger { border-color: var(--agent); color: var(--agent); }
-.path { color: var(--muted); max-width: 26ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: rtl; text-align: left; }
+.path { color: var(--muted); max-width: 26ch; min-width: 10ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: rtl; text-align: left; }
 .spacer { flex: 1; }
 .badge { display: inline-flex; gap: 6px; align-items: center; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; }
 .badge.net-open { background: rgba(245, 158, 11, 0.12); color: var(--warn); border: 1px solid var(--warn); }

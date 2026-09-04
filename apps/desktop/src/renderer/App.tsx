@@ -37,6 +37,7 @@ declare global {
       stopBrowser(): Promise<void>;
       navigate(url: string): Promise<void>;
       browserInput(event: unknown): void;
+      writeDiagnostics(): Promise<string>;
       onBrowserState(cb: (s: BrowserStatus) => void): () => void;
       onBrowserFrame(cb: (f: { width: number; height: number; data: Uint8Array }) => void): () => void;
       onEvent(cb: (e: AgentdStatus) => void): () => void;
@@ -134,6 +135,9 @@ export function App() {
           )}
           {status.type === "agentd.error" && `agentd error: ${status.message}`}
         </span>
+        <button className="btn" title="Write a diagnostics file (versions, containers, recent agentd log) with secrets removed" onClick={() => void window.workbench.writeDiagnostics().then((p) => window.alert(`Diagnostics written to\n${p}`))}>
+          Diagnostics
+        </button>
         <button className="btn danger" disabled={!session.sessionId} onClick={destroy}>Destroy sandbox</button>
       </header>
       {handoff && (

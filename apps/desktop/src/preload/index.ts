@@ -29,6 +29,7 @@ const api = {
   stopBrowser: () => ipcRenderer.invoke("browser:stop"),
   navigate: (url: string) => ipcRenderer.invoke("browser:navigate", url),
   browserInput: (event: unknown) => ipcRenderer.send("browser:input", event),
+  writeDiagnostics: (): Promise<string> => ipcRenderer.invoke("diagnostics:write"),
   onBrowserState: on<unknown>("browser:state"),
   onBrowserFrame: on<{ width: number; height: number; data: Uint8Array }>("browser:frame"),
   onRun: on<unknown>("run:event"),
