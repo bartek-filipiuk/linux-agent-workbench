@@ -14,19 +14,21 @@ RUN apt-get update \
 ENV LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 
 # Rootless overlay on this host rejects tar's final fchmodat on directories (exit 2, "Cannot change mode");
-# the files are extracted correctly, so only that specific failure is tolerated and node is verified afterwards.
+# tar leaves directories at its temporary 0700 mode, so modes are normalised with a plain chmod (which works) and node is verified.
 RUN curl -fsSLo /tmp/node.tar.xz "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz" \
  && echo "${NODE_SHA256}  /tmp/node.tar.xz" | sha256sum -c - \
  && { tar --no-same-owner -xJf /tmp/node.tar.xz -C /usr/local --strip-components=1 2>/tmp/tar.log || [ $? -eq 2 ]; } \
  && ! grep -v -e "Cannot change mode" -e "Exiting with failure status" /tmp/tar.log | grep -q "tar:" \
  && rm /tmp/node.tar.xz /tmp/tar.log \
+ && find /usr/local -type d -exec chmod 755 {} + \
  && node -v && npm -v \
  && npm install -g --no-audit --no-fund "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}" "@openai/codex@${CODEX_VERSION}"
 
 # uid 1000 is "ubuntu" in the base image; rename it so paths match the spec.
 # No -m: moving the home dir fails on rootless overlay, and /home/agent is a tmpfs at runtime anyway.
 RUN usermod -l agent ubuntu && usermod -d /home/agent agent && groupmod -n agent ubuntu \
- && mkdir -p /home/agent && chown agent:agent /home/agent
+ && mkdir -p /home/agent && chown agent:agent /home/agent \
+ && for g in adm dialout cdrom floppy sudo audio dip video plugdev; do gpasswd -d agent "$g" >/dev/null; done
 
 COPY images/terminal/opt-package.json /opt/law/package.json
 RUN cd /opt/law && npm install --omit=dev --no-audit --no-fund

@@ -48,6 +48,9 @@ export class TerminalSession {
     const name = this.opts.sessionName ?? "main";
     const args = ["-S", this.opts.tmuxSocket, "-f", "/dev/null", "new-session", "-A", "-s", name];
     if (this.opts.cwd) args.push("-c", this.opts.cwd);
+    // Chained into the same tmux command so it cannot race the server start:
+    // status line off so the model never reads tmux chrome as program output.
+    args.push(";", "set-option", "-g", "status", "off");
     this.proc = pty.spawn("tmux", args, {
       name: "xterm-256color",
       cols: this.cols,
@@ -67,10 +70,6 @@ export class TerminalSession {
       this.exitCode = exitCode;
       this.revision++;
     });
-    // ponytail: status line off so the model never reads tmux chrome as program output
-    await new Promise<void>((resolve) =>
-      execFile("tmux", ["-S", this.opts.tmuxSocket, "set-option", "-g", "status", "off"], () => resolve()),
-    );
   }
 
   onData(cb: Listener): () => void {

@@ -46,6 +46,7 @@ describe("TerminalSession", () => {
     expect(obs.size).toEqual({ rows: 24, cols: 80 });
     expect(obs.exited).toBe(false);
     expect(obs.screen).not.toMatch(/\x1b/);
+    expect(obs.screen).not.toMatch(/\[main\] 0:bash/);
   });
 
   it("rejects stale expectedRevision", async () => {
