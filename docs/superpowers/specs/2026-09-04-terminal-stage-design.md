@@ -293,6 +293,27 @@ tree) in `runs.snapshot_json`. "Restore pre-run state" runs
 `git stash apply <oid>` after `git checkout <head>` behind a confirmation dialog.
 Without git: a yellow "no snapshot" badge in the top bar.
 
+### 7.7 Screen state, waiting and nested-agent questions (added 2026-09-04, M5)
+
+The PTY has no reliable "command finished" or "program is waiting" signal (§8.2 of the parent
+document). T1 handles it in two layers:
+
+- `terminal_wait { idleMs?: number (default 1500, max 30000), timeoutMs?: number (default 60000,
+  max 180000), until?: string (regex, max 200 chars) }` returns the observation as soon as the screen
+  has been quiet for `idleMs` or `until` matches, otherwise on timeout with `timedOut: true`. The
+  worker implements it on top of the output revision; the model stops polling.
+- Every observation carries `hint: { state, options? }` computed from the screen text:
+  `busy` (spinner / "esc to interrupt" / "Working"), `idle_shell` (shell prompt on the last line),
+  `nested_agent_idle` (Claude Code or Codex input box waiting), `question_menu` (a numbered or
+  `❯`-marked option list the agent may answer with UP/DOWN/ENTER), `permission_prompt` and
+  `password_prompt` (handoff to the human, as in §7.4), `unknown`.
+  `question_menu` lists the option labels so the model picks by moving the cursor, never by
+  guessing a number.
+
+Ceiling: both are heuristics on screen text. The structured path (Claude Code `stream-json` with
+permission events, Codex App Server, ACP) replaces them in v1.1 and is the only reliable way to know
+that a nested agent finished or is asking something.
+
 ## 8. Storage
 
 `$XDG_DATA_HOME/linux-agent-workbench/state.sqlite`, WAL, `node:sqlite`.
