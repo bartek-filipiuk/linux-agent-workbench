@@ -34,6 +34,15 @@ describe("terminal tools", () => {
     expect(obs.screen).toBe("$ pwd");
   });
 
+  it("submit=true presses ENTER after the text in one call", async () => {
+    await setup();
+    const out = JSON.parse(await executeTerminalTool({ callId: "1", name: "terminal_input", args: { kind: "text", text: "pwd", submit: true } }, w, sig));
+    expect(out).toEqual({ revision: 2 });
+    const inputs = fw.received.map((r) => (r as { payload?: { kind?: string; key?: string } }).payload).filter((p) => p?.kind);
+    expect(inputs.map((p) => p!.kind)).toEqual(["text", "key"]);
+    expect(inputs[1]).toMatchObject({ kind: "key", key: "ENTER" });
+  });
+
   it("rejects invalid args before touching the worker", async () => {
     await setup();
     await expect(executeTerminalTool({ callId: "1", name: "terminal_input", args: { kind: "text", text: "a\x00" } }, w, sig))

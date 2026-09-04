@@ -5,6 +5,8 @@ import type { TerminalWorker } from "../worker/types.js";
 
 export const RequestHumanArgs = z.object({ reason: z.string().min(1).max(500) });
 const NoArgs = z.object({}).strict();
+// submit=true runs the line: ENTER is sent after the text or paste, saving the model a turn per command.
+export const TerminalInputArgs = z.intersection(TerminalInput, z.object({ submit: z.boolean().optional() }));
 
 export class HandoffRequested extends Error {
   constructor(readonly reason: string) {
@@ -26,8 +28,8 @@ export const TERMINAL_TOOLS: ToolSpec[] = [
   {
     name: "terminal_input",
     description:
-      "Send input to the terminal. kind=text types characters (no control characters); kind=key sends one named key (ENTER, TAB, ESC, CTRL_C, CTRL_D, arrows); kind=paste pastes a block. Follow text with a separate ENTER key to run a command.",
-    parameters: schema(TerminalInput),
+      "Send input to the terminal. kind=text types characters (no control characters); kind=key sends one named key (ENTER, TAB, ESC, CTRL_C, CTRL_D, arrows); kind=paste pastes a block. Set submit=true to press ENTER right after the text or paste (one call runs the command).",
+    parameters: schema(TerminalInputArgs),
   },
   {
     name: "terminal_wait",
@@ -58,8 +60,12 @@ export async function executeTerminalTool(call: ToolCall, worker: TerminalWorker
   switch (call.name) {
     case "terminal_observe":
       return JSON.stringify(await worker.observe(parseArgs(TerminalObserveInput, call.args, call.name), signal));
-    case "terminal_input":
-      return JSON.stringify(await worker.input(parseArgs(TerminalInput, call.args, call.name), signal));
+    case "terminal_input": {
+      const { submit, ...input } = parseArgs(TerminalInputArgs, call.args, call.name);
+      const typed = await worker.input(input, signal);
+      if (!submit || input.kind === "key") return JSON.stringify(typed);
+      return JSON.stringify(await worker.input({ kind: "key", key: "ENTER" }, signal));
+    }
     case "terminal_wait":
       return JSON.stringify(await worker.wait(parseArgs(TerminalWaitInput, call.args, call.name), signal));
     case "terminal_interrupt":

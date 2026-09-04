@@ -47,3 +47,4 @@
 - `PATH=~/.nvm/versions/node/v24.20.0/bin:$PATH npx vitest run` — expected: all files pass, container tests skipped.
 - `LAW_CONTAINER_TESTS=1 npx vitest run tests/container` — needs both images built.
 - `pnpm dev` — starts Electron; agentd logs are prefixed `[agentd]`.
+- Benchmark (desktop app closed): `node scripts/bench.mjs --model <id> --runs 3` runs `scripts/bench-goals/search-summary.txt` headlessly and validates the artefact; `node scripts/bench-report.mjs 6 --prices IN,OUT` prints wall/model/tool/human time, turns, cached share and cost. Clear the sandbox screen between runs (the harness does); a stale `wc` line on screen lets a model skip the work and still "answer".
