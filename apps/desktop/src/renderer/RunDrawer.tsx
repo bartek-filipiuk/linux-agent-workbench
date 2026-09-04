@@ -87,10 +87,40 @@ function Inline({ text }: { text: string }) {
   );
 }
 
+const DONE_MARKER = /PROJECT DONE/i;
+
 export function RunDrawer({ run, sandboxReady }: { run: RunView; sandboxReady: boolean }) {
   const [goal, setGoal] = useState("Run ls -al and tell me how many entries are listed.");
+  // Autopilot: keep restarting the same goal until the agent says PROJECT DONE or the run limit is hit,
+  // and hand control back on handoffs by itself. For long builds where nobody sits at the keyboard.
+  const [autopilot, setAutopilot] = useState(false);
+  const [maxRuns, setMaxRuns] = useState(20);
+  const [pilot, setPilot] = useState({ runs: 0, spent: 0, note: "" });
+  const prevState = useRef<string | undefined>(undefined);
   const logRef = useRef<HTMLOListElement>(null);
   const busy = run.state !== undefined && RUNNING.has(run.state);
+
+  useEffect(() => {
+    const was = prevState.current;
+    prevState.current = run.state;
+    if (!autopilot || run.state === was) return;
+    if (run.state === "running" && was !== "handoff" && was !== "awaiting_approval") setPilot((p) => ({ ...p, runs: p.runs + 1 }));
+    if (run.state === "handoff") {
+      const t = setTimeout(() => void window.workbench.resumeRun(), 10_000);
+      return () => clearTimeout(t);
+    }
+    if (run.state === "completed" || run.state === "budget_exceeded") {
+      const spent = pilot.spent + (run.costUsd ?? 0);
+      const done = DONE_MARKER.test(run.finalText ?? "");
+      const more = !done && pilot.runs < maxRuns;
+      setPilot((p) => ({ ...p, spent, note: done ? "project done" : more ? "restarting in 5 s" : "run limit reached" }));
+      if (!more) return;
+      const t = setTimeout(() => void window.workbench.startRun(goal), 5000);
+      return () => clearTimeout(t);
+    }
+    if (run.state === "failed" || run.state === "stopped") setPilot((p) => ({ ...p, note: `stopped: run ${run.state}` }));
+    return undefined;
+  }, [run.state, autopilot, maxRuns, goal, pilot.runs, pilot.spent, run.costUsd, run.finalText]);
   const thinking = busy && run.approvals.length === 0 && run.state !== "handoff" && !run.log.some((l) => l.kind === "tool" && l.status === "executing");
   const canRestore = run.runId !== undefined && run.snapshot && run.state !== undefined && TERMINAL.has(run.state);
 
@@ -116,6 +146,15 @@ export function RunDrawer({ run, sandboxReady }: { run: RunView; sandboxReady: b
         <button className="btn primary" disabled={!sandboxReady || busy || !goal.trim()} onClick={() => void window.workbench.startRun(goal)}>Start run</button>
         <button className="btn danger" disabled={!busy} onClick={() => void window.workbench.stopRun()} title="Shortcut: Esc while the agent has the terminal">Stop</button>
         {canRestore && <button className="btn" onClick={restore}>Restore pre-run state</button>}
+      </div>
+      <div className="row autopilot" title="Restart the same goal after each completed run until the agent's final reply contains PROJECT DONE or the run limit is hit; handoffs are given back after 10 s.">
+        <label>
+          <input type="checkbox" checked={autopilot} onChange={(e) => { setAutopilot(e.target.checked); setPilot({ runs: 0, spent: 0, note: "" }); }} /> Autopilot
+        </label>
+        <label>
+          max runs <input type="number" min={1} max={200} value={maxRuns} onChange={(e) => setMaxRuns(Math.max(1, Number(e.target.value) || 1))} disabled={!autopilot} />
+        </label>
+        {autopilot && <span className="muted">run {pilot.runs}/{maxRuns}{pilot.spent ? ` · $${pilot.spent.toFixed(2)}` : ""}{pilot.note ? ` · ${pilot.note}` : ""}</span>}
       </div>
       <div className="stats">
         <span>state <b>{label(STATE_LABEL, run.state) || "idle"}</b>{run.endReason ? ` · ${label(END_REASON_LABEL, run.endReason)}` : ""}</span>

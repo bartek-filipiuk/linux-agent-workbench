@@ -48,6 +48,9 @@ html, body, #root { height: 100%; }
 .error { color: var(--agent); text-align: left; white-space: pre-wrap; max-width: 80ch; }
 .main { gap: 12px; }
 .drawer { width: 380px; flex: none; display: flex; flex-direction: column; gap: 10px; background: var(--panel); border: 1px solid #1f242b; border-radius: 6px; padding: 12px; min-height: 0; }
+.autopilot { font-size: 12px; align-items: center; gap: 12px; flex-wrap: wrap; }
+.autopilot input[type="number"] { width: 5ch; background: var(--bg); color: var(--fg); border: 1px solid #2a3139; border-radius: 4px; padding: 2px 4px; font: inherit; }
+.autopilot .muted { color: var(--muted); }
 .drawer textarea { width: 100%; background: var(--bg); color: var(--fg); border: 1px solid #2a3139; border-radius: 4px; padding: 8px; font: inherit; resize: vertical; }
 .label { color: var(--muted); font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; }
 .row { display: flex; gap: 8px; }
