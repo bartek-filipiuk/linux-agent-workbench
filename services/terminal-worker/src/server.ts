@@ -40,6 +40,7 @@ export class WorkerServer {
   }
 
   private accept(socket: net.Socket): void {
+    console.log(`terminal-worker: client connected${this.clients ? " (replacing previous client)" : ""}`);
     this.unsubscribe?.();
     this.current?.close();
     const conn = new FramedConnection(socket);

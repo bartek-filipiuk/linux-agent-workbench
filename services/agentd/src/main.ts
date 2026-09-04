@@ -17,6 +17,13 @@ if (!parentPort) {
   process.exit(2);
 }
 
+// If Electron main dies without cleaning up (SIGKILL, crash), this utility process would linger and keep the
+// worker socket busy. Reparenting to pid 1 is the signal to leave.
+const parentPid = process.ppid;
+setInterval(() => {
+  if (process.ppid !== parentPid) process.exit(0);
+}, 2000).unref();
+
 parentPort.once("message", (e) => {
   const port = e.ports[0];
   if (!port) {

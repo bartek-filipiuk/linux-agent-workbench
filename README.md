@@ -23,3 +23,14 @@ pnpm dev                             # builds protocol + agentd, starts Electron
 - `services/agentd` — orchestrator, storage, provider adapters, policy
 - `services/terminal-worker` — PTY/tmux worker that runs inside the container (Milestone 2)
 - `apps/desktop` — Electron main/preload/renderer
+
+### Sandbox image
+
+```bash
+pnpm images:build        # builds localhost/law-terminal and pins its id in images/terminal/image.json
+pnpm test:container      # Podman-backed tests (needs the image)
+```
+
+The app starts one container per workspace (`law-terminal-<id>`), keeps it running when the window closes, and reconnects to the same tmux session on the next start. "Destroy sandbox" removes it.
+
+Host notes (Ubuntu 22.04, Podman 3.4 rootless): the build tolerates tar's directory chmod failure on rootless overlay, and no CPU quota is applied because the user's cgroup delegates only `memory` and `pids`.

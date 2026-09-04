@@ -120,6 +120,7 @@ export class TerminalSessionManager extends EventEmitter {
   }
 
   private setStatus(s: SessionStatus): SessionStatus {
+    console.error(`[agentd] session ${s.state}${s.message ? `: ${s.message}` : ""}`);
     this._status = s;
     this.emit("status", s);
     return s;
