@@ -17,6 +17,7 @@ let win: BrowserWindow | null = null;
 let port: MessagePortMain | null = null;
 let settings: Settings = { networkMode: "open" };
 let lease: { owner: "agent" | "human"; reason?: string } = { owner: "human" };
+let browser: { state: string; url?: string; title?: string; message?: string } = { state: "idle" };
 
 const repoRoot = () => path.resolve(__dirname, "..", "..", "..", "..");
 const settingsFile = () => path.join(app.getPath("userData"), "settings.json");
@@ -78,6 +79,15 @@ function onAgentd(msg: AgentdToMain) {
     case "lease.state":
       lease = { owner: msg.owner, ...(msg.reason ? { reason: msg.reason } : {}) };
       send("lease:state", lease);
+      return;
+    case "browser.state": {
+      const { type: _t, ...rest } = msg;
+      browser = rest;
+      send("browser:state", browser);
+      return;
+    }
+    case "browser.frame":
+      send("browser:frame", { width: msg.width, height: msg.height, data: msg.data });
       return;
   }
 }
@@ -150,6 +160,15 @@ ipcMain.handle("run:resume", () => toAgentd({ type: "run.resume" }));
 ipcMain.handle("lease:take", (_e, owner: unknown) => toAgentd({ type: "lease.take", owner: owner === "agent" ? "agent" : "human" }));
 ipcMain.handle("approval:decide", (_e, id: unknown, decision: unknown) => {
   if (typeof id === "string" && (decision === "once" || decision === "session" || decision === "deny")) toAgentd({ type: "approval.decide", id, decision });
+});
+ipcMain.handle("browser:get", () => browser);
+ipcMain.handle("browser:start", () => toAgentd({ type: "browser.start" }));
+ipcMain.handle("browser:stop", () => toAgentd({ type: "browser.stop" }));
+ipcMain.handle("browser:navigate", (_e, url: unknown) => {
+  if (typeof url === "string" && url.trim()) toAgentd({ type: "browser.navigate", url: url.trim().slice(0, 4096) });
+});
+ipcMain.on("browser:input", (_e, event: unknown) => {
+  if (event && typeof event === "object") toAgentd({ type: "browser.input", event: event as never });
 });
 ipcMain.handle("run:restore", (_e, runId: unknown) => {
   if (typeof runId === "string" && runId) toAgentd({ type: "run.restore", runId });

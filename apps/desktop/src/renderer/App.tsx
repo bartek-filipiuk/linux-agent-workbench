@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { TerminalPanel } from "./TerminalPanel";
+import { BrowserPanel, type BrowserStatus } from "./BrowserPanel";
 import { RunDrawer, emptyRun, reduceRun, type RunEvent, type RunView } from "./RunDrawer";
 import { STATE_LABEL, label } from "./labels";
 
@@ -30,6 +31,13 @@ declare global {
       releaseControl(): Promise<void>;
       decideApproval(id: string, decision: "once" | "session" | "deny"): Promise<void>;
       restoreRun(runId: string): Promise<void>;
+      getBrowser(): Promise<BrowserStatus>;
+      startBrowser(): Promise<void>;
+      stopBrowser(): Promise<void>;
+      navigate(url: string): Promise<void>;
+      browserInput(event: unknown): void;
+      onBrowserState(cb: (s: BrowserStatus) => void): () => void;
+      onBrowserFrame(cb: (f: { width: number; height: number; data: Uint8Array }) => void): () => void;
       onEvent(cb: (e: AgentdStatus) => void): () => void;
       onSession(cb: (s: SessionStatus) => void): () => void;
       onTerminalData(cb: (data: Uint8Array) => void): () => void;
@@ -46,13 +54,17 @@ export function App() {
   const [lease, setLease] = useState<LeaseState>({ owner: "human" });
   const [run, setRun] = useState<RunView>(emptyRun);
   const [handoff, setHandoff] = useState<string | null>(null);
+  const [browser, setBrowser] = useState<BrowserStatus>({ state: "idle" });
+  const [view, setView] = useState<"terminal" | "browser" | "both">("terminal");
 
   useEffect(() => {
     void window.workbench.getStatus().then(setStatus);
     void window.workbench.getSession().then(setSession);
     void window.workbench.getNetwork().then(setNetwork);
     void window.workbench.getLease().then(setLease);
+    void window.workbench.getBrowser().then(setBrowser);
     const offs = [
+      window.workbench.onBrowserState(setBrowser),
       window.workbench.onEvent(setStatus),
       window.workbench.onSession(setSession),
       window.workbench.onLease(setLease),
@@ -102,6 +114,13 @@ export function App() {
             <option value="none">none</option>
           </select>
         </span>
+        <span className="view-switch" role="tablist" aria-label="Panels">
+          {(["terminal", "browser", "both"] as const).map((v) => (
+            <button key={v} role="tab" aria-selected={view === v} className={`btn ${view === v ? "active" : ""}`} onClick={() => setView(v)}>
+              {v === "terminal" ? "Terminal" : v === "browser" ? "Browser" : "Both"}
+            </button>
+          ))}
+        </span>
         <span className="spacer" />
         <span className="status">
           <span className={`dot ${dot}`} />
@@ -120,7 +139,8 @@ export function App() {
         </div>
       )}
       <main className="main">
-        {live ? (
+        {view !== "terminal" && <BrowserPanel status={browser} />}
+        {view === "browser" ? null : live ? (
           <TerminalPanel owner={agentOwns ? "agent" : "human"} />
         ) : (
           <div className="empty">
