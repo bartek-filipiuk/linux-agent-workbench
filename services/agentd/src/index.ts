@@ -14,3 +14,5 @@ export type { PriceTable, BudgetLimit } from "./orchestrator/budgets.js";
 export { SYSTEM_PROMPT } from "./orchestrator/system-prompt.js";
 export { allowAllPolicy } from "./policy/types.js";
 export type { Policy, PolicyDecision, PolicyContext } from "./policy/types.js";
+export { PodmanRuntime, buildRunArgs, sessionIdFor, validateWorkspacePath, containerName } from "./runtime/podman.js";
+export type { RunSpec, Exec } from "./runtime/podman.js";
