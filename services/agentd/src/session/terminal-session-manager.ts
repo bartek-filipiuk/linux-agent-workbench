@@ -62,7 +62,7 @@ export class TerminalSessionManager extends EventEmitter {
       fs.mkdirSync(runtimeDir, { recursive: true, mode: 0o700 });
       fs.chmodSync(runtimeDir, 0o700);
       const gitconfigPath = path.join(os.homedir(), ".gitconfig");
-      await this.deps.runtime.ensureRunning({
+      const started = await this.deps.runtime.ensureRunning({
         sessionId,
         workspacePath: real,
         runtimeDir,
@@ -70,6 +70,8 @@ export class TerminalSessionManager extends EventEmitter {
         networkMode,
         ...(fs.existsSync(gitconfigPath) ? { gitconfigPath } : {}),
       });
+      const outdated = started === "outdated";
+      if (outdated) console.error("[agentd] sandbox container runs an older image; destroy the sandbox to upgrade it");
       const worker = await this.waitForWorker(path.join(runtimeDir, "worker.sock"), sessionId);
       this._worker = worker;
       this.unsubscribe.push(worker.onPtyData((b) => this.emit("data", b)));
@@ -81,7 +83,7 @@ export class TerminalSessionManager extends EventEmitter {
           }
         }),
       );
-      return this.setStatus({ state: "ready", ...base });
+      return this.setStatus({ state: "ready", ...base, ...(outdated ? { message: "sandbox runs an older image; Destroy sandbox and reopen to upgrade" } : {}) });
     } catch (e) {
       return this.setStatus({ state: "error", ...base, message: e instanceof Error ? e.message : String(e) });
     }

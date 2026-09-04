@@ -62,12 +62,13 @@ describe("buildRunArgs", () => {
 });
 
 describe("PodmanRuntime", () => {
-  function fakeExec(states: Record<string, string>, calls: string[][]) {
+  function fakeExec(states: Record<string, string>, calls: string[][], images: Record<string, string> = {}) {
     return async (args: string[]) => {
       calls.push(args);
       if (args[0] === "inspect") {
         const name = args.at(-1)!;
         if (!(name in states)) throw new Error("no such container");
+        if (args.includes("{{.Image}}")) return { stdout: (images[name] ?? "sha256:deadbeef") + "\n", stderr: "" };
         return { stdout: states[name]! + "\n", stderr: "" };
       }
       if (args[0] === "run") return { stdout: "cid\n", stderr: "" };
@@ -91,6 +92,16 @@ describe("PodmanRuntime", () => {
     const rt = new PodmanRuntime(fakeExec({ "law-terminal-0123456789abcdef": "exited" }, calls));
     expect(await rt.ensureRunning(spec)).toBe("started");
     expect(calls.map((c) => c[0])).toEqual(["inspect", "rm", "run"]);
+  });
+
+  it("recreates or reports a running container built from another image", async () => {
+    const calls: string[][] = [];
+    const rt = new PodmanRuntime(fakeExec({ "law-terminal-0123456789abcdef": "running" }, calls, { "law-terminal-0123456789abcdef": "sha256:old" }));
+    expect(await rt.ensureRunning(spec)).toBe("outdated");
+    expect(calls.some((c) => c[0] === "run")).toBe(false);
+    const rt2 = new PodmanRuntime(fakeExec({ "law-terminal-0123456789abcdef": "running" }, calls, { "law-terminal-0123456789abcdef": "sha256:old" }));
+    expect(await rt2.ensureRunningWith("law-terminal-0123456789abcdef", ["run"], { imageId: "sha256:deadbeef", recreateOnImageMismatch: true })).toBe("started");
+    expect(calls.slice(-2).map((c) => c[0])).toEqual(["rm", "run"]);
   });
 
   it("starts when missing and destroys idempotently", async () => {

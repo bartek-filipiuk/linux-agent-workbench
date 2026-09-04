@@ -74,9 +74,11 @@ export function podmanLauncher(opts: {
   return async ({ socketDir }) => {
     fs.mkdirSync(opts.downloadsDir, { recursive: true, mode: 0o700 });
     const name = browserContainerName(opts.sessionId);
+    // The browser container holds no state outside its profile volume: an outdated image is simply replaced.
     const result = await opts.runtime.ensureRunningWith(
       name,
       buildBrowserRunArgs({ sessionId: opts.sessionId, runtimeDir: socketDir, downloadsDir: opts.downloadsDir, imageId: opts.imageId, networkMode: opts.networkMode }),
+      { imageId: opts.imageId, recreateOnImageMismatch: true },
     );
     console.error(`[agentd] browser container ${name}: ${result}`);
     let running = true;

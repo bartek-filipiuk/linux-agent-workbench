@@ -152,8 +152,8 @@ export class PodmanRuntime {
     }
   }
 
-  async ensureRunning(spec: RunSpec): Promise<"reused" | "started"> {
-    return this.ensureRunningWith(containerName(spec.sessionId), buildRunArgs(spec));
+  async ensureRunning(spec: RunSpec): Promise<"reused" | "started" | "outdated"> {
+    return this.ensureRunningWith(containerName(spec.sessionId), buildRunArgs(spec), { imageId: spec.imageId });
   }
 
   async stateOf(name: string): Promise<"running" | "stopped" | "missing"> {
@@ -165,10 +165,32 @@ export class PodmanRuntime {
     }
   }
 
-  async ensureRunningWith(name: string, args: string[]): Promise<"reused" | "started"> {
+  /** Image id (sha256:…) the container was created from, or undefined when it does not exist. */
+  async imageOf(name: string): Promise<string | undefined> {
+    try {
+      const { stdout } = await this.exec(["inspect", "--type", "container", "--format", "{{.Image}}", name]);
+      return stdout.trim() || undefined;
+    } catch {
+      return undefined;
+    }
+  }
+
+  /**
+   * Start the container unless one with that name is already running. With `imageId`, a running container
+   * built from another image is recreated when `recreateOnImageMismatch` is set, otherwise reported as "outdated".
+   */
+  async ensureRunningWith(name: string, args: string[], opts: { imageId?: string; recreateOnImageMismatch?: boolean } = {}): Promise<"reused" | "started" | "outdated"> {
     const state = await this.stateOf(name);
-    if (state === "running") return "reused";
-    if (state === "stopped") await this.exec(["rm", "-f", "--ignore", name]);
+    if (state === "running") {
+      if (!opts.imageId) return "reused";
+      const current = await this.imageOf(name);
+      const same = current !== undefined && (current === opts.imageId || current.replace(/^sha256:/, "") === opts.imageId.replace(/^sha256:/, ""));
+      if (same) return "reused";
+      if (!opts.recreateOnImageMismatch) return "outdated";
+      await this.exec(["rm", "-f", "--ignore", name]);
+    } else if (state === "stopped") {
+      await this.exec(["rm", "-f", "--ignore", name]);
+    }
     await this.exec(args);
     return "started";
   }
