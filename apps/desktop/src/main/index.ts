@@ -1,14 +1,15 @@
-import { app, BrowserWindow, dialog, ipcMain, MessageChannelMain, utilityProcess, type MessagePortMain } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, MessageChannelMain, safeStorage, utilityProcess, type MessagePortMain } from "electron";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import type { AgentdToMain, MainToAgentd, SessionStatus } from "@law/agentd";
 import { parseEnvFile } from "./env-file";
+import { resolveApiKey, stripEnvKey, type KeyStore } from "./key-store";
 import { readSettings, writeSettings, type Settings } from "./settings";
 
 type AgentdStatus =
   | { type: "agentd.starting" }
-  | { type: "agentd.ready"; schemaVersion: number; dbPath: string; model: string; interruptedRuns: number }
+  | { type: "agentd.ready"; schemaVersion: number; dbPath: string; model: string; interruptedRuns: number; keyStore: KeyStore; keyBackend: string }
   | { type: "agentd.error"; message: string };
 
 let status: AgentdStatus = { type: "agentd.starting" };
@@ -19,15 +20,37 @@ let settings: Settings = { networkMode: "open" };
 type LeaseState = { surface: "terminal" | "browser"; owner: "agent" | "human"; reason?: string };
 let leases: Record<"terminal" | "browser", LeaseState> = { terminal: { surface: "terminal", owner: "human" }, browser: { surface: "browser", owner: "human" } };
 let browser: { state: string; url?: string; title?: string; message?: string } = { state: "idle" };
+let keyInfo: { keyStore: KeyStore; keyBackend: string } = { keyStore: "none", keyBackend: "unknown" };
 
 const repoRoot = () => path.resolve(__dirname, "..", "..", "..", "..");
 const settingsFile = () => path.join(app.getPath("userData"), "settings.json");
 
-function loadEnv(): Record<string, string> {
+function loadEnv(): { env: Record<string, string>; file?: string } {
   for (const p of [path.join(app.getPath("userData"), ".env"), path.join(repoRoot(), ".env")]) {
-    if (fs.existsSync(p)) return parseEnvFile(fs.readFileSync(p, "utf8"));
+    if (fs.existsSync(p)) return { env: parseEnvFile(fs.readFileSync(p, "utf8")), file: p };
   }
-  return {};
+  return { env: {} };
+}
+
+/** The key from the OS keyring when it truly encrypts, else from .env; a .env key is moved into the keyring once. */
+function loadApiKey(env: Record<string, string>, envFile: string | undefined): string {
+  const available = safeStorage.isEncryptionAvailable();
+  const backend = process.platform === "linux" && available ? safeStorage.getSelectedStorageBackend() : available ? process.platform : "unknown";
+  const r = resolveApiKey({
+    encryptedKey: settings.openaiKeyEncrypted,
+    envKey: env.OPENAI_API_KEY,
+    keys: { backend, available, encrypt: (p) => safeStorage.encryptString(p), decrypt: (b) => safeStorage.decryptString(b) },
+  });
+  keyInfo = { keyStore: r.keyStore, keyBackend: r.backend };
+  if (r.keyStore === "keyring" && !r.encryptedKey) console.error(`[main] OPENAI_API_KEY loaded from the OS keyring (${backend})`);
+  if (r.keyStore === "env") console.error(`[main] OPENAI_API_KEY stays in ${envFile ?? ".env"}: safeStorage backend is ${backend}`);
+  if (r.encryptedKey && envFile) {
+    settings = { ...settings, openaiKeyEncrypted: r.encryptedKey };
+    writeSettings(settingsFile(), settings);
+    fs.writeFileSync(envFile, stripEnvKey(fs.readFileSync(envFile, "utf8"), new Date().toISOString().slice(0, 10)), { mode: 0o600 });
+    console.error(`[main] OPENAI_API_KEY moved from ${envFile} to the OS keyring (${backend})`);
+  }
+  return r.apiKey;
 }
 
 function xdg(name: "XDG_DATA_HOME" | "XDG_RUNTIME_DIR", fallback: string): string {
@@ -52,7 +75,7 @@ function onAgentd(msg: AgentdToMain) {
   switch (msg.type) {
     case "agentd.ready":
     case "agentd.error":
-      status = msg;
+      status = msg.type === "agentd.ready" ? { ...msg, ...keyInfo } : msg;
       send("agentd:event", status);
       if (msg.type === "agentd.ready" && settings.lastWorkspace) {
         toAgentd({ type: "session.start", workspacePath: settings.lastWorkspace, networkMode: settings.networkMode });
@@ -96,11 +119,11 @@ function onAgentd(msg: AgentdToMain) {
 }
 
 function startAgentd() {
-  const env = loadEnv();
-  const apiKey = env.OPENAI_API_KEY ?? "";
+  const { env, file: envFile } = loadEnv();
+  const apiKey = loadApiKey(env, envFile);
   const model = env.OPENAI_MODEL ?? "gpt-5.6-sol";
   const imageId = readImageId();
-  if (!apiKey) return onAgentd({ type: "agentd.error", message: "OPENAI_API_KEY missing in .env" });
+  if (!apiKey) return onAgentd({ type: "agentd.error", message: "OPENAI_API_KEY missing: put it in .env once; it is moved to the OS keyring on the next start" });
   if (!imageId) return onAgentd({ type: "agentd.error", message: "images/terminal/image.json missing; run pnpm images:build" });
   const entry = path.join(repoRoot(), "services", "agentd", "dist", "main.js");
   const child = utilityProcess.fork(entry, [], { serviceName: "agentd", stdio: "inherit" });

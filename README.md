@@ -17,6 +17,8 @@ pnpm dev                             # builds protocol + agentd, starts Electron
 
 `.env` keys: `OPENAI_API_KEY`, `OPENAI_MODEL` (default `gpt-5.6-sol`), optional `OPENAI_PRICE_INPUT_PER_MTOK` and `OPENAI_PRICE_OUTPUT_PER_MTOK` (USD per million tokens; without them the run cost shows `n/a`). The app reads `~/.config/@law/desktop/.env` first, then the repo root; keep the key outside any directory you open as a workspace.
 
+On the first start with a real keyring (GNOME Keyring, KWallet), the app moves `OPENAI_API_KEY` from `.env` into the OS keyring through Electron's `safeStorage` (stored encrypted in `settings.json`) and replaces the `.env` line with a note. If the only backend is `basic_text` the key stays in `.env`, nothing is written, and the top bar shows `key in plain .env`.
+
 ## Layout
 
 - `packages/protocol` — framing, Zod schemas, error codes

@@ -6,7 +6,7 @@ import { STATE_LABEL, label } from "./labels";
 
 type AgentdStatus =
   | { type: "agentd.starting" }
-  | { type: "agentd.ready"; schemaVersion: number; dbPath: string; model: string; interruptedRuns: number }
+  | { type: "agentd.ready"; schemaVersion: number; dbPath: string; model: string; interruptedRuns: number; keyStore?: "keyring" | "env" | "none"; keyBackend?: string }
   | { type: "agentd.error"; message: string };
 type SessionStatus = { state: "idle" | "starting" | "ready" | "disconnected" | "stopped" | "error"; sessionId?: string; workspacePath?: string; networkMode?: "open" | "none"; message?: string };
 type LeaseState = { surface: "terminal" | "browser"; owner: "agent" | "human"; reason?: string };
@@ -129,6 +129,9 @@ export function App() {
           <span className={`dot ${dot}`} />
           {status.type === "agentd.starting" && "agentd starting"}
           {status.type === "agentd.ready" && `${status.model} · sandbox ${session.state} · run ${label(STATE_LABEL, run.state) || "idle"}`}
+          {status.type === "agentd.ready" && status.keyStore === "env" && (
+            <span className="warn" title={`safeStorage backend: ${status.keyBackend ?? "unknown"}. Install gnome-keyring or kwallet so the key can be encrypted.`}> · key in plain .env</span>
+          )}
           {status.type === "agentd.error" && `agentd error: ${status.message}`}
         </span>
         <button className="btn danger" disabled={!session.sessionId} onClick={destroy}>Destroy sandbox</button>

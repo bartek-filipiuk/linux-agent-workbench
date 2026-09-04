@@ -15,6 +15,7 @@ body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.5 var(--
 .topbar .brand { font-weight: 700; letter-spacing: 0.04em; white-space: nowrap; }
 .topbar .btn, .topbar .status { white-space: nowrap; }
 .status { display: inline-flex; align-items: center; gap: 8px; }
+.status .warn { color: var(--warn, #e0a94b); }
 .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
 .dot.ready { background: #22c55e; }
 .dot.error { background: var(--agent); }
