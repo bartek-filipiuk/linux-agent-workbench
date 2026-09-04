@@ -51,3 +51,9 @@ Ceiling: the gate covers the interactive shell only. `bash -c`, scripts, other s
 ### SSH and git identity in the sandbox
 
 The container mounts the named volume `law-ssh` at `/home/agent/.ssh` and, if present, the host `~/.gitconfig` read-only. Put a **dedicated deploy key** and a pinned `known_hosts` into the volume (`podman unshare` + the path from `podman volume inspect law-ssh`), never the host `~/.ssh`. `ssh`/`scp`/`rsync` are `approval` commands: prefer "Allow once", because the gate sees the connection, not what runs on the remote side.
+
+### Network
+
+Neither container has a network namespace of its own (`--network none`). The only way out is an HTTP proxy that agentd serves on a Unix socket in the session's runtime dir; a small forwarder inside each container exposes it as `127.0.0.1:3128`, and `HTTP_PROXY`/`HTTPS_PROXY` point there. The proxy resolves every hostname on the host, refuses private, loopback and link-local addresses (by name and by resolved address) with `403`, and records each decision in the `egress_log` table. With the network mode `none` agentd serves no socket, so proxy-aware tools fail immediately.
+
+What works: curl, git, apt, pip, npm/pnpm, Claude Code, Codex, Chromium (launched with `--proxy-server`), and ssh through the `ProxyCommand` shipped in `/etc/ssh/ssh_config.d/law-egress.conf`. What does not: anything that ignores proxy variables, ping, UDP, and tools that resolve names themselves before connecting.

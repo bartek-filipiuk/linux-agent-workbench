@@ -19,12 +19,14 @@ export type EgressProxyOptions = {
   connect?: (address: string, port: number) => net.Socket;
   maxUpstreams?: number;
   upstreamIdleMs?: number;
+  connectTimeoutMs?: number;
 };
 
 const HEADER_CAP = 16 * 1024;
 const REQUEST_LINE = /^([A-Z]+) (\S+) HTTP\/1\.[01]\r?\n/;
 
-const defaultLookup: Lookup = async (host) => (await dns.promises.lookup(host, { all: true })).map((a) => a.address);
+// IPv4 first: many hosts publish AAAA records while the machine has no IPv6 route, and a connect to such an address hangs.
+const defaultLookup: Lookup = async (host) => (await dns.promises.lookup(host, { all: true, order: "ipv4first" })).map((a) => a.address);
 
 function respond(socket: net.Socket, status: number, text: string): void {
   const body = `${text}\n`;
@@ -120,16 +122,20 @@ export class EgressProxy {
     this.upstreams++;
     const upstream = (this.opts.connect ?? ((a, p) => net.connect({ host: a, port: p })))(addresses[0]!, port);
     upstream.setTimeout(this.opts.upstreamIdleMs ?? 5 * 60_000, () => upstream.destroy());
+    const connectTimer = setTimeout(() => upstream.destroy(new Error("connect timeout")), this.opts.connectTimeoutMs ?? 10_000);
+    let connected = false;
     const finish = () => {
+      clearTimeout(connectTimer);
       this.upstreams--;
-      client.destroy();
+      if (!connected && !client.destroyed) respond(client, 502, "Bad Gateway");
+      else client.destroy();
     };
     upstream.once("close", finish);
-    upstream.on("error", () => {
-      if (!client.destroyed && client.writable && !client.bytesWritten) respond(client, 502, "Bad Gateway");
-    });
+    upstream.on("error", () => undefined); // reported through "close" above
     client.on("close", () => upstream.destroy());
     upstream.on("connect", () => {
+      connected = true;
+      clearTimeout(connectTimer);
       if (method === "CONNECT") {
         client.write("HTTP/1.1 200 Connection established\r\n\r\n");
         if (rest.length) upstream.write(rest);

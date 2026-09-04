@@ -110,6 +110,26 @@ describe("EgressProxy", { timeout: 15_000 }, () => {
     expect(got).toMatch(/path=\/hello\?x=1 host=public\.test:\d+$/);
   });
 
+  it("answers 502 when the upstream never connects", async () => {
+    const sock2 = path.join(dir, "egress2.sock");
+    const p2 = new EgressProxy({
+      decide: () => ({ allow: true }),
+      log: () => undefined,
+      lookup,
+      connect: () => new net.Socket(), // never connects
+      connectTimeoutMs: 200,
+    });
+    await p2.listen(sock2);
+    const got = await new Promise<string>((resolve) => {
+      const c = net.connect(sock2, () => c.write("CONNECT public.test:443 HTTP/1.1\r\n\r\n"));
+      let s = "";
+      c.on("data", (d) => (s += d.toString()));
+      c.on("close", () => resolve(s));
+    });
+    expect(got).toMatch(/^HTTP\/1\.1 502 Bad Gateway/);
+    await p2.close();
+  });
+
   it("answers 400 to junk and 431 to oversized headers", async () => {
     expect(await request("HELLO\r\n\r\n")).toMatch(/^HTTP\/1\.1 400/);
     expect(await request(`GET http://public.test/ HTTP/1.1\r\nX: ${"a".repeat(20_000)}`)).toMatch(/^HTTP\/1\.1 431/);

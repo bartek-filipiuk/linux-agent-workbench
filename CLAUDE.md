@@ -6,7 +6,7 @@
 
 ### Architektura
 - `packages/protocol` — Zod schemas + framed Unix-socket protocol (u32 len, u8 kind: 0 JSON, 1 PTY out, 2 keys, 3 browser JPEG frame). `FramedConnection` in `src/node/connection.ts`.
-- `services/agentd` — the daemon (Electron utilityProcess). `ipc.ts` (`Daemon`) routes main-process messages; `orchestrator/run-controller.ts` runs the model loop; `policy/*` decides what a tool call may do; `session/*` owns the podman containers; `storage/store.ts` is SQLite (node:sqlite, WAL).
+- `services/agentd` — the daemon (Electron utilityProcess). `ipc.ts` (`Daemon`) routes main-process messages; `orchestrator/run-controller.ts` runs the model loop; `policy/*` decides what a tool call may do; `session/*` owns the podman containers; `egress/*` is the HTTP proxy the containers use for all network traffic; `storage/store.ts` is SQLite (node:sqlite, WAL).
 - `services/terminal-worker` — node-pty + tmux inside `law-terminal-<session>`; bash gate (`images/terminal/gate.cjs` → `gate.sock` → agentd `gate.check`).
 - `services/browser-worker` — Playwright Chromium inside `law-browser-<session>`; screencast frames, DOM-walk observation, ref-based actions.
 - `apps/desktop` — Electron 44 + React 19 + xterm.js; `main/index.ts` spawns agentd and forwards IPC, `renderer/*` is the UI.
@@ -18,6 +18,7 @@
 - Handoff: a policy returns `LEASE_DENIED` with `handoff`, or the model calls `request_human` → run state `handoff`, both leases go to the human, no observations reach the model until "Give control back".
 - Browser observe: `BrowserSession.walkFrames` (main frame, then every iframe, refs `e<n>` bound to `revision`) → `observationHints` (login_form, captcha, two_factor) appended by `browserExecutor`.
 - Shell gate: bash DEBUG trap → `gate.cjs` → worker → agentd `classify` (auto/log/approval/deny) → `ApprovalManager`.
+- Egress: tool → `127.0.0.1:3128` (forwarder in the worker) → `/run/law/egress.sock` → `EgressProxy` in agentd (`SessionEgress` per session) → host DNS + private-range check → upstream; decisions in `egress_log`.
 
 ### Konwencje
 - Tests next to the package in `test/*.test.ts` (vitest 4); fixtures in `fixtures/`; container tests in `tests/container/` run only with `LAW_CONTAINER_TESTS=1`.
@@ -32,6 +33,7 @@
 - A killed browser container leaves `SingletonLock` in the profile volume; the worker removes it on start.
 - Headless shell gets 403 from x.com and friends: the container runs full Chromium (`LAW_BROWSER_CHANNEL=chromium`) with a stock UA.
 - reCAPTCHA and similar widgets live in cross-origin iframes; observation walks frames, bounds are page coordinates.
+- Containers run with `--network none`; a tool that ignores `HTTPS_PROXY` has no network at all. ssh works only through the shipped `ProxyCommand`.
 - Never type into the user's live Claude Code session in the sandbox terminal.
 
 ### Jak dodać feature
