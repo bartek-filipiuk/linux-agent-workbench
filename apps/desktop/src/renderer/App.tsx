@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { TerminalPanel } from "./TerminalPanel";
 import { RunDrawer, emptyRun, reduceRun, type RunEvent, type RunView } from "./RunDrawer";
+import { STATE_LABEL, label } from "./labels";
 
 type AgentdStatus =
   | { type: "agentd.starting" }
@@ -68,6 +69,25 @@ export function App() {
   const live = session.state === "ready";
   const agentOwns = lease.owner === "agent";
   const runActive = run.state !== undefined && ["running", "awaiting_approval"].includes(run.state);
+  const approvalsPending = run.approvals.length > 0;
+
+  // Esc stops the run while the agent has the terminal; when you hold the keyboard, Esc belongs to the shell.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && runActive && agentOwns) {
+        e.preventDefault();
+        void window.workbench.stopRun();
+      }
+    };
+    window.addEventListener("keydown", onKey, true);
+    return () => window.removeEventListener("keydown", onKey, true);
+  }, [runActive, agentOwns]);
+
+  const destroy = () => {
+    if (window.confirm("Remove the sandbox container? The tmux session and anything outside /workspace inside it are lost. Files in the workspace stay.")) {
+      void window.workbench.destroySandbox();
+    }
+  };
 
   return (
     <div className="shell">
@@ -86,17 +106,17 @@ export function App() {
         <span className="status">
           <span className={`dot ${dot}`} />
           {status.type === "agentd.starting" && "agentd starting"}
-          {status.type === "agentd.ready" && `${status.model} · sandbox ${session.state} · run ${run.state ?? "idle"}`}
+          {status.type === "agentd.ready" && `${status.model} · sandbox ${session.state} · run ${label(STATE_LABEL, run.state) || "idle"}`}
           {status.type === "agentd.error" && `agentd error: ${status.message}`}
         </span>
-        <button className="btn danger" disabled={!session.sessionId} onClick={() => void window.workbench.destroySandbox()}>Destroy sandbox</button>
+        <button className="btn danger" disabled={!session.sessionId} onClick={destroy}>Destroy sandbox</button>
       </header>
       {handoff && (
         <div className="banner">
           <span>
-            Agent paused and needs you: <b>{handoff}</b>. You have the keyboard.
+            {approvalsPending ? "The agent is waiting for your decision on the right." : <>Agent paused and needs you: <b>{handoff}</b>. You have the keyboard.</>}
           </span>
-          <button className="btn primary" onClick={() => void window.workbench.resumeRun()}>Give control back to agent</button>
+          {!approvalsPending && <button className="btn primary" onClick={() => void window.workbench.resumeRun()}>Give control back to agent</button>}
         </div>
       )}
       <main className="main">

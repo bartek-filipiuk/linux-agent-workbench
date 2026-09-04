@@ -131,13 +131,15 @@ export class RunController extends EventEmitter {
     const { store } = this.deps;
     const decision = await this.policy.authorize(call, { runId: this.runId, networkMode: this.input.networkMode });
     const rowId = store.beginToolCall(this.runId, call);
-    this.emit("tool", { name: call.name, status: "executing", callId: call.callId });
+    const preview = previewOf(call);
+    const tool = (status: "executing" | "done" | "denied" | "error") => this.emit("tool", { name: call.name, status, callId: call.callId, preview });
+    tool("executing");
 
     if (!decision.allow) {
       const error = { code: decision.code, message: decision.reason };
       store.finishToolCall(rowId, "denied", { error }, decision.code);
       store.appendEvent(this.runId, "tool.denied", { name: call.name, ...error });
-      this.emit("tool", { name: call.name, status: "denied", callId: call.callId });
+      tool("denied");
       if (decision.handoff) {
         const observation = await this.handoff(decision.handoff, worker);
         return { callId: call.callId, output: JSON.stringify({ resumed: true, observation, note: decision.reason }) };
@@ -149,13 +151,13 @@ export class RunController extends EventEmitter {
       const output = await executeTerminalTool(call, worker, signal);
       store.finishToolCall(rowId, "done", JSON.parse(output));
       store.appendEvent(this.runId, "tool.done", { name: call.name, bytes: output.length });
-      this.emit("tool", { name: call.name, status: "done", callId: call.callId });
+      tool("done");
       return { callId: call.callId, output };
     } catch (e) {
       if (e instanceof HandoffRequested) {
         store.finishToolCall(rowId, "done", { handoff: e.reason });
         const observation = await this.handoff(e.reason, worker);
-        this.emit("tool", { name: call.name, status: "done", callId: call.callId });
+        tool("done");
         return { callId: call.callId, output: JSON.stringify({ resumed: true, observation }) };
       }
       const error = ProtocolError.is(e)
@@ -163,7 +165,7 @@ export class RunController extends EventEmitter {
         : { code: "INVALID_INPUT" as const, message: e instanceof Error ? e.message : String(e) };
       store.finishToolCall(rowId, "error", { error }, error.code);
       store.appendEvent(this.runId, "tool.error", { name: call.name, ...error });
-      this.emit("tool", { name: call.name, status: "error", callId: call.callId });
+      tool("error");
       if (signal.aborted) throw e;
       return { callId: call.callId, output: JSON.stringify({ error }) };
     }
@@ -196,5 +198,21 @@ export class RunController extends EventEmitter {
   private finish(state: RunState, endReason: string, finalText?: string): RunOutcome {
     this.setState(state, endReason);
     return { runId: this.runId, state, endReason, ...(finalText !== undefined ? { finalText } : {}) };
+  }
+}
+
+// A short, human-readable summary of what a tool call does, for the UI log.
+function previewOf(call: ToolCall): string {
+  const a = (call.args ?? {}) as Record<string, unknown>;
+  const clip = (v: unknown, n = 60) => String(v).replace(/\s+/g, " ").slice(0, n);
+  switch (call.name) {
+    case "terminal_input":
+      return a.kind === "key" ? `key ${String(a.key)}` : clip(a.text);
+    case "terminal_wait":
+      return a.until ? `until /${clip(a.until, 40)}/` : `idle ${String(a.idleMs ?? 1500)}ms`;
+    case "request_human":
+      return clip(a.reason);
+    default:
+      return "";
   }
 }

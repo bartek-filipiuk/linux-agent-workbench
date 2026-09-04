@@ -109,6 +109,7 @@ function createWindow() {
     width: 1400,
     height: 900,
     backgroundColor: "#0b0d10",
+    autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, "../preload/index.js"),
       contextIsolation: true,

@@ -52,7 +52,7 @@ export type SessionStateMsg = { type: "session.state" } & SessionStatus;
 export type TerminalData = { type: "terminal.data"; data: Uint8Array };
 export type RunStateMsg = { type: "run.state"; runId: string; state: RunState; endReason?: string; finalText?: string; turns: number; toolCalls: number; costUsd: number | null; snapshot: boolean };
 export type RunCommentary = { type: "run.commentary"; runId: string; text: string };
-export type RunTool = { type: "run.tool"; runId: string; name: string; status: "executing" | "done" | "denied" | "error"; callId: string; turns: number; toolCalls: number; costUsd: number | null };
+export type RunTool = { type: "run.tool"; runId: string; name: string; status: "executing" | "done" | "denied" | "error"; callId: string; preview: string; turns: number; toolCalls: number; costUsd: number | null };
 export type RunHandoff = { type: "run.handoff"; runId: string; reason: string };
 export type LeaseStateMsg = { type: "lease.state"; owner: LeaseOwner; reason?: string };
 export type ApprovalRequestMsg = { type: "approval.request" } & ApprovalRequest;
@@ -231,7 +231,7 @@ export class Daemon {
       if (!TERMINAL.has(state)) postState(state);
     });
     rc.on("commentary", (text: string) => this.deps.post({ type: "run.commentary", runId: rc.runId, text }));
-    rc.on("tool", (t: { name: string; status: RunTool["status"]; callId: string }) => this.deps.post({ type: "run.tool", runId: rc.runId, ...t, ...rc.stats }));
+    rc.on("tool", (t: { name: string; status: RunTool["status"]; callId: string; preview: string }) => this.deps.post({ type: "run.tool", runId: rc.runId, ...t, ...rc.stats }));
     rc.on("handoff", (h: { reason: string }) => this.deps.post({ type: "run.handoff", runId: rc.runId, reason: h.reason }));
     this.lease.take("agent", "run started");
     void rc.start().then((out) =>

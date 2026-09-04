@@ -1,17 +1,18 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ApprovalCard, type ApprovalView } from "./ApprovalCard";
+import { END_REASON_LABEL, STATE_LABEL, label, renderInline } from "./labels";
 
 export type RunEvent =
   | { type: "run.state"; runId: string; state: string; endReason?: string; finalText?: string; turns: number; toolCalls: number; costUsd: number | null; snapshot: boolean }
   | { type: "run.commentary"; runId: string; text: string }
-  | { type: "run.tool"; runId: string; name: string; status: "executing" | "done" | "denied" | "error"; callId: string; turns: number; toolCalls: number; costUsd: number | null }
+  | { type: "run.tool"; runId: string; name: string; status: "executing" | "done" | "denied" | "error"; callId: string; preview?: string; turns: number; toolCalls: number; costUsd: number | null }
   | { type: "run.handoff"; runId: string; reason: string }
   | { type: "approval.request"; id: string; runId: string; command: string; category: string; ruleId: string; summary: string; expiresAt: number }
   | { type: "approval.resolved"; id: string; decision: "once" | "session" | "deny" }
   | { type: "gate.event"; command: string; bucket: "auto" | "log" | "approval" | "deny"; actor: "human" | "agent"; decision: "allow" | "deny"; ruleId?: string; reason?: string }
   | { type: "run.restored"; runId: string; ok: boolean; message?: string };
 
-export type LogRow = { kind: "commentary" | "tool" | "gate"; text: string; status?: string };
+export type LogRow = { kind: "commentary" | "tool" | "gate"; text: string; status?: string; preview?: string };
 
 export type RunView = {
   runId?: string;
@@ -33,7 +34,6 @@ const TERMINAL = new Set(["completed", "stopped", "failed", "budget_exceeded", "
 const RUNNING = new Set(["running", "awaiting_approval", "handoff"]);
 
 export function reduceRun(prev: RunView, e: RunEvent): RunView {
-  // Events without a runId (gate, approvals) belong to the current view; a new runId starts a fresh view.
   const eventRun = "runId" in e ? e.runId : undefined;
   const view = eventRun && prev.runId && prev.runId !== eventRun ? { ...emptyRun, runId: eventRun } : { ...prev, ...(eventRun ? { runId: eventRun } : {}) };
   switch (e.type) {
@@ -57,7 +57,7 @@ export function reduceRun(prev: RunView, e: RunEvent): RunView {
       const log = [...view.log];
       const key = `${e.name} ${e.callId}`;
       const i = log.findIndex((l) => l.kind === "tool" && l.text === key);
-      const row: LogRow = { kind: "tool", text: key, status: e.status };
+      const row: LogRow = { kind: "tool", text: key, status: e.status, ...(e.preview ? { preview: e.preview } : {}) };
       if (i >= 0) log[i] = row;
       else log.push(row);
       return { ...view, log, turns: e.turns, toolCalls: e.toolCalls, costUsd: e.costUsd };
@@ -69,58 +69,91 @@ export function reduceRun(prev: RunView, e: RunEvent): RunView {
     case "approval.resolved":
       return { ...view, approvals: view.approvals.filter((a) => a.id !== e.id) };
     case "gate.event":
-      return { ...view, log: [...view.log, { kind: "gate", text: `${e.actor}: ${e.command}`, status: `${e.bucket}/${e.decision}` }] };
+      // Read-only commands are noise in the log; the event log in SQLite keeps them.
+      if (e.bucket === "auto") return view;
+      return { ...view, log: [...view.log, { kind: "gate", text: e.command, status: `${e.actor} · ${e.decision === "deny" ? "blocked" : e.bucket === "approval" ? "approved" : "ran"}` }] };
     case "run.restored":
       return { ...view, restored: e.ok ? "Workspace restored to the pre-run snapshot." : `Restore failed: ${e.message ?? "unknown error"}` };
   }
 }
 
+function Inline({ text }: { text: string }) {
+  return (
+    <>
+      {renderInline(text).map((part, i) =>
+        typeof part === "string" ? <span key={i}>{part}</span> : part.bold !== undefined ? <b key={i}>{part.bold}</b> : <code key={i}>{part.code}</code>,
+      )}
+    </>
+  );
+}
+
 export function RunDrawer({ run, sandboxReady }: { run: RunView; sandboxReady: boolean }) {
   const [goal, setGoal] = useState("Run ls -al and tell me how many entries are listed.");
+  const logRef = useRef<HTMLOListElement>(null);
   const busy = run.state !== undefined && RUNNING.has(run.state);
+  const thinking = busy && run.approvals.length === 0 && run.state !== "handoff" && !run.log.some((l) => l.kind === "tool" && l.status === "executing");
   const canRestore = run.runId !== undefined && run.snapshot && run.state !== undefined && TERMINAL.has(run.state);
+
+  useEffect(() => {
+    const el = logRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [run.log.length, thinking, run.finalText]);
+
   const restore = () => {
     if (run.runId && window.confirm("Restore tracked files to the state before this run? Untracked files are left as they are.")) {
       void window.workbench.restoreRun(run.runId);
     }
   };
+
   return (
     <aside className="drawer">
       {run.approvals.map((a) => (
         <ApprovalCard key={a.id} a={a} />
       ))}
       <label className="label" htmlFor="goal">Goal</label>
-      <textarea id="goal" value={goal} onChange={(e) => setGoal(e.target.value)} rows={4} disabled={busy} />
+      <textarea id="goal" value={goal} onChange={(e) => setGoal(e.target.value)} rows={4} disabled={busy} placeholder="What should the agent do in this workspace?" />
       <div className="row">
         <button className="btn primary" disabled={!sandboxReady || busy || !goal.trim()} onClick={() => void window.workbench.startRun(goal)}>Start run</button>
-        <button className="btn danger" disabled={!busy} onClick={() => void window.workbench.stopRun()}>Stop</button>
+        <button className="btn danger" disabled={!busy} onClick={() => void window.workbench.stopRun()} title="Shortcut: Esc while the agent has the terminal">Stop</button>
         {canRestore && <button className="btn" onClick={restore}>Restore pre-run state</button>}
       </div>
       <div className="stats">
-        <span>state <b>{run.state ?? "idle"}</b>{run.endReason ? ` (${run.endReason})` : ""}</span>
+        <span>state <b>{label(STATE_LABEL, run.state) || "idle"}</b>{run.endReason ? ` · ${label(END_REASON_LABEL, run.endReason)}` : ""}</span>
         <span>turns <b>{run.turns}</b></span>
         <span>tools <b>{run.toolCalls}</b></span>
         <span>cost <b>{run.costUsd === null ? "n/a" : `$${run.costUsd.toFixed(4)}`}</b></span>
-        {run.state && <span>snapshot <b>{run.snapshot ? "git" : "none"}</b></span>}
+        <span>snapshot <b>{run.state ? (run.snapshot ? "git" : "none") : "—"}</b></span>
       </div>
       {run.restored && <div className="notice">{run.restored}</div>}
-      <ol className="log">
+      <ol className="log" ref={logRef}>
         {run.log.map((l, i) => (
-          <li key={i} className={l.kind === "tool" ? `tool ${l.status ?? ""}` : l.kind === "gate" ? `gate ${l.status?.endsWith("deny") ? "deny" : ""}` : "commentary"}>
+          <li key={i} className={l.kind === "tool" ? `tool ${l.status ?? ""}` : l.kind === "gate" ? `gate ${l.status?.endsWith("blocked") ? "deny" : ""}` : "commentary"}>
             {l.kind === "tool" ? (
               <>
-                <code>{l.text.split(" ")[0]}</code> <span className="st">{l.status}</span>
+                <code>{l.text.split(" ")[0]}</code>
+                {l.preview && <span className="preview">{l.preview}</span>}
+                <span className="st">{l.status}</span>
               </>
             ) : l.kind === "gate" ? (
               <>
                 <span className="st">{l.status}</span> <code>{l.text}</code>
               </>
             ) : (
-              l.text
+              <Inline text={l.text} />
             )}
           </li>
         ))}
-        {run.finalText && run.state === "completed" && <li className="final">{run.finalText}</li>}
+        {thinking && (
+          <li className="tool executing thinking">
+            <code>model</code>
+            <span className="st">thinking</span>
+          </li>
+        )}
+        {run.finalText && run.state === "completed" && (
+          <li className="final">
+            <Inline text={run.finalText} />
+          </li>
+        )}
       </ol>
     </aside>
   );
