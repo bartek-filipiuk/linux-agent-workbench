@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { randomBytes } from "node:crypto";
@@ -24,6 +25,8 @@ export type FrameListener = (frame: { width: number; height: number; jpeg: Uint8
 export type BrowserSessionOptions = {
   profileDir: string;
   downloadsDir?: string;
+  /** "chromium" = full Chromium in new headless mode (needed by sites that refuse the headless shell). */
+  channel?: string;
   viewport?: { width: number; height: number };
   headless?: boolean;
   activeFps?: number;
@@ -89,6 +92,18 @@ const OBSERVE_SCRIPT = `
 })
 `;
 
+/** Chrome's stock UA for the installed major version, without the "Headless" marker. */
+export function chromeUserAgent(executablePath: string): string {
+  let major = "140";
+  try {
+    const out = execFileSync(executablePath, ["--version"], { encoding: "utf8", timeout: 5000 });
+    major = /(\d+)\./.exec(out)?.[1] ?? major;
+  } catch {
+    /* keep the fallback */
+  }
+  return `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${major}.0.0.0 Safari/537.36`;
+}
+
 export class BrowserSession {
   private context: BrowserContext | undefined;
   private readonly pages: PageEntry[] = [];
@@ -118,10 +133,21 @@ export class BrowserSession {
   async start(screencast: BrowserScreencastOptions = {}): Promise<void> {
     this.screencast = screencast;
     fs.mkdirSync(this.downloadsDir, { recursive: true });
+    // One Chromium per profile is guaranteed by the session; a lock left by a killed container
+    // (different hostname in the symlink) would otherwise make Chromium refuse the profile.
+    for (const f of ["SingletonLock", "SingletonSocket", "SingletonCookie"]) {
+      fs.rmSync(path.join(this.opts.profileDir, f), { force: true });
+    }
+    const channel = this.opts.channel ?? process.env.LAW_BROWSER_CHANNEL;
     this.context = await chromium.launchPersistentContext(this.opts.profileDir, {
       headless: this.opts.headless ?? true,
       viewport: this.viewport,
       acceptDownloads: true,
+      ...(channel ? { channel } : {}),
+      // Sites such as x.com answer 403 to the headless signature; present as a regular Chrome.
+      userAgent: chromeUserAgent(chromium.executablePath()),
+      ignoreDefaultArgs: ["--enable-automation"],
+      args: ["--disable-blink-features=AutomationControlled"],
     });
     for (const p of this.context.pages()) await this.registerPage(p);
     if (!this.active) await this.registerPage(await this.context.newPage());

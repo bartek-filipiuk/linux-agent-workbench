@@ -20,6 +20,6 @@ RUN chown -R root:root /opt/law
 
 USER agent
 WORKDIR /home/agent
-ENV HOME=/home/agent LAW_BROWSER_SOCKET=/run/law/browser.sock LAW_BROWSER_PROFILE=/profile/user-data LAW_BROWSER_DOWNLOADS=/downloads PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+ENV HOME=/home/agent LAW_BROWSER_SOCKET=/run/law/browser.sock LAW_BROWSER_PROFILE=/profile/user-data LAW_BROWSER_DOWNLOADS=/downloads LAW_BROWSER_CHANNEL=chromium PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 # ponytail: bash loop as supervisor, same as the terminal image
 CMD ["bash", "-c", "while true; do node /opt/law/worker/main.js; echo 'browser-worker exited, restarting in 1s'; sleep 1; done"]

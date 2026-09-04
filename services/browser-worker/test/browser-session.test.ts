@@ -51,6 +51,18 @@ describe("BrowserSession", { timeout: 30_000 }, () => {
     await until(async () => (await s.info()).title === "typed:hey");
   });
 
+  it("starts on a profile locked by a Chromium from another container", async () => {
+    const profileDir = fs.mkdtempSync(path.join(os.tmpdir(), "law-bw-lock-"));
+    fs.symlinkSync("otherhost-4242", path.join(profileDir, "SingletonLock"));
+    const locked = new BrowserSession({ profileDir, channel: "chromium", viewport: { width: 320, height: 200 } });
+    try {
+      await locked.start();
+      expect((await locked.info()).url).toBe("about:blank");
+    } finally {
+      await locked.close();
+    }
+  });
+
   it("refuses non-http navigation", async () => {
     await expect(s.navigate("file:///etc/passwd")).rejects.toThrow(/http/);
     await expect(s.navigate("javascript:alert(1)")).rejects.toThrow(/http/);
