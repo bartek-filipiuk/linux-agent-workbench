@@ -31,6 +31,8 @@ pnpm images:build        # builds localhost/law-terminal and pins its id in imag
 pnpm test:container      # Podman-backed tests (needs the image)
 ```
 
+`pnpm images:build` refuses to run with less than 5 GB free on `/`, removes previous builds and build-cache layers after a successful build (`pnpm images:prune` does the same on demand), and fails with exit 4 when podman image storage still exceeds 6 GB. An image used by a running sandbox cannot be removed until that sandbox is destroyed and reopened on the new image.
+
 The app starts one container per workspace (`law-terminal-<id>`), keeps it running when the window closes, and reconnects to the same tmux session on the next start. "Destroy sandbox" removes it.
 
 Host notes (Ubuntu 22.04, Podman 3.4 rootless): the build tolerates tar's directory chmod failure on rootless overlay, and no CPU quota is applied because the user's cgroup delegates only `memory` and `pids`.
