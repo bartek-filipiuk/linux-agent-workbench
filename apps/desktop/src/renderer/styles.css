@@ -11,7 +11,7 @@
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.5 var(--mono); }
-.topbar { display: flex; gap: 16px; align-items: center; padding: 10px 16px; background: var(--panel); border-bottom: 1px solid #1f242b; }
+.topbar { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; padding: 10px 16px; background: var(--panel); border-bottom: 1px solid #1f242b; }
 .topbar .brand { font-weight: 700; letter-spacing: 0.04em; white-space: nowrap; }
 .topbar .btn, .topbar .status { white-space: nowrap; }
 .status { display: inline-flex; align-items: center; gap: 8px; }

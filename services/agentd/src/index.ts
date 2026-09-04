@@ -48,6 +48,8 @@ export { makeEgressDecider, EGRESS_RULE } from "./egress/host-gate.js";
 export { HostAllowlist } from "./policy/host-allowlist.js";
 export { buildSystemPrompt } from "./orchestrator/system-prompt.js";
 export { PolicySet } from "./ipc.js";
+export { Notifier, parseReply } from "./notify/notifier.js";
+export type { NotifyConfig, Notification } from "./notify/notifier.js";
 export { markSessionUsed, lastUsedAt, stopOrphans } from "./maintenance/orphans.js";
 export type { ContainerLister } from "./maintenance/orphans.js";
 export type { BrowserClassification, BrowserPolicyDeps, DomainMode } from "./policy/browser-policy.js";

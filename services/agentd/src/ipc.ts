@@ -12,6 +12,10 @@ import { markSessionUsed, stopOrphans, type ContainerLister } from "./maintenanc
 import { makeEgressDecider } from "./egress/host-gate.js";
 import { HostAllowlist } from "./policy/host-allowlist.js";
 import { buildSystemPrompt } from "./orchestrator/system-prompt.js";
+import { Notifier } from "./notify/notifier.js";
+
+const APPROVAL_TTL_MS = 120_000;
+const APPROVAL_TTL_REMOTE_MS = 10 * 60_000; // the human may be answering from a phone
 
 const RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
 const LAST_USED_INTERVAL_MS = 30 * 60 * 1000;
@@ -37,6 +41,7 @@ export const ConfigInit = z.object({
   prices: Prices.optional(),
   browserImageId: z.string().min(1).optional(),
   browserDomainMode: z.enum(["open", "ask"]).optional(),
+  notify: z.object({ url: z.string().url(), replyUrl: z.string().url().optional(), token: z.string().min(1).optional() }).optional(),
 });
 export type ConfigInit = z.infer<typeof ConfigInit>;
 
@@ -136,6 +141,7 @@ export class Daemon {
   private runtimeRoot = "";
   private egress: SessionEgress | undefined;
   private lastUsedTimer: NodeJS.Timeout | undefined;
+  private notifier: Notifier | undefined;
 
   constructor(private readonly deps: DaemonDeps) {
     for (const [surface, lease] of [["terminal", this.lease], ["browser", this.browserLease]] as const) {
@@ -166,8 +172,26 @@ export class Daemon {
           this.manager = this.deps.makeManager(msg.imageId, msg.runtimeRoot);
           this.manager.on("data", (data: Uint8Array) => this.deps.post({ type: "terminal.data", data }));
           this.manager.on("status", (s: SessionStatus) => this.deps.post({ type: "session.state", ...s }));
-          this.approvals = new ApprovalManager(runtime.store);
-          this.approvals.on("request", (r: ApprovalRequest) => this.deps.post({ type: "approval.request", ...r }));
+          if (msg.notify) {
+            this.notifier?.stop();
+            const notify = msg.notify;
+            this.notifier = new Notifier(
+              { url: notify.url, ...(notify.replyUrl ? { replyUrl: notify.replyUrl } : {}), ...(notify.token ? { token: notify.token } : {}) },
+              {
+                onReply: (decision, id) => {
+                  const ok = this.approvals?.decide(id, decision) ?? false;
+                  console.error(`[agentd] remote decision ${decision} for ${id}: ${ok ? "applied" : "no such pending approval"}`);
+                },
+                log: (line) => console.error(`[agentd] ${line}`),
+              },
+            );
+            this.notifier.start();
+          }
+          this.approvals = new ApprovalManager(runtime.store, { ttlMs: msg.notify ? APPROVAL_TTL_REMOTE_MS : APPROVAL_TTL_MS });
+          this.approvals.on("request", (r: ApprovalRequest) => {
+            this.deps.post({ type: "approval.request", ...r });
+            void this.notifier?.publish({ title: `Approval: ${r.summary}`, body: r.command, priority: "high", tags: ["lock"], approvalId: r.id });
+          });
           this.approvals.on("resolved", (r: { id: string; decision: ApprovalDecision }) => this.deps.post({ type: "approval.resolved", ...r }));
           this.gate = new CommandGate({
             lease: this.lease,
@@ -380,11 +404,15 @@ export class Daemon {
     });
     rc.on("commentary", (text: string) => this.deps.post({ type: "run.commentary", runId: rc.runId, text }));
     rc.on("tool", (t: { name: string; status: RunTool["status"]; callId: string; preview: string }) => this.deps.post({ type: "run.tool", runId: rc.runId, ...t, ...rc.stats }));
-    rc.on("handoff", (h: { reason: string }) => this.deps.post({ type: "run.handoff", runId: rc.runId, reason: h.reason }));
+    rc.on("handoff", (h: { reason: string }) => {
+      this.deps.post({ type: "run.handoff", runId: rc.runId, reason: h.reason });
+      void this.notifier?.publish({ title: "Needs you", body: h.reason, priority: "high", tags: ["raised_hand"] });
+    });
     this.takeBoth("agent", "run started");
-    void rc.start().then((out) =>
-      postState(out.state, { ...(out.endReason ? { endReason: out.endReason } : {}), ...(out.finalText !== undefined ? { finalText: out.finalText } : {}) }),
-    );
+    void rc.start().then((out) => {
+      postState(out.state, { ...(out.endReason ? { endReason: out.endReason } : {}), ...(out.finalText !== undefined ? { finalText: out.finalText } : {}) });
+      void this.notifier?.publish({ title: `Run ${out.state}`, body: (out.finalText ?? out.endReason ?? goal).slice(0, 1000), tags: [out.state === "completed" ? "white_check_mark" : "warning"] });
+    });
   }
 
   private requireManager(): TerminalSessionManager {

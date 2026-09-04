@@ -173,7 +173,11 @@ function startAgentd() {
   const pout = Number(env.OPENAI_PRICE_OUTPUT_PER_MTOK);
   const prices = env.OPENAI_PRICE_INPUT_PER_MTOK && Number.isFinite(pin) && Number.isFinite(pout) ? { inputUsdPerMTok: pin, outputUsdPerMTok: pout } : undefined;
   const browserImageId = readImageId("browser");
-  toAgentd({ type: "config.init", apiKey, model, dbPath: dbPath(), imageId, runtimeRoot: runtimeRoot(), ...(prices ? { prices } : {}), ...(browserImageId ? { browserImageId } : {}) });
+  // ntfy topics for approvals/handoffs on the phone; the topic names are the secret, so keep them random.
+  const notify = env.LAW_NTFY_URL
+    ? { url: env.LAW_NTFY_URL, ...(env.LAW_NTFY_REPLY_URL ? { replyUrl: env.LAW_NTFY_REPLY_URL } : {}), ...(env.LAW_NTFY_TOKEN ? { token: env.LAW_NTFY_TOKEN } : {}) }
+    : undefined;
+  toAgentd({ type: "config.init", apiKey, model, dbPath: dbPath(), imageId, runtimeRoot: runtimeRoot(), ...(prices ? { prices } : {}), ...(browserImageId ? { browserImageId } : {}), ...(notify ? { notify } : {}) });
   child.on("exit", (code) => onAgentd({ type: "agentd.error", message: `agentd exited with code ${code}` }));
 }
 

@@ -62,6 +62,10 @@ The top-bar setting DOMAINS `open | ask` governs both the browser and the proxy.
 
 What works: curl, git, apt, pip, npm/pnpm, Claude Code, Codex, Chromium (launched with `--proxy-server`), and ssh through the `ProxyCommand` shipped in `/etc/ssh/ssh_config.d/law-egress.conf`. What does not: anything that ignores proxy variables, ping, UDP, and tools that resolve names themselves before connecting.
 
+### Notifications on your phone (ntfy)
+
+Set in `.env`: `LAW_NTFY_URL` (topic the app publishes to, e.g. `https://ntfy.sh/law-<random>`), `LAW_NTFY_REPLY_URL` (a second topic your phone publishes decisions to) and optionally `LAW_NTFY_TOKEN`. Approval cards, handoffs and run endings are pushed; approval notifications carry "Allow once / Allow for run / Deny" buttons that post `once|session|deny <approvalId>` to the reply topic, which agentd streams and applies. With notifications configured an approval waits 10 minutes instead of 2. The topic names are the secret: pick long random ones, and use a self-hosted ntfy or an access token if summaries of your commands must not leave your machines.
+
 ### Maintenance and diagnostics
 
 At startup agentd deletes runs that ended more than 30 days ago (with their events, tool calls, approvals and usage) and egress rows older than that, and stops containers whose session has not been used for 7 days (`last-used` marker in the session's runtime dir; volumes are kept). Screenshots are never written to the database. The "Diagnostics" button writes `~/.local/share/linux-agent-workbench/diagnostics/law-diagnostics-<timestamp>.txt` with versions, image ids, containers, settings without the key and the last 500 agentd log lines, all passed through a redactor; check it before sharing anyway.
