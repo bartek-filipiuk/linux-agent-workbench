@@ -6,3 +6,4 @@ export { FakeModelAdapter } from "./provider/fake.js";
 export type { ScriptedTurn } from "./provider/fake.js";
 export type { TerminalWorker } from "./worker/types.js";
 export { SocketTerminalWorker } from "./worker/socket-worker.js";
+export { TERMINAL_TOOLS, executeTerminalTool, HandoffRequested } from "./tools/terminal-tools.js";
