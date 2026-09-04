@@ -70,7 +70,8 @@ export class BrowserWorkerServer {
           return conn.reply(id, { ok: false, error: { code: "INVALID_INPUT", message: `unknown request ${env.type}` } });
       }
     } catch (e) {
-      const err = ProtocolError.is(e) ? e.toJSON() : { code: "INVALID_INPUT" as const, message: e instanceof Error ? e.message : String(e) };
+      const raw = e instanceof Error ? e.message : String(e);
+      const err = ProtocolError.is(e) ? e.toJSON() : { code: "INVALID_INPUT" as const, message: raw.replace(/\u001b\[[0-9;]*m/g, "").split("\n")[0]!.trim() };
       conn.reply(id, { ok: false, error: err });
     }
   }

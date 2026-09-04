@@ -32,6 +32,9 @@ export type BrowserSessionOptions = {
 
 type PageEntry = { id: string; page: Page };
 
+// Playwright errors carry a multi-line, ANSI-coloured call log; the model and the UI need the first line only.
+const firstLine = (m: string) => m.replace(/\u001b\[[0-9;]*m/g, "").split("\n")[0]!.trim();
+
 // Runs inside the page: collects interactive elements and parks them in a registry the worker resolves refs against.
 const OBSERVE_SCRIPT = `
 (({ key, max }) => {
@@ -179,7 +182,20 @@ export class BrowserSession {
   async navigate(url: string): Promise<BrowserInfo> {
     const target = normaliseNavigableUrl(url);
     if (!target) throw new ProtocolError("INVALID_INPUT", "only http and https URLs can be opened");
-    await this.requirePage().goto(target, { waitUntil: "domcontentloaded", timeout: 30_000 });
+    const page = this.requirePage();
+    try {
+      await page.goto(target, { waitUntil: "domcontentloaded", timeout: 30_000 });
+    } catch (e) {
+      // A container's network is still settling in the first seconds after start (ERR_NETWORK_CHANGED); one retry covers it.
+      const msg = e instanceof Error ? e.message : String(e);
+      if (!/ERR_NETWORK_CHANGED|ERR_INTERNET_DISCONNECTED|ERR_NAME_NOT_RESOLVED/.test(msg)) throw new ProtocolError("INVALID_INPUT", firstLine(msg));
+      await sleep(1500);
+      try {
+        await page.goto(target, { waitUntil: "domcontentloaded", timeout: 30_000 });
+      } catch (e2) {
+        throw new ProtocolError("INVALID_INPUT", firstLine(e2 instanceof Error ? e2.message : String(e2)));
+      }
+    }
     this.lastInputAt = Date.now();
     this.revision++;
     return this.info();
