@@ -8,7 +8,7 @@ ARG CODEX_VERSION=0.153.2
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
-      ca-certificates curl xz-utils tmux git ripgrep jq less nano python3 build-essential locales procps \
+      ca-certificates curl xz-utils tmux git ripgrep jq less nano python3 build-essential locales procps openssh-client \
  && rm -rf /var/lib/apt/lists/* \
  && locale-gen en_US.UTF-8
 ENV LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8

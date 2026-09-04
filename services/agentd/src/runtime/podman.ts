@@ -42,6 +42,8 @@ export type RunSpec = {
   runtimeDir: string;
   imageId: string;
   networkMode: NetworkMode;
+  /** Host ~/.gitconfig to expose read-only so commits inside the sandbox carry the user's identity. */
+  gitconfigPath?: string;
 };
 
 export function containerName(sessionId: string): string {
@@ -53,6 +55,9 @@ export function buildRunArgs(spec: RunSpec): string[] {
   const name = containerName(spec.sessionId);
   if (!path.isAbsolute(spec.workspacePath) || !path.isAbsolute(spec.runtimeDir)) {
     throw new ProtocolError("INVALID_INPUT", "workspace and runtime dir must be absolute");
+  }
+  if (spec.gitconfigPath !== undefined && (!path.isAbsolute(spec.gitconfigPath) || spec.gitconfigPath.includes(":"))) {
+    throw new ProtocolError("INVALID_INPUT", "gitconfig path must be absolute");
   }
   return [
     "run", "-d", "--rm",
@@ -72,6 +77,9 @@ export function buildRunArgs(spec: RunSpec): string[] {
     "--tmpfs", "/home/agent:rw,nosuid,nodev,size=512m",
     "--volume", "law-auth-claude:/home/agent/.claude",
     "--volume", "law-auth-codex:/home/agent/.codex",
+    // Dedicated SSH material only: deploy keys and known_hosts the user puts here, never the host ~/.ssh.
+    "--volume", "law-ssh:/home/agent/.ssh",
+    ...(spec.gitconfigPath ? ["--volume", `${spec.gitconfigPath}:/home/agent/.gitconfig:ro`] : []),
     "--volume", `${spec.workspacePath}:/workspace:rw`,
     "--volume", `${spec.runtimeDir}:/run/law:rw`,
     "--network", spec.networkMode === "none" ? "none" : "slirp4netns",

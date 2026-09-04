@@ -1,5 +1,6 @@
 import { EventEmitter } from "node:events";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
 import { ProtocolError, type NetworkMode } from "@law/protocol";
@@ -60,7 +61,15 @@ export class TerminalSessionManager extends EventEmitter {
       const runtimeDir = path.join(this.deps.runtimeRoot, sessionId);
       fs.mkdirSync(runtimeDir, { recursive: true, mode: 0o700 });
       fs.chmodSync(runtimeDir, 0o700);
-      await this.deps.runtime.ensureRunning({ sessionId, workspacePath: real, runtimeDir, imageId: this.deps.imageId, networkMode });
+      const gitconfigPath = path.join(os.homedir(), ".gitconfig");
+      await this.deps.runtime.ensureRunning({
+        sessionId,
+        workspacePath: real,
+        runtimeDir,
+        imageId: this.deps.imageId,
+        networkMode,
+        ...(fs.existsSync(gitconfigPath) ? { gitconfigPath } : {}),
+      });
       const worker = await this.waitForWorker(path.join(runtimeDir, "worker.sock"), sessionId);
       this._worker = worker;
       this.unsubscribe.push(worker.onPtyData((b) => this.emit("data", b)));

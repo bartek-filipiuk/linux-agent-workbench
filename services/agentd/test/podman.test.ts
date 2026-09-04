@@ -47,6 +47,10 @@ describe("buildRunArgs", () => {
     expect(args).toContain("law-auth-claude:/home/agent/.claude");
     expect(args[args.indexOf("--network") + 1]).toBe("slirp4netns");
     expect(args).toContain("CLAUDE_CONFIG_DIR=/home/agent/.claude");
+    expect(args).toContain("law-ssh:/home/agent/.ssh");
+    expect(args.join(" ")).not.toContain(".gitconfig");
+    expect(buildRunArgs({ ...spec, gitconfigPath: "/home/u/.gitconfig" })).toContain("/home/u/.gitconfig:/home/agent/.gitconfig:ro");
+    expect(() => buildRunArgs({ ...spec, gitconfigPath: "rel/.gitconfig" })).toThrow(ProtocolError);
     expect(args.at(-1)).toBe("sha256:deadbeef");
     expect(args.join(" ")).not.toMatch(/OPENAI|ANTHROPIC/);
   });

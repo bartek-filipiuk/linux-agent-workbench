@@ -45,3 +45,7 @@ Every simple command of the interactive shell in the sandbox is checked by agent
 - when a nested tool shows a permission or password prompt, the agent's next keystroke is blocked and the run hands off to you.
 
 Ceiling: the gate covers the interactive shell only. `bash -c`, scripts, other shells and processes started by nested agents are governed by the container, mounts and network profile. Before each run on a git workspace a snapshot (`HEAD` + `git stash create`) is recorded; "Restore pre-run state" brings tracked files back, untracked files are left alone.
+
+### SSH and git identity in the sandbox
+
+The container mounts the named volume `law-ssh` at `/home/agent/.ssh` and, if present, the host `~/.gitconfig` read-only. Put a **dedicated deploy key** and a pinned `known_hosts` into the volume (`podman unshare` + the path from `podman volume inspect law-ssh`), never the host `~/.ssh`. `ssh`/`scp`/`rsync` are `approval` commands: prefer "Allow once", because the gate sees the connection, not what runs on the remote side.
