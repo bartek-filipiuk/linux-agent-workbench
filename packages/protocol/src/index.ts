@@ -1,1 +1,5 @@
 export * from "./framing.js";
+export * from "./errors.js";
+export * from "./messages.js";
+export * from "./terminal.js";
+export * from "./run.js";
