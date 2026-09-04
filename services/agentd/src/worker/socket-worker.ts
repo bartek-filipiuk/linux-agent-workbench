@@ -4,10 +4,12 @@ import {
   ProtocolError,
   TerminalInputResult,
   TerminalObservation,
+  TerminalWaitResult,
   WorkerHealth,
   type TerminalInput,
   type TerminalObserveInput,
   type TerminalResize,
+  type TerminalWaitInput,
   type Envelope,
 } from "@law/protocol";
 import type { TerminalWorker } from "./types.js";
@@ -60,6 +62,12 @@ export class SocketTerminalWorker implements TerminalWorker {
 
   async input(input: TerminalInput, signal?: AbortSignal) {
     return TerminalInputResult.parse(await this.req("terminal.input", input, signal));
+  }
+
+  async wait(input: TerminalWaitInput, signal?: AbortSignal) {
+    // The worker may legitimately hold this request for up to timeoutMs; give the socket the same slack.
+    const timeoutMs = (input.timeoutMs ?? 60_000) + 5_000;
+    return TerminalWaitResult.parse(await this.conn.request("terminal.wait", input, { timeoutMs, ...(signal ? { signal } : {}) }));
   }
 
   async interrupt(signal?: AbortSignal) {

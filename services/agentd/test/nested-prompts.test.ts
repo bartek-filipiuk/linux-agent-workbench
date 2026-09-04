@@ -4,16 +4,17 @@ import { allowAllPolicy } from "../src/policy/types.js";
 
 describe("detectNestedPrompt", () => {
   it.each([
-    ["Claude wants to run `rm -rf dist`\n\nDo you want to proceed?\n❯ 1. Yes\n  2. Yes, and don't ask again\n  3. No, and tell Claude what to do differently (esc)", "claude-proceed"],
-    ["Allow command?\n  [y] yes  [n] no", "codex-allow"],
-    ["[sudo] password for agent:", "sudo-password"],
-    ["Password:", "password"],
+    ["Claude wants to run `rm -rf dist`\n\nDo you want to proceed?\n❯ 1. Yes\n  2. Yes, and don't ask again\n  3. No, and tell Claude what to do differently (esc)", "permission_prompt"],
+    ["Allow command?\n  [y] yes  [n] no", "permission_prompt"],
+    ["[sudo] password for agent:", "password_prompt"],
+    ["Password:", "password_prompt"],
   ])("matches %j", (screen, id) => {
     expect(detectNestedPrompt(screen)?.id).toBe(id);
   });
   it("ignores normal output", () => {
     expect(detectNestedPrompt("agent@law:/workspace$ ls\nREADME.md\nagent@law:/workspace$ ")).toBeNull();
     expect(detectNestedPrompt("Would you like fries with that? no")).toBeNull();
+    expect(detectNestedPrompt("? Which approach?\n❯ 1. Fast\n  2. Careful\nEnter to select")).toBeNull();
   });
 });
 

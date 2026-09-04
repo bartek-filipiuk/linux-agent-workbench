@@ -1,6 +1,6 @@
 import net from "node:net";
 import { FramedConnection } from "@law/protocol/node";
-import { KEY_BYTES, TerminalInput, TerminalObserveInput, type Envelope, type TerminalObservation } from "@law/protocol";
+import { KEY_BYTES, TerminalInput, TerminalObserveInput, TerminalWaitInput, classifyScreen, type Envelope, type TerminalObservation } from "@law/protocol";
 
 export class FakeWorker {
   revision = 0;
@@ -41,6 +41,7 @@ export class FakeWorker {
       size: { rows: 24, cols: 80 },
       idleMs: 10,
       exited: false,
+      hint: classifyScreen(this.screen),
     };
   }
 
@@ -64,6 +65,11 @@ export class FakeWorker {
         else this.screen += inp.text;
         this.revision++;
         return conn.reply(id!, { ok: true, payload: { revision: this.revision } });
+      }
+      case "terminal.wait": {
+        const w = TerminalWaitInput.parse(env.payload);
+        const matched = w.until ? new RegExp(w.until, "im").test(this.screen) : false;
+        return conn.reply(id!, { ok: true, payload: { ...this.observation(), timedOut: false, matched } });
       }
       case "terminal.interrupt":
         this.screen += "^C\n$ ";

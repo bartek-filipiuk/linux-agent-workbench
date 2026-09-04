@@ -37,7 +37,7 @@ describe("OpenAIResponsesAdapter", () => {
     expect((calls[0]!.init.headers as Record<string, string>).authorization).toBe("Bearer sk-test");
     expect(calls[0]!.body).toMatchObject({ model: "gpt-5.6-sol", instructions: "SYS", input: [{ role: "user", content: "list files" }] });
     expect((calls[0]!.body.tools as Array<{ type: string; name: string; strict: boolean }>).map((t) => [t.type, t.name, t.strict])).toEqual([
-      ["function", "terminal_observe", false], ["function", "terminal_input", false], ["function", "terminal_interrupt", false], ["function", "request_human", false],
+      ["function", "terminal_observe", false], ["function", "terminal_input", false], ["function", "terminal_wait", false], ["function", "terminal_interrupt", false], ["function", "request_human", false],
     ]);
     expect(turn).toMatchObject({ responseId: "resp_1", text: "Looking.", usage: { inputTokens: 66, outputTokens: 21 } });
     expect(turn.toolCalls).toEqual([

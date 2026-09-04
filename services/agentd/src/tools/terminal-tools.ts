@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ProtocolError, TerminalInput, TerminalObserveInput } from "@law/protocol";
+import { ProtocolError, TerminalInput, TerminalObserveInput, TerminalWaitInput } from "@law/protocol";
 import type { ToolCall, ToolSpec } from "../provider/types.js";
 import type { TerminalWorker } from "../worker/types.js";
 
@@ -30,6 +30,12 @@ export const TERMINAL_TOOLS: ToolSpec[] = [
     parameters: schema(TerminalInput),
   },
   {
+    name: "terminal_wait",
+    description:
+      "Wait for the terminal to settle, then return the observation. Returns when the screen has been quiet for idleMs (default 1500), when the regex `until` matches the screen, or after timeoutMs (default 60000, then timedOut=true). Use this after sending input instead of repeated observes. The result's hint.state tells you what the screen is: busy, idle_shell, nested_agent_idle, question_menu (answer with UP/DOWN/ENTER), permission_prompt or password_prompt (the human answers these).",
+    parameters: schema(TerminalWaitInput),
+  },
+  {
     name: "terminal_interrupt",
     description: "Send Ctrl-C to the foreground process.",
     parameters: schema(NoArgs),
@@ -54,6 +60,8 @@ export async function executeTerminalTool(call: ToolCall, worker: TerminalWorker
       return JSON.stringify(await worker.observe(parseArgs(TerminalObserveInput, call.args, call.name), signal));
     case "terminal_input":
       return JSON.stringify(await worker.input(parseArgs(TerminalInput, call.args, call.name), signal));
+    case "terminal_wait":
+      return JSON.stringify(await worker.wait(parseArgs(TerminalWaitInput, call.args, call.name), signal));
     case "terminal_interrupt":
       parseArgs(NoArgs, call.args, call.name);
       await worker.interrupt(signal);

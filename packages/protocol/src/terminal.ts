@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ScreenHint } from "./screen-state.js";
 
 export const TERMINAL_TEXT_MAX = 8192; // bytes
 
@@ -51,8 +52,30 @@ export const TerminalObservation = z.object({
   idleMs: z.number().nonnegative(),
   exited: z.boolean(),
   exitCode: z.number().int().optional(),
+  hint: ScreenHint.optional(),
 });
 export type TerminalObservation = z.infer<typeof TerminalObservation>;
+
+export const TerminalWaitInput = z.object({
+  idleMs: z.number().int().min(100).max(30_000).optional(),
+  timeoutMs: z.number().int().min(500).max(180_000).optional(),
+  until: z
+    .string()
+    .max(200)
+    .refine((s) => {
+      try {
+        new RegExp(s, "im");
+        return true;
+      } catch {
+        return false;
+      }
+    }, "until must be a valid regular expression")
+    .optional(),
+});
+export type TerminalWaitInput = z.infer<typeof TerminalWaitInput>;
+
+export const TerminalWaitResult = TerminalObservation.extend({ timedOut: z.boolean(), matched: z.boolean() });
+export type TerminalWaitResult = z.infer<typeof TerminalWaitResult>;
 
 export const TerminalResize = z.object({
   cols: z.number().int().min(20).max(500),

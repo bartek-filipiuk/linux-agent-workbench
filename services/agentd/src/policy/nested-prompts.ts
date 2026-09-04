@@ -1,16 +1,11 @@
+import { classifyScreen, type ScreenHint } from "@law/protocol";
 import type { Policy, PolicyContext, PolicyDecision } from "./types.js";
 import type { ToolCall } from "../provider/types.js";
 
-export const NESTED_PROMPT_PATTERNS: Array<{ id: string; pattern: RegExp }> = [
-  { id: "claude-proceed", pattern: /do you want to proceed\?|yes, allow|don't ask again|esc to cancel/i },
-  { id: "codex-allow", pattern: /allow command\?|would you like to run|\bapprove\b.*\?/i },
-  { id: "sudo-password", pattern: /\[sudo\] password/i },
-  { id: "password", pattern: /^\s*password( for [^:]+)?:\s*$/im },
-];
-
+// Kept for callers that only need a yes/no: a prompt the human must answer.
 export function detectNestedPrompt(screen: string): { id: string } | null {
-  for (const p of NESTED_PROMPT_PATTERNS) if (p.pattern.test(screen)) return { id: p.id };
-  return null;
+  const hint: ScreenHint = classifyScreen(screen);
+  return hint.state === "permission_prompt" || hint.state === "password_prompt" ? { id: hint.state } : null;
 }
 
 // Screen regexes decide when to stop the agent's keystrokes; the human answers the prompt.
@@ -22,11 +17,12 @@ export class NestedPromptPolicy implements Policy {
     const { screen } = await this.observe();
     const hit = detectNestedPrompt(screen);
     if (!hit) return { allow: true };
+    const what = hit.id === "password_prompt" ? "password prompt" : "permission prompt";
     return {
       allow: false,
       code: "LEASE_DENIED",
-      reason: `a permission prompt (${hit.id}) is on screen; the human must answer it`,
-      handoff: `nested permission prompt on screen (${hit.id}); answer it in the terminal, then give control back`,
+      reason: `a ${what} is on screen; the human must answer it`,
+      handoff: `${what} on screen; answer it in the terminal, then give control back`,
     };
   }
 }

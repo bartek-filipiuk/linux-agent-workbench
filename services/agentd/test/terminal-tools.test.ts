@@ -21,7 +21,7 @@ afterEach(async () => {
 
 describe("terminal tools", () => {
   it("exposes four tools with JSON schema parameters", () => {
-    expect(TERMINAL_TOOLS.map((t) => t.name)).toEqual(["terminal_observe", "terminal_input", "terminal_interrupt", "request_human"]);
+    expect(TERMINAL_TOOLS.map((t) => t.name)).toEqual(["terminal_observe", "terminal_input", "terminal_wait", "terminal_interrupt", "request_human"]);
     const input = TERMINAL_TOOLS.find((t) => t.name === "terminal_input")!;
     expect(JSON.stringify(input.parameters)).toContain("CTRL_C");
   });
