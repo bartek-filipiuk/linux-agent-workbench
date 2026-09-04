@@ -18,3 +18,5 @@ export { PodmanRuntime, buildRunArgs, sessionIdFor, validateWorkspacePath, conta
 export type { RunSpec, Exec } from "./runtime/podman.js";
 export { TerminalSessionManager } from "./session/terminal-session-manager.js";
 export type { SessionState, SessionStatus, ManagerDeps } from "./session/terminal-session-manager.js";
+export { Daemon, MainToAgentd, ConfigInit, SessionStart, SessionStop, TerminalWrite, TerminalResizeMsg, AgentdReady, AgentdError } from "./ipc.js";
+export type { AgentdToMain, SessionStateMsg, TerminalData, DaemonDeps } from "./ipc.js";
