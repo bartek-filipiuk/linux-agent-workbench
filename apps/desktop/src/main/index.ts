@@ -69,6 +69,10 @@ function onAgentd(msg: AgentdToMain) {
     case "run.commentary":
     case "run.tool":
     case "run.handoff":
+    case "approval.request":
+    case "approval.resolved":
+    case "gate.event":
+    case "run.restored":
       send("run:event", msg);
       return;
     case "lease.state":
@@ -143,6 +147,12 @@ ipcMain.handle("run:start", (_e, goal: unknown) => {
 ipcMain.handle("run:stop", () => toAgentd({ type: "run.stop" }));
 ipcMain.handle("run:resume", () => toAgentd({ type: "run.resume" }));
 ipcMain.handle("lease:take", (_e, owner: unknown) => toAgentd({ type: "lease.take", owner: owner === "agent" ? "agent" : "human" }));
+ipcMain.handle("approval:decide", (_e, id: unknown, decision: unknown) => {
+  if (typeof id === "string" && (decision === "once" || decision === "session" || decision === "deny")) toAgentd({ type: "approval.decide", id, decision });
+});
+ipcMain.handle("run:restore", (_e, runId: unknown) => {
+  if (typeof runId === "string" && runId) toAgentd({ type: "run.restore", runId });
+});
 ipcMain.on("terminal:write", (_e, data: unknown) => {
   if (typeof data === "string" && data.length <= 65_536) toAgentd({ type: "terminal.write", data: new TextEncoder().encode(data) });
 });

@@ -22,6 +22,8 @@ const api = {
   resumeRun: () => ipcRenderer.invoke("run:resume"),
   takeControl: () => ipcRenderer.invoke("lease:take", "human"),
   releaseControl: () => ipcRenderer.invoke("lease:take", "agent"),
+  decideApproval: (id: string, decision: "once" | "session" | "deny") => ipcRenderer.invoke("approval:decide", id, decision),
+  restoreRun: (runId: string) => ipcRenderer.invoke("run:restore", runId),
   onRun: on<unknown>("run:event"),
   onLease: on<unknown>("lease:state"),
   onEvent: on<unknown>("agentd:event"),

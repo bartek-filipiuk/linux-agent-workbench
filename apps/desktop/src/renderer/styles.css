@@ -56,3 +56,12 @@ html, body, #root { height: 100%; }
 .log .tool.denied .st, .log .tool.error .st { color: var(--agent); }
 .log .final { color: #22c55e; padding: 8px; border: 1px solid #22c55e; border-radius: 4px; white-space: pre-wrap; }
 .banner { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; background: rgba(59, 130, 246, 0.12); border-bottom: 1px solid var(--human); }
+.approval { border: 1px solid var(--agent); border-radius: 6px; padding: 10px; display: flex; flex-direction: column; gap: 8px; background: rgba(255, 59, 59, 0.06); }
+.approval-head { color: var(--agent); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+.approval-summary { color: var(--fg); }
+.approval-cmd { margin: 0; padding: 8px; background: var(--bg); border-radius: 4px; white-space: pre-wrap; word-break: break-all; }
+.log .gate { color: var(--muted); font-size: 12px; padding: 2px 8px; display: flex; gap: 8px; align-items: baseline; }
+.log .gate .st { font-size: 11px; text-transform: uppercase; }
+.log .gate code { color: var(--muted); }
+.log .gate.deny, .log .gate.deny code { color: var(--agent); }
+.notice { padding: 8px; border: 1px solid var(--human); border-radius: 4px; color: var(--human); font-size: 13px; }

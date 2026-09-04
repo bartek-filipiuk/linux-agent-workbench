@@ -27,6 +27,8 @@ declare global {
       resumeRun(): Promise<void>;
       takeControl(): Promise<void>;
       releaseControl(): Promise<void>;
+      decideApproval(id: string, decision: "once" | "session" | "deny"): Promise<void>;
+      restoreRun(runId: string): Promise<void>;
       onEvent(cb: (e: AgentdStatus) => void): () => void;
       onSession(cb: (s: SessionStatus) => void): () => void;
       onTerminalData(cb: (data: Uint8Array) => void): () => void;
