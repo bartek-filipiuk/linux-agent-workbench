@@ -20,3 +20,7 @@ export { TerminalSessionManager } from "./session/terminal-session-manager.js";
 export type { SessionState, SessionStatus, ManagerDeps } from "./session/terminal-session-manager.js";
 export { Daemon, MainToAgentd, ConfigInit, SessionStart, SessionStop, TerminalWrite, TerminalResizeMsg, AgentdReady, AgentdError } from "./ipc.js";
 export type { AgentdToMain, SessionStateMsg, TerminalData, DaemonDeps } from "./ipc.js";
+export { OpenAIResponsesAdapter } from "./provider/openai.js";
+export type { OpenAIAdapterOptions } from "./provider/openai.js";
+export { Lease, LeasePolicy } from "./policy/lease.js";
+export type { LeaseOwner, LeaseState } from "./policy/lease.js";
