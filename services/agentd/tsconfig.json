@@ -1,12 +1,5 @@
 {
   "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "rootDir": "src",
-    "outDir": "dist",
-    "paths": {
-      "@law/protocol": ["../../packages/protocol/src/index.ts"],
-      "@law/protocol/node": ["../../packages/protocol/src/node/index.ts"]
-    }
-  },
+  "compilerOptions": { "rootDir": "src", "outDir": "dist" },
   "include": ["src"]
 }

@@ -1,0 +1,156 @@
+import { DatabaseSync } from "node:sqlite";
+import { randomUUID } from "node:crypto";
+import fs from "node:fs";
+import path from "node:path";
+import { TERMINAL_STATES, type ErrorCode, type NetworkMode, type RunEvent, type RunState, type Sensitivity } from "@law/protocol";
+import { migrate } from "./migrate.js";
+
+export type RunRow = {
+  id: string;
+  workspace_id: string;
+  goal: string;
+  model: string;
+  state: RunState;
+  network_mode: NetworkMode;
+  started_at: number;
+  ended_at: number | null;
+  end_reason: string | null;
+  snapshot_json: string | null;
+  cost_usd: number;
+  turns: number;
+  tool_calls: number;
+};
+
+export type ToolCallStatus = "executing" | "done" | "denied" | "error" | "unknown";
+export type ToolCallRow = {
+  id: string;
+  run_id: string;
+  call_id: string;
+  name: string;
+  input_json: string;
+  status: ToolCallStatus;
+  output_json: string | null;
+  started_at: number;
+  ended_at: number | null;
+  error_code: string | null;
+};
+
+const NON_TERMINAL: RunState[] = ["idle", "running", "awaiting_approval", "handoff"];
+
+export class Store {
+  private readonly db: DatabaseSync;
+  readonly schemaVersion: number;
+
+  constructor(file: string) {
+    if (file !== ":memory:") fs.mkdirSync(path.dirname(file), { recursive: true });
+    this.db = new DatabaseSync(file);
+    this.db.exec("PRAGMA journal_mode = WAL");
+    this.db.exec("PRAGMA foreign_keys = ON");
+    this.db.exec("PRAGMA busy_timeout = 5000");
+    this.schemaVersion = migrate(this.db);
+  }
+
+  createWorkspace(wsPath: string): string {
+    const now = Date.now();
+    const existing = this.db.prepare(`SELECT id FROM workspaces WHERE path = ?`).get(wsPath) as { id: string } | undefined;
+    if (existing) {
+      this.db.prepare(`UPDATE workspaces SET last_used_at = ? WHERE id = ?`).run(now, existing.id);
+      return existing.id;
+    }
+    const id = randomUUID();
+    this.db.prepare(`INSERT INTO workspaces (id, path, created_at, last_used_at) VALUES (?, ?, ?, ?)`).run(id, wsPath, now, now);
+    return id;
+  }
+
+  createRun(input: { workspaceId: string; goal: string; model: string; networkMode: NetworkMode; snapshot?: unknown }): string {
+    const id = randomUUID();
+    const now = Date.now();
+    this.db
+      .prepare(
+        `INSERT INTO runs (id, workspace_id, goal, model, state, network_mode, started_at, snapshot_json)
+         VALUES (?, ?, ?, ?, 'running', ?, ?, ?)`,
+      )
+      .run(id, input.workspaceId, input.goal, input.model, input.networkMode, now, input.snapshot === undefined ? null : JSON.stringify(input.snapshot));
+    this.appendEvent(id, "run.created", { goal: input.goal, model: input.model, networkMode: input.networkMode });
+    return id;
+  }
+
+  setRunState(runId: string, state: RunState, endReason?: string): void {
+    const terminal = TERMINAL_STATES.has(state);
+    this.db
+      .prepare(`UPDATE runs SET state = ?, ended_at = COALESCE(?, ended_at), end_reason = COALESCE(?, end_reason) WHERE id = ?`)
+      .run(state, terminal ? Date.now() : null, endReason ?? null, runId);
+    this.appendEvent(runId, "run.state", { state, ...(endReason ? { endReason } : {}) });
+  }
+
+  getRun(runId: string): RunRow | undefined {
+    return this.db.prepare(`SELECT * FROM runs WHERE id = ?`).get(runId) as RunRow | undefined;
+  }
+
+  appendEvent(runId: string, type: string, payload: Record<string, unknown>, sensitivity: Sensitivity = "normal"): number {
+    const r = this.db
+      .prepare(`INSERT INTO run_events (run_id, ts, type, payload_json, sensitivity) VALUES (?, ?, ?, ?, ?)`)
+      .run(runId, Date.now(), type, JSON.stringify(payload), sensitivity);
+    return Number(r.lastInsertRowid);
+  }
+
+  listEvents(runId: string): RunEvent[] {
+    const rows = this.db.prepare(`SELECT * FROM run_events WHERE run_id = ? ORDER BY seq`).all(runId) as {
+      seq: number; run_id: string; ts: number; type: string; payload_json: string; sensitivity: Sensitivity;
+    }[];
+    return rows.map((r) => ({ seq: r.seq, runId: r.run_id, ts: r.ts, type: r.type, payload: JSON.parse(r.payload_json), sensitivity: r.sensitivity }));
+  }
+
+  beginToolCall(runId: string, call: { callId: string; name: string; args: unknown }): string {
+    const id = randomUUID();
+    this.db
+      .prepare(`INSERT INTO tool_calls (id, run_id, call_id, name, input_json, status, started_at) VALUES (?, ?, ?, ?, ?, 'executing', ?)`)
+      .run(id, runId, call.callId, call.name, JSON.stringify(call.args ?? null), Date.now());
+    return id;
+  }
+
+  finishToolCall(id: string, status: "done" | "denied" | "error", output: unknown, errorCode?: ErrorCode): void {
+    this.db
+      .prepare(`UPDATE tool_calls SET status = ?, output_json = ?, ended_at = ?, error_code = ? WHERE id = ?`)
+      .run(status, JSON.stringify(output ?? null), Date.now(), errorCode ?? null, id);
+  }
+
+  listToolCalls(runId: string): ToolCallRow[] {
+    return this.db.prepare(`SELECT * FROM tool_calls WHERE run_id = ? ORDER BY started_at, rowid`).all(runId) as ToolCallRow[];
+  }
+
+  recordUsage(runId: string, u: { responseId: string; inputTokens: number; outputTokens: number; costUsd: number }): void {
+    this.db
+      .prepare(`INSERT INTO provider_usage (run_id, response_id, input_tokens, output_tokens, cost_usd, ts) VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(runId, u.responseId, u.inputTokens, u.outputTokens, u.costUsd, Date.now());
+  }
+
+  addRunTotals(runId: string, d: { turns?: number; toolCalls?: number; costUsd?: number }): void {
+    this.db
+      .prepare(`UPDATE runs SET turns = turns + ?, tool_calls = tool_calls + ?, cost_usd = cost_usd + ? WHERE id = ?`)
+      .run(d.turns ?? 0, d.toolCalls ?? 0, d.costUsd ?? 0, runId);
+  }
+
+  markInterruptedRuns(reason: string): number {
+    const placeholders = NON_TERMINAL.map(() => "?").join(",");
+    const rows = this.db.prepare(`SELECT id FROM runs WHERE state IN (${placeholders})`).all(...NON_TERMINAL) as { id: string }[];
+    const now = Date.now();
+    this.db.exec("BEGIN");
+    try {
+      for (const { id } of rows) {
+        this.db.prepare(`UPDATE tool_calls SET status = 'unknown', ended_at = ? WHERE run_id = ? AND status = 'executing'`).run(now, id);
+        this.db.prepare(`UPDATE runs SET state = 'interrupted', ended_at = ?, end_reason = ? WHERE id = ?`).run(now, reason, id);
+        this.appendEvent(id, "run.interrupted", { reason });
+      }
+      this.db.exec("COMMIT");
+    } catch (e) {
+      this.db.exec("ROLLBACK");
+      throw e;
+    }
+    return rows.length;
+  }
+
+  close(): void {
+    this.db.close();
+  }
+}
