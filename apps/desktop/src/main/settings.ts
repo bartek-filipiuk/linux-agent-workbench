@@ -1,16 +1,28 @@
 import fs from "node:fs";
 
-export type Settings = { lastWorkspace?: string; networkMode: "open" | "none"; openaiKeyEncrypted?: string };
+export type Settings = {
+  lastWorkspace?: string;
+  networkMode: "open" | "none";
+  /** Nested agents (claude, codex) start with their permission prompts skipped; the sandbox is the boundary. */
+  nestedAutonomy: boolean;
+  /** "ask" = a card before the sandbox or the browser first talks to a new host. */
+  domainMode: "open" | "ask";
+  openaiKeyEncrypted?: string;
+};
+
+export const DEFAULT_SETTINGS: Settings = { networkMode: "open", nestedAutonomy: true, domainMode: "open" };
 
 export function readSettings(file: string): Settings {
   try {
     const raw = JSON.parse(fs.readFileSync(file, "utf8")) as Record<string, unknown>;
     const networkMode = raw.networkMode === "none" ? "none" : "open";
+    const nestedAutonomy = raw.nestedAutonomy !== false;
+    const domainMode = raw.domainMode === "ask" ? "ask" : "open";
     const lastWorkspace = typeof raw.lastWorkspace === "string" && raw.lastWorkspace ? raw.lastWorkspace : undefined;
     const openaiKeyEncrypted = typeof raw.openaiKeyEncrypted === "string" && raw.openaiKeyEncrypted ? raw.openaiKeyEncrypted : undefined;
-    return { networkMode, ...(lastWorkspace ? { lastWorkspace } : {}), ...(openaiKeyEncrypted ? { openaiKeyEncrypted } : {}) };
+    return { networkMode, nestedAutonomy, domainMode, ...(lastWorkspace ? { lastWorkspace } : {}), ...(openaiKeyEncrypted ? { openaiKeyEncrypted } : {}) };
   } catch {
-    return { networkMode: "open" };
+    return { ...DEFAULT_SETTINGS };
   }
 }
 

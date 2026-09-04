@@ -1,3 +1,11 @@
+/** The base prompt plus the paragraph that matches the session's nested-agent setting. */
+export function buildSystemPrompt(opts: { nestedAutonomy: boolean }): string {
+  const nested = opts.nestedAutonomy
+    ? `- Nested agents run autonomously inside the sandbox: start them as "claude --dangerously-skip-permissions" and "codex --dangerously-bypass-approvals-and-sandbox". The sandbox (read-only root, /workspace only, egress proxy) is the boundary, so their own permission prompts are unnecessary. Answer their question menus yourself.`
+    : `- Nested agents run supervised: start "claude" and "codex" without permission-bypass flags; a bypass flag needs the human's approval.`;
+  return `${SYSTEM_PROMPT}\n${nested}`;
+}
+
 export const SYSTEM_PROMPT = `You operate a Linux terminal and, when browser_* tools are listed, a sandboxed web browser, on behalf of a human.
 
 Surfaces:

@@ -4,7 +4,8 @@ import type { ApprovalDecision, ApprovalRequest } from "@law/protocol";
 import type { Store } from "../storage/store.js";
 import type { Rule } from "./rules.js";
 
-export type ApprovalOutcome = "allow" | "deny";
+/** How the human answered: "once" covers this call, "session" this rule for the rest of the run. */
+export type ApprovalOutcome = "once" | "session" | "deny";
 
 type Pending = { request: ApprovalRequest; resolve: (o: ApprovalOutcome) => void; timer: NodeJS.Timeout; ruleId: string; runId: string };
 
@@ -77,6 +78,6 @@ export class ApprovalManager extends EventEmitter {
     this.store.decideApproval(id, decision);
     this.store.appendEvent(p.runId, "approval.decided", { id, decision, ruleId: p.ruleId });
     this.emit("resolved", { id, decision });
-    p.resolve(decision === "deny" ? "deny" : "allow");
+    p.resolve(decision);
   }
 }

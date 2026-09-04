@@ -2,11 +2,13 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { NetworkMode } from "@law/protocol";
-import { EgressProxy, type EgressLogEntry } from "./proxy.js";
+import { EgressProxy, type EgressDecision, type EgressLogEntry } from "./proxy.js";
 
 export type SessionEgressDeps = {
   runtimeRoot: string;
   log: (sessionId: string, entry: EgressLogEntry) => void;
+  /** Host gate; absent = allow everything that is not private. */
+  decide?: (host: string, port: number) => EgressDecision | Promise<EgressDecision>;
 };
 
 export function egressSocketPaths(runtimeRoot: string, sessionId: string): string[] {
@@ -30,7 +32,7 @@ export class SessionEgress {
     for (const p of egressSocketPaths(this.deps.runtimeRoot, sessionId)) fs.rmSync(p, { force: true });
     if (networkMode !== "open") return;
     const proxy = new EgressProxy({
-      decide: () => ({ allow: true }), // ponytail: hostname allowlists plug in here
+      decide: this.deps.decide ?? (() => ({ allow: true })),
       log: (e) => this.deps.log(sessionId, e),
     });
     for (const p of egressSocketPaths(this.deps.runtimeRoot, sessionId)) {

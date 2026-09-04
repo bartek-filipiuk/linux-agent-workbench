@@ -9,6 +9,9 @@ import { Lease, LeasePolicy, type LeaseOwner, type Surface } from "./policy/leas
 import { BrowserActionPolicy, type DomainMode } from "./policy/browser-policy.js";
 import { SessionEgress } from "./egress/session-egress.js";
 import { markSessionUsed, stopOrphans, type ContainerLister } from "./maintenance/orphans.js";
+import { makeEgressDecider } from "./egress/host-gate.js";
+import { HostAllowlist } from "./policy/host-allowlist.js";
+import { buildSystemPrompt } from "./orchestrator/system-prompt.js";
 
 const RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
 const LAST_USED_INTERVAL_MS = 30 * 60 * 1000;
@@ -51,10 +54,11 @@ export const BrowserStart = z.object({ type: z.literal("browser.start") });
 export const BrowserStop = z.object({ type: z.literal("browser.stop") });
 export const BrowserNavigateMsg = z.object({ type: z.literal("browser.navigate"), url: z.string().min(1).max(4096) });
 export const BrowserInputMsg = z.object({ type: z.literal("browser.input"), event: BrowserInputEvent });
+export const PolicySet = z.object({ type: z.literal("policy.set"), nestedAutonomy: z.boolean().optional(), domainMode: z.enum(["open", "ask"]).optional() });
 
 export const MainToAgentd = z.discriminatedUnion("type", [
   ConfigInit, SessionStart, SessionStop, TerminalWrite, TerminalResizeMsg, RunStart, RunStop, RunResume, LeaseTake, ApprovalDecide, RunRestore,
-  BrowserStart, BrowserStop, BrowserNavigateMsg, BrowserInputMsg,
+  BrowserStart, BrowserStop, BrowserNavigateMsg, BrowserInputMsg, PolicySet,
 ]);
 export type MainToAgentd = z.infer<typeof MainToAgentd>;
 
@@ -120,6 +124,8 @@ export class Daemon {
   private readonly lease = new Lease();
   private readonly browserLease = new Lease();
   private domainMode: DomainMode = "open";
+  private nestedAutonomy = true;
+  private allowlist: HostAllowlist | undefined;
   private run: RunController | undefined;
   private approvals: ApprovalManager | undefined;
   private gate: CommandGate | undefined;
@@ -169,18 +175,26 @@ export class Daemon {
             store: runtime.store,
             currentRunId: () => (this.run && !TERMINAL.has(this.run.state) ? this.run.runId : undefined),
             networkMode: () => this.manager?.status.networkMode ?? "open",
+            nestedAutonomy: () => this.nestedAutonomy,
           });
           this.gate.on("event", (e: GateEvent) => this.deps.post({ type: "gate.event", ...e }));
           this.browserImageId = msg.browserImageId;
           this.domainMode = msg.browserDomainMode ?? "open";
           this.runtimeRoot = msg.runtimeRoot;
           const store = runtime.store;
+          const approvals = this.approvals;
           this.egress = new SessionEgress({
             runtimeRoot: msg.runtimeRoot,
             log: (sessionId, e) => {
               store.logEgress(sessionId, e);
               if (!e.allowed) console.error(`[agentd] egress denied ${e.host}:${e.port}: ${e.reason}`);
             },
+            decide: makeEgressDecider({
+              mode: () => this.domainMode,
+              allowlist: () => this.allowlist,
+              approvals,
+              currentRunId: () => (this.run && !TERMINAL.has(this.run.state) ? this.run.runId : undefined),
+            }),
           });
           // Startup maintenance: forget month-old runs, stop containers nobody used for a week.
           try {
@@ -204,6 +218,7 @@ export class Daemon {
               this.lastUsedTimer.unref();
             }
             if (s.state === "ready" && s.sessionId) this.ensureBrowserManager(s.sessionId, s.networkMode ?? "open");
+            if (s.state === "ready" && s.workspacePath) this.allowlist = new HostAllowlist(store, store.createWorkspace(s.workspacePath));
             if (s.state !== "ready" || !this.manager?.worker || !this.gate) return;
             this.unhookGate?.();
             const gate = this.gate;
@@ -217,6 +232,10 @@ export class Daemon {
       }
       case "session.start":
         await this.requireManager().start(msg.workspacePath, msg.networkMode);
+        return;
+      case "policy.set":
+        if (msg.nestedAutonomy !== undefined) this.nestedAutonomy = msg.nestedAutonomy;
+        if (msg.domainMode !== undefined) this.domainMode = msg.domainMode;
         return;
       case "session.stop":
         this.run?.stop();
@@ -337,7 +356,7 @@ export class Daemon {
     if (browser && this.approvals) {
       const approvals = this.approvals;
       policies.push(new LeasePolicy(this.browserLease, "browser"));
-      policies.push(new BrowserActionPolicy({ lastObservation: () => browser.lastObservation, approvals, domainMode: () => this.domainMode }));
+      policies.push(new BrowserActionPolicy({ lastObservation: () => browser.lastObservation, approvals, domainMode: () => this.domainMode, hosts: () => this.allowlist }));
       executors.push(browserExecutor(browser));
     }
     const rc = new RunController(
@@ -348,6 +367,7 @@ export class Daemon {
         tools: composeExecutors(...executors),
         policy: composePolicies(...policies),
         prices: runtime.prices,
+        systemPrompt: buildSystemPrompt({ nestedAutonomy: this.nestedAutonomy }),
       },
       { workspaceId, goal, networkMode: status.networkMode ?? "open", ...(snapshot ? { snapshot } : {}) },
     );

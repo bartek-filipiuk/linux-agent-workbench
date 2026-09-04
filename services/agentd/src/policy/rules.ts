@@ -12,16 +12,20 @@ export const AUTO_PREFIXES = [
   "claude", "codex", "cd", "clear", "history", "true", "man", "help", "exit", "logout",
 ];
 
-export const DENY_RULES: Rule[] = [
-  {
-    id: "nested-bypass",
-    category: "permission_change",
-    pattern: /--dangerously-skip-permissions|--dangerously-bypass-approvals-and-sandbox|(^|\s)--yolo(\s|$)/,
-    summary: "nested agent started with a permission bypass flag",
-  },
-];
+// Nothing is refused outright any more: the container is the boundary, the human decides the rest.
+export const DENY_RULES: Rule[] = [];
+
+// A nested agent that skips its own permission prompts. With nested autonomy on (the default) this is
+// merely logged; the sandbox (read-only root, /workspace only, egress proxy) is what contains it.
+export const NESTED_BYPASS_RULE: Rule = {
+  id: "nested-bypass",
+  category: "permission_change",
+  pattern: /--dangerously-skip-permissions|--dangerously-bypass-approvals-and-sandbox|(^|\s)--yolo(\s|$)/,
+  summary: "nested agent started with a permission bypass flag",
+};
 
 export const RULES: Rule[] = [
+  NESTED_BYPASS_RULE,
   { id: "git-push", category: "publish", pattern: /^git\s+push\b/, summary: "push commits to a remote", network: true },
   { id: "npm-publish", category: "publish", pattern: /^(npm|pnpm|yarn)\s+publish\b/, summary: "publish a package", network: true },
   { id: "pipe-to-shell", category: "external_exec", pattern: /^(curl|wget)\b.*\|\s*(sudo\s+)?(sh|bash|zsh)\b/, summary: "download and execute a remote script", network: true },
@@ -43,7 +47,7 @@ function fragments(line: string): { simple: string[]; pipelines: string[] } {
   return { simple, pipelines };
 }
 
-export function classify(command: string, ctx: { networkMode: NetworkMode }): Classification {
+export function classify(command: string, ctx: { networkMode: NetworkMode; nestedAutonomy?: boolean }): Classification {
   const { simple, pipelines } = fragments(command);
   if (simple.length === 0) return { bucket: "auto" };
   const candidates = [...simple, ...pipelines];
@@ -52,7 +56,9 @@ export function classify(command: string, ctx: { networkMode: NetworkMode }): Cl
   }
   for (const rule of RULES) {
     if (rule.network && ctx.networkMode === "none") continue;
-    if (candidates.some((p) => rule.pattern.test(p))) return { bucket: "approval", ruleId: rule.id, category: rule.category, summary: rule.summary };
+    if (!candidates.some((p) => rule.pattern.test(p))) continue;
+    if (rule.id === NESTED_BYPASS_RULE.id && ctx.nestedAutonomy) return { bucket: "log", ruleId: rule.id, category: rule.category, summary: rule.summary };
+    return { bucket: "approval", ruleId: rule.id, category: rule.category, summary: rule.summary };
   }
   // A redirection turns a read-only command into a write; keep those in the log bucket.
   const allAuto = simple.every((p) => !p.includes(">") && AUTO_PREFIXES.some((prefix) => p === prefix || p.startsWith(prefix + " ")));

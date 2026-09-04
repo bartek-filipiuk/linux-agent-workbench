@@ -7,7 +7,7 @@ import { parseEnvFile } from "./env-file";
 import { execFileSync } from "node:child_process";
 import { resolveApiKey, stripEnvKey, type KeyStore } from "./key-store";
 import { RingBuffer, redact } from "./redact";
-import { readSettings, writeSettings, type Settings } from "./settings";
+import { DEFAULT_SETTINGS, readSettings, writeSettings, type Settings } from "./settings";
 
 type AgentdStatus =
   | { type: "agentd.starting" }
@@ -18,7 +18,7 @@ let status: AgentdStatus = { type: "agentd.starting" };
 let session: SessionStatus = { state: "idle" };
 let win: BrowserWindow | null = null;
 let port: MessagePortMain | null = null;
-let settings: Settings = { networkMode: "open" };
+let settings: Settings = { ...DEFAULT_SETTINGS };
 type LeaseState = { surface: "terminal" | "browser"; owner: "agent" | "human"; reason?: string };
 let leases: Record<"terminal" | "browser", LeaseState> = { terminal: { surface: "terminal", owner: "human" }, browser: { surface: "browser", owner: "human" } };
 let browser: { state: string; url?: string; title?: string; message?: string } = { state: "idle" };
@@ -109,8 +109,9 @@ function onAgentd(msg: AgentdToMain) {
     case "agentd.error":
       status = msg.type === "agentd.ready" ? { ...msg, ...keyInfo } : msg;
       send("agentd:event", status);
-      if (msg.type === "agentd.ready" && settings.lastWorkspace) {
-        toAgentd({ type: "session.start", workspacePath: settings.lastWorkspace, networkMode: settings.networkMode });
+      if (msg.type === "agentd.ready") {
+        toAgentd({ type: "policy.set", nestedAutonomy: settings.nestedAutonomy, domainMode: settings.domainMode });
+        if (settings.lastWorkspace) toAgentd({ type: "session.start", workspacePath: settings.lastWorkspace, networkMode: settings.networkMode });
       }
       return;
     case "session.state": {
@@ -172,8 +173,7 @@ function startAgentd() {
   const pout = Number(env.OPENAI_PRICE_OUTPUT_PER_MTOK);
   const prices = env.OPENAI_PRICE_INPUT_PER_MTOK && Number.isFinite(pin) && Number.isFinite(pout) ? { inputUsdPerMTok: pin, outputUsdPerMTok: pout } : undefined;
   const browserImageId = readImageId("browser");
-  const browserDomainMode = env.LAW_BROWSER_DOMAIN_MODE === "ask" ? "ask" : "open";
-  toAgentd({ type: "config.init", apiKey, model, dbPath: dbPath(), imageId, runtimeRoot: runtimeRoot(), browserDomainMode, ...(prices ? { prices } : {}), ...(browserImageId ? { browserImageId } : {}) });
+  toAgentd({ type: "config.init", apiKey, model, dbPath: dbPath(), imageId, runtimeRoot: runtimeRoot(), ...(prices ? { prices } : {}), ...(browserImageId ? { browserImageId } : {}) });
   child.on("exit", (code) => onAgentd({ type: "agentd.error", message: `agentd exited with code ${code}` }));
 }
 
@@ -213,6 +213,15 @@ ipcMain.handle("network:set", (_e, mode: unknown) => {
   return settings.networkMode;
 });
 ipcMain.handle("network:get", () => settings.networkMode);
+ipcMain.handle("policy:get", () => ({ nestedAutonomy: settings.nestedAutonomy, domainMode: settings.domainMode }));
+ipcMain.handle("policy:set", (_e, patch: unknown) => {
+  const p = (patch ?? {}) as { nestedAutonomy?: unknown; domainMode?: unknown };
+  if (typeof p.nestedAutonomy === "boolean") settings = { ...settings, nestedAutonomy: p.nestedAutonomy };
+  if (p.domainMode === "open" || p.domainMode === "ask") settings = { ...settings, domainMode: p.domainMode };
+  writeSettings(settingsFile(), settings);
+  toAgentd({ type: "policy.set", nestedAutonomy: settings.nestedAutonomy, domainMode: settings.domainMode });
+  return { nestedAutonomy: settings.nestedAutonomy, domainMode: settings.domainMode };
+});
 ipcMain.handle("sandbox:destroy", () => toAgentd({ type: "session.stop", destroy: true }));
 ipcMain.handle("lease:get", () => leases);
 ipcMain.handle("run:start", (_e, goal: unknown) => {

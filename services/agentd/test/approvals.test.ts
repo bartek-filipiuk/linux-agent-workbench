@@ -21,7 +21,7 @@ describe("ApprovalManager", () => {
     expect(reqs[0]).toMatchObject({ command: "git push", ruleId: "git-push", category: "publish" });
     expect(am.pending).toHaveLength(1);
     expect(am.decide(reqs[0]!.id, "once")).toBe(true);
-    await expect(p).resolves.toBe("allow");
+    await expect(p).resolves.toBe("once");
     expect(am.pending).toHaveLength(0);
     expect(am.decide(reqs[0]!.id, "once")).toBe(false);
     const rows = store.listEvents(runId).filter((e) => e.type === "approval.decided");
@@ -31,7 +31,7 @@ describe("ApprovalManager", () => {
   it("session decision remembers the rule for the run only", async () => {
     const { runId, am, store } = setup(5000);
     am.on("request", (r) => am.decide(r.id, "session"));
-    await expect(am.request({ runId, command: "git push", rule })).resolves.toBe("allow");
+    await expect(am.request({ runId, command: "git push", rule })).resolves.toBe("session");
     expect(am.isSessionAllowed(runId, "git-push")).toBe(true);
     const otherRun = store.createRun({ workspaceId: store.createWorkspace("/w"), goal: "g2", model: "m", networkMode: "open" });
     expect(am.isSessionAllowed(otherRun, "git-push")).toBe(false);

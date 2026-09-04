@@ -14,7 +14,7 @@ describe("handleConfigInit", () => {
       (p) => new Store(p),
     );
     const ready = AgentdReady.parse(reply);
-    expect(ready).toMatchObject({ schemaVersion: 2, model: "gpt-5.6-sol", interruptedRuns: 0 });
+    expect(ready).toMatchObject({ schemaVersion: 3, model: "gpt-5.6-sol", interruptedRuns: 0 });
     expect(JSON.stringify(reply)).not.toContain("sk-test");
   });
 

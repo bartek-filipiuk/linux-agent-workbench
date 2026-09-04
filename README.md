@@ -44,7 +44,7 @@ Host notes (Ubuntu 22.04, Podman 3.4 rootless): the build tolerates tar's direct
 Every simple command of the interactive shell in the sandbox is checked by agentd before it runs (a bash `DEBUG` trap calls `/opt/law/gate.cjs`, which asks the worker, which asks agentd):
 
 - commands typed by the human are always allowed and logged;
-- for the agent: read-only prefixes run silently (`auto`), most commands run and are logged (`log`), risky ones wait for your decision in the drawer (`approval`: pushes, publishes, `curl | sh`, `sudo`, recursive `rm`/`chmod`, `git reset --hard`, remote shells, raw disk writes), and nested agents started with permission-bypass flags are refused (`deny`);
+- for the agent: read-only prefixes run silently (`auto`), most commands run and are logged (`log`), risky ones wait for your decision in the drawer (`approval`: pushes, publishes, `curl | sh`, `sudo`, recursive `rm`/`chmod`, `git reset --hard`, remote shells, raw disk writes); a nested agent started with a permission-bypass flag is logged when the top-bar setting AGENTS is `autonomous` (the default: the sandbox is the boundary, and the operator model is told to start `claude --dangerously-skip-permissions`) and asks for approval when it is `supervised`;
 - an approval is `Allow once` (this exact command), `Allow for this run` (this rule until the run ends) or `Deny`; no answer within 120 s denies;
 - when a nested tool shows a permission or password prompt, the agent's next keystroke is blocked and the run hands off to you.
 
@@ -57,6 +57,8 @@ The container mounts the named volume `law-ssh` at `/home/agent/.ssh` and, if pr
 ### Network
 
 Neither container has a network namespace of its own (`--network none`). The only way out is an HTTP proxy that agentd serves on a Unix socket in the session's runtime dir; a small forwarder inside each container exposes it as `127.0.0.1:3128`, and `HTTP_PROXY`/`HTTPS_PROXY` point there. The proxy resolves every hostname on the host, refuses private, loopback and link-local addresses (by name and by resolved address) with `403`, and records each decision in the `egress_log` table. With the network mode `none` agentd serves no socket, so proxy-aware tools fail immediately.
+
+The top-bar setting DOMAINS `open | ask` governs both the browser and the proxy. In `ask` mode the first connection to a host during a run shows an approval card ("Allow once" covers this app run, "Allow for this run" also remembers the host for the workspace); concurrent connections to one host share one card; traffic while no run is active is the human's and is not questioned. Hosts are matched exactly, so `www.x.com` and `api.x.com` are two entries.
 
 What works: curl, git, apt, pip, npm/pnpm, Claude Code, Codex, Chromium (launched with `--proxy-server`), and ssh through the `ProxyCommand` shipped in `/etc/ssh/ssh_config.d/law-egress.conf`. What does not: anything that ignores proxy variables, ping, UDP, and tools that resolve names themselves before connecting.
 

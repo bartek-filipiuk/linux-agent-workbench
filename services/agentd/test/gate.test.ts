@@ -10,11 +10,12 @@ function setup() {
   const lease = new Lease();
   const approvals = new ApprovalManager(store, { ttlMs: 5000 });
   let network: "open" | "none" = "open";
-  const gate = new CommandGate({ lease, approvals, store, currentRunId: () => runId, networkMode: () => network });
+  let autonomy = false;
+  const gate = new CommandGate({ lease, approvals, store, currentRunId: () => runId, networkMode: () => network, nestedAutonomy: () => autonomy });
   const events: Array<Record<string, unknown>> = [];
   gate.on("event", (e) => events.push(e));
   const req = (command: string) => gate.check({ command, cwd: "/workspace", pid: 1 });
-  return { store, runId, lease, approvals, gate, events, req, setNetwork: (n: "open" | "none") => (network = n) };
+  return { store, runId, lease, approvals, gate, events, req, setNetwork: (n: "open" | "none") => (network = n), setAutonomy: (a: boolean) => (autonomy = a) };
 }
 
 describe("CommandGate", () => {
@@ -24,14 +25,17 @@ describe("CommandGate", () => {
     expect(events[0]).toMatchObject({ actor: "human", bucket: "approval", decision: "allow" });
   });
 
-  it("auto-allows, logs, and denies for the agent", async () => {
-    const { req, lease, events, store, runId } = setup();
+  it("auto-allows and logs for the agent; a bypass flag asks unless nested autonomy is on", async () => {
+    const { req, lease, events, store, runId, approvals, setAutonomy } = setup();
     lease.take("agent");
     expect(await req("ls -al")).toEqual({ decision: "allow" });
     expect(await req("node x.js")).toEqual({ decision: "allow" });
-    expect(await req("claude --dangerously-skip-permissions")).toMatchObject({ decision: "deny", reason: expect.stringMatching(/bypass/) });
-    expect(events.map((e) => e.bucket)).toEqual(["auto", "log", "deny"]);
-    expect(store.listEvents(runId).filter((e) => e.type === "command.gate")).toHaveLength(3);
+    approvals.once("request", (r) => approvals.decide(r.id, "deny"));
+    expect(await req("claude --dangerously-skip-permissions")).toMatchObject({ decision: "deny", reason: expect.stringMatching(/denied by the human/) });
+    setAutonomy(true);
+    expect(await req("claude --dangerously-skip-permissions")).toEqual({ decision: "allow" });
+    expect(events.map((e) => e.bucket)).toEqual(["auto", "log", "approval", "log"]);
+    expect(store.listEvents(runId).filter((e) => e.type === "command.gate")).toHaveLength(4);
   });
 
   it("asks for approval and honours once / session / deny", async () => {

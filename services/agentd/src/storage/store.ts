@@ -87,6 +87,14 @@ export class Store {
     return this.db.prepare(`SELECT * FROM runs WHERE id = ?`).get(runId) as RunRow | undefined;
   }
 
+  listAllowedHosts(workspaceId: string): string[] {
+    return (this.db.prepare(`SELECT host FROM host_allowlist WHERE workspace_id = ? ORDER BY host`).all(workspaceId) as { host: string }[]).map((r) => r.host);
+  }
+
+  addAllowedHost(workspaceId: string, host: string): void {
+    this.db.prepare(`INSERT OR IGNORE INTO host_allowlist (workspace_id, host, added_at) VALUES (?, ?, ?)`).run(workspaceId, host, Date.now());
+  }
+
   logEgress(sessionId: string, e: { host: string; port: number; allowed: boolean; reason?: string }): void {
     this.db
       .prepare(`INSERT INTO egress_log (ts, session_id, host, port, allowed, reason) VALUES (?, ?, ?, ?, ?, ?)`)

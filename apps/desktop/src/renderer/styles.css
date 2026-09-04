@@ -42,6 +42,8 @@ html, body, #root { height: 100%; }
 .badge.net-open { background: rgba(245, 158, 11, 0.12); color: var(--warn); border: 1px solid var(--warn); }
 .badge.net-none { background: #1f242b; color: var(--muted); border: 1px solid #2a3139; }
 .badge select { background: transparent; color: inherit; border: none; font: inherit; }
+.badge.pol-auto, .badge.pol-open { background: #1f242b; color: var(--muted); border: 1px solid #2a3139; }
+.badge.pol-sup, .badge.pol-ask { background: rgba(96, 165, 250, 0.12); color: var(--human); border: 1px solid var(--human); }
 .empty { margin: auto; color: var(--muted); text-align: center; }
 .error { color: var(--agent); text-align: left; white-space: pre-wrap; max-width: 80ch; }
 .main { gap: 12px; }

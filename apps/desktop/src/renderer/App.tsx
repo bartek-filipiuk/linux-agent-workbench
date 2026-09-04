@@ -10,6 +10,7 @@ type AgentdStatus =
   | { type: "agentd.error"; message: string };
 type SessionStatus = { state: "idle" | "starting" | "ready" | "disconnected" | "stopped" | "error"; sessionId?: string; workspacePath?: string; networkMode?: "open" | "none"; message?: string };
 type LeaseState = { surface: "terminal" | "browser"; owner: "agent" | "human"; reason?: string };
+type PolicySettings = { nestedAutonomy: boolean; domainMode: "open" | "ask" };
 type Leases = Record<"terminal" | "browser", LeaseState>;
 
 declare global {
@@ -38,6 +39,8 @@ declare global {
       navigate(url: string): Promise<void>;
       browserInput(event: unknown): void;
       writeDiagnostics(): Promise<string>;
+      getPolicy(): Promise<PolicySettings>;
+      setPolicy(patch: Partial<PolicySettings>): Promise<PolicySettings>;
       onBrowserState(cb: (s: BrowserStatus) => void): () => void;
       onBrowserFrame(cb: (f: { width: number; height: number; data: Uint8Array }) => void): () => void;
       onEvent(cb: (e: AgentdStatus) => void): () => void;
@@ -53,6 +56,7 @@ export function App() {
   const [status, setStatus] = useState<AgentdStatus>({ type: "agentd.starting" });
   const [session, setSession] = useState<SessionStatus>({ state: "idle" });
   const [network, setNetwork] = useState<"open" | "none">("open");
+  const [policy, setPolicy] = useState<PolicySettings>({ nestedAutonomy: true, domainMode: "open" });
   const [leases, setLeases] = useState<Leases>({ terminal: { surface: "terminal", owner: "human" }, browser: { surface: "browser", owner: "human" } });
   const [run, setRun] = useState<RunView>(emptyRun);
   const [handoff, setHandoff] = useState<string | null>(null);
@@ -63,6 +67,7 @@ export function App() {
     void window.workbench.getStatus().then(setStatus);
     void window.workbench.getSession().then(setSession);
     void window.workbench.getNetwork().then(setNetwork);
+    void window.workbench.getPolicy().then(setPolicy);
     void window.workbench.getLease().then(setLeases);
     void window.workbench.getBrowser().then(setBrowser);
     const offs = [
@@ -116,6 +121,20 @@ export function App() {
           <select value={network} onChange={(e) => void window.workbench.setNetwork(e.target.value as "open" | "none").then(setNetwork)}>
             <option value="open">open</option>
             <option value="none">none</option>
+          </select>
+        </span>
+        <span className={`badge pol-${policy.nestedAutonomy ? "auto" : "sup"}`} title="Autonomous: claude and codex start with their permission prompts skipped; the sandbox is the boundary. Supervised: a bypass flag needs your approval.">
+          AGENTS
+          <select value={policy.nestedAutonomy ? "auto" : "sup"} onChange={(e) => void window.workbench.setPolicy({ nestedAutonomy: e.target.value === "auto" }).then(setPolicy)}>
+            <option value="auto">autonomous</option>
+            <option value="sup">supervised</option>
+          </select>
+        </span>
+        <span className={`badge pol-${policy.domainMode}`} title="ask: a card before the sandbox or the browser first talks to a new host during a run">
+          DOMAINS
+          <select value={policy.domainMode} onChange={(e) => void window.workbench.setPolicy({ domainMode: e.target.value as "open" | "ask" }).then(setPolicy)}>
+            <option value="open">open</option>
+            <option value="ask">ask</option>
           </select>
         </span>
         <span className="view-switch" role="tablist" aria-label="Panels">

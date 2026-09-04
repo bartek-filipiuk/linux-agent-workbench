@@ -4,6 +4,7 @@ import type { Policy, PolicyContext, PolicyDecision } from "./types.js";
 import type { ApprovalManager } from "./approvals.js";
 import type { Rule } from "./rules.js";
 import { isPrivateAddress } from "./private-address.js";
+import type { HostAllowlist } from "./host-allowlist.js";
 
 export { isPrivateAddress };
 
@@ -76,6 +77,8 @@ export type BrowserPolicyDeps = {
   lastObservation: () => BrowserObservation | undefined;
   approvals: Pick<ApprovalManager, "request" | "isSessionAllowed">;
   domainMode?: () => DomainMode;
+  /** Shared with the egress proxy: one answer per host covers both. Absent = a private per-run set. */
+  hosts?: () => HostAllowlist | undefined;
   allowPrivate?: boolean;
 };
 
@@ -93,13 +96,17 @@ export class BrowserActionPolicy implements Policy {
     if (c.kind === "deny") return { allow: false, code: "POLICY_DENIED", reason: c.reason };
     if (c.kind === "handoff") return { allow: false, code: "LEASE_DENIED", reason: c.reason, handoff: c.reason };
     if (action.kind === "navigate" && (this.deps.domainMode?.() ?? "open") === "ask") {
-      const host = new URL(action.url.includes("://") ? action.url : `https://${action.url}`).hostname;
-      if (!this.seenHosts.has(host)) {
+      const host = new URL(action.url.includes("://") ? action.url : `https://${action.url}`).hostname.toLowerCase();
+      const shared = this.deps.hosts?.();
+      if (!this.seenHosts.has(host) && !shared?.has(host)) {
+        let persist = false;
         if (!this.deps.approvals.isSessionAllowed(ctx.runId, DOMAIN_RULE.id)) {
           const outcome = await this.deps.approvals.request({ runId: ctx.runId, command: `open ${host}`, rule: DOMAIN_RULE });
           if (outcome === "deny") return { allow: false, code: "POLICY_DENIED", reason: `the human declined opening ${host}` };
+          persist = outcome === "session";
         }
         this.seenHosts.add(host);
+        shared?.add(host, { persist });
       }
     }
     if (c.kind === "approval") {

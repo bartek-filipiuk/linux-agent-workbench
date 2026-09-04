@@ -43,10 +43,10 @@ describe("BrowserActionPolicy", () => {
   const ctx = { runId: "r", networkMode: "open" as const };
   function make(domainMode: "open" | "ask" = "open") {
     const requests: string[] = [];
-    let answer: "allow" | "deny" = "allow";
+    let answer: "once" | "session" | "deny" = "once";
     const approvals = { request: async (i: { command: string }) => { requests.push(i.command); return answer; }, isSessionAllowed: () => false };
     const p = new BrowserActionPolicy({ lastObservation: () => obs, approvals, domainMode: () => domainMode });
-    return { p, requests, setAnswer: (a: "allow" | "deny") => (answer = a) };
+    return { p, requests, setAnswer: (a: "once" | "session" | "deny") => (answer = a) };
   }
   it("ignores non-browser tools and allows reads", async () => {
     const { p } = make();

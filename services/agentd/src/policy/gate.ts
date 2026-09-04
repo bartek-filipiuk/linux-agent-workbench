@@ -15,6 +15,7 @@ export class CommandGate extends EventEmitter {
       store: Store;
       currentRunId: () => string | undefined;
       networkMode: () => NetworkMode;
+      nestedAutonomy?: () => boolean;
     },
   ) {
     super();
@@ -22,7 +23,7 @@ export class CommandGate extends EventEmitter {
 
   async check(req: { command: string; cwd: string; pid: number }): Promise<{ decision: "allow" | "deny"; reason?: string }> {
     const actor = this.deps.lease.state.owner;
-    const c = classify(req.command, { networkMode: this.deps.networkMode() });
+    const c = classify(req.command, { networkMode: this.deps.networkMode(), nestedAutonomy: this.deps.nestedAutonomy?.() ?? false });
     const runId = this.deps.currentRunId();
     const done = (decision: "allow" | "deny", reason?: string) => {
       const ev: GateEvent = { command: req.command, bucket: c.bucket, actor, decision, ...(c.ruleId ? { ruleId: c.ruleId } : {}), ...(reason ? { reason } : {}) };
@@ -36,13 +37,13 @@ export class CommandGate extends EventEmitter {
       case "log":
         return done("allow");
       case "deny":
-        return done("deny", `refused: ${c.summary ?? "policy"} (permission bypass flags are never allowed)`);
+        return done("deny", `refused: ${c.summary ?? "policy"}`);
       case "approval": {
         const rule = RULES.find((r) => r.id === c.ruleId)!;
         if (!runId) return done("deny", "no active run to attach an approval to");
         if (this.deps.approvals.isSessionAllowed(runId, rule.id)) return done("allow");
         const outcome = await this.deps.approvals.request({ runId, command: req.command, rule });
-        return outcome === "allow" ? done("allow") : done("deny", `denied by the human: ${rule.summary}`);
+        return outcome !== "deny" ? done("allow") : done("deny", `denied by the human: ${rule.summary}`);
       }
     }
   }

@@ -14,13 +14,13 @@ function mkRun(store: Store) {
 describe("Store", () => {
   it("migrates to the current schema version and is idempotent", () => {
     const s = mkStore();
-    expect(s.schemaVersion).toBe(2);
+    expect(s.schemaVersion).toBe(3);
     s.close();
     const file = path.join(tmpDir(), "state.sqlite");
     const a = new Store(file);
     a.close();
     const b = new Store(file);
-    expect(b.schemaVersion).toBe(2);
+    expect(b.schemaVersion).toBe(3);
     b.close();
   });
 

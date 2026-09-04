@@ -31,10 +31,12 @@ describe("classify", () => {
     expect(classify("rm -rf x", none).bucket).toBe("approval");
   });
 
-  it("denies nested agents started with permission bypass flags", () => {
-    expect(classify("claude --dangerously-skip-permissions", open)).toMatchObject({ bucket: "deny" });
-    expect(classify("codex --dangerously-bypass-approvals-and-sandbox", open)).toMatchObject({ bucket: "deny" });
-    expect(classify("codex exec --yolo 'do it'", open)).toMatchObject({ bucket: "deny" });
+  it("asks before nested agents with permission bypass flags, and only logs them under nested autonomy", () => {
+    expect(classify("claude --dangerously-skip-permissions", open)).toMatchObject({ bucket: "approval", ruleId: "nested-bypass" });
+    expect(classify("codex --dangerously-bypass-approvals-and-sandbox", open)).toMatchObject({ bucket: "approval" });
+    expect(classify("codex exec --yolo 'do it'", open)).toMatchObject({ bucket: "approval" });
+    expect(classify("claude --dangerously-skip-permissions", { ...open, nestedAutonomy: true })).toMatchObject({ bucket: "log", ruleId: "nested-bypass" });
+    expect(classify("git push", { ...open, nestedAutonomy: true }).bucket).toBe("approval"); // autonomy relaxes only the bypass rule
   });
 
   it("is not fooled by leading whitespace, env assignments or command chaining", () => {
