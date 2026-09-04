@@ -3,7 +3,7 @@ import type { ToolCall } from "../provider/types.js";
 
 export type PolicyDecision =
   | { allow: true }
-  | { allow: false; code: "POLICY_DENIED" | "LEASE_DENIED"; reason: string };
+  | { allow: false; code: "POLICY_DENIED" | "LEASE_DENIED"; reason: string; handoff?: string };
 
 export type PolicyContext = { runId: string; networkMode: NetworkMode };
 

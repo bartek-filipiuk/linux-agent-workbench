@@ -30,3 +30,6 @@ export { ApprovalManager } from "./policy/approvals.js";
 export type { ApprovalOutcome } from "./policy/approvals.js";
 export { CommandGate } from "./policy/gate.js";
 export type { GateEvent } from "./policy/gate.js";
+export { NestedPromptPolicy, composePolicies, detectNestedPrompt, NESTED_PROMPT_PATTERNS } from "./policy/nested-prompts.js";
+export { snapshotWorkspace, restoreSnapshot } from "./session/snapshot.js";
+export type { Snapshot } from "./session/snapshot.js";

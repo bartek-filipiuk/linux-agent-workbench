@@ -138,6 +138,10 @@ export class RunController extends EventEmitter {
       store.finishToolCall(rowId, "denied", { error }, decision.code);
       store.appendEvent(this.runId, "tool.denied", { name: call.name, ...error });
       this.emit("tool", { name: call.name, status: "denied", callId: call.callId });
+      if (decision.handoff) {
+        const observation = await this.handoff(decision.handoff, worker);
+        return { callId: call.callId, output: JSON.stringify({ resumed: true, observation, note: decision.reason }) };
+      }
       return { callId: call.callId, output: JSON.stringify({ error }) };
     }
 

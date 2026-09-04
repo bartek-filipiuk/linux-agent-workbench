@@ -136,6 +136,26 @@ describe("RunController", () => {
     expect((await p).state).toBe("stopped");
   });
 
+  it("a denial carrying a handoff reason pauses the run and resumes with an observation", async () => {
+    const { ws, store, worker, fw } = await setup();
+    const adapter = new FakeModelAdapter([
+      { toolCalls: [{ name: "terminal_input", args: { kind: "key", key: "ENTER" } }] },
+      { text: "resumed" },
+    ]);
+    const policy = { authorize: async () => ({ allow: false as const, code: "LEASE_DENIED" as const, reason: "prompt visible", handoff: "nested permission prompt on screen" }) };
+    const rc = new RunController({ store, adapter, worker, policy }, input(ws));
+    const handoff = new Promise<{ reason: string }>((r) => rc.on("handoff", r));
+    const p = rc.start();
+    expect((await handoff).reason).toMatch(/nested permission prompt/);
+    fw.screen = "$ done";
+    rc.resumeFromHandoff();
+    const out = await p;
+    expect(out.state).toBe("completed");
+    const output = JSON.parse(toolResultsOf(adapter.inputs[1])[0]!.output);
+    expect(output).toMatchObject({ resumed: true, observation: { screen: "$ done" } });
+    expect(store.listToolCalls(out.runId)[0]?.status).toBe("denied");
+  });
+
   it("fails cleanly when the model adapter throws", async () => {
     const { ws, store, worker, fw } = await setup();
     const adapter = { model: "boom", turn: async () => { throw new Error("upstream 500"); } };
