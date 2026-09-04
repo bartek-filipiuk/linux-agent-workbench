@@ -39,6 +39,17 @@ export class WorkerServer {
     return new Promise((r) => this.server.close(() => r()));
   }
 
+  async forwardGate(req: { command: string; cwd: string; pid: number }): Promise<{ decision: "allow" | "deny"; reason?: string }> {
+    const conn = this.current;
+    if (!conn || conn.closed) return { decision: "deny", reason: "no policy connection" };
+    try {
+      const r = await conn.request("gate.check", req, { timeoutMs: 180_000 });
+      return r.decision === "allow" ? { decision: "allow" } : { decision: "deny", reason: typeof r.reason === "string" ? r.reason : "denied by policy" };
+    } catch (e) {
+      return { decision: "deny", reason: e instanceof Error ? e.message : String(e) };
+    }
+  }
+
   private accept(socket: net.Socket): void {
     console.log(`terminal-worker: client connected${this.clients ? " (replacing previous client)" : ""}`);
     this.unsubscribe?.();

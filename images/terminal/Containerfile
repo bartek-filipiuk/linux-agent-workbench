@@ -35,6 +35,7 @@ RUN cd /opt/law && npm install --omit=dev --no-audit --no-fund
 COPY packages/protocol/package.json /opt/law/node_modules/@law/protocol/package.json
 COPY packages/protocol/dist /opt/law/node_modules/@law/protocol/dist
 COPY services/terminal-worker/dist /opt/law/worker
+COPY images/terminal/gate.js /opt/law/gate.js
 COPY images/terminal/bash.bashrc /tmp/law.bashrc
 RUN cat /tmp/law.bashrc >> /etc/bash.bashrc && rm /tmp/law.bashrc && chown -R root:root /opt/law
 
