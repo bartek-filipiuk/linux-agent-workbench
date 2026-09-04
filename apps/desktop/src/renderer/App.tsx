@@ -142,7 +142,7 @@ export function App() {
         </div>
       )}
       <main className="main">
-        {view !== "terminal" && <BrowserPanel status={browser} owner={agentOwnsBrowser ? "agent" : "human"} />}
+        {view !== "terminal" && <BrowserPanel status={browser} owner={agentOwnsBrowser ? "agent" : "human"} runActive={runActive || run.state === "handoff"} />}
         {view === "browser" ? null : live ? (
           <TerminalPanel owner={agentOwns ? "agent" : "human"} />
         ) : (

@@ -142,7 +142,7 @@ export class Daemon {
       return;
     }
     const msg = parsed.data;
-    if (msg.type !== "terminal.write") console.error(`[agentd] <- ${msg.type}`);
+    if (msg.type !== "terminal.write" && msg.type !== "browser.input") console.error(`[agentd] <- ${msg.type}`);
     switch (msg.type) {
       case "config.init": {
         const { reply, runtime } = handleConfigInit(msg, this.deps.openStore);

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { BrowserObservation } from "@law/protocol";
-import { BrowserActionPolicy, classifyBrowserAction, isPrivateAddress } from "../src/policy/browser-policy.js";
+import { BrowserActionPolicy, classifyBrowserAction, isPrivateAddress, observationHints } from "../src/policy/browser-policy.js";
 import { Lease, LeasePolicy } from "../src/policy/lease.js";
 
 const obs: BrowserObservation = {
@@ -27,7 +27,7 @@ describe("classifyBrowserAction", () => {
   it("denies private navigation unless allowed, denies typing into passwords", () => {
     expect(classifyBrowserAction({ kind: "navigate", url: "http://127.0.0.1/" }, obs).kind).toBe("deny");
     expect(classifyBrowserAction({ kind: "navigate", url: "http://127.0.0.1/" }, obs, { allowPrivate: true }).kind).toBe("allow");
-    expect(classifyBrowserAction({ kind: "type", ref: "e3", revision: 1, text: "s3cret" }, obs)).toMatchObject({ kind: "deny" });
+    expect(classifyBrowserAction({ kind: "type", ref: "e3", revision: 1, text: "s3cret" }, obs)).toMatchObject({ kind: "handoff", reason: expect.stringMatching(/password/) });
     expect(classifyBrowserAction({ kind: "type", ref: "e1", revision: 1, text: "hello" }, obs).kind).toBe("allow");
   });
   it("routes consequential clicks to approval with the right category", () => {
@@ -67,10 +67,25 @@ describe("BrowserActionPolicy", () => {
     await p.authorize({ callId: "3", name: "browser_act", args: { action: { kind: "navigate", url: "https://other.example.com/" } } }, ctx);
     expect(requests).toEqual(["open docs.example.com", "open other.example.com"]);
   });
-  it("denies password typing without asking", async () => {
+  it("turns password typing into a handoff without asking", async () => {
     const { p, requests } = make();
-    expect(await p.authorize({ callId: "1", name: "browser_act", args: { action: { kind: "type", ref: "e3", revision: 1, text: "x" } } }, ctx)).toMatchObject({ allow: false, code: "POLICY_DENIED" });
+    expect(await p.authorize({ callId: "1", name: "browser_act", args: { action: { kind: "type", ref: "e3", revision: 1, text: "x" } } }, ctx)).toMatchObject({ allow: false, code: "LEASE_DENIED", handoff: expect.stringMatching(/password field/) });
     expect(requests).toEqual([]);
+  });
+
+  it("hands off sign-in clicks on a login page and captcha buttons", () => {
+    const login = { ...obs, elements: [...obs.elements, { ref: "e6", role: "button", name: "Log in", enabled: true, editable: false, inViewport: true, bounds: { x: 0, y: 0, width: 1, height: 1 } }, { ref: "e7", role: "button", name: "I'm not a robot", enabled: true, editable: false, inViewport: true, bounds: { x: 0, y: 0, width: 1, height: 1 } }] };
+    expect(classifyBrowserAction({ kind: "click", ref: "e6", revision: 1 }, login)).toMatchObject({ kind: "handoff", reason: expect.stringMatching(/sign-in/) });
+    expect(classifyBrowserAction({ kind: "click", ref: "e7", revision: 1 }, login)).toMatchObject({ kind: "handoff", reason: expect.stringMatching(/CAPTCHA/) });
+    const noPassword = { ...obs, elements: [{ ref: "e6", role: "button", name: "Log in", enabled: true, editable: false, inViewport: true, bounds: { x: 0, y: 0, width: 1, height: 1 } }] };
+    expect(classifyBrowserAction({ kind: "click", ref: "e6", revision: 1 }, noPassword).kind).toBe("allow");
+  });
+
+  it("hints the model about login forms, captchas and 2fa", () => {
+    expect(observationHints(obs).join(" ")).toMatch(/login_form/);
+    expect(observationHints({ elements: [{ ref: "e1", role: "button", name: "Verify you are human", enabled: true, editable: false, inViewport: true, bounds: { x: 0, y: 0, width: 1, height: 1 } }] }).join(" ")).toMatch(/captcha/);
+    expect(observationHints({ elements: [{ ref: "e1", role: "textbox", name: "Enter the verification code", enabled: true, editable: true, inViewport: true, bounds: { x: 0, y: 0, width: 1, height: 1 } }] }).join(" ")).toMatch(/two_factor/);
+    expect(observationHints({ elements: [] })).toEqual([]);
   });
 });
 

@@ -5,7 +5,7 @@ export type BrowserStatus = { state: "idle" | "starting" | "ready" | "stopped" |
 const KEY_MAP: Record<string, string> = { " ": "Space" };
 
 // Human-only surface in B1: the canvas shows the sandbox browser and forwards pointer and keyboard input.
-export function BrowserPanel({ status, owner }: { status: BrowserStatus; owner: "human" | "agent" }) {
+export function BrowserPanel({ status, owner, runActive }: { status: BrowserStatus; owner: "human" | "agent"; runActive: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const viewport = useRef({ width: 1280, height: 800 });
   const decoding = useRef(false);
@@ -82,6 +82,11 @@ export function BrowserPanel({ status, owner }: { status: BrowserStatus; owner: 
             {status.state === "starting" ? "Starting…" : "Open browser"}
           </button>
         )}
+        {live && runActive && (human ? (
+          <button className="btn" type="button" onClick={() => void window.workbench.releaseControl("browser")}>Give browser to agent</button>
+        ) : (
+          <button className="btn" type="button" onClick={() => void window.workbench.takeControl("browser")}>Take the browser</button>
+        ))}
         <span className="hint">{live ? `${status.title ?? ""} · ${fps} fps` : status.state === "error" ? status.message : "sandbox browser is closed"}</span>
       </form>
       <div className={`browser-stage ${owner}`}>

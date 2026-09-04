@@ -41,7 +41,25 @@ export const BROWSER_RULES: Rule[] = [
 ];
 export const DOMAIN_RULE: Rule = { id: "browser-domain", category: "external_side_effect", pattern: /./, summary: "open a new domain" };
 
-export type BrowserClassification = { kind: "allow" } | { kind: "deny"; reason: string } | { kind: "approval"; rule: Rule; command: string };
+export type BrowserClassification =
+  | { kind: "allow" }
+  | { kind: "deny"; reason: string }
+  | { kind: "handoff"; reason: string }
+  | { kind: "approval"; rule: Rule; command: string };
+
+const SIGN_IN = /\b(sign in|log in|login|continue|next|verify|submit)\b/i;
+const CAPTCHA = /captcha|not a robot|verify you are human|security check/i;
+const TWO_FACTOR = /verification code|one-time|2fa|authenticator|passcode/i;
+
+/** Text hints for the model: what on this page belongs to the human. */
+export function observationHints(obs: Pick<BrowserObservation, "elements">): string[] {
+  const hints: string[] = [];
+  const blob = obs.elements.map((e) => `${e.name} ${e.text ?? ""}`).join("\n");
+  if (obs.elements.some((e) => e.role === "password")) hints.push("login_form: a password field is on this page; the human must log in (call request_human)");
+  if (CAPTCHA.test(blob)) hints.push("captcha: a human verification is on this page; call request_human");
+  if (TWO_FACTOR.test(blob)) hints.push("two_factor: a verification code is requested; call request_human");
+  return hints;
+}
 
 function findElement(obs: BrowserObservation | undefined, ref: string) {
   return obs?.elements.find((e) => e.ref === ref);
@@ -54,12 +72,15 @@ export function classifyBrowserAction(action: BrowserAction, obs: BrowserObserva
   }
   if (action.kind === "type") {
     const el = findElement(obs, action.ref);
-    if (el?.role === "password") return { kind: "deny", reason: "the model must not type into password fields; ask the human (request_human)" };
+    if (el?.role === "password") return { kind: "handoff", reason: "password field needs your input; log in through the browser panel, then give control back" };
     if (!action.submit) return { kind: "allow" };
   }
   if (action.kind === "click" || action.kind === "type") {
     const el = findElement(obs, action.ref);
     const label = `${el?.name ?? ""} ${el?.text ?? ""}`;
+    const loginPage = obs?.elements.some((e) => e.role === "password") ?? false;
+    if (loginPage && SIGN_IN.test(label)) return { kind: "handoff", reason: "sign-in needs your credentials; log in through the browser panel, then give control back" };
+    if (CAPTCHA.test(label)) return { kind: "handoff", reason: "CAPTCHA or verification needs you; solve it in the browser panel, then give control back" };
     for (const rule of BROWSER_RULES) {
       if (rule.pattern.test(label)) {
         return { kind: "approval", rule, command: `${action.kind} "${(el?.name || el?.text || action.ref).slice(0, 80)}" on ${obs?.url ?? "the page"}` };
@@ -90,6 +111,7 @@ export class BrowserActionPolicy implements Policy {
     if (!action || typeof action !== "object" || !("kind" in action)) return { allow: true }; // the executor rejects malformed args
     const c = classifyBrowserAction(action, this.deps.lastObservation(), { allowPrivate: this.deps.allowPrivate ?? false });
     if (c.kind === "deny") return { allow: false, code: "POLICY_DENIED", reason: c.reason };
+    if (c.kind === "handoff") return { allow: false, code: "LEASE_DENIED", reason: c.reason, handoff: c.reason };
     if (action.kind === "navigate" && (this.deps.domainMode?.() ?? "open") === "ask") {
       const host = new URL(action.url.includes("://") ? action.url : `https://${action.url}`).hostname;
       if (!this.seenHosts.has(host)) {

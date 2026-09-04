@@ -39,7 +39,7 @@ export { buildBrowserRunArgs, browserContainerName } from "./runtime/podman.js";
 export type { BrowserRunSpec } from "./runtime/podman.js";
 export { BrowserStart, BrowserStop, BrowserNavigateMsg, BrowserInputMsg } from "./ipc.js";
 export type { BrowserStateMsg, BrowserFrameMsg } from "./ipc.js";
-export { BrowserActionPolicy, classifyBrowserAction, isPrivateAddress, BROWSER_RULES, DOMAIN_RULE } from "./policy/browser-policy.js";
+export { BrowserActionPolicy, classifyBrowserAction, isPrivateAddress, observationHints, BROWSER_RULES, DOMAIN_RULE } from "./policy/browser-policy.js";
 export type { BrowserClassification, BrowserPolicyDeps, DomainMode } from "./policy/browser-policy.js";
 export { BROWSER_TOOLS, browserExecutor } from "./tools/browser-tools.js";
 export { terminalExecutor } from "./tools/terminal-tools.js";

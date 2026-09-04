@@ -2,6 +2,7 @@ import { z } from "zod";
 import { BrowserAction, BrowserObserveInput, BrowserWaitInput, ProtocolError, type BrowserObservation } from "@law/protocol";
 import type { ToolCall, ToolExecutor, ToolSpec } from "../provider/types.js";
 import type { BrowserSessionManager } from "../session/browser-session-manager.js";
+import { observationHints } from "../policy/browser-policy.js";
 
 const schema = (s: z.ZodType) => z.toJSONSchema(s, { target: "draft-7", unrepresentable: "any" }) as Record<string, unknown>;
 const ActArgs = z.object({ action: BrowserAction });
@@ -52,7 +53,8 @@ export function browserExecutor(browser: BrowserToolTarget): ToolExecutor {
         case "browser_observe": {
           const obs: BrowserObservation = await browser.observe(parseArgs(BrowserObserveInput, call.args, call.name), signal);
           const { screenshotJpegBase64, ...text } = obs;
-          return { output: JSON.stringify(text), ...(screenshotJpegBase64 ? { imageJpegBase64: screenshotJpegBase64 } : {}) };
+          const hints = observationHints(obs);
+          return { output: JSON.stringify(hints.length ? { ...text, hints } : text), ...(screenshotJpegBase64 ? { imageJpegBase64: screenshotJpegBase64 } : {}) };
         }
         case "browser_act":
           return { output: JSON.stringify(await browser.act(parseArgs(ActArgs, call.args, call.name).action, signal)) };
