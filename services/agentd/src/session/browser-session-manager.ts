@@ -5,7 +5,21 @@ import net from "node:net";
 import path from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
 import { FramedConnection } from "@law/protocol/node";
-import { BrowserInfo, ProtocolError, decodeBrowserFrame, type BrowserInputEvent, type NetworkMode } from "@law/protocol";
+import {
+  BrowserActResult,
+  BrowserDownload,
+  BrowserInfo,
+  BrowserObservation,
+  BrowserWaitResult,
+  ProtocolError,
+  decodeBrowserFrame,
+  type BrowserAction,
+  type BrowserInputEvent,
+  type BrowserObserveInput,
+  type BrowserWaitInput,
+  type NetworkMode,
+} from "@law/protocol";
+import { z } from "zod";
 import { browserContainerName, buildBrowserRunArgs, type PodmanRuntime } from "../runtime/podman.js";
 
 export type BrowserState = "idle" | "starting" | "ready" | "stopped" | "error";
@@ -127,6 +141,25 @@ export class BrowserSessionManager extends EventEmitter {
 
   input(event: BrowserInputEvent): void {
     this.conn?.notify("browser.input", event);
+  }
+
+  async observe(input: BrowserObserveInput = {}, signal?: AbortSignal): Promise<BrowserObservation> {
+    return BrowserObservation.parse(await this.requireConn().request("browser.observe", input, { timeoutMs: 30_000, ...(signal ? { signal } : {}) }));
+  }
+
+  async act(action: BrowserAction, signal?: AbortSignal): Promise<BrowserActResult> {
+    const r = BrowserActResult.parse(await this.requireConn().request("browser.act", action, { timeoutMs: 45_000, ...(signal ? { signal } : {}) }));
+    this.setStatus({ state: "ready", url: r.url, title: r.title });
+    return r;
+  }
+
+  async wait(input: BrowserWaitInput, signal?: AbortSignal): Promise<BrowserWaitResult> {
+    const timeoutMs = (input.timeoutMs ?? 15_000) + 5_000;
+    return BrowserWaitResult.parse(await this.requireConn().request("browser.wait", input, { timeoutMs, ...(signal ? { signal } : {}) }));
+  }
+
+  async downloads(): Promise<BrowserDownload[]> {
+    return z.object({ downloads: z.array(BrowserDownload) }).parse(await this.requireConn().request("browser.downloads", {})).downloads;
   }
 
   /** Close the connection; a container keeps running for the next start, a host process is stopped. */
