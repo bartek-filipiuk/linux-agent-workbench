@@ -65,7 +65,8 @@ export function buildRunArgs(spec: RunSpec): string[] {
     "--read-only",
     "--pids-limit=512",
     "--memory=4g",
-    "--cpus=4",
+    // ponytail: no --cpus. Rootless cgroup v2 here delegates only memory+pids; a cpu quota needs a
+    // systemd user@.service drop-in with Delegate=cpu cpuset io memory pids (hardening milestone).
     "--tmpfs", "/tmp:rw,nosuid,nodev,size=1g",
     "--tmpfs", "/run:rw,nosuid,nodev,size=64m",
     "--tmpfs", "/home/agent:rw,nosuid,nodev,size=512m",
