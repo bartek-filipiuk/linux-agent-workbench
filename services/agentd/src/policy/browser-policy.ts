@@ -40,6 +40,10 @@ export const BROWSER_RULES: Rule[] = [
   { id: "browser-permission", category: "permission_change", pattern: /\b(grant|allow|authorize|revoke|approve)\b/i, summary: "permission change" },
 ];
 export const DOMAIN_RULE: Rule = { id: "browser-domain", category: "external_side_effect", pattern: /./, summary: "open a new domain" };
+// ponytail: these used to be hard handoffs; a card with "allow for this session" blocks less and the human still decides.
+export const PRIVATE_RULE: Rule = { id: "browser-private", category: "external_side_effect", pattern: /./, summary: "open a private or local address" };
+export const SIGNIN_RULE: Rule = { id: "browser-signin", category: "credential_transmission", pattern: /./, summary: "click a sign-in control next to a password field" };
+export const CAPTCHA_RULE: Rule = { id: "browser-captcha", category: "external_side_effect", pattern: /./, summary: "click a CAPTCHA or human-verification control" };
 
 export type BrowserClassification =
   | { kind: "allow" }
@@ -56,7 +60,7 @@ export function observationHints(obs: Pick<BrowserObservation, "elements">): str
   const hints: string[] = [];
   const blob = obs.elements.map((e) => `${e.name} ${e.text ?? ""}`).join("\n");
   if (obs.elements.some((e) => e.role === "password")) hints.push("login_form: a password field is on this page; the human must log in (call request_human)");
-  if (CAPTCHA.test(blob)) hints.push("captcha: a human verification is on this page; call request_human");
+  if (CAPTCHA.test(blob)) hints.push("captcha: a human verification is on this page; click its checkbox yourself (the human approves the click in a card); call request_human only if an image or audio challenge appears");
   if (TWO_FACTOR.test(blob)) hints.push("two_factor: a verification code is requested; call request_human");
   return hints;
 }
@@ -67,7 +71,7 @@ function findElement(obs: BrowserObservation | undefined, ref: string) {
 
 export function classifyBrowserAction(action: BrowserAction, obs: BrowserObservation | undefined, opts: { allowPrivate?: boolean } = {}): BrowserClassification {
   if (action.kind === "navigate") {
-    if (!opts.allowPrivate && isPrivateAddress(action.url)) return { kind: "deny", reason: "the model may not open private or local addresses" };
+    if (!opts.allowPrivate && isPrivateAddress(action.url)) return { kind: "approval", rule: PRIVATE_RULE, command: `navigate ${action.url.slice(0, 120)}` };
     return { kind: "allow" };
   }
   if (action.kind === "type") {
@@ -79,12 +83,11 @@ export function classifyBrowserAction(action: BrowserAction, obs: BrowserObserva
     const el = findElement(obs, action.ref);
     const label = `${el?.name ?? ""} ${el?.text ?? ""}`;
     const loginPage = obs?.elements.some((e) => e.role === "password") ?? false;
-    if (loginPage && SIGN_IN.test(label)) return { kind: "handoff", reason: "sign-in needs your credentials; log in through the browser panel, then give control back" };
-    if (CAPTCHA.test(label)) return { kind: "handoff", reason: "CAPTCHA or verification needs you; solve it in the browser panel, then give control back" };
+    const command = `${action.kind} "${(el?.name || el?.text || action.ref).slice(0, 80)}" on ${obs?.url ?? "the page"}`;
+    if (loginPage && SIGN_IN.test(label)) return { kind: "approval", rule: SIGNIN_RULE, command };
+    if (CAPTCHA.test(label)) return { kind: "approval", rule: CAPTCHA_RULE, command };
     for (const rule of BROWSER_RULES) {
-      if (rule.pattern.test(label)) {
-        return { kind: "approval", rule, command: `${action.kind} "${(el?.name || el?.text || action.ref).slice(0, 80)}" on ${obs?.url ?? "the page"}` };
-      }
+      if (rule.pattern.test(label)) return { kind: "approval", rule, command };
     }
   }
   return { kind: "allow" };

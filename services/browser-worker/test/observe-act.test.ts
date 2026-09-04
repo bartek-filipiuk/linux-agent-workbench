@@ -53,6 +53,17 @@ describe("observe and act", { timeout: 30_000 }, () => {
     await expect(s.act({ kind: "click", ref: "e999", revision: fresh.revision })).rejects.toSatisfy((e) => ProtocolError.is(e, "STALE_OBSERVATION"));
   });
 
+  it("observes and clicks elements inside iframes with page coordinates", async () => {
+    await s.navigate(`${site.url}/frame.html`);
+    const obs = await s.observe({ screenshot: false });
+    const cb = byName(obs, "not a robot");
+    expect(cb).toMatchObject({ role: "checkbox" });
+    expect(cb.ref).toBe(`e${obs.elements.length}`);
+    expect((cb as { bounds: { y: number } }).bounds.y).toBeGreaterThan(150);
+    await s.act({ kind: "click", ref: cb.ref, revision: obs.revision });
+    expect((await s.info()).title).toBe("FRAMED_CLICK");
+  });
+
   it("types, selects and submits a form", async () => {
     await s.navigate(`${site.url}/form.html`);
     let obs = await s.observe({ screenshot: false });

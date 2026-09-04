@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { randomBytes } from "node:crypto";
 import { setTimeout as sleep } from "node:timers/promises";
-import { chromium, type BrowserContext, type ElementHandle, type Page } from "playwright";
+import { chromium, type BrowserContext, type ElementHandle, type Frame, type Page } from "playwright";
 import {
   ProtocolError,
   normaliseNavigableUrl,
@@ -40,7 +40,7 @@ const firstLine = (m: string) => m.replace(/\u001b\[[0-9;]*m/g, "").split("\n")[
 
 // Runs inside the page: collects interactive elements and parks them in a registry the worker resolves refs against.
 const OBSERVE_SCRIPT = `
-(({ key, max }) => {
+(({ key, max, start }) => {
   const SEL = 'a[href],button,input:not([type=hidden]),select,textarea,summary,[role=button],[role=link],[role=tab],[role=menuitem],[role=checkbox],[role=radio],[role=switch],[role=textbox],[role=combobox],[role=option],[contenteditable=""],[contenteditable="true"],[onclick],h1,h2,h3';
   const clip = (s, n = 120) => (s || "").replace(/\\s+/g, " ").trim().slice(0, n);
   const roleOf = (el) => {
@@ -85,7 +85,7 @@ const OBSERVE_SCRIPT = `
   out.sort((a, b) => (a.inViewport === b.inViewport ? 0 : a.inViewport ? -1 : 1));
   const kept = out.slice(0, max);
   const els = new Map();
-  const elements = kept.map((it, i) => { const ref = "e" + (i + 1); els.set(ref, it.el); const { el, ...rest } = it; return { ref, ...rest }; });
+  const elements = kept.map((it, i) => { const ref = "e" + (start + i + 1); els.set(ref, it.el); const { el, ...rest } = it; return { ref, ...rest }; });
   window[key] = { els };
   const doc = document.documentElement;
   return { elements, scroll: { x: Math.round(window.scrollX), y: Math.round(window.scrollY), maxY: Math.max(0, doc.scrollHeight - vh) } };
@@ -116,6 +116,7 @@ export class BrowserSession {
   private readonly activeFps: number;
   private readonly idleFps: number;
   private readonly registryKey = `__law_${randomBytes(6).toString("hex")}`;
+  private refFrames = new Map<string, Frame>(); // which frame registered each ref of the current revision
   private screencast: BrowserScreencastOptions = {};
   private lastDialog: { type: string; message: string } | undefined;
   private readonly downloadsDir: string;
@@ -258,10 +259,7 @@ export class BrowserSession {
     const page = this.requirePage();
     this.revision++;
     const max = input.maxElements ?? 200;
-    const data = (await page.evaluate(`${OBSERVE_SCRIPT}(${JSON.stringify({ key: this.registryKey, max })})`)) as {
-      elements: BrowserElement[];
-      scroll: { x: number; y: number; maxY: number };
-    };
+    const { elements, scroll } = await this.walkFrames(page, max);
     const screenshot = input.screenshot === false ? undefined : (await page.screenshot({ type: "jpeg", quality: 50 })).toString("base64");
     const pages = await Promise.all(this.pages.map(async (e) => ({ id: e.id, url: e.page.url(), title: await e.page.title().catch(() => "") })));
     const dialog = this.lastDialog;
@@ -272,21 +270,48 @@ export class BrowserSession {
       url: page.url(),
       title: await page.title().catch(() => ""),
       viewport: page.viewportSize() ?? this.viewport,
-      scroll: data.scroll,
-      elements: data.elements,
+      scroll,
+      elements,
       pages,
       ...(screenshot ? { screenshotJpegBase64: screenshot } : {}),
       ...(dialog ? { lastDialog: dialog } : {}),
     };
   }
 
+  /** Main frame first, then every child frame (where the reCAPTCHA checkbox and embedded widgets live), refs numbered across all of them. */
+  private async walkFrames(page: Page, max: number): Promise<{ elements: BrowserElement[]; scroll: { x: number; y: number; maxY: number } }> {
+    const elements: BrowserElement[] = [];
+    let scroll = { x: 0, y: 0, maxY: 0 };
+    this.refFrames = new Map();
+    for (const frame of page.frames()) {
+      if (elements.length >= max) break;
+      let offset = { x: 0, y: 0 };
+      const isMain = frame === page.mainFrame();
+      if (!isMain) {
+        const box = await frame.frameElement().then((fe) => fe.boundingBox()).catch(() => null);
+        if (!box) continue; // detached or not rendered
+        offset = { x: Math.round(box.x), y: Math.round(box.y) };
+      }
+      const data = (await frame
+        .evaluate(`${OBSERVE_SCRIPT}(${JSON.stringify({ key: this.registryKey, max: max - elements.length, start: elements.length })})`)
+        .catch(() => null)) as { elements: BrowserElement[]; scroll: { x: number; y: number; maxY: number } } | null;
+      if (!data) continue; // navigated away or sandboxed
+      if (isMain) scroll = data.scroll;
+      for (const el of data.elements) {
+        this.refFrames.set(el.ref, frame);
+        elements.push(isMain ? el : { ...el, bounds: { ...el.bounds, x: el.bounds.x + offset.x, y: el.bounds.y + offset.y } });
+      }
+    }
+    return { elements, scroll };
+  }
+
   private async handleFor(ref: string, revision: number): Promise<ElementHandle> {
     if (revision !== this.revision) {
       throw new ProtocolError("STALE_OBSERVATION", `revision ${revision} is stale (current ${this.revision}); observe again before acting`);
     }
-    const page = this.requirePage();
-    const h = await page.evaluateHandle(`(window[${JSON.stringify(this.registryKey)}]?.els.get(${JSON.stringify(ref)}) ?? null)`);
-    const el = h.asElement();
+    const frame = this.refFrames.get(ref);
+    const h = frame && !frame.isDetached() ? await frame.evaluateHandle(`(window[${JSON.stringify(this.registryKey)}]?.els.get(${JSON.stringify(ref)}) ?? null)`) : undefined;
+    const el = h?.asElement();
     if (!el) throw new ProtocolError("STALE_OBSERVATION", `unknown element ref ${ref}; observe again`);
     return el;
   }
