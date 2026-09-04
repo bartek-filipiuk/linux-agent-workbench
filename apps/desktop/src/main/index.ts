@@ -1,8 +1,10 @@
-import { app, BrowserWindow, ipcMain, MessageChannelMain, utilityProcess } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, MessageChannelMain, utilityProcess, type MessagePortMain } from "electron";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import type { AgentdToMain, MainToAgentd, SessionStatus } from "@law/agentd";
 import { parseEnvFile } from "./env-file";
+import { readSettings, writeSettings, type Settings } from "./settings";
 
 type AgentdStatus =
   | { type: "agentd.starting" }
@@ -10,53 +12,84 @@ type AgentdStatus =
   | { type: "agentd.error"; message: string };
 
 let status: AgentdStatus = { type: "agentd.starting" };
+let session: SessionStatus = { state: "idle" };
 let win: BrowserWindow | null = null;
+let port: MessagePortMain | null = null;
+let settings: Settings = { networkMode: "open" };
 
-function repoRoot(): string {
-  // out/main/index.js -> out/main -> out -> apps/desktop -> apps -> repo root
-  return path.resolve(__dirname, "..", "..", "..", "..");
-}
+const repoRoot = () => path.resolve(__dirname, "..", "..", "..", "..");
+const settingsFile = () => path.join(app.getPath("userData"), "settings.json");
 
 function loadEnv(): Record<string, string> {
-  const candidates = [path.join(app.getPath("userData"), ".env"), path.join(repoRoot(), ".env")];
-  for (const p of candidates) {
+  for (const p of [path.join(app.getPath("userData"), ".env"), path.join(repoRoot(), ".env")]) {
     if (fs.existsSync(p)) return parseEnvFile(fs.readFileSync(p, "utf8"));
   }
   return {};
 }
 
-function dbPath(): string {
-  const base = process.env.XDG_DATA_HOME || path.join(os.homedir(), ".local", "share");
-  return path.join(base, "linux-agent-workbench", "state.sqlite");
+function xdg(name: "XDG_DATA_HOME" | "XDG_RUNTIME_DIR", fallback: string): string {
+  return process.env[name] || fallback;
+}
+const dbPath = () => path.join(xdg("XDG_DATA_HOME", path.join(os.homedir(), ".local", "share")), "linux-agent-workbench", "state.sqlite");
+const runtimeRoot = () => path.join(xdg("XDG_RUNTIME_DIR", path.join(os.tmpdir(), `law-${os.userInfo().uid}`)), "linux-agent-workbench");
+
+function readImageId(): string | undefined {
+  try {
+    const j = JSON.parse(fs.readFileSync(path.join(repoRoot(), "images", "terminal", "image.json"), "utf8")) as { id?: string };
+    return j.id;
+  } catch {
+    return undefined;
+  }
 }
 
-function publish(next: AgentdStatus) {
-  status = next;
-  win?.webContents.send("agentd:event", status);
+const send = (channel: string, payload: unknown) => win?.webContents.send(channel, payload);
+const toAgentd = (msg: MainToAgentd) => port?.postMessage(msg);
+
+function onAgentd(msg: AgentdToMain) {
+  switch (msg.type) {
+    case "agentd.ready":
+    case "agentd.error":
+      status = msg;
+      send("agentd:event", status);
+      if (msg.type === "agentd.ready" && settings.lastWorkspace) {
+        toAgentd({ type: "session.start", workspacePath: settings.lastWorkspace, networkMode: settings.networkMode });
+      }
+      return;
+    case "session.state": {
+      const { type: _t, ...rest } = msg;
+      session = rest;
+      send("session:state", session);
+      return;
+    }
+    case "terminal.data":
+      send("terminal:data", msg.data);
+      return;
+  }
 }
 
 function startAgentd() {
-  const entry = path.join(repoRoot(), "services", "agentd", "dist", "main.js");
   const env = loadEnv();
   const apiKey = env.OPENAI_API_KEY ?? "";
   const model = env.OPENAI_MODEL ?? "gpt-5.6-sol";
-  if (!apiKey) {
-    publish({ type: "agentd.error", message: "OPENAI_API_KEY missing in .env" });
-    return;
-  }
+  const imageId = readImageId();
+  if (!apiKey) return onAgentd({ type: "agentd.error", message: "OPENAI_API_KEY missing in .env" });
+  if (!imageId) return onAgentd({ type: "agentd.error", message: "images/terminal/image.json missing; run pnpm images:build" });
+  const entry = path.join(repoRoot(), "services", "agentd", "dist", "main.js");
   const child = utilityProcess.fork(entry, [], { serviceName: "agentd", stdio: "inherit" });
   const { port1, port2 } = new MessageChannelMain();
   child.postMessage({ type: "port" }, [port1]);
-  port2.on("message", (e) => publish(e.data as AgentdStatus));
+  port = port2;
+  port2.on("message", (e) => onAgentd(e.data as AgentdToMain));
   port2.start();
-  port2.postMessage({ type: "config.init", apiKey, model, dbPath: dbPath() });
-  child.on("exit", (code) => publish({ type: "agentd.error", message: `agentd exited with code ${code}` }));
+  fs.mkdirSync(runtimeRoot(), { recursive: true, mode: 0o700 });
+  toAgentd({ type: "config.init", apiKey, model, dbPath: dbPath(), imageId, runtimeRoot: runtimeRoot() });
+  child.on("exit", (code) => onAgentd({ type: "agentd.error", message: `agentd exited with code ${code}` }));
 }
 
 function createWindow() {
   win = new BrowserWindow({
-    width: 1280,
-    height: 800,
+    width: 1400,
+    height: 900,
     backgroundColor: "#0b0d10",
     webPreferences: {
       preload: path.join(__dirname, "../preload/index.js"),
@@ -70,8 +103,34 @@ function createWindow() {
 }
 
 ipcMain.handle("agentd:status", () => status);
+ipcMain.handle("session:get", () => session);
+ipcMain.handle("workspace:select", async () => {
+  const r = await dialog.showOpenDialog({ properties: ["openDirectory"], title: "Choose workspace" });
+  const dir = r.filePaths[0];
+  if (r.canceled || !dir) return;
+  settings = { ...settings, lastWorkspace: dir };
+  writeSettings(settingsFile(), settings);
+  toAgentd({ type: "session.start", workspacePath: dir, networkMode: settings.networkMode });
+});
+ipcMain.handle("workspace:reopen", () => {
+  if (settings.lastWorkspace) toAgentd({ type: "session.start", workspacePath: settings.lastWorkspace, networkMode: settings.networkMode });
+});
+ipcMain.handle("network:set", (_e, mode: unknown) => {
+  settings = { ...settings, networkMode: mode === "none" ? "none" : "open" };
+  writeSettings(settingsFile(), settings);
+  return settings.networkMode;
+});
+ipcMain.handle("network:get", () => settings.networkMode);
+ipcMain.handle("sandbox:destroy", () => toAgentd({ type: "session.stop", destroy: true }));
+ipcMain.on("terminal:write", (_e, data: unknown) => {
+  if (typeof data === "string" && data.length <= 65_536) toAgentd({ type: "terminal.write", data: new TextEncoder().encode(data) });
+});
+ipcMain.on("terminal:resize", (_e, cols: unknown, rows: unknown) => {
+  if (Number.isInteger(cols) && Number.isInteger(rows)) toAgentd({ type: "terminal.resize", cols: cols as number, rows: rows as number });
+});
 
 app.whenReady().then(() => {
+  settings = readSettings(settingsFile());
   createWindow();
   startAgentd();
 });

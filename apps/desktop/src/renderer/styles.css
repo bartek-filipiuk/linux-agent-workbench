@@ -17,3 +17,25 @@ body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.5 var(--
 .dot.error { background: var(--agent); }
 .main { padding: 24px 16px; color: var(--muted); }
 code { color: var(--fg); }
+html, body, #root { height: 100%; }
+.shell { display: flex; flex-direction: column; height: 100%; }
+.main { flex: 1; min-height: 0; padding: 12px 16px; display: flex; }
+.terminal { flex: 1; min-height: 0; padding: 6px; border: 2px solid var(--human); border-radius: 6px; background: var(--bg); }
+.terminal.agent { border-color: var(--agent); }
+.terminal .xterm { height: 100%; }
+.bottombar { display: flex; gap: 16px; align-items: center; padding: 8px 16px; background: var(--panel); border-top: 1px solid #1f242b; font-size: 12px; }
+.owner.human { color: var(--human); font-weight: 700; }
+.owner.agent { color: var(--agent); font-weight: 700; }
+.hint { color: var(--muted); }
+.btn { background: #1f242b; color: var(--fg); border: 1px solid #2a3139; border-radius: 4px; padding: 6px 10px; font: inherit; cursor: pointer; }
+.btn:hover { background: #2a3139; }
+.btn:disabled { opacity: 0.4; cursor: default; }
+.btn.danger { border-color: var(--agent); color: var(--agent); }
+.path { color: var(--muted); max-width: 40ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.spacer { flex: 1; }
+.badge { display: inline-flex; gap: 6px; align-items: center; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+.badge.net-open { background: rgba(255, 59, 59, 0.15); color: var(--agent); border: 1px solid var(--agent); }
+.badge.net-none { background: #1f242b; color: var(--muted); border: 1px solid #2a3139; }
+.badge select { background: transparent; color: inherit; border: none; font: inherit; }
+.empty { margin: auto; color: var(--muted); text-align: center; }
+.error { color: var(--agent); text-align: left; white-space: pre-wrap; max-width: 80ch; }

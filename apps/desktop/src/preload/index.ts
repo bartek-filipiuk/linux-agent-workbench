@@ -1,12 +1,24 @@
 import { contextBridge, ipcRenderer } from "electron";
 
+const on = <T,>(channel: string) => (cb: (payload: T) => void) => {
+  const handler = (_e: unknown, payload: T) => cb(payload);
+  ipcRenderer.on(channel, handler);
+  return () => ipcRenderer.removeListener(channel, handler);
+};
+
 const api = {
   getStatus: () => ipcRenderer.invoke("agentd:status"),
-  onEvent: (cb: (e: unknown) => void) => {
-    const handler = (_e: unknown, payload: unknown) => cb(payload);
-    ipcRenderer.on("agentd:event", handler);
-    return () => ipcRenderer.removeListener("agentd:event", handler);
-  },
+  getSession: () => ipcRenderer.invoke("session:get"),
+  selectWorkspace: () => ipcRenderer.invoke("workspace:select"),
+  reopenLast: () => ipcRenderer.invoke("workspace:reopen"),
+  getNetwork: () => ipcRenderer.invoke("network:get"),
+  setNetwork: (mode: "open" | "none") => ipcRenderer.invoke("network:set", mode),
+  destroySandbox: () => ipcRenderer.invoke("sandbox:destroy"),
+  terminalWrite: (data: string) => ipcRenderer.send("terminal:write", data),
+  terminalResize: (cols: number, rows: number) => ipcRenderer.send("terminal:resize", cols, rows),
+  onEvent: on<unknown>("agentd:event"),
+  onSession: on<unknown>("session:state"),
+  onTerminalData: on<Uint8Array>("terminal:data"),
 };
 
 contextBridge.exposeInMainWorld("workbench", api);

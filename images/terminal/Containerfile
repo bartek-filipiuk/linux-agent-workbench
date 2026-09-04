@@ -1,0 +1,43 @@
+FROM docker.io/library/ubuntu:24.04
+
+ARG NODE_VERSION=24.20.0
+ARG NODE_SHA256=2f2c0da162318f0de47665410c7c8c2ed3d36c8f3105de4bbc61176c70a7cbf2
+ARG CLAUDE_CODE_VERSION=2.1.260
+ARG CODEX_VERSION=0.153.2
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      ca-certificates curl xz-utils tmux git ripgrep jq less nano python3 build-essential locales procps \
+ && rm -rf /var/lib/apt/lists/* \
+ && locale-gen en_US.UTF-8
+ENV LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
+
+# Rootless overlay on this host rejects tar's final fchmodat on directories (exit 2, "Cannot change mode");
+# the files are extracted correctly, so only that specific failure is tolerated and node is verified afterwards.
+RUN curl -fsSLo /tmp/node.tar.xz "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz" \
+ && echo "${NODE_SHA256}  /tmp/node.tar.xz" | sha256sum -c - \
+ && { tar --no-same-owner -xJf /tmp/node.tar.xz -C /usr/local --strip-components=1 2>/tmp/tar.log || [ $? -eq 2 ]; } \
+ && ! grep -v -e "Cannot change mode" -e "Exiting with failure status" /tmp/tar.log | grep -q "tar:" \
+ && rm /tmp/node.tar.xz /tmp/tar.log \
+ && node -v && npm -v \
+ && npm install -g --no-audit --no-fund "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}" "@openai/codex@${CODEX_VERSION}"
+
+# uid 1000 is "ubuntu" in the base image; rename it so paths match the spec.
+# No -m: moving the home dir fails on rootless overlay, and /home/agent is a tmpfs at runtime anyway.
+RUN usermod -l agent ubuntu && usermod -d /home/agent agent && groupmod -n agent ubuntu \
+ && mkdir -p /home/agent && chown agent:agent /home/agent
+
+COPY images/terminal/opt-package.json /opt/law/package.json
+RUN cd /opt/law && npm install --omit=dev --no-audit --no-fund
+COPY packages/protocol/package.json /opt/law/node_modules/@law/protocol/package.json
+COPY packages/protocol/dist /opt/law/node_modules/@law/protocol/dist
+COPY services/terminal-worker/dist /opt/law/worker
+COPY images/terminal/bash.bashrc /tmp/law.bashrc
+RUN cat /tmp/law.bashrc >> /etc/bash.bashrc && rm /tmp/law.bashrc && chown -R root:root /opt/law
+
+USER agent
+WORKDIR /workspace
+ENV HOME=/home/agent TERM=xterm-256color LAW_SOCKET_DIR=/run/law
+# ponytail: bash loop as supervisor; the tmux server is a separate process and survives worker restarts
+CMD ["bash", "-c", "while true; do node /opt/law/worker/main.js; echo 'terminal-worker exited, restarting in 1s'; sleep 1; done"]
