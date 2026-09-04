@@ -97,6 +97,7 @@ export function podmanLauncher(opts: {
 
 export class BrowserSessionManager extends EventEmitter {
   private _status: BrowserStatus = { state: "idle" };
+  lastObservation: BrowserObservation | undefined;
   private handle: LaunchHandle | undefined;
   private conn: FramedConnection | undefined;
 
@@ -144,7 +145,9 @@ export class BrowserSessionManager extends EventEmitter {
   }
 
   async observe(input: BrowserObserveInput = {}, signal?: AbortSignal): Promise<BrowserObservation> {
-    return BrowserObservation.parse(await this.requireConn().request("browser.observe", input, { timeoutMs: 30_000, ...(signal ? { signal } : {}) }));
+    const obs = BrowserObservation.parse(await this.requireConn().request("browser.observe", input, { timeoutMs: 30_000, ...(signal ? { signal } : {}) }));
+    this.lastObservation = obs;
+    return obs;
   }
 
   async act(action: BrowserAction, signal?: AbortSignal): Promise<BrowserActResult> {

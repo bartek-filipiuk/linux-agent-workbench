@@ -20,12 +20,19 @@ export class Lease extends EventEmitter {
   }
 }
 
-export class LeasePolicy implements Policy {
-  constructor(private readonly lease: Lease) {}
+export type Surface = "terminal" | "browser";
 
-  async authorize(_call: ToolCall, _ctx: PolicyContext): Promise<PolicyDecision> {
+export class LeasePolicy implements Policy {
+  constructor(
+    private readonly lease: Lease,
+    private readonly surface: Surface = "terminal",
+  ) {}
+
+  async authorize(call: ToolCall, _ctx: PolicyContext): Promise<PolicyDecision> {
+    const prefix = this.surface === "browser" ? "browser_" : "terminal_";
+    if (!call.name.startsWith(prefix)) return { allow: true };
     if (this.lease.state.owner !== "agent") {
-      return { allow: false, code: "LEASE_DENIED", reason: "the human holds the terminal; wait for control to be handed back" };
+      return { allow: false, code: "LEASE_DENIED", reason: `the human holds the ${this.surface}; wait for control to be handed back` };
     }
     return { allow: true };
   }

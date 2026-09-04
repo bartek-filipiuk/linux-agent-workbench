@@ -11,6 +11,7 @@ type Pending = { request: ApprovalRequest; resolve: (o: ApprovalOutcome) => void
 export class ApprovalManager extends EventEmitter {
   private readonly pendingMap = new Map<string, Pending>();
   private readonly sessionAllowed = new Map<string, Set<string>>(); // runId -> ruleIds
+  private readonly rules = new Map<string, Rule>();
   private readonly ttlMs: number;
   private readonly now: () => number;
 
@@ -43,6 +44,7 @@ export class ApprovalManager extends EventEmitter {
       summary: input.rule.summary,
       expiresAt: this.now() + this.ttlMs,
     };
+    this.rules.set(input.rule.id, input.rule);
     this.store.createApproval(request);
     this.store.appendEvent(input.runId, "approval.requested", { id, command: input.command, ruleId: input.rule.id, category: input.rule.category });
     return new Promise((resolve) => {
@@ -58,12 +60,16 @@ export class ApprovalManager extends EventEmitter {
     return true;
   }
 
+  private pendingRule(ruleId: string): Rule | undefined {
+    return this.rules.get(ruleId);
+  }
+
   private finish(id: string, decision: ApprovalDecision): void {
     const p = this.pendingMap.get(id);
     if (!p) return;
     this.pendingMap.delete(id);
     clearTimeout(p.timer);
-    if (decision === "session") {
+    if (decision === "session" && !this.pendingRule(p.ruleId)?.noSession) {
       const set = this.sessionAllowed.get(p.runId) ?? new Set<string>();
       set.add(p.ruleId);
       this.sessionAllowed.set(p.runId, set);
