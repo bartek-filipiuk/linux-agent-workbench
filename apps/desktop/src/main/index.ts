@@ -16,7 +16,8 @@ let session: SessionStatus = { state: "idle" };
 let win: BrowserWindow | null = null;
 let port: MessagePortMain | null = null;
 let settings: Settings = { networkMode: "open" };
-let lease: { owner: "agent" | "human"; reason?: string } = { owner: "human" };
+type LeaseState = { surface: "terminal" | "browser"; owner: "agent" | "human"; reason?: string };
+let leases: Record<"terminal" | "browser", LeaseState> = { terminal: { surface: "terminal", owner: "human" }, browser: { surface: "browser", owner: "human" } };
 let browser: { state: string; url?: string; title?: string; message?: string } = { state: "idle" };
 
 const repoRoot = () => path.resolve(__dirname, "..", "..", "..", "..");
@@ -76,10 +77,12 @@ function onAgentd(msg: AgentdToMain) {
     case "run.restored":
       send("run:event", msg);
       return;
-    case "lease.state":
-      lease = { owner: msg.owner, ...(msg.reason ? { reason: msg.reason } : {}) };
-      send("lease:state", lease);
+    case "lease.state": {
+      const l: LeaseState = { surface: msg.surface, owner: msg.owner, ...(msg.reason ? { reason: msg.reason } : {}) };
+      leases = { ...leases, [msg.surface]: l };
+      send("lease:state", l);
       return;
+    }
     case "browser.state": {
       const { type: _t, ...rest } = msg;
       browser = rest;
@@ -111,7 +114,8 @@ function startAgentd() {
   const pout = Number(env.OPENAI_PRICE_OUTPUT_PER_MTOK);
   const prices = env.OPENAI_PRICE_INPUT_PER_MTOK && Number.isFinite(pin) && Number.isFinite(pout) ? { inputUsdPerMTok: pin, outputUsdPerMTok: pout } : undefined;
   const browserImageId = readImageId("browser");
-  toAgentd({ type: "config.init", apiKey, model, dbPath: dbPath(), imageId, runtimeRoot: runtimeRoot(), ...(prices ? { prices } : {}), ...(browserImageId ? { browserImageId } : {}) });
+  const browserDomainMode = env.LAW_BROWSER_DOMAIN_MODE === "ask" ? "ask" : "open";
+  toAgentd({ type: "config.init", apiKey, model, dbPath: dbPath(), imageId, runtimeRoot: runtimeRoot(), browserDomainMode, ...(prices ? { prices } : {}), ...(browserImageId ? { browserImageId } : {}) });
   child.on("exit", (code) => onAgentd({ type: "agentd.error", message: `agentd exited with code ${code}` }));
 }
 
@@ -152,13 +156,15 @@ ipcMain.handle("network:set", (_e, mode: unknown) => {
 });
 ipcMain.handle("network:get", () => settings.networkMode);
 ipcMain.handle("sandbox:destroy", () => toAgentd({ type: "session.stop", destroy: true }));
-ipcMain.handle("lease:get", () => lease);
+ipcMain.handle("lease:get", () => leases);
 ipcMain.handle("run:start", (_e, goal: unknown) => {
   if (typeof goal === "string" && goal.trim()) toAgentd({ type: "run.start", goal: goal.trim().slice(0, 4000) });
 });
 ipcMain.handle("run:stop", () => toAgentd({ type: "run.stop" }));
 ipcMain.handle("run:resume", () => toAgentd({ type: "run.resume" }));
-ipcMain.handle("lease:take", (_e, owner: unknown) => toAgentd({ type: "lease.take", owner: owner === "agent" ? "agent" : "human" }));
+ipcMain.handle("lease:take", (_e, owner: unknown, surface: unknown) =>
+  toAgentd({ type: "lease.take", owner: owner === "agent" ? "agent" : "human", ...(surface === "terminal" || surface === "browser" ? { surface } : {}) }),
+);
 ipcMain.handle("approval:decide", (_e, id: unknown, decision: unknown) => {
   if (typeof id === "string" && (decision === "once" || decision === "session" || decision === "deny")) toAgentd({ type: "approval.decide", id, decision });
 });

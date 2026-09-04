@@ -87,3 +87,5 @@ html, body, #root { height: 100%; }
 .browser-stage { flex: 1; min-height: 0; border: 2px solid var(--human); border-radius: 6px; background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 .browser-stage canvas { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; outline: none; cursor: default; }
 .browser-stage canvas:focus-visible { box-shadow: inset 0 0 0 2px var(--human); }
+.browser-stage.agent { border-color: var(--agent); }
+.browser-stage.agent canvas { cursor: not-allowed; }

@@ -9,14 +9,15 @@ type AgentdStatus =
   | { type: "agentd.ready"; schemaVersion: number; dbPath: string; model: string; interruptedRuns: number }
   | { type: "agentd.error"; message: string };
 type SessionStatus = { state: "idle" | "starting" | "ready" | "disconnected" | "stopped" | "error"; sessionId?: string; workspacePath?: string; networkMode?: "open" | "none"; message?: string };
-type LeaseState = { owner: "agent" | "human"; reason?: string };
+type LeaseState = { surface: "terminal" | "browser"; owner: "agent" | "human"; reason?: string };
+type Leases = Record<"terminal" | "browser", LeaseState>;
 
 declare global {
   interface Window {
     workbench: {
       getStatus(): Promise<AgentdStatus>;
       getSession(): Promise<SessionStatus>;
-      getLease(): Promise<LeaseState>;
+      getLease(): Promise<Leases>;
       selectWorkspace(): Promise<void>;
       reopenLast(): Promise<void>;
       getNetwork(): Promise<"open" | "none">;
@@ -27,8 +28,8 @@ declare global {
       startRun(goal: string): Promise<void>;
       stopRun(): Promise<void>;
       resumeRun(): Promise<void>;
-      takeControl(): Promise<void>;
-      releaseControl(): Promise<void>;
+      takeControl(surface?: "terminal" | "browser"): Promise<void>;
+      releaseControl(surface?: "terminal" | "browser"): Promise<void>;
       decideApproval(id: string, decision: "once" | "session" | "deny"): Promise<void>;
       restoreRun(runId: string): Promise<void>;
       getBrowser(): Promise<BrowserStatus>;
@@ -51,7 +52,7 @@ export function App() {
   const [status, setStatus] = useState<AgentdStatus>({ type: "agentd.starting" });
   const [session, setSession] = useState<SessionStatus>({ state: "idle" });
   const [network, setNetwork] = useState<"open" | "none">("open");
-  const [lease, setLease] = useState<LeaseState>({ owner: "human" });
+  const [leases, setLeases] = useState<Leases>({ terminal: { surface: "terminal", owner: "human" }, browser: { surface: "browser", owner: "human" } });
   const [run, setRun] = useState<RunView>(emptyRun);
   const [handoff, setHandoff] = useState<string | null>(null);
   const [browser, setBrowser] = useState<BrowserStatus>({ state: "idle" });
@@ -61,13 +62,13 @@ export function App() {
     void window.workbench.getStatus().then(setStatus);
     void window.workbench.getSession().then(setSession);
     void window.workbench.getNetwork().then(setNetwork);
-    void window.workbench.getLease().then(setLease);
+    void window.workbench.getLease().then(setLeases);
     void window.workbench.getBrowser().then(setBrowser);
     const offs = [
       window.workbench.onBrowserState(setBrowser),
       window.workbench.onEvent(setStatus),
       window.workbench.onSession(setSession),
-      window.workbench.onLease(setLease),
+      window.workbench.onLease((l) => setLeases((prev) => ({ ...prev, [l.surface]: l }))),
       window.workbench.onRun((e) => {
         setRun((v) => reduceRun(v, e));
         if (e.type === "run.handoff") setHandoff(e.reason);
@@ -79,21 +80,23 @@ export function App() {
 
   const dot = status.type === "agentd.ready" ? "ready" : status.type === "agentd.error" ? "error" : "";
   const live = session.state === "ready";
-  const agentOwns = lease.owner === "agent";
+  const agentOwns = leases.terminal.owner === "agent";
+  const agentOwnsBrowser = leases.browser.owner === "agent";
+  const anyAgent = agentOwns || agentOwnsBrowser;
   const runActive = run.state !== undefined && ["running", "awaiting_approval"].includes(run.state);
   const approvalsPending = run.approvals.length > 0;
 
   // Esc stops the run while the agent has the terminal; when you hold the keyboard, Esc belongs to the shell.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && runActive && agentOwns) {
+      if (e.key === "Escape" && runActive && anyAgent) {
         e.preventDefault();
         void window.workbench.stopRun();
       }
     };
     window.addEventListener("keydown", onKey, true);
     return () => window.removeEventListener("keydown", onKey, true);
-  }, [runActive, agentOwns]);
+  }, [runActive, anyAgent]);
 
   const destroy = () => {
     if (window.confirm("Remove the sandbox container? The tmux session and anything outside /workspace inside it are lost. Files in the workspace stay.")) {
@@ -139,7 +142,7 @@ export function App() {
         </div>
       )}
       <main className="main">
-        {view !== "terminal" && <BrowserPanel status={browser} />}
+        {view !== "terminal" && <BrowserPanel status={browser} owner={agentOwnsBrowser ? "agent" : "human"} />}
         {view === "browser" ? null : live ? (
           <TerminalPanel owner={agentOwns ? "agent" : "human"} />
         ) : (
@@ -157,10 +160,11 @@ export function App() {
         <RunDrawer run={run} sandboxReady={live} />
       </main>
       <footer className="bottombar">
-        <span className={`owner ${lease.owner}`}>{agentOwns ? "AGENT controls the terminal" : "HUMAN controls the terminal"}</span>
-        {lease.reason && <span className="hint">{lease.reason}</span>}
+        <span className={`owner ${leases.terminal.owner}`}>terminal: {leases.terminal.owner.toUpperCase()}</span>
+        <span className={`owner ${leases.browser.owner}`}>browser: {leases.browser.owner.toUpperCase()}</span>
+        {(leases.terminal.reason ?? leases.browser.reason) && <span className="hint">{leases.terminal.reason ?? leases.browser.reason}</span>}
         <span className="spacer" />
-        {agentOwns ? (
+        {anyAgent ? (
           <button className="btn" onClick={() => void window.workbench.takeControl()}>Take control</button>
         ) : (
           runActive && <button className="btn" onClick={() => void window.workbench.releaseControl()}>Give control back</button>

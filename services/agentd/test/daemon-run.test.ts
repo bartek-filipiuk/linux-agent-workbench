@@ -53,8 +53,9 @@ describe("Daemon run flow", () => {
     expect(last("lease.state")).toBeUndefined();
     await d.handle({ type: "run.start", goal: "count files" });
     await settle(() => (last("run.state") as { state?: string } | undefined)?.state === "completed");
-    const leases = posted.filter((p) => p.type === "lease.state").map((p) => p.owner);
+    const leases = posted.filter((p) => p.type === "lease.state" && p.surface === "terminal").map((p) => p.owner);
     expect(leases).toEqual(["agent", "human"]);
+    expect(posted.filter((p) => p.type === "lease.state" && p.surface === "browser").map((p) => p.owner)).toEqual(["agent", "human"]);
     expect(last("run.commentary")).toMatchObject({ text: "Two entries." });
     expect(posted.filter((p) => p.type === "run.tool" && p.status === "done")).toHaveLength(3);
     expect(last("run.state")).toMatchObject({ state: "completed", finalText: "Two entries.", turns: 3, toolCalls: 3, costUsd: null });
