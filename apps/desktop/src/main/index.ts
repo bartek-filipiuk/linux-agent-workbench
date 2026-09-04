@@ -16,6 +16,7 @@ let session: SessionStatus = { state: "idle" };
 let win: BrowserWindow | null = null;
 let port: MessagePortMain | null = null;
 let settings: Settings = { networkMode: "open" };
+let lease: { owner: "agent" | "human"; reason?: string } = { owner: "human" };
 
 const repoRoot = () => path.resolve(__dirname, "..", "..", "..", "..");
 const settingsFile = () => path.join(app.getPath("userData"), "settings.json");
@@ -64,6 +65,16 @@ function onAgentd(msg: AgentdToMain) {
     case "terminal.data":
       send("terminal:data", msg.data);
       return;
+    case "run.state":
+    case "run.commentary":
+    case "run.tool":
+    case "run.handoff":
+      send("run:event", msg);
+      return;
+    case "lease.state":
+      lease = { owner: msg.owner, ...(msg.reason ? { reason: msg.reason } : {}) };
+      send("lease:state", lease);
+      return;
   }
 }
 
@@ -82,7 +93,10 @@ function startAgentd() {
   port2.on("message", (e) => onAgentd(e.data as AgentdToMain));
   port2.start();
   fs.mkdirSync(runtimeRoot(), { recursive: true, mode: 0o700 });
-  toAgentd({ type: "config.init", apiKey, model, dbPath: dbPath(), imageId, runtimeRoot: runtimeRoot() });
+  const pin = Number(env.OPENAI_PRICE_INPUT_PER_MTOK);
+  const pout = Number(env.OPENAI_PRICE_OUTPUT_PER_MTOK);
+  const prices = env.OPENAI_PRICE_INPUT_PER_MTOK && Number.isFinite(pin) && Number.isFinite(pout) ? { inputUsdPerMTok: pin, outputUsdPerMTok: pout } : undefined;
+  toAgentd({ type: "config.init", apiKey, model, dbPath: dbPath(), imageId, runtimeRoot: runtimeRoot(), ...(prices ? { prices } : {}) });
   child.on("exit", (code) => onAgentd({ type: "agentd.error", message: `agentd exited with code ${code}` }));
 }
 
@@ -122,6 +136,13 @@ ipcMain.handle("network:set", (_e, mode: unknown) => {
 });
 ipcMain.handle("network:get", () => settings.networkMode);
 ipcMain.handle("sandbox:destroy", () => toAgentd({ type: "session.stop", destroy: true }));
+ipcMain.handle("lease:get", () => lease);
+ipcMain.handle("run:start", (_e, goal: unknown) => {
+  if (typeof goal === "string" && goal.trim()) toAgentd({ type: "run.start", goal: goal.trim().slice(0, 4000) });
+});
+ipcMain.handle("run:stop", () => toAgentd({ type: "run.stop" }));
+ipcMain.handle("run:resume", () => toAgentd({ type: "run.resume" }));
+ipcMain.handle("lease:take", (_e, owner: unknown) => toAgentd({ type: "lease.take", owner: owner === "agent" ? "agent" : "human" }));
 ipcMain.on("terminal:write", (_e, data: unknown) => {
   if (typeof data === "string" && data.length <= 65_536) toAgentd({ type: "terminal.write", data: new TextEncoder().encode(data) });
 });

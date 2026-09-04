@@ -32,7 +32,7 @@ export class RunController extends EventEmitter {
   private readonly prices: PriceTable;
   private readonly system: string;
   private handoffResume: (() => void) | undefined;
-  private costKnown = true;
+  private costKnown: boolean;
 
   constructor(
     private readonly deps: RunControllerDeps,
@@ -41,6 +41,7 @@ export class RunController extends EventEmitter {
     super();
     this.policy = deps.policy ?? allowAllPolicy;
     this.prices = deps.prices ?? {};
+    this.costKnown = deps.adapter.model in this.prices;
     this.system = deps.systemPrompt ?? SYSTEM_PROMPT;
     this.budget = new BudgetTracker(deps.budgets ?? DEFAULT_BUDGETS, deps.now);
     this.runId = deps.store.createRun({
