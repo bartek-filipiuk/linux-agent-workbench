@@ -1,5 +1,6 @@
 // Browser worker entry. B1: runs on the host, spawned by agentd. B2 moves it into its own container.
 import fs from "node:fs";
+import { startEgressForwarder } from "@law/protocol/node";
 import { BrowserSession } from "./browser-session.js";
 import { BrowserWorkerServer } from "./server.js";
 
@@ -11,7 +12,16 @@ if (!socketPath || !profileDir) {
 }
 fs.mkdirSync(profileDir, { recursive: true, mode: 0o700 });
 
-const session = new BrowserSession({ profileDir, ...(process.env.LAW_BROWSER_DOWNLOADS ? { downloadsDir: process.env.LAW_BROWSER_DOWNLOADS } : {}) });
+// In the container the only way out is the egress socket mounted from the host (B6 H1).
+const egressSocket = process.env.LAW_EGRESS_SOCKET;
+const egressPort = Number(process.env.LAW_EGRESS_PORT ?? 3128);
+if (egressSocket) await startEgressForwarder({ socketPath: egressSocket, port: egressPort });
+
+const session = new BrowserSession({
+  profileDir,
+  ...(process.env.LAW_BROWSER_DOWNLOADS ? { downloadsDir: process.env.LAW_BROWSER_DOWNLOADS } : {}),
+  ...(egressSocket ? { proxyServer: `http://127.0.0.1:${egressPort}` } : {}),
+});
 const server = new BrowserWorkerServer(socketPath, session);
 await session.start();
 await server.listen();

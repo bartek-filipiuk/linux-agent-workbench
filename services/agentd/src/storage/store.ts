@@ -87,6 +87,12 @@ export class Store {
     return this.db.prepare(`SELECT * FROM runs WHERE id = ?`).get(runId) as RunRow | undefined;
   }
 
+  logEgress(sessionId: string, e: { host: string; port: number; allowed: boolean; reason?: string }): void {
+    this.db
+      .prepare(`INSERT INTO egress_log (ts, session_id, host, port, allowed, reason) VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(Date.now(), sessionId, e.host, e.port, e.allowed ? 1 : 0, e.reason ?? null);
+  }
+
   appendEvent(runId: string, type: string, payload: Record<string, unknown>, sensitivity: Sensitivity = "normal"): number {
     const r = this.db
       .prepare(`INSERT INTO run_events (run_id, ts, type, payload_json, sensitivity) VALUES (?, ?, ?, ?, ?)`)

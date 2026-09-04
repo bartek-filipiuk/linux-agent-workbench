@@ -7,6 +7,7 @@ import type { ModelAdapter } from "./provider/types.js";
 import { RunController } from "./orchestrator/run-controller.js";
 import { Lease, LeasePolicy, type LeaseOwner, type Surface } from "./policy/lease.js";
 import { BrowserActionPolicy, type DomainMode } from "./policy/browser-policy.js";
+import { SessionEgress } from "./egress/session-egress.js";
 import { browserExecutor } from "./tools/browser-tools.js";
 import { terminalExecutor } from "./tools/terminal-tools.js";
 import { composeExecutors } from "./provider/types.js";
@@ -121,6 +122,7 @@ export class Daemon {
   private browserSessionId: string | undefined;
   private browserImageId: string | undefined;
   private runtimeRoot = "";
+  private egress: SessionEgress | undefined;
 
   constructor(private readonly deps: DaemonDeps) {
     for (const [surface, lease] of [["terminal", this.lease], ["browser", this.browserLease]] as const) {
@@ -165,7 +167,18 @@ export class Daemon {
           this.browserImageId = msg.browserImageId;
           this.domainMode = msg.browserDomainMode ?? "open";
           this.runtimeRoot = msg.runtimeRoot;
+          const store = runtime.store;
+          this.egress = new SessionEgress({
+            runtimeRoot: msg.runtimeRoot,
+            log: (sessionId, e) => {
+              store.logEgress(sessionId, e);
+              if (!e.allowed) console.error(`[agentd] egress denied ${e.host}:${e.port}: ${e.reason}`);
+            },
+          });
           this.manager.on("status", (s: SessionStatus) => {
+            if (s.state === "starting" && s.sessionId) {
+              this.egress?.ensure(s.sessionId, s.networkMode ?? "open").catch((e) => console.error(`[agentd] egress proxy failed: ${e instanceof Error ? e.message : String(e)}`));
+            }
             if (s.state === "ready" && s.sessionId) this.ensureBrowserManager(s.sessionId, s.networkMode ?? "open");
             if (s.state !== "ready" || !this.manager?.worker || !this.gate) return;
             this.unhookGate?.();
@@ -183,6 +196,7 @@ export class Daemon {
         return;
       case "session.stop":
         this.run?.stop();
+        await this.egress?.close();
         if (msg.destroy) {
           await this.browser?.destroy();
           this.browser = undefined;

@@ -27,6 +27,8 @@ export type BrowserSessionOptions = {
   downloadsDir?: string;
   /** "chromium" = full Chromium in new headless mode (needed by sites that refuse the headless shell). */
   channel?: string;
+  /** HTTP proxy for all page traffic, e.g. the sandbox egress forwarder on 127.0.0.1:3128. */
+  proxyServer?: string;
   viewport?: { width: number; height: number };
   headless?: boolean;
   activeFps?: number;
@@ -145,6 +147,7 @@ export class BrowserSession {
       viewport: this.viewport,
       acceptDownloads: true,
       ...(channel ? { channel } : {}),
+      ...(this.opts.proxyServer ? { proxy: { server: this.opts.proxyServer } } : {}),
       // Sites such as x.com answer 403 to the headless signature; present as a regular Chrome.
       userAgent: chromeUserAgent(chromium.executablePath()),
       ignoreDefaultArgs: ["--enable-automation"],

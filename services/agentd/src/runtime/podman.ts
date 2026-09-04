@@ -64,6 +64,13 @@ export type BrowserRunSpec = {
   networkMode: NetworkMode;
 };
 
+const PROXY_URL = "http://127.0.0.1:3128";
+export const EGRESS_ENV = [
+  "--env", `HTTP_PROXY=${PROXY_URL}`, "--env", `HTTPS_PROXY=${PROXY_URL}`, "--env", `http_proxy=${PROXY_URL}`, "--env", `https_proxy=${PROXY_URL}`,
+  "--env", "NO_PROXY=localhost,127.0.0.1,::1", "--env", "no_proxy=localhost,127.0.0.1,::1",
+  "--env", "LAW_EGRESS_SOCKET=/run/law/egress.sock", "--env", "LAW_EGRESS_PORT=3128",
+];
+
 // The browser container sees no workspace and no keys: only its profile volume, a downloads dir and the socket dir.
 export function buildBrowserRunArgs(spec: BrowserRunSpec): string[] {
   const name = browserContainerName(spec.sessionId);
@@ -88,7 +95,9 @@ export function buildBrowserRunArgs(spec: BrowserRunSpec): string[] {
     "--volume", "law-browser-profile-default:/profile",
     "--volume", `${spec.downloadsDir}:/downloads:rw`,
     "--volume", `${spec.runtimeDir}:/run/law:rw`,
-    "--network", spec.networkMode === "none" ? "none" : "slirp4netns",
+    // No network namespace of its own: everything leaves through the egress proxy socket in /run/law (B6 H1).
+    "--network", "none",
+    ...EGRESS_ENV,
     "--env", "HOME=/home/agent",
     spec.imageId,
   ];
@@ -125,7 +134,9 @@ export function buildRunArgs(spec: RunSpec): string[] {
     ...(spec.gitconfigPath ? ["--volume", `${spec.gitconfigPath}:/home/agent/.gitconfig:ro`] : []),
     "--volume", `${spec.workspacePath}:/workspace:rw`,
     "--volume", `${spec.runtimeDir}:/run/law:rw`,
-    "--network", spec.networkMode === "none" ? "none" : "slirp4netns",
+    // No network namespace of its own: everything leaves through the egress proxy socket in /run/law (B6 H1).
+    "--network", "none",
+    ...EGRESS_ENV,
     "--env", "TERM=xterm-256color",
     "--env", "HOME=/home/agent",
     // Claude Code keeps its account/onboarding state in ~/.claude.json, outside ~/.claude; point it at the volume.

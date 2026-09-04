@@ -45,7 +45,11 @@ describe("buildRunArgs", () => {
     expect(args).toContain("/home/u/proj:/workspace:rw");
     expect(args).toContain(`${spec.runtimeDir}:/run/law:rw`);
     expect(args).toContain("law-auth-claude:/home/agent/.claude");
-    expect(args[args.indexOf("--network") + 1]).toBe("slirp4netns");
+    // No network namespace of its own; everything goes through the egress socket (B6 H1).
+    expect(args[args.indexOf("--network") + 1]).toBe("none");
+    expect(args).not.toContain("slirp4netns");
+    expect(args).toContain("HTTPS_PROXY=http://127.0.0.1:3128");
+    expect(args).toContain("LAW_EGRESS_SOCKET=/run/law/egress.sock");
     expect(args).toContain("CLAUDE_CONFIG_DIR=/home/agent/.claude");
     expect(args).toContain("law-ssh:/home/agent/.ssh");
     expect(args.join(" ")).not.toContain(".gitconfig");

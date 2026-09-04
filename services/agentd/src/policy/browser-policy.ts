@@ -3,32 +3,9 @@ import type { ToolCall } from "../provider/types.js";
 import type { Policy, PolicyContext, PolicyDecision } from "./types.js";
 import type { ApprovalManager } from "./approvals.js";
 import type { Rule } from "./rules.js";
+import { isPrivateAddress } from "./private-address.js";
 
-// ---- private / link-local addresses the model may never open (the human still can) ----
-
-const PRIVATE_HOSTS = /^(localhost|.*\.localhost|.*\.local|.*\.internal|.*\.home\.arpa)$/i;
-
-function ipv4Private(host: string): boolean {
-  const m = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(host);
-  if (!m) return false;
-  const [a, b] = [Number(m[1]), Number(m[2])];
-  return a === 10 || a === 127 || a === 0 || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) || (a === 169 && b === 254);
-}
-
-function ipv6Private(host: string): boolean {
-  const h = host.replace(/^\[|\]$/g, "").toLowerCase();
-  return h === "::1" || h === "::" || h.startsWith("fe80:") || h.startsWith("fc") || h.startsWith("fd") || h.startsWith("::ffff:127.") || h.startsWith("::ffff:10.");
-}
-
-export function isPrivateAddress(url: string): boolean {
-  let host: string;
-  try {
-    host = new URL(url).hostname;
-  } catch {
-    return true;
-  }
-  return PRIVATE_HOSTS.test(host) || ipv4Private(host) || ipv6Private(host);
-}
+export { isPrivateAddress };
 
 // ---- consequential actions by element name ----
 

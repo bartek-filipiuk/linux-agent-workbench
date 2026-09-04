@@ -8,7 +8,7 @@ ARG CODEX_VERSION=0.153.2
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
-      ca-certificates curl xz-utils tmux git ripgrep jq less nano python3 build-essential locales procps openssh-client \
+      ca-certificates curl xz-utils tmux git ripgrep jq less nano python3 build-essential locales procps openssh-client netcat-openbsd \
  && rm -rf /var/lib/apt/lists/* \
  && locale-gen en_US.UTF-8
 ENV LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
@@ -38,6 +38,9 @@ COPY services/terminal-worker/dist /opt/law/worker
 COPY images/terminal/gate.cjs /opt/law/gate.cjs
 COPY images/terminal/bash.bashrc /tmp/law.bashrc
 RUN cat /tmp/law.bashrc >> /etc/bash.bashrc && rm /tmp/law.bashrc && chown -R root:root /opt/law
+# The container has no network namespace of its own: ssh reaches hosts through the egress proxy (B6 H1).
+RUN mkdir -p /etc/ssh/ssh_config.d \
+ && printf 'Host *\n  ProxyCommand nc -X connect -x 127.0.0.1:3128 %%h %%p\n' > /etc/ssh/ssh_config.d/law-egress.conf
 
 USER agent
 WORKDIR /workspace

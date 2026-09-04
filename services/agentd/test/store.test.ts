@@ -12,15 +12,15 @@ function mkRun(store: Store) {
 }
 
 describe("Store", () => {
-  it("migrates to schema version 1 and is idempotent", () => {
+  it("migrates to the current schema version and is idempotent", () => {
     const s = mkStore();
-    expect(s.schemaVersion).toBe(1);
+    expect(s.schemaVersion).toBe(2);
     s.close();
     const file = path.join(tmpDir(), "state.sqlite");
     const a = new Store(file);
     a.close();
     const b = new Store(file);
-    expect(b.schemaVersion).toBe(1);
+    expect(b.schemaVersion).toBe(2);
     b.close();
   });
 
