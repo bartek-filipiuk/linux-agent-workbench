@@ -111,18 +111,27 @@ export class TerminalSession {
     const lines: string[] = [];
     for (let y = 0; y < this.term.rows; y++) lines.push(buf.getLine(buf.baseY + y)?.translateToString(true) ?? "");
     while (lines.length > 0 && lines[lines.length - 1] === "") lines.pop();
-    const tail: string[] = [];
-    for (let y = Math.max(0, buf.baseY - maxLines); y < buf.baseY; y++) tail.push(buf.getLine(y)?.translateToString(true) ?? "");
     return {
       revision: this.revision,
       screen: lines.join("\n"),
-      scrollbackTail: tail.join("\n"),
+      scrollbackTail: await this.history(maxLines),
       cursor: { row: buf.cursorY, col: buf.cursorX },
       size: { rows: this.term.rows, cols: this.term.cols },
       idleMs: Date.now() - this.lastDataAt,
       exited: this.exited,
       ...(this.exitCode !== undefined ? { exitCode: this.exitCode } : {}),
     };
+  }
+
+  // tmux keeps its own history and repaints the pane instead of scrolling the outer terminal,
+  // so the headless scrollback is incomplete; ask tmux for the lines above the viewport.
+  private history(maxLines: number): Promise<string> {
+    const name = this.opts.sessionName ?? "main";
+    return new Promise((resolve) =>
+      execFile("tmux", ["-S", this.opts.tmuxSocket, "capture-pane", "-p", "-t", name, "-S", `-${maxLines}`, "-E", "-1"], (err, stdout) =>
+        resolve(err ? "" : stdout.replace(/\n+$/, "")),
+      ),
+    );
   }
 
   health(): WorkerHealth {
