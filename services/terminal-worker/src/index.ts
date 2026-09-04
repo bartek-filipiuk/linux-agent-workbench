@@ -1,2 +1,2 @@
-// Implemented in Milestone 2 (node-pty + tmux worker).
-export {};
+export { TerminalSession } from "./terminal-session.js";
+export { WorkerServer } from "./server.js";
