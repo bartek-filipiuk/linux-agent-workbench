@@ -4,9 +4,12 @@
 FROM mcr.microsoft.com/playwright:v1.62.1-noble
 
 ENV DEBIAN_FRONTEND=noninteractive
-# uid 1000 is "pwuser" in the base image; rename so paths match the spec. No -m: /home/agent is a tmpfs at runtime.
-RUN usermod -l agent pwuser && usermod -d /home/agent agent && groupmod -n agent pwuser \
- && mkdir -p /home/agent /profile /downloads && chown agent:agent /home/agent /profile /downloads
+# uid 1000 is "ubuntu" in the base image (pwuser is 1001). --userns=keep-id maps the host user to uid 1000,
+# so that is the account we rename to "agent". No -m: /home/agent is a tmpfs at runtime.
+RUN userdel -r pwuser 2>/dev/null || true \
+ && usermod -l agent ubuntu && usermod -d /home/agent agent && groupmod -n agent ubuntu \
+ && mkdir -p /home/agent /profile /downloads && chown agent:agent /home/agent /profile /downloads \
+ && for g in adm dialout cdrom floppy sudo audio dip video plugdev; do gpasswd -d agent "$g" >/dev/null 2>&1 || true; done
 
 COPY images/browser/opt-package.json /opt/law/package.json
 RUN cd /opt/law && npm install --omit=dev --no-audit --no-fund
