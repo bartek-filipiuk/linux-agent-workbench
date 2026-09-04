@@ -3,18 +3,18 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { BrowserSession } from "../src/browser-session.js";
-
-const fixture = `data:text/html,${encodeURIComponent(`<!doctype html><title>start</title>
-<button id="b" onclick="document.title='clicked'" style="position:absolute;left:100px;top:100px;width:80px;height:40px">go</button>
-<input id="i" style="position:absolute;left:100px;top:200px" oninput="document.title='typed:'+this.value">`)}`;
+import { startFixtureServer } from "./helpers/fixture-server.js";
 
 let s: BrowserSession;
+let site: { url: string; close: () => Promise<void> };
 beforeAll(async () => {
+  site = await startFixtureServer();
   s = new BrowserSession({ profileDir: fs.mkdtempSync(path.join(os.tmpdir(), "law-bw-")), viewport: { width: 640, height: 400 }, activeFps: 30, idleFps: 30 });
   await s.start({ size: { width: 320, height: 200 } });
 }, 60_000);
 afterAll(async () => {
   await s.close();
+  await site.close();
 });
 const until = async (pred: () => Promise<boolean> | boolean, ms = 10_000) => {
   const t0 = Date.now();
@@ -29,8 +29,7 @@ describe("BrowserSession", { timeout: 30_000 }, () => {
   it("streams frames with the viewport size", async () => {
     const frames: Array<{ width: number; height: number; jpeg: Uint8Array }> = [];
     const off = s.onFrame((f) => frames.push(f));
-    // A data: URL is not navigable through navigate(); load the fixture through the page directly for the test.
-    await (s as unknown as { page: { goto(u: string): Promise<unknown> } }).page.goto(fixture);
+    await s.navigate(`${site.url}/input.html`);
     await until(() => frames.length > 0);
     off();
     expect(frames[0]).toMatchObject({ width: 640, height: 400 });

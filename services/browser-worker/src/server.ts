@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import net from "node:net";
 import { FramedConnection } from "@law/protocol/node";
-import { BrowserInputEvent, BrowserNavigate, ProtocolError, encodeBrowserFrame, type Envelope } from "@law/protocol";
+import { BrowserAction, BrowserInputEvent, BrowserNavigate, BrowserObserveInput, BrowserWaitInput, ProtocolError, encodeBrowserFrame, type Envelope } from "@law/protocol";
 import type { BrowserSession } from "./browser-session.js";
 
 export class BrowserWorkerServer {
@@ -58,6 +58,14 @@ export class BrowserWorkerServer {
           return conn.reply(id, { ok: true, payload: await this.session.navigate(BrowserNavigate.parse(env.payload).url) });
         case "browser.info":
           return conn.reply(id, { ok: true, payload: await this.session.info() });
+        case "browser.observe":
+          return conn.reply(id, { ok: true, payload: await this.session.observe(BrowserObserveInput.parse(env.payload)) });
+        case "browser.act":
+          return conn.reply(id, { ok: true, payload: await this.session.act(BrowserAction.parse(env.payload)) });
+        case "browser.wait":
+          return conn.reply(id, { ok: true, payload: await this.session.wait(BrowserWaitInput.parse(env.payload)) });
+        case "browser.downloads":
+          return conn.reply(id, { ok: true, payload: { downloads: this.session.listDownloads() } });
         default:
           return conn.reply(id, { ok: false, error: { code: "INVALID_INPUT", message: `unknown request ${env.type}` } });
       }

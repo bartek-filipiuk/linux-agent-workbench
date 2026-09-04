@@ -23,3 +23,31 @@ describe("browser protocol", () => {
     expect(BrowserInputEvent.safeParse({ kind: "teleport", x: 1 }).success).toBe(false);
   });
 });
+
+import { BrowserAction, BrowserObservation } from "../src/browser.js";
+import { ErrorCode } from "../src/errors.js";
+
+describe("browser actions and observation", () => {
+  it("accepts every action kind and rejects malformed refs", () => {
+    const ok = [
+      { kind: "navigate", url: "https://x" },
+      { kind: "click", ref: "e3", revision: 2 },
+      { kind: "type", ref: "e1", revision: 2, text: "hi", submit: true },
+      { kind: "press", key: "Enter" },
+      { kind: "select", ref: "e2", revision: 2, values: ["b"] },
+      { kind: "mouse", x: 1, y: 2, action: "wheel", deltaY: 100 },
+      { kind: "switchPage", pageId: "p2" },
+      { kind: "closePage", pageId: "p2" },
+      { kind: "wait", ms: 500 },
+    ];
+    for (const a of ok) expect(BrowserAction.safeParse(a).success, JSON.stringify(a)).toBe(true);
+    expect(BrowserAction.safeParse({ kind: "click", ref: "3", revision: 2 }).success).toBe(false);
+    expect(BrowserAction.safeParse({ kind: "click", ref: "e3" }).success).toBe(false);
+    expect(BrowserAction.safeParse({ kind: "wait", ms: 60_000 }).success).toBe(false);
+  });
+  it("has STALE_OBSERVATION and validates an observation", () => {
+    expect(ErrorCode.options).toContain("STALE_OBSERVATION");
+    const obs = { revision: 1, activePageId: "p1", url: "https://x", title: "t", viewport: { width: 1280, height: 800 }, scroll: { x: 0, y: 0, maxY: 0 }, elements: [], pages: [{ id: "p1", url: "https://x", title: "t" }] };
+    expect(BrowserObservation.safeParse(obs).success).toBe(true);
+  });
+});

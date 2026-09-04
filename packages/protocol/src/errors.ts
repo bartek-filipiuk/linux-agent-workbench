@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const ErrorCode = z.enum([
   "STALE_REVISION",
+  "STALE_OBSERVATION",
   "LEASE_DENIED",
   "POLICY_DENIED",
   "BUDGET_EXCEEDED",
