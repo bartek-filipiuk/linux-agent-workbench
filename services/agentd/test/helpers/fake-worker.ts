@@ -80,6 +80,12 @@ export class FakeWorker {
     }
   }
 
+  askClient(type: string, payload: Record<string, unknown>) {
+    const c = [...this.conns][0];
+    if (!c) throw new Error("no client");
+    return c.request(type, payload, { timeoutMs: 2000 });
+  }
+
   emitPty(text: string) {
     const bytes = new TextEncoder().encode(text);
     for (const c of this.conns) c.sendRaw(1, bytes);

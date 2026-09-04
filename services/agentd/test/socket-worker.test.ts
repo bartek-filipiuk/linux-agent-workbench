@@ -57,4 +57,15 @@ describe("SocketTerminalWorker", () => {
   it("fails to connect when no worker listens", async () => {
     await expect(SocketTerminalWorker.connect(tmpSocketPath())).rejects.toSatisfy((e) => ProtocolError.is(e, "WORKER_UNAVAILABLE"));
   });
+
+  it("answers requests coming from the worker via onRequest", async () => {
+    const p = tmpSocketPath();
+    fw = await FakeWorker.listen(p);
+    const w = await SocketTerminalWorker.connect(p);
+    w.onRequest("gate.check", async (payload) => ({ decision: payload.command === "ls" ? "allow" : "deny" }));
+    expect(await fw.askClient("gate.check", { command: "ls" })).toEqual({ decision: "allow" });
+    expect(await fw.askClient("gate.check", { command: "rm" })).toEqual({ decision: "deny" });
+    await expect(fw.askClient("nope", {})).rejects.toMatchObject({ code: "INVALID_INPUT" });
+    w.close();
+  });
 });

@@ -8,14 +8,35 @@ import {
   type TerminalInput,
   type TerminalObserveInput,
   type TerminalResize,
+  type Envelope,
 } from "@law/protocol";
 import type { TerminalWorker } from "./types.js";
 
 export class SocketTerminalWorker implements TerminalWorker {
+  private readonly handlers = new Map<string, (payload: Record<string, unknown>) => Promise<Record<string, unknown>>>();
+
   private constructor(
     private readonly conn: FramedConnection,
     private readonly requestTimeoutMs: number,
-  ) {}
+  ) {
+    this.conn.on("message", (env: Envelope) => void this.dispatchRequest(env));
+  }
+
+  onRequest(type: string, handler: (payload: Record<string, unknown>) => Promise<Record<string, unknown>>): () => void {
+    this.handlers.set(type, handler);
+    return () => void this.handlers.delete(type);
+  }
+
+  private async dispatchRequest(env: Envelope): Promise<void> {
+    if (!env.id) return;
+    const h = this.handlers.get(env.type);
+    if (!h) return this.conn.reply(env.id, { ok: false, error: { code: "INVALID_INPUT", message: `no handler for ${env.type}` } });
+    try {
+      this.conn.reply(env.id, { ok: true, payload: await h(env.payload) });
+    } catch (e) {
+      this.conn.reply(env.id, { ok: false, error: { code: "INVALID_INPUT", message: e instanceof Error ? e.message : String(e) } });
+    }
+  }
 
   static connect(socketPath: string, opts: { requestTimeoutMs?: number } = {}): Promise<SocketTerminalWorker> {
     return new Promise((resolve, reject) => {

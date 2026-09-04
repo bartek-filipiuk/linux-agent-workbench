@@ -131,6 +131,16 @@ export class Store {
       .run(d.turns ?? 0, d.toolCalls ?? 0, d.costUsd ?? 0, runId);
   }
 
+  createApproval(a: { id: string; runId: string; commandHash: string; command: string; category: string; ruleId: string; expiresAt: number }): void {
+    this.db
+      .prepare(`INSERT INTO approvals (id, run_id, command_hash, command, category, rule_id, created_at, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
+      .run(a.id, a.runId, a.commandHash, a.command, a.category, a.ruleId, Date.now(), a.expiresAt);
+  }
+
+  decideApproval(id: string, decision: string): void {
+    this.db.prepare(`UPDATE approvals SET decision = ?, decided_at = ? WHERE id = ?`).run(decision, Date.now(), id);
+  }
+
   markInterruptedRuns(reason: string): number {
     const placeholders = NON_TERMINAL.map(() => "?").join(",");
     const rows = this.db.prepare(`SELECT id FROM runs WHERE state IN (${placeholders})`).all(...NON_TERMINAL) as { id: string }[];

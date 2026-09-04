@@ -10,5 +10,6 @@ export interface TerminalWorker {
   writeRaw(bytes: Uint8Array): void;
   onPtyData(cb: (bytes: Uint8Array) => void): () => void;
   onClose(cb: () => void): () => void;
+  onRequest(type: string, handler: (payload: Record<string, unknown>) => Promise<Record<string, unknown>>): () => void;
   close(): void;
 }
