@@ -13,7 +13,7 @@ function mk(extra: Partial<ConstructorParameters<typeof TerminalSession>[0]> = {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "law-tmux-"));
   const tmuxSocket = path.join(dir, "t.sock");
   sockets.push(tmuxSocket);
-  const s = new TerminalSession({ tmuxSocket, cwd: dir, cols: 80, rows: 24, env: { PS1: "$ ", TERM: "xterm-256color", PATH: process.env.PATH ?? "" }, ...extra });
+  const s = new TerminalSession({ tmuxSocket, cwd: dir, cols: 80, rows: 24, env: { PS1: "$ ", TERM: "xterm-256color", LANG: "C.UTF-8", PATH: process.env.PATH ?? "" }, ...extra });
   sessions.push(s);
   return s;
 }
@@ -101,5 +101,53 @@ describe("TerminalSession", () => {
     await new Promise((r) => setTimeout(r, 200));
     const captured = execFileSync("tmux", ["-S", sock, "capture-pane", "-p", "-t", "main"]).toString();
     expect(captured).toContain("KEEP_ME");
+  });
+
+  it("wait returns once the shell is quiet, with an idle_shell hint", async () => {
+    const s = mk();
+    await s.start();
+    const r = await s.wait({ idleMs: 300, timeoutMs: 5000 });
+    expect(r).toMatchObject({ timedOut: false, matched: false });
+    expect(r.hint?.state).toBe("idle_shell");
+  });
+
+  it("drives the mock nested agent: idle box, question menu, permission prompt, done", { timeout: 40_000 }, async () => {
+    const s = mk();
+    await s.start();
+    await s.wait({ idleMs: 300 });
+    const fixture = path.resolve(__dirname, "../../../fixtures/terminal/mock-agent.mjs");
+    await s.input({ kind: "text", text: `node ${fixture}` });
+    await s.input({ kind: "key", key: "ENTER" });
+    const idle = await s.wait({ idleMs: 400, timeoutMs: 10_000 });
+    expect(idle.hint?.state).toBe("nested_agent_idle");
+    await s.input({ kind: "text", text: "create hello.txt" });
+    await s.input({ kind: "key", key: "ENTER" });
+    const menu = await s.wait({ until: "Which approach", timeoutMs: 10_000 });
+    expect(menu.matched).toBe(true);
+    expect(menu.hint).toEqual({ state: "question_menu", options: ["Fast path", "Careful path"] });
+    await s.input({ kind: "key", key: "DOWN" });
+    await s.input({ kind: "key", key: "ENTER" });
+    const perm = await s.wait({ idleMs: 400, timeoutMs: 10_000 });
+    expect(perm.hint?.state).toBe("permission_prompt");
+    await s.input({ kind: "text", text: "1" });
+    await s.input({ kind: "key", key: "ENTER" });
+    const done = await s.wait({ until: "Done: created hello.txt", timeoutMs: 10_000 });
+    expect(done.matched).toBe(true);
+    expect(done.screen).toContain("Careful path");
+    const cwd = path.dirname(sockets.at(-1)!);
+    expect(fs.existsSync(path.join(cwd, "hello.txt"))).toBe(true);
+    await s.input({ kind: "text", text: "q" });
+    await s.input({ kind: "key", key: "ENTER" });
+  });
+
+  it("wait times out when the screen keeps changing", async () => {
+    const s = mk();
+    await s.start();
+    await s.wait({ idleMs: 300 });
+    await s.input({ kind: "text", text: "while true; do echo tick; sleep 0.1; done" });
+    await s.input({ kind: "key", key: "ENTER" });
+    const r = await s.wait({ idleMs: 500, timeoutMs: 1500 });
+    expect(r.timedOut).toBe(true);
+    s.interrupt();
   });
 });

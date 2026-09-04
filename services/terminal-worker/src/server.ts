@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import net from "node:net";
 import { FramedConnection } from "@law/protocol/node";
-import { ProtocolError, TerminalInput, TerminalObserveInput, TerminalResize, type Envelope } from "@law/protocol";
+import { ProtocolError, TerminalInput, TerminalObserveInput, TerminalResize, TerminalWaitInput, type Envelope } from "@law/protocol";
 import type { TerminalSession } from "./terminal-session.js";
 
 export class WorkerServer {
@@ -70,6 +70,8 @@ export class WorkerServer {
           return conn.reply(id, { ok: true, payload: await this.session.observe(TerminalObserveInput.parse(env.payload)) });
         case "terminal.input":
           return conn.reply(id, { ok: true, payload: await this.session.input(TerminalInput.parse(env.payload)) });
+        case "terminal.wait":
+          return conn.reply(id, { ok: true, payload: await this.session.wait(TerminalWaitInput.parse(env.payload)) });
         case "terminal.interrupt":
           this.session.interrupt();
           return conn.reply(id, { ok: true });

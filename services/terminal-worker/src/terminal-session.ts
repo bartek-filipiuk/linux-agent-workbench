@@ -4,11 +4,14 @@ import xtermHeadless from "@xterm/headless";
 import {
   KEY_BYTES,
   ProtocolError,
+  classifyScreen,
   type TerminalInput,
   type TerminalInputResult,
   type TerminalObservation,
   type TerminalObserveInput,
   type TerminalResize,
+  type TerminalWaitInput,
+  type TerminalWaitResult,
   type WorkerHealth,
 } from "@law/protocol";
 
@@ -46,7 +49,8 @@ export class TerminalSession {
 
   async start(): Promise<void> {
     const name = this.opts.sessionName ?? "main";
-    const args = ["-S", this.opts.tmuxSocket, "-f", "/dev/null", "new-session", "-A", "-s", name];
+    // -u: UTF-8 regardless of the locale, otherwise tmux replaces box drawing and cursor glyphs with "_".
+    const args = ["-u", "-S", this.opts.tmuxSocket, "-f", "/dev/null", "new-session", "-A", "-s", name];
     if (this.opts.cwd) args.push("-c", this.opts.cwd);
     // Chained into the same tmux command so it cannot race the server start:
     // status line off so the model never reads tmux chrome as program output.
@@ -110,9 +114,11 @@ export class TerminalSession {
     const lines: string[] = [];
     for (let y = 0; y < this.term.rows; y++) lines.push(buf.getLine(buf.baseY + y)?.translateToString(true) ?? "");
     while (lines.length > 0 && lines[lines.length - 1] === "") lines.pop();
+    const screen = lines.join("\n");
     return {
       revision: this.revision,
-      screen: lines.join("\n"),
+      screen,
+      hint: classifyScreen(screen),
       scrollbackTail: await this.history(maxLines),
       cursor: { row: buf.cursorY, col: buf.cursorX },
       size: { rows: this.term.rows, cols: this.term.cols },
@@ -120,6 +126,25 @@ export class TerminalSession {
       exited: this.exited,
       ...(this.exitCode !== undefined ? { exitCode: this.exitCode } : {}),
     };
+  }
+
+  // Resolve when the output has been quiet for idleMs, when `until` matches the screen, or on timeout.
+  async wait(input: TerminalWaitInput = {}): Promise<TerminalWaitResult> {
+    const idleMs = input.idleMs ?? 1500;
+    const timeoutMs = input.timeoutMs ?? 60_000;
+    const until = input.until ? new RegExp(input.until, "im") : undefined;
+    const deadline = Date.now() + timeoutMs;
+    for (;;) {
+      const obs = await this.observe();
+      if (until && until.test(obs.screen)) return { ...obs, timedOut: false, matched: true };
+      const quietFor = Date.now() - this.lastDataAt;
+      if (!until && quietFor >= idleMs) return { ...obs, timedOut: false, matched: false };
+      if (until && this.exited) return { ...obs, timedOut: false, matched: false };
+      const now = Date.now();
+      if (now >= deadline) return { ...obs, timedOut: true, matched: false };
+      const next = Math.min(deadline - now, Math.max(50, idleMs - quietFor), 500);
+      await new Promise((r) => setTimeout(r, next));
+    }
   }
 
   // tmux keeps its own history and repaints the pane instead of scrolling the outer terminal,
