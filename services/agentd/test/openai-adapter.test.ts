@@ -25,7 +25,7 @@ const fcResponse = {
     { type: "function_call", call_id: "call_a", name: "terminal_observe", arguments: "{\"maxLines\":50}" },
     { type: "function_call", call_id: "call_b", name: "terminal_input", arguments: "not json" },
   ],
-  usage: { input_tokens: 66, output_tokens: 21 },
+  usage: { input_tokens: 66, output_tokens: 21, input_tokens_details: { cached_tokens: 40 } },
 };
 
 describe("OpenAIResponsesAdapter", () => {
@@ -39,7 +39,7 @@ describe("OpenAIResponsesAdapter", () => {
     expect((calls[0]!.body.tools as Array<{ type: string; name: string; strict: boolean }>).map((t) => [t.type, t.name, t.strict])).toEqual([
       ["function", "terminal_observe", false], ["function", "terminal_input", false], ["function", "terminal_wait", false], ["function", "terminal_interrupt", false], ["function", "request_human", false],
     ]);
-    expect(turn).toMatchObject({ responseId: "resp_1", text: "Looking.", usage: { inputTokens: 66, outputTokens: 21 } });
+    expect(turn).toMatchObject({ responseId: "resp_1", text: "Looking.", usage: { inputTokens: 66, outputTokens: 21, cachedInputTokens: 40 } });
     expect(turn.toolCalls).toEqual([
       { callId: "call_a", name: "terminal_observe", args: { maxLines: 50 } },
       { callId: "call_b", name: "terminal_input", args: { __invalid: "not json" } },

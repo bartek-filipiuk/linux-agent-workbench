@@ -4,7 +4,7 @@ import { Store } from "../src/storage/store.js";
 import { FakeModelAdapter } from "../src/provider/fake.js";
 import { SocketTerminalWorker } from "../src/worker/socket-worker.js";
 import { RunController } from "../src/orchestrator/run-controller.js";
-import { BudgetTracker, BudgetExceededError } from "../src/orchestrator/budgets.js";
+import { BudgetTracker, BudgetExceededError, costOf } from "../src/orchestrator/budgets.js";
 import { FakeWorker } from "./helpers/fake-worker.js";
 import { tmpSocketPath } from "./helpers/tmp.js";
 
@@ -178,6 +178,15 @@ describe("RunController", () => {
     const rc = new RunController({ store, adapter, worker }, input(ws));
     const out = await rc.start();
     expect(out).toMatchObject({ state: "failed", endReason: "upstream 500" });
+  });
+});
+
+describe("costOf", () => {
+  it("bills cached input tokens at a tenth of the input price", () => {
+    const prices = { m: { inputUsdPerMTok: 1, outputUsdPerMTok: 2 } };
+    expect(costOf("m", { inputTokens: 1000, outputTokens: 100, cachedInputTokens: 500 }, prices)).toBeCloseTo((500 + 50 + 200) / 1_000_000, 12);
+    expect(costOf("m", { inputTokens: 1000, outputTokens: 0 }, prices)).toBeCloseTo(1000 / 1_000_000, 12);
+    expect(costOf("other", { inputTokens: 1, outputTokens: 1 }, prices)).toBeUndefined();
   });
 });
 

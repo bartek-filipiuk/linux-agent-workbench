@@ -133,10 +133,10 @@ export class Store {
     return this.db.prepare(`SELECT * FROM tool_calls WHERE run_id = ? ORDER BY started_at, rowid`).all(runId) as ToolCallRow[];
   }
 
-  recordUsage(runId: string, u: { responseId: string; inputTokens: number; outputTokens: number; costUsd: number }): void {
+  recordUsage(runId: string, u: { responseId: string; inputTokens: number; outputTokens: number; cachedInputTokens?: number; costUsd: number }): void {
     this.db
-      .prepare(`INSERT INTO provider_usage (run_id, response_id, input_tokens, output_tokens, cost_usd, ts) VALUES (?, ?, ?, ?, ?, ?)`)
-      .run(runId, u.responseId, u.inputTokens, u.outputTokens, u.costUsd, Date.now());
+      .prepare(`INSERT INTO provider_usage (run_id, response_id, input_tokens, output_tokens, cached_tokens, cost_usd, ts) VALUES (?, ?, ?, ?, ?, ?, ?)`)
+      .run(runId, u.responseId, u.inputTokens, u.outputTokens, u.cachedInputTokens ?? 0, u.costUsd, Date.now());
   }
 
   addRunTotals(runId: string, d: { turns?: number; toolCalls?: number; costUsd?: number }): void {

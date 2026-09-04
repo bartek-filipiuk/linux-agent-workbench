@@ -26,7 +26,9 @@ const ResponseBody = z.object({
   status: z.string().optional(),
   error: z.object({ message: z.string() }).nullable().optional(),
   output: z.array(z.unknown()),
-  usage: z.object({ input_tokens: z.number(), output_tokens: z.number() }).optional(),
+  usage: z
+    .object({ input_tokens: z.number(), output_tokens: z.number(), input_tokens_details: z.object({ cached_tokens: z.number() }).partial().optional() })
+    .optional(),
 });
 
 const RETRY_STATUS = new Set([408, 429]);
@@ -94,7 +96,11 @@ export class OpenAIResponsesAdapter implements ModelAdapter {
       responseId: parsed.id,
       text: texts.join("\n"),
       toolCalls,
-      usage: { inputTokens: parsed.usage?.input_tokens ?? 0, outputTokens: parsed.usage?.output_tokens ?? 0 },
+      usage: {
+        inputTokens: parsed.usage?.input_tokens ?? 0,
+        outputTokens: parsed.usage?.output_tokens ?? 0,
+        cachedInputTokens: parsed.usage?.input_tokens_details?.cached_tokens ?? 0,
+      },
     };
   }
 

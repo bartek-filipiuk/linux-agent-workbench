@@ -9,7 +9,8 @@ export type ToolResult = { callId: string; output: string; imageJpegBase64?: str
 
 export type ModelTurnInput = { goal: string } | { toolResults: ToolResult[] };
 
-export type ModelUsage = { inputTokens: number; outputTokens: number };
+/** cachedInputTokens: the part of inputTokens served from the provider's prompt cache (billed at a fraction). */
+export type ModelUsage = { inputTokens: number; outputTokens: number; cachedInputTokens?: number };
 
 export type ModelTurn = {
   responseId: string;

@@ -45,8 +45,13 @@ export class BudgetTracker {
   }
 }
 
+/** OpenAI bills cached input tokens at a tenth of the input price. */
+export const CACHED_INPUT_FACTOR = 0.1;
+
 export function costOf(model: string, usage: ModelUsage, prices: PriceTable): number | undefined {
   const p = prices[model];
   if (!p) return undefined;
-  return (usage.inputTokens * p.inputUsdPerMTok + usage.outputTokens * p.outputUsdPerMTok) / 1_000_000;
+  const cached = Math.min(usage.cachedInputTokens ?? 0, usage.inputTokens);
+  const fresh = usage.inputTokens - cached;
+  return ((fresh + cached * CACHED_INPUT_FACTOR) * p.inputUsdPerMTok + usage.outputTokens * p.outputUsdPerMTok) / 1_000_000;
 }
