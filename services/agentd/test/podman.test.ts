@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { PodmanRuntime, buildRunArgs, sessionIdFor, validateWorkspacePath } from "../src/runtime/podman.js";
+import { PodmanRuntime, buildBrowserRunArgs, buildRunArgs, sessionIdFor, validateWorkspacePath } from "../src/runtime/podman.js";
 import { ProtocolError } from "@law/protocol";
 
 const spec = {
@@ -100,5 +100,21 @@ describe("PodmanRuntime", () => {
     expect(await rt.ensureRunning(spec)).toBe("started");
     await rt.destroy(spec.sessionId);
     expect(calls.at(-1)).toEqual(["rm", "-f", "--ignore", "law-terminal-0123456789abcdef"]);
+  });
+});
+
+describe("buildBrowserRunArgs", () => {
+  const bspec = { sessionId: "0123456789abcdef", runtimeDir: "/run/user/1000/law/0123456789abcdef/browser", downloadsDir: "/home/u/.local/share/law/downloads/0123456789abcdef", imageId: "sha256:beef", networkMode: "open" as const };
+  it("isolates the browser: profile volume, downloads, socket dir, no workspace, no keys", () => {
+    const args = buildBrowserRunArgs(bspec);
+    expect(args[args.indexOf("--name") + 1]).toBe("law-browser-0123456789abcdef");
+    for (const flag of ["--userns=keep-id", "--cap-drop=ALL", "--security-opt=no-new-privileges", "--read-only", "--shm-size=1g"]) expect(args).toContain(flag);
+    expect(args).toContain("law-browser-profile-default:/profile");
+    expect(args).toContain(`${bspec.downloadsDir}:/downloads:rw`);
+    expect(args).toContain(`${bspec.runtimeDir}:/run/law:rw`);
+    expect(args.join(" ")).not.toMatch(/workspace|OPENAI|ANTHROPIC|law-auth/);
+    expect(args.at(-1)).toBe("sha256:beef");
+    expect(buildBrowserRunArgs({ ...bspec, networkMode: "none" })).toContain("none");
+    expect(() => buildBrowserRunArgs({ ...bspec, sessionId: "x" })).toThrow();
   });
 });

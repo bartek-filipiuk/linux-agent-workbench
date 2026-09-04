@@ -4,9 +4,10 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-IMAGE=localhost/law-terminal
+NAME="${1:-terminal}"            # terminal | browser
+IMAGE="localhost/law-${NAME}"
 MIN_FREE_GB=5
-MAX_STORAGE_GB=6   # current image + one previous image still used by a running sandbox + base
+MAX_STORAGE_GB=10  # two images + their bases + one previous image still used by a running sandbox
 
 free_gb() { df --output=avail -BG / | tail -1 | tr -dc '0-9'; }
 storage_gb() { podman system df --format '{{.Size}}' 2>/dev/null | head -1 | awk '{v=$1; if (v ~ /GB/) {sub(/GB/,"",v); print v+0} else if (v ~ /MB/) {sub(/MB/,"",v); print v/1000} else print 0}'; }
@@ -17,11 +18,11 @@ if [ "$(free_gb)" -lt "$MIN_FREE_GB" ]; then
 fi
 
 pnpm --filter @law/protocol build
-pnpm --filter @law/terminal-worker build
+pnpm --filter "@law/${NAME}-worker" build
 SHA="$(git rev-parse --short HEAD)"
-podman build -f images/terminal/Containerfile -t "${IMAGE}:${SHA}" -t "${IMAGE}:latest" .
+podman build -f "images/${NAME}/Containerfile" -t "${IMAGE}:${SHA}" -t "${IMAGE}:latest" .
 ID="$(podman image inspect "${IMAGE}:${SHA}" --format '{{.Id}}')"
-printf '{ "tag": "%s", "id": "%s" }\n' "$SHA" "$ID" > images/terminal/image.json
+printf '{ "tag": "%s", "id": "%s" }\n' "$SHA" "$ID" > "images/${NAME}/image.json"
 echo "image ${IMAGE}:${SHA} id=${ID}"
 
 bash scripts/prune-images.sh

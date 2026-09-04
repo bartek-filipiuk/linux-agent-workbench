@@ -4,7 +4,7 @@ import { Daemon } from "./ipc.js";
 import { PodmanRuntime } from "./runtime/podman.js";
 import { TerminalSessionManager } from "./session/terminal-session-manager.js";
 import { OpenAIResponsesAdapter } from "./provider/openai.js";
-import { BrowserSessionManager } from "./session/browser-session-manager.js";
+import { BrowserSessionManager, hostLauncher, podmanLauncher } from "./session/browser-session-manager.js";
 import { dataDir } from "./paths.js";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -39,11 +39,15 @@ parentPort.once("message", (e) => {
     openStore: (p) => new Store(p),
     makeManager: (imageId, runtimeRoot) => new TerminalSessionManager({ runtime: new PodmanRuntime(), runtimeRoot, imageId }),
     makeAdapter: (model, apiKey) => new OpenAIResponsesAdapter({ model, apiKey }),
-    makeBrowser: (runtimeRoot) =>
+    makeBrowser: ({ runtimeRoot, sessionId, networkMode, browserImageId }) =>
       new BrowserSessionManager({
-        runtimeRoot: path.join(runtimeRoot, "browser"),
-        profileDir: path.join(dataDir(), "profiles", "browser", "default", "user-data"),
-        workerEntry: fileURLToPath(new URL("../../browser-worker/dist/main.js", import.meta.url)),
+        socketDir: path.join(runtimeRoot, sessionId, "browser"),
+        launcher: browserImageId
+          ? podmanLauncher({ runtime: new PodmanRuntime(), sessionId, imageId: browserImageId, networkMode, downloadsDir: path.join(dataDir(), "downloads", sessionId) })
+          : hostLauncher({
+              workerEntry: fileURLToPath(new URL("../../browser-worker/dist/main.js", import.meta.url)),
+              profileDir: path.join(dataDir(), "profiles", "browser", "default", "user-data"),
+            }),
       }),
     post: (m) => port.postMessage(m),
   });

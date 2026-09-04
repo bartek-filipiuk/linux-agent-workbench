@@ -1,0 +1,22 @@
+# Browser worker image: pinned Playwright base (Chromium + system deps + Node), worker under /opt/law.
+# Chromium runs without its own SUID/userns sandbox here (Playwright's default inside containers);
+# the rootless container with no capabilities is the isolation boundary.
+FROM mcr.microsoft.com/playwright:v1.62.1-noble
+
+ENV DEBIAN_FRONTEND=noninteractive
+# uid 1000 is "pwuser" in the base image; rename so paths match the spec. No -m: /home/agent is a tmpfs at runtime.
+RUN usermod -l agent pwuser && usermod -d /home/agent agent && groupmod -n agent pwuser \
+ && mkdir -p /home/agent /profile /downloads && chown agent:agent /home/agent /profile /downloads
+
+COPY images/browser/opt-package.json /opt/law/package.json
+RUN cd /opt/law && npm install --omit=dev --no-audit --no-fund
+COPY packages/protocol/package.json /opt/law/node_modules/@law/protocol/package.json
+COPY packages/protocol/dist /opt/law/node_modules/@law/protocol/dist
+COPY services/browser-worker/dist /opt/law/worker
+RUN chown -R root:root /opt/law
+
+USER agent
+WORKDIR /home/agent
+ENV HOME=/home/agent LAW_BROWSER_SOCKET=/run/law/browser.sock LAW_BROWSER_PROFILE=/profile/user-data PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+# ponytail: bash loop as supervisor, same as the terminal image
+CMD ["bash", "-c", "while true; do node /opt/law/worker/main.js; echo 'browser-worker exited, restarting in 1s'; sleep 1; done"]

@@ -153,4 +153,11 @@ describe("Daemon run flow", () => {
     await d.handle({ type: "run.start", goal: "g" });
     expect(posted.at(-1)).toMatchObject({ type: "agentd.error" });
   });
+
+  it("browser.start needs a ready sandbox session and a configured launcher", async () => {
+    const posted: Array<Record<string, unknown>> = [];
+    const d = new Daemon({ openStore: (p) => new Store(p), makeManager: () => { throw new Error("unused"); }, makeAdapter: () => new FakeModelAdapter([]), post: (m) => posted.push(m as Record<string, unknown>) });
+    await d.handle({ type: "browser.start" });
+    expect(posted.at(-1)).toMatchObject({ type: "agentd.error", message: expect.stringMatching(/not configured/) });
+  });
 });

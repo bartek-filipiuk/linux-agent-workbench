@@ -51,6 +51,49 @@ export function containerName(sessionId: string): string {
   return `law-terminal-${sessionId}`;
 }
 
+export function browserContainerName(sessionId: string): string {
+  if (!SESSION_ID.test(sessionId)) throw new ProtocolError("INVALID_INPUT", "invalid session id");
+  return `law-browser-${sessionId}`;
+}
+
+export type BrowserRunSpec = {
+  sessionId: string;
+  runtimeDir: string;
+  downloadsDir: string;
+  imageId: string;
+  networkMode: NetworkMode;
+};
+
+// The browser container sees no workspace and no keys: only its profile volume, a downloads dir and the socket dir.
+export function buildBrowserRunArgs(spec: BrowserRunSpec): string[] {
+  const name = browserContainerName(spec.sessionId);
+  if (!path.isAbsolute(spec.runtimeDir) || !path.isAbsolute(spec.downloadsDir)) {
+    throw new ProtocolError("INVALID_INPUT", "runtime and downloads dirs must be absolute");
+  }
+  return [
+    "run", "-d", "--rm",
+    "--name", name,
+    "--label", "law.app=1",
+    "--label", `law.session=${spec.sessionId}`,
+    "--userns=keep-id",
+    "--cap-drop=ALL",
+    "--security-opt=no-new-privileges",
+    "--read-only",
+    "--pids-limit=512",
+    "--memory=2g",
+    "--shm-size=1g",
+    "--tmpfs", "/tmp:rw,nosuid,nodev,size=1g",
+    "--tmpfs", "/run:rw,nosuid,nodev,size=64m",
+    "--tmpfs", "/home/agent:rw,nosuid,nodev,size=256m",
+    "--volume", "law-browser-profile-default:/profile",
+    "--volume", `${spec.downloadsDir}:/downloads:rw`,
+    "--volume", `${spec.runtimeDir}:/run/law:rw`,
+    "--network", spec.networkMode === "none" ? "none" : "slirp4netns",
+    "--env", "HOME=/home/agent",
+    spec.imageId,
+  ];
+}
+
 export function buildRunArgs(spec: RunSpec): string[] {
   const name = containerName(spec.sessionId);
   if (!path.isAbsolute(spec.workspacePath) || !path.isAbsolute(spec.runtimeDir)) {
@@ -110,15 +153,41 @@ export class PodmanRuntime {
   }
 
   async ensureRunning(spec: RunSpec): Promise<"reused" | "started"> {
-    const state = await this.state(spec.sessionId);
+    return this.ensureRunningWith(containerName(spec.sessionId), buildRunArgs(spec));
+  }
+
+  async stateOf(name: string): Promise<"running" | "stopped" | "missing"> {
+    try {
+      const { stdout } = await this.exec(["inspect", "--type", "container", "--format", "{{.State.Status}}", name]);
+      return stdout.trim() === "running" ? "running" : "stopped";
+    } catch {
+      return "missing";
+    }
+  }
+
+  async ensureRunningWith(name: string, args: string[]): Promise<"reused" | "started"> {
+    const state = await this.stateOf(name);
     if (state === "running") return "reused";
-    if (state === "stopped") await this.exec(["rm", "-f", "--ignore", containerName(spec.sessionId)]);
-    await this.exec(buildRunArgs(spec));
+    if (state === "stopped") await this.exec(["rm", "-f", "--ignore", name]);
+    await this.exec(args);
     return "started";
   }
 
   async destroy(sessionId: string): Promise<void> {
-    await this.exec(["rm", "-f", "--ignore", containerName(sessionId)]);
+    await this.destroyByName(containerName(sessionId));
+  }
+
+  async destroyByName(name: string): Promise<void> {
+    await this.exec(["rm", "-f", "--ignore", name]);
+  }
+
+  async logsOf(name: string, tail = 50): Promise<string> {
+    try {
+      const { stdout, stderr } = await this.exec(["logs", "--tail", String(tail), name]);
+      return (stdout + stderr).trim();
+    } catch (e) {
+      return e instanceof Error ? e.message : String(e);
+    }
   }
 
   async logs(sessionId: string, tail = 50): Promise<string> {

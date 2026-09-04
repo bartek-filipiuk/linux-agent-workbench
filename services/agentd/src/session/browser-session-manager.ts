@@ -1,28 +1,80 @@
 import { EventEmitter } from "node:events";
-import { spawn as nodeSpawn, type ChildProcess } from "node:child_process";
+import { spawn as nodeSpawn } from "node:child_process";
 import fs from "node:fs";
 import net from "node:net";
 import path from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
 import { FramedConnection } from "@law/protocol/node";
-import { BrowserInfo, ProtocolError, decodeBrowserFrame, type BrowserInputEvent } from "@law/protocol";
+import { BrowserInfo, ProtocolError, decodeBrowserFrame, type BrowserInputEvent, type NetworkMode } from "@law/protocol";
+import { browserContainerName, buildBrowserRunArgs, type PodmanRuntime } from "../runtime/podman.js";
 
 export type BrowserState = "idle" | "starting" | "ready" | "stopped" | "error";
 export type BrowserStatus = { state: BrowserState; url?: string; title?: string; message?: string };
 export type BrowserFrame = { width: number; height: number; jpeg: Uint8Array };
 
+/** Whatever runs the worker: a host process (B1) or a container (B2). The socket contract is the same. */
+export type LaunchHandle = { alive(): boolean; detach(): Promise<void>; destroy(): Promise<void>; logs(): Promise<string> };
+export type BrowserLauncher = (ctx: { socketDir: string; socketPath: string }) => Promise<LaunchHandle>;
+
 export type BrowserManagerDeps = {
-  runtimeRoot: string;
-  profileDir: string;
-  workerEntry: string;
-  spawn?: typeof nodeSpawn;
+  socketDir: string;
+  launcher: BrowserLauncher;
   connectTimeoutMs?: number;
 };
 
-// B1: the worker is a host process. B2 swaps the spawn for a container start; the socket contract stays.
+export function hostLauncher(opts: { workerEntry: string; profileDir: string; spawn?: typeof nodeSpawn }): BrowserLauncher {
+  return async ({ socketPath }) => {
+    fs.mkdirSync(opts.profileDir, { recursive: true, mode: 0o700 });
+    const spawn = opts.spawn ?? nodeSpawn;
+    const child = spawn(process.execPath, [opts.workerEntry], {
+      // Inside an Electron utilityProcess execPath is Electron itself; ELECTRON_RUN_AS_NODE makes it behave as plain Node.
+      env: { PATH: process.env.PATH ?? "", HOME: process.env.HOME ?? "", ELECTRON_RUN_AS_NODE: "1", LAW_BROWSER_SOCKET: socketPath, LAW_BROWSER_PROFILE: opts.profileDir },
+      stdio: ["ignore", "inherit", "inherit"],
+    });
+    let exited = false;
+    child.on("exit", () => (exited = true));
+    const kill = async () => {
+      if (exited) return;
+      child.kill("SIGTERM");
+      await Promise.race([new Promise<void>((r) => child.once("exit", () => r())), sleep(5000)]);
+      if (!exited) child.kill("SIGKILL");
+    };
+    return { alive: () => !exited, detach: kill, destroy: kill, logs: async () => "(host worker: see the agentd console)" };
+  };
+}
+
+export function podmanLauncher(opts: {
+  runtime: PodmanRuntime;
+  sessionId: string;
+  imageId: string;
+  networkMode: NetworkMode;
+  downloadsDir: string;
+}): BrowserLauncher {
+  return async ({ socketDir }) => {
+    fs.mkdirSync(opts.downloadsDir, { recursive: true, mode: 0o700 });
+    const name = browserContainerName(opts.sessionId);
+    const result = await opts.runtime.ensureRunningWith(
+      name,
+      buildBrowserRunArgs({ sessionId: opts.sessionId, runtimeDir: socketDir, downloadsDir: opts.downloadsDir, imageId: opts.imageId, networkMode: opts.networkMode }),
+    );
+    console.error(`[agentd] browser container ${name}: ${result}`);
+    let running = true;
+    return {
+      alive: () => running,
+      // Detach keeps the container (and the profile session) for the next connection, like the terminal sandbox.
+      detach: async () => {},
+      destroy: async () => {
+        running = false;
+        await opts.runtime.destroyByName(name);
+      },
+      logs: () => opts.runtime.logsOf(name),
+    };
+  };
+}
+
 export class BrowserSessionManager extends EventEmitter {
   private _status: BrowserStatus = { state: "idle" };
-  private child: ChildProcess | undefined;
+  private handle: LaunchHandle | undefined;
   private conn: FramedConnection | undefined;
 
   constructor(private readonly deps: BrowserManagerDeps) {
@@ -37,25 +89,15 @@ export class BrowserSessionManager extends EventEmitter {
     if (this._status.state === "ready" || this._status.state === "starting") return this._status;
     this.setStatus({ state: "starting" });
     try {
-      fs.mkdirSync(this.deps.runtimeRoot, { recursive: true, mode: 0o700 });
-      fs.mkdirSync(this.deps.profileDir, { recursive: true, mode: 0o700 });
-      const socketPath = path.join(this.deps.runtimeRoot, "browser.sock");
-      try {
-        fs.unlinkSync(socketPath);
-      } catch {}
-      const spawn = this.deps.spawn ?? nodeSpawn;
-      const child = spawn(process.execPath, [this.deps.workerEntry], {
-        // Inside an Electron utilityProcess execPath is Electron itself; ELECTRON_RUN_AS_NODE makes it behave as plain Node.
-        env: { PATH: process.env.PATH ?? "", HOME: process.env.HOME ?? "", ELECTRON_RUN_AS_NODE: "1", LAW_BROWSER_SOCKET: socketPath, LAW_BROWSER_PROFILE: this.deps.profileDir },
-        stdio: ["ignore", "inherit", "inherit"],
-      });
-      this.child = child;
-      child.on("exit", (code) => {
-        if (this.child === child) {
-          this.child = undefined;
-          if (this._status.state !== "stopped") this.setStatus({ state: "error", message: `browser worker exited with code ${code}` });
-        }
-      });
+      fs.mkdirSync(this.deps.socketDir, { recursive: true, mode: 0o700 });
+      fs.chmodSync(this.deps.socketDir, 0o700);
+      const socketPath = path.join(this.deps.socketDir, "browser.sock");
+      if (!this.handle?.alive()) {
+        try {
+          fs.unlinkSync(socketPath);
+        } catch {}
+        this.handle = await this.deps.launcher({ socketDir: this.deps.socketDir, socketPath });
+      }
       const conn = await this.waitForSocket(socketPath);
       this.conn = conn;
       conn.on("browser-frame", (bytes: Uint8Array) => this.emit("frame", decodeBrowserFrame(bytes)));
@@ -65,8 +107,9 @@ export class BrowserSessionManager extends EventEmitter {
       const info = BrowserInfo.parse(await conn.request("browser.info", {}));
       return this.setStatus({ state: "ready", url: info.url, title: info.title });
     } catch (e) {
+      const logs = await this.handle?.logs().catch(() => "");
       await this.stop("error");
-      return this.setStatus({ state: "error", message: e instanceof Error ? e.message : String(e) });
+      return this.setStatus({ state: "error", message: `${e instanceof Error ? e.message : String(e)}${logs ? `\n${logs}` : ""}` });
     }
   }
 
@@ -80,19 +123,23 @@ export class BrowserSessionManager extends EventEmitter {
     this.conn?.notify("browser.input", event);
   }
 
+  /** Close the connection; a container keeps running for the next start, a host process is stopped. */
   async stop(finalState: BrowserState = "stopped"): Promise<void> {
     const conn = this.conn;
-    const child = this.child;
     this.conn = undefined;
-    this.child = undefined;
     conn?.close();
-    if (child && child.exitCode === null) {
-      child.kill("SIGTERM");
-      const gone = new Promise<void>((r) => child.once("exit", () => r()));
-      await Promise.race([gone, sleep(5000)]);
-      if (child.exitCode === null) child.kill("SIGKILL");
-    }
+    await this.handle?.detach();
     if (finalState === "stopped") this.setStatus({ state: "stopped" });
+  }
+
+  /** Stop and remove the worker (container or process) for good. */
+  async destroy(): Promise<void> {
+    const conn = this.conn;
+    this.conn = undefined;
+    conn?.close();
+    await this.handle?.destroy();
+    this.handle = undefined;
+    this.setStatus({ state: "stopped" });
   }
 
   private async waitForSocket(socketPath: string): Promise<FramedConnection> {
@@ -106,7 +153,7 @@ export class BrowserSessionManager extends EventEmitter {
         });
         if (conn) return conn;
       }
-      if (!this.child) throw new ProtocolError("WORKER_UNAVAILABLE", "browser worker exited before listening");
+      if (!this.handle?.alive()) throw new ProtocolError("WORKER_UNAVAILABLE", "browser worker exited before listening");
       await sleep(250);
     }
     throw new ProtocolError("WORKER_UNAVAILABLE", "browser worker socket not ready");

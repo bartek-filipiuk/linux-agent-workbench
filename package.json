@@ -13,7 +13,8 @@
     "dev": "pnpm --filter @law/protocol build && pnpm --filter @law/agentd build && pnpm --filter @law/desktop dev",
     "images:build": "bash scripts/build-image.sh",
     "test:container": "LAW_CONTAINER_TESTS=1 vitest run tests/container",
-    "images:prune": "bash scripts/prune-images.sh"
+    "images:prune": "bash scripts/prune-images.sh",
+    "images:build:browser": "bash scripts/build-image.sh browser"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

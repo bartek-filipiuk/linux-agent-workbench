@@ -22,6 +22,7 @@ export const ConfigInit = z.object({
   imageId: z.string().min(1),
   runtimeRoot: z.string().min(1),
   prices: Prices.optional(),
+  browserImageId: z.string().min(1).optional(),
 });
 export type ConfigInit = z.infer<typeof ConfigInit>;
 
@@ -89,10 +90,11 @@ export function handleConfigInit(msg: unknown, openStore: (dbPath: string) => St
   }
 }
 
+export type BrowserContext = { runtimeRoot: string; sessionId: string; networkMode: NetworkMode; browserImageId?: string };
 export type DaemonDeps = {
   openStore: (dbPath: string) => Store;
   makeManager: (imageId: string, runtimeRoot: string) => TerminalSessionManager;
-  makeBrowser?: (runtimeRoot: string) => BrowserSessionManager;
+  makeBrowser?: (ctx: BrowserContext) => BrowserSessionManager;
   makeAdapter: (model: string, apiKey: string) => ModelAdapter;
   post: (msg: AgentdToMain) => void;
 };
@@ -108,6 +110,8 @@ export class Daemon {
   private gate: CommandGate | undefined;
   private unhookGate: (() => void) | undefined;
   private browser: BrowserSessionManager | undefined;
+  private browserImageId: string | undefined;
+  private runtimeRoot = "";
 
   constructor(private readonly deps: DaemonDeps) {
     this.lease.on("change", (s: { owner: LeaseOwner; reason?: string }) =>
@@ -142,11 +146,8 @@ export class Daemon {
             networkMode: () => this.manager?.status.networkMode ?? "open",
           });
           this.gate.on("event", (e: GateEvent) => this.deps.post({ type: "gate.event", ...e }));
-          if (this.deps.makeBrowser) {
-            this.browser = this.deps.makeBrowser(msg.runtimeRoot);
-            this.browser.on("status", (s: BrowserStatus) => this.deps.post({ type: "browser.state", ...s }));
-            this.browser.on("frame", (f: { width: number; height: number; jpeg: Uint8Array }) => this.deps.post({ type: "browser.frame", width: f.width, height: f.height, data: f.jpeg }));
-          }
+          this.browserImageId = msg.browserImageId;
+          this.runtimeRoot = msg.runtimeRoot;
           this.manager.on("status", (s: SessionStatus) => {
             if (s.state !== "ready" || !this.manager?.worker || !this.gate) return;
             this.unhookGate?.();
@@ -164,8 +165,14 @@ export class Daemon {
         return;
       case "session.stop":
         this.run?.stop();
-        if (msg.destroy) await this.requireManager().destroy();
-        else this.requireManager().detach();
+        if (msg.destroy) {
+          await this.browser?.destroy();
+          this.browser = undefined;
+          await this.requireManager().destroy();
+        } else {
+          await this.browser?.stop();
+          this.requireManager().detach();
+        }
         return;
       case "terminal.write":
         if (this.lease.state.owner === "human") this.requireManager().write(msg.data);
@@ -176,10 +183,18 @@ export class Daemon {
       case "run.start":
         await this.startRun(msg.goal);
         return;
-      case "browser.start":
-        if (!this.browser) return this.deps.post({ type: "agentd.error", message: "browser support not configured" });
+      case "browser.start": {
+        const st = this.manager?.status;
+        if (!this.deps.makeBrowser) return this.deps.post({ type: "agentd.error", message: "browser support not configured" });
+        if (!st || st.state !== "ready" || !st.sessionId) return this.deps.post({ type: "agentd.error", message: "open a workspace first; the browser belongs to the sandbox session" });
+        if (!this.browser) {
+          this.browser = this.deps.makeBrowser({ runtimeRoot: this.runtimeRoot, sessionId: st.sessionId, networkMode: st.networkMode ?? "open", ...(this.browserImageId ? { browserImageId: this.browserImageId } : {}) });
+          this.browser.on("status", (s: BrowserStatus) => this.deps.post({ type: "browser.state", ...s }));
+          this.browser.on("frame", (f: { width: number; height: number; jpeg: Uint8Array }) => this.deps.post({ type: "browser.frame", width: f.width, height: f.height, data: f.jpeg }));
+        }
         await this.browser.start();
         return;
+      }
       case "browser.stop":
         await this.browser?.stop();
         return;

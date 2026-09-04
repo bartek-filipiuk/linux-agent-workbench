@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { BrowserSessionManager } from "../src/session/browser-session-manager.js";
+import { BrowserSessionManager, hostLauncher } from "../src/session/browser-session-manager.js";
 import { tmpDir } from "./helpers/tmp.js";
 
 // Real worker process on the host (Playwright + headless Chromium); skipped when the worker is not built.
@@ -17,7 +17,7 @@ afterEach(async () => {
 describe.skipIf(!built)("BrowserSessionManager (host worker)", { timeout: 60_000 }, () => {
   it("spawns the worker, streams frames, navigates and stops cleanly", async () => {
     const root = tmpDir("law-br-");
-    m = new BrowserSessionManager({ runtimeRoot: path.join(root, "rt"), profileDir: path.join(root, "profile"), workerEntry });
+    m = new BrowserSessionManager({ socketDir: path.join(root, "rt"), launcher: hostLauncher({ workerEntry, profileDir: path.join(root, "profile") }) });
     const frames: number[] = [];
     m.on("frame", (f: { width: number; height: number; jpeg: Uint8Array }) => frames.push(f.jpeg.length));
     const status = await m.start();
@@ -32,7 +32,7 @@ describe.skipIf(!built)("BrowserSessionManager (host worker)", { timeout: 60_000
 
   it("reports an error when the worker cannot start", async () => {
     const root = tmpDir("law-br-");
-    m = new BrowserSessionManager({ runtimeRoot: path.join(root, "rt"), profileDir: path.join(root, "profile"), workerEntry: path.join(root, "missing.js"), connectTimeoutMs: 5000 });
+    m = new BrowserSessionManager({ socketDir: path.join(root, "rt"), launcher: hostLauncher({ workerEntry: path.join(root, "missing.js"), profileDir: path.join(root, "profile") }), connectTimeoutMs: 5000 });
     const status = await m.start();
     expect(status.state).toBe("error");
   });
