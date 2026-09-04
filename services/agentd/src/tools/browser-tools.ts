@@ -8,11 +8,42 @@ const schema = (s: z.ZodType) => z.toJSONSchema(s, { target: "draft-7", unrepres
 const ActArgs = z.object({ action: BrowserAction });
 const NoArgs = z.object({}).strict();
 
+const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
+
+/**
+ * One line per element instead of a JSON object: a fifth of the tokens for the same information.
+ *   e7 link "Meet us! - Droptica" → https://www.droptica.com/company/team
+ *   e2 textbox "q" = "Droptica" [off] [disabled] @x,y wxh
+ */
+export function formatBrowserObservation(obs: BrowserObservation, opts: { bounds?: boolean; hints?: string[] } = {}): string {
+  const lines: string[] = [];
+  lines.push(`page ${obs.activePageId} · revision ${obs.revision} (refs below are valid for this revision only)`);
+  lines.push(`url ${obs.url}`);
+  lines.push(`title ${obs.title}`);
+  lines.push(`scroll y ${obs.scroll.y} of ${obs.scroll.maxY} · viewport ${obs.viewport.width}x${obs.viewport.height}`);
+  if (obs.pages.length > 1) lines.push(`pages: ${obs.pages.map((p) => `${p.id}${p.id === obs.activePageId ? "*" : ""} "${clip(p.title, 40)}" ${clip(p.url, 60)}`).join(" ; ")}`);
+  if (obs.lastDialog) lines.push(`dialog (auto-dismissed): ${obs.lastDialog.type} "${clip(obs.lastDialog.message, 120)}"`);
+  const off = obs.elements.filter((e) => !e.inViewport).length;
+  lines.push(`elements (${obs.elements.length}${off ? `, ${off} off screen marked [off]` : ""}):`);
+  for (const e of obs.elements) {
+    let line = `${e.ref} ${e.role} "${e.name}"`;
+    if (e.text && e.text !== e.name) line += ` — ${e.text}`;
+    if (e.value !== undefined && e.value !== "") line += ` = "${clip(e.value, 60)}"`;
+    if (e.href) line += ` → ${clip(e.href, 100)}`;
+    if (!e.enabled) line += " [disabled]";
+    if (!e.inViewport) line += " [off]";
+    if (opts.bounds) line += ` @${e.bounds.x},${e.bounds.y} ${e.bounds.width}x${e.bounds.height}`;
+    lines.push(line);
+  }
+  if (opts.hints?.length) lines.push(`hints: ${opts.hints.join(" | ")}`);
+  return lines.join("\n");
+}
+
 export const BROWSER_TOOLS: ToolSpec[] = [
   {
     name: "browser_observe",
     description:
-      "Describe the current page: url, title, interactive elements with short-lived refs (e1, e2, …), roles, names, values, whether they are in the viewport, the list of open pages, scroll position and the last dialog. Refs are valid only for the returned revision. Set screenshot=true when the text is not enough to understand the layout.",
+      "Describe the current page as text: url, title, scroll, then one line per interactive element: ref (e1, e2, …), role, \"name\", = value, → href, [off] when outside the viewport, [disabled]. Refs are valid only for the returned revision. Set screenshot=true when the text is not enough to understand the layout; coordinates are then appended to each element. maxElements trims long pages.",
     parameters: schema(BrowserObserveInput),
   },
   {
@@ -51,10 +82,12 @@ export function browserExecutor(browser: BrowserToolTarget): ToolExecutor {
       await ready();
       switch (call.name) {
         case "browser_observe": {
-          const obs: BrowserObservation = await browser.observe(parseArgs(BrowserObserveInput, call.args, call.name), signal);
-          const { screenshotJpegBase64, ...text } = obs;
+          const input = parseArgs(BrowserObserveInput, call.args, call.name);
+          const obs: BrowserObservation = await browser.observe(input, signal);
           const hints = observationHints(obs);
-          return { output: JSON.stringify(hints.length ? { ...text, hints } : text), ...(screenshotJpegBase64 ? { imageJpegBase64: screenshotJpegBase64 } : {}) };
+          // Coordinates only matter next to a screenshot; without one they are pure token weight.
+          const output = formatBrowserObservation(obs, { bounds: input.screenshot === true, hints });
+          return { output, ...(obs.screenshotJpegBase64 ? { imageJpegBase64: obs.screenshotJpegBase64 } : {}) };
         }
         case "browser_act":
           return { output: JSON.stringify(await browser.act(parseArgs(ActArgs, call.args, call.name).action, signal)) };

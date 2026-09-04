@@ -88,6 +88,7 @@ const container = containerName(ready.sessionId);
 console.log(`bench: model ${model}, ${runs} runs, sandbox ${container}`);
 
 const expectFile = flag("--expect", "/workspace/summary.md"); // the artefact a valid run must leave behind
+const minMarks = Number(flag("--min-marks", 4)); // sentence terminators the artefact must contain (0 = just non-empty)
 const inSandbox = (cmd) => execFileSync("podman", ["exec", container, "bash", "-lc", cmd], { encoding: "utf8" }).trim();
 
 const summary = [];
@@ -111,7 +112,7 @@ for (let i = 1; i <= runs; i++) {
   const wall = Date.now() - t0;
   // Validity: the artefact exists and has at least four sentence terminators; a run that only claims a result fails here.
   const check = inSandbox(`if [ -s ${expectFile} ]; then grep -o '[.!?]' ${expectFile} | wc -l; else echo missing; fi`);
-  const valid = check !== "missing" && Number(check) >= 4;
+  const valid = check !== "missing" && Number(check) >= minMarks;
   const claimed = /(\d+)\s*(?:words?|word count)|word count[^0-9]*(\d+)/i.exec(end.finalText ?? "");
   const actual = check === "missing" ? "-" : inSandbox(`wc -w < ${expectFile}`);
   summary.push({ i, state: end.state, wall, turns: end.turns, toolCalls: end.toolCalls, handoffs, approvals, valid });

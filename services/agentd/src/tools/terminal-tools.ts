@@ -7,6 +7,22 @@ export const RequestHumanArgs = z.object({ reason: z.string().min(1).max(500) })
 const NoArgs = z.object({}).strict();
 // submit=true runs the line: ENTER is sent after the text or paste, saving the model a turn per command.
 export const TerminalInputArgs = z.intersection(TerminalInput, z.object({ submit: z.boolean().optional() }));
+// scrollback=true adds the history tail; by default only the visible screen travels to the model.
+const Scrollback = z.object({ scrollback: z.boolean().optional() });
+export const TerminalObserveArgs = z.intersection(TerminalObserveInput, Scrollback);
+export const TerminalWaitArgs = z.intersection(TerminalWaitInput, Scrollback);
+
+/** Trailing whitespace and empty lines carry nothing; the scrollback tail only when asked for. */
+export function slimTerminal<T extends { screen: string; scrollbackTail?: string }>(obs: T, scrollback: boolean): T {
+  const screen = obs.screen
+    .split("\n")
+    .map((l) => l.replace(/\s+$/, ""))
+    .join("\n")
+    .replace(/\n+$/, "");
+  const out = { ...obs, screen };
+  if (!scrollback) delete out.scrollbackTail;
+  return out;
+}
 
 export class HandoffRequested extends Error {
   constructor(readonly reason: string) {
@@ -22,8 +38,8 @@ export const TERMINAL_TOOLS: ToolSpec[] = [
   {
     name: "terminal_observe",
     description:
-      "Read the current terminal screen (plain text, no ANSI), cursor, size and idle time. Call after sending input and before deciding the next step.",
-    parameters: schema(TerminalObserveInput),
+      "Read the current terminal screen (plain text, no ANSI), cursor, size and idle time. Call after sending input and before deciding the next step. scrollback=true adds the history tail (output that already scrolled off).",
+    parameters: schema(TerminalObserveArgs),
   },
   {
     name: "terminal_input",
@@ -35,7 +51,7 @@ export const TERMINAL_TOOLS: ToolSpec[] = [
     name: "terminal_wait",
     description:
       "Wait for the terminal to settle, then return the observation. Returns when the screen has been quiet for idleMs (default 1500), when the regex `until` matches the screen, or after timeoutMs (default 60000, then timedOut=true). Use this after sending input instead of repeated observes. The result's hint.state tells you what the screen is: busy, idle_shell, nested_agent_idle, question_menu (answer with UP/DOWN/ENTER), permission_prompt or password_prompt (the human answers these).",
-    parameters: schema(TerminalWaitInput),
+    parameters: schema(TerminalWaitArgs),
   },
   {
     name: "terminal_interrupt",
@@ -58,16 +74,20 @@ function parseArgs<T>(s: z.ZodType<T>, args: unknown, tool: string): T {
 
 export async function executeTerminalTool(call: ToolCall, worker: TerminalWorker, signal: AbortSignal): Promise<string> {
   switch (call.name) {
-    case "terminal_observe":
-      return JSON.stringify(await worker.observe(parseArgs(TerminalObserveInput, call.args, call.name), signal));
+    case "terminal_observe": {
+      const { scrollback, ...input } = parseArgs(TerminalObserveArgs, call.args, call.name);
+      return JSON.stringify(slimTerminal(await worker.observe(input, signal), scrollback === true));
+    }
     case "terminal_input": {
       const { submit, ...input } = parseArgs(TerminalInputArgs, call.args, call.name);
       const typed = await worker.input(input, signal);
       if (!submit || input.kind === "key") return JSON.stringify(typed);
       return JSON.stringify(await worker.input({ kind: "key", key: "ENTER" }, signal));
     }
-    case "terminal_wait":
-      return JSON.stringify(await worker.wait(parseArgs(TerminalWaitInput, call.args, call.name), signal));
+    case "terminal_wait": {
+      const { scrollback, ...input } = parseArgs(TerminalWaitArgs, call.args, call.name);
+      return JSON.stringify(slimTerminal(await worker.wait(input, signal), scrollback === true));
+    }
     case "terminal_interrupt":
       parseArgs(NoArgs, call.args, call.name);
       await worker.interrupt(signal);

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { ProtocolError } from "@law/protocol";
-import { HandoffRequested, TERMINAL_TOOLS, executeTerminalTool } from "../src/tools/terminal-tools.js";
+import { HandoffRequested, TERMINAL_TOOLS, executeTerminalTool, slimTerminal } from "../src/tools/terminal-tools.js";
 import { SocketTerminalWorker } from "../src/worker/socket-worker.js";
 import { FakeWorker } from "./helpers/fake-worker.js";
 import { tmpSocketPath } from "./helpers/tmp.js";
@@ -41,6 +41,12 @@ describe("terminal tools", () => {
     const inputs = fw.received.map((r) => (r as { payload?: { kind?: string; key?: string } }).payload).filter((p) => p?.kind);
     expect(inputs.map((p) => p!.kind)).toEqual(["text", "key"]);
     expect(inputs[1]).toMatchObject({ kind: "key", key: "ENTER" });
+  });
+
+  it("slims observations: trailing blanks go, scrollback only on request", () => {
+    const obs = { revision: 1, screen: "$ ls   \nfile.txt\n\n\n   \n", scrollbackTail: "older\nlines", cursor: { row: 1, col: 0 } };
+    expect(slimTerminal(obs, false)).toEqual({ revision: 1, screen: "$ ls\nfile.txt", cursor: { row: 1, col: 0 } });
+    expect(slimTerminal(obs, true).scrollbackTail).toBe("older\nlines");
   });
 
   it("rejects invalid args before touching the worker", async () => {
