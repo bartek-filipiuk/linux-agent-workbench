@@ -15,7 +15,7 @@ pnpm test
 pnpm dev                             # builds protocol + agentd, starts Electron
 ```
 
-`.env` keys: `OPENAI_API_KEY`, `OPENAI_MODEL` (default `gpt-5.6-sol`).
+`.env` keys: `OPENAI_API_KEY`, `OPENAI_MODEL` (default `gpt-5.6-sol`), optional `OPENAI_PRICE_INPUT_PER_MTOK` and `OPENAI_PRICE_OUTPUT_PER_MTOK` (USD per million tokens; without them the run cost shows `n/a`). The app reads `~/.config/@law/desktop/.env` first, then the repo root; keep the key outside any directory you open as a workspace.
 
 ## Layout
 
