@@ -46,6 +46,8 @@ describe.skipIf(!enabled || !imageId)("browser container", { timeout: 120_000 },
   it("keeps the profile across stop and start (container reused), and across destroy (volume)", async () => {
     await m.stop();
     expect(m.status.state).toBe("stopped");
+    // A brand-new manager (app restart) must reconnect to the running container instead of breaking its socket.
+    m = make();
     const again = await m.start();
     expect(again.state, again.message).toBe("ready");
     expect(again.url).toMatch(/example\.com/); // same page: the container and its Chromium survived the detach

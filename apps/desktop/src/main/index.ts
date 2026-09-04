@@ -35,9 +35,9 @@ function xdg(name: "XDG_DATA_HOME" | "XDG_RUNTIME_DIR", fallback: string): strin
 const dbPath = () => path.join(xdg("XDG_DATA_HOME", path.join(os.homedir(), ".local", "share")), "linux-agent-workbench", "state.sqlite");
 const runtimeRoot = () => path.join(xdg("XDG_RUNTIME_DIR", path.join(os.tmpdir(), `law-${os.userInfo().uid}`)), "linux-agent-workbench");
 
-function readImageId(): string | undefined {
+function readImageId(name: "terminal" | "browser" = "terminal"): string | undefined {
   try {
-    const j = JSON.parse(fs.readFileSync(path.join(repoRoot(), "images", "terminal", "image.json"), "utf8")) as { id?: string };
+    const j = JSON.parse(fs.readFileSync(path.join(repoRoot(), "images", name, "image.json"), "utf8")) as { id?: string };
     return j.id;
   } catch {
     return undefined;
@@ -110,7 +110,8 @@ function startAgentd() {
   const pin = Number(env.OPENAI_PRICE_INPUT_PER_MTOK);
   const pout = Number(env.OPENAI_PRICE_OUTPUT_PER_MTOK);
   const prices = env.OPENAI_PRICE_INPUT_PER_MTOK && Number.isFinite(pin) && Number.isFinite(pout) ? { inputUsdPerMTok: pin, outputUsdPerMTok: pout } : undefined;
-  toAgentd({ type: "config.init", apiKey, model, dbPath: dbPath(), imageId, runtimeRoot: runtimeRoot(), ...(prices ? { prices } : {}) });
+  const browserImageId = readImageId("browser");
+  toAgentd({ type: "config.init", apiKey, model, dbPath: dbPath(), imageId, runtimeRoot: runtimeRoot(), ...(prices ? { prices } : {}), ...(browserImageId ? { browserImageId } : {}) });
   child.on("exit", (code) => onAgentd({ type: "agentd.error", message: `agentd exited with code ${code}` }));
 }
 

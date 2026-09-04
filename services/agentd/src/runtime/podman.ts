@@ -181,6 +181,10 @@ export class PodmanRuntime {
     await this.exec(["rm", "-f", "--ignore", name]);
   }
 
+  async execIn(name: string, args: string[]): Promise<void> {
+    await this.exec(["exec", name, ...args]);
+  }
+
   async logsOf(name: string, tail = 50): Promise<string> {
     try {
       const { stdout, stderr } = await this.exec(["logs", "--tail", String(tail), name]);

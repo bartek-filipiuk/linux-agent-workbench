@@ -13,7 +13,14 @@ export type BrowserStatus = { state: BrowserState; url?: string; title?: string;
 export type BrowserFrame = { width: number; height: number; jpeg: Uint8Array };
 
 /** Whatever runs the worker: a host process (B1) or a container (B2). The socket contract is the same. */
-export type LaunchHandle = { alive(): boolean; detach(): Promise<void>; destroy(): Promise<void>; logs(): Promise<string> };
+export type LaunchHandle = {
+  alive(): boolean;
+  detach(): Promise<void>;
+  destroy(): Promise<void>;
+  logs(): Promise<string>;
+  /** Restart the worker process without touching its state store (container only). */
+  restartWorker?(): Promise<void>;
+};
 export type BrowserLauncher = (ctx: { socketDir: string; socketPath: string }) => Promise<LaunchHandle>;
 
 export type BrowserManagerDeps = {
@@ -68,6 +75,8 @@ export function podmanLauncher(opts: {
         await opts.runtime.destroyByName(name);
       },
       logs: () => opts.runtime.logsOf(name),
+      // The supervisor loop in the image brings the worker back with a fresh socket file.
+      restartWorker: () => opts.runtime.execIn(name, ["pkill", "-f", "worker/main.js"]),
     };
   };
 }
@@ -92,12 +101,9 @@ export class BrowserSessionManager extends EventEmitter {
       fs.mkdirSync(this.deps.socketDir, { recursive: true, mode: 0o700 });
       fs.chmodSync(this.deps.socketDir, 0o700);
       const socketPath = path.join(this.deps.socketDir, "browser.sock");
-      if (!this.handle?.alive()) {
-        try {
-          fs.unlinkSync(socketPath);
-        } catch {}
-        this.handle = await this.deps.launcher({ socketDir: this.deps.socketDir, socketPath });
-      }
+      // Never unlink a stale-looking socket here: a reused container's worker may still be listening on it.
+      // A freshly started worker replaces its own socket file when it binds.
+      if (!this.handle?.alive()) this.handle = await this.deps.launcher({ socketDir: this.deps.socketDir, socketPath });
       const conn = await this.waitForSocket(socketPath);
       this.conn = conn;
       conn.on("browser-frame", (bytes: Uint8Array) => this.emit("frame", decodeBrowserFrame(bytes)));
@@ -144,7 +150,15 @@ export class BrowserSessionManager extends EventEmitter {
 
   private async waitForSocket(socketPath: string): Promise<FramedConnection> {
     const deadline = Date.now() + (this.deps.connectTimeoutMs ?? 30_000);
+    const kickAt = Date.now() + 5_000;
+    let kicked = false;
     while (Date.now() < deadline) {
+      // A reused container whose socket file vanished (e.g. an older client unlinked it) needs a fresh worker.
+      if (!kicked && Date.now() > kickAt && this.handle?.restartWorker) {
+        kicked = true;
+        console.error("[agentd] browser worker socket missing on a reused container; restarting the worker");
+        await this.handle.restartWorker().catch(() => {});
+      }
       if (fs.existsSync(socketPath)) {
         const conn = await new Promise<FramedConnection | null>((resolve) => {
           const s = net.createConnection(socketPath);
