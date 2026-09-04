@@ -1,11 +1,15 @@
 import { z } from "zod";
-import { NetworkMode, type RunState } from "@law/protocol";
+import { ApprovalDecision, NetworkMode, type ApprovalRequest, type RunState } from "@law/protocol";
 import type { Store } from "./storage/store.js";
 import type { SessionStatus, TerminalSessionManager } from "./session/terminal-session-manager.js";
 import type { ModelAdapter } from "./provider/types.js";
 import { RunController } from "./orchestrator/run-controller.js";
 import { Lease, LeasePolicy, type LeaseOwner } from "./policy/lease.js";
 import type { PriceTable } from "./orchestrator/budgets.js";
+import { ApprovalManager } from "./policy/approvals.js";
+import { CommandGate, type GateEvent } from "./policy/gate.js";
+import { NestedPromptPolicy, composePolicies } from "./policy/nested-prompts.js";
+import { restoreSnapshot, snapshotWorkspace, type Snapshot } from "./session/snapshot.js";
 
 const Prices = z.object({ inputUsdPerMTok: z.number().nonnegative(), outputUsdPerMTok: z.number().nonnegative() });
 
@@ -28,8 +32,10 @@ export const RunStart = z.object({ type: z.literal("run.start"), goal: z.string(
 export const RunStop = z.object({ type: z.literal("run.stop") });
 export const RunResume = z.object({ type: z.literal("run.resume") });
 export const LeaseTake = z.object({ type: z.literal("lease.take"), owner: z.enum(["agent", "human"]) });
+export const ApprovalDecide = z.object({ type: z.literal("approval.decide"), id: z.string().min(1), decision: ApprovalDecision });
+export const RunRestore = z.object({ type: z.literal("run.restore"), runId: z.string().min(1) });
 
-export const MainToAgentd = z.discriminatedUnion("type", [ConfigInit, SessionStart, SessionStop, TerminalWrite, TerminalResizeMsg, RunStart, RunStop, RunResume, LeaseTake]);
+export const MainToAgentd = z.discriminatedUnion("type", [ConfigInit, SessionStart, SessionStop, TerminalWrite, TerminalResizeMsg, RunStart, RunStop, RunResume, LeaseTake, ApprovalDecide, RunRestore]);
 export type MainToAgentd = z.infer<typeof MainToAgentd>;
 
 export const AgentdReady = z.object({
@@ -44,12 +50,18 @@ export const AgentdError = z.object({ type: z.literal("agentd.error"), message: 
 export type AgentdError = z.infer<typeof AgentdError>;
 export type SessionStateMsg = { type: "session.state" } & SessionStatus;
 export type TerminalData = { type: "terminal.data"; data: Uint8Array };
-export type RunStateMsg = { type: "run.state"; runId: string; state: RunState; endReason?: string; finalText?: string; turns: number; toolCalls: number; costUsd: number | null };
+export type RunStateMsg = { type: "run.state"; runId: string; state: RunState; endReason?: string; finalText?: string; turns: number; toolCalls: number; costUsd: number | null; snapshot: boolean };
 export type RunCommentary = { type: "run.commentary"; runId: string; text: string };
 export type RunTool = { type: "run.tool"; runId: string; name: string; status: "executing" | "done" | "denied" | "error"; callId: string; turns: number; toolCalls: number; costUsd: number | null };
 export type RunHandoff = { type: "run.handoff"; runId: string; reason: string };
 export type LeaseStateMsg = { type: "lease.state"; owner: LeaseOwner; reason?: string };
-export type AgentdToMain = AgentdReady | AgentdError | SessionStateMsg | TerminalData | RunStateMsg | RunCommentary | RunTool | RunHandoff | LeaseStateMsg;
+export type ApprovalRequestMsg = { type: "approval.request" } & ApprovalRequest;
+export type ApprovalResolved = { type: "approval.resolved"; id: string; decision: ApprovalDecision };
+export type GateEventMsg = { type: "gate.event" } & GateEvent;
+export type RunRestored = { type: "run.restored"; runId: string; ok: boolean; message?: string };
+export type AgentdToMain =
+  | AgentdReady | AgentdError | SessionStateMsg | TerminalData | RunStateMsg | RunCommentary | RunTool | RunHandoff | LeaseStateMsg
+  | ApprovalRequestMsg | ApprovalResolved | GateEventMsg | RunRestored;
 
 export type AgentdRuntime = { store: Store; model: string; apiKey: string; prices: PriceTable };
 
@@ -81,6 +93,9 @@ export class Daemon {
   private manager: TerminalSessionManager | undefined;
   private readonly lease = new Lease();
   private run: RunController | undefined;
+  private approvals: ApprovalManager | undefined;
+  private gate: CommandGate | undefined;
+  private unhookGate: (() => void) | undefined;
 
   constructor(private readonly deps: DaemonDeps) {
     this.lease.on("change", (s: { owner: LeaseOwner; reason?: string }) =>
@@ -104,6 +119,25 @@ export class Daemon {
           this.manager = this.deps.makeManager(msg.imageId, msg.runtimeRoot);
           this.manager.on("data", (data: Uint8Array) => this.deps.post({ type: "terminal.data", data }));
           this.manager.on("status", (s: SessionStatus) => this.deps.post({ type: "session.state", ...s }));
+          this.approvals = new ApprovalManager(runtime.store);
+          this.approvals.on("request", (r: ApprovalRequest) => this.deps.post({ type: "approval.request", ...r }));
+          this.approvals.on("resolved", (r: { id: string; decision: ApprovalDecision }) => this.deps.post({ type: "approval.resolved", ...r }));
+          this.gate = new CommandGate({
+            lease: this.lease,
+            approvals: this.approvals,
+            store: runtime.store,
+            currentRunId: () => (this.run && !TERMINAL.has(this.run.state) ? this.run.runId : undefined),
+            networkMode: () => this.manager?.status.networkMode ?? "open",
+          });
+          this.gate.on("event", (e: GateEvent) => this.deps.post({ type: "gate.event", ...e }));
+          this.manager.on("status", (s: SessionStatus) => {
+            if (s.state !== "ready" || !this.manager?.worker || !this.gate) return;
+            this.unhookGate?.();
+            const gate = this.gate;
+            this.unhookGate = this.manager.worker.onRequest("gate.check", (p) =>
+              gate.check({ command: String(p.command ?? ""), cwd: String(p.cwd ?? ""), pid: Number(p.pid ?? 0) }),
+            );
+          });
         }
         this.deps.post(reply);
         return;
@@ -123,8 +157,31 @@ export class Daemon {
         await this.requireManager().resize(msg.cols, msg.rows);
         return;
       case "run.start":
-        this.startRun(msg.goal);
+        await this.startRun(msg.goal);
         return;
+      case "approval.decide":
+        if (!this.approvals?.decide(msg.id, msg.decision)) this.deps.post({ type: "agentd.error", message: "approval not pending" });
+        return;
+      case "run.restore": {
+        const run = this.runtime?.store.getRun(msg.runId);
+        const workspacePath = this.manager?.status.workspacePath;
+        if (!run?.snapshot_json || !workspacePath) {
+          this.deps.post({ type: "run.restored", runId: msg.runId, ok: false, message: "no snapshot for this run" });
+          return;
+        }
+        if (this.run && !TERMINAL.has(this.run.state)) {
+          this.deps.post({ type: "run.restored", runId: msg.runId, ok: false, message: "stop the run first" });
+          return;
+        }
+        try {
+          await restoreSnapshot(workspacePath, JSON.parse(run.snapshot_json) as Snapshot);
+          this.runtime!.store.appendEvent(msg.runId, "run.restored", {});
+          this.deps.post({ type: "run.restored", runId: msg.runId, ok: true });
+        } catch (e) {
+          this.deps.post({ type: "run.restored", runId: msg.runId, ok: false, message: e instanceof Error ? e.message : String(e) });
+        }
+        return;
+      }
       case "run.stop":
         this.run?.stop();
         return;
@@ -141,7 +198,7 @@ export class Daemon {
     }
   }
 
-  private startRun(goal: string): void {
+  private async startRun(goal: string): Promise<void> {
     const manager = this.manager;
     const runtime = this.runtime;
     const status = manager?.status;
@@ -154,19 +211,21 @@ export class Daemon {
       return;
     }
     const workspaceId = runtime.store.createWorkspace(status.workspacePath);
+    const worker = manager.worker;
+    const snapshot = await snapshotWorkspace(status.workspacePath);
     const rc = new RunController(
       {
         store: runtime.store,
         adapter: this.deps.makeAdapter(runtime.model, runtime.apiKey),
-        worker: manager.worker,
-        policy: new LeasePolicy(this.lease),
+        worker,
+        policy: composePolicies(new LeasePolicy(this.lease), new NestedPromptPolicy(() => worker.observe({}))),
         prices: runtime.prices,
       },
-      { workspaceId, goal, networkMode: status.networkMode ?? "open" },
+      { workspaceId, goal, networkMode: status.networkMode ?? "open", ...(snapshot ? { snapshot } : {}) },
     );
     this.run = rc;
     const postState = (state: RunState, extra: { endReason?: string; finalText?: string } = {}) =>
-      this.deps.post({ type: "run.state", runId: rc.runId, state, ...extra, ...rc.stats });
+      this.deps.post({ type: "run.state", runId: rc.runId, state, ...extra, ...rc.stats, snapshot: snapshot !== null });
     rc.on("state", (state: RunState) => {
       if (state === "handoff" || TERMINAL.has(state)) this.lease.take("human", state === "handoff" ? "agent asked for help" : `run ${state}`);
       if (!TERMINAL.has(state)) postState(state);

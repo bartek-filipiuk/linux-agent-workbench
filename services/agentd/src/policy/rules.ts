@@ -9,7 +9,7 @@ export const AUTO_PREFIXES = [
   "ls", "cat", "head", "tail", "less", "grep", "rg", "find", "pwd", "echo", "which", "type", "wc", "stat", "file", "tree", "env", "printenv",
   "git status", "git diff", "git log", "git show", "git branch", "git remote -v",
   "npm test", "pnpm test", "npm run test", "pnpm run test", "node --version", "node -v", "npm --version", "pnpm --version",
-  "claude", "codex", "cd", "clear", "history", "true", "man", "help",
+  "claude", "codex", "cd", "clear", "history", "true", "man", "help", "exit", "logout",
 ];
 
 export const DENY_RULES: Rule[] = [

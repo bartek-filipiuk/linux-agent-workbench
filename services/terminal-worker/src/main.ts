@@ -11,12 +11,13 @@ const cwd = process.env.LAW_WORKDIR ?? "/workspace";
 const session = new TerminalSession({ tmuxSocket, cwd, cols: 120, rows: 36 });
 const server = new WorkerServer(path.join(socketDir, "worker.sock"), session);
 
-await session.start();
-await server.listen();
-console.log(`terminal-worker listening on ${path.join(socketDir, "worker.sock")}`);
+// The gate socket must exist before the shell starts: bashrc installs the DEBUG trap only when it sees it.
 const gate = new GateServer(path.join(socketDir, "gate.sock"), (req) => server.forwardGate(req));
 await gate.listen();
 console.log(`terminal-worker gate on ${path.join(socketDir, "gate.sock")}`);
+await session.start();
+await server.listen();
+console.log(`terminal-worker listening on ${path.join(socketDir, "worker.sock")}`);
 
 const shutdown = () => {
   void Promise.all([server.close(), gate.close()]).finally(() => {

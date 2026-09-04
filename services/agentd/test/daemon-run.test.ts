@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
+import fs from "node:fs";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 import { Daemon } from "../src/ipc.js";
 import { Store } from "../src/storage/store.js";
 import { TerminalSessionManager } from "../src/session/terminal-session-manager.js";
@@ -14,9 +16,11 @@ afterEach(async () => {
   fw = undefined;
 });
 
-async function boot(adapter: FakeModelAdapter) {
+async function bootWith(adapter: FakeModelAdapter, prepareWorkspace?: (dir: string) => void) {
   const posted: Array<Record<string, unknown>> = [];
   const runtimeRoot = tmpDir("law-rt-");
+  const workspace = tmpDir("law-ws-");
+  prepareWorkspace?.(workspace);
   const runtime = {
     ensureRunning: async (spec: { runtimeDir: string }) => { fw = await FakeWorker.listen(path.join(spec.runtimeDir, "worker.sock")); return "started" as const; },
     destroy: async () => {},
@@ -31,10 +35,11 @@ async function boot(adapter: FakeModelAdapter) {
     post: (m) => posted.push(m as Record<string, unknown>),
   });
   await d.handle({ type: "config.init", apiKey: "sk-x", model: "fake", dbPath: ":memory:", imageId: "sha256:x", runtimeRoot });
-  await d.handle({ type: "session.start", workspacePath: tmpDir("law-ws-"), networkMode: "open" });
+  await d.handle({ type: "session.start", workspacePath: workspace, networkMode: "open" });
   const last = (type: string) => [...posted].reverse().find((p) => p.type === type);
-  return { d, posted, last };
+  return { d, posted, last, workspace };
 }
+const boot = (adapter: FakeModelAdapter) => bootWith(adapter);
 const settle = (pred: () => boolean, ms = 3000) => expect.poll(pred, { timeout: ms }).toBe(true);
 
 describe("Daemon run flow", () => {
@@ -105,6 +110,41 @@ describe("Daemon run flow", () => {
     await d.handle({ type: "lease.take", owner: "human" });
     await settle(() => (last("run.state") as { state?: string } | undefined)?.state === "completed");
     expect(last("run.tool")).toMatchObject({ name: "terminal_observe", status: "denied" });
+  });
+
+  it("routes gate checks from the worker through approvals and back", async () => {
+    const adapter = new FakeModelAdapter([{ text: "slow", delayMs: 1500 }]);
+    const { d, last } = await boot(adapter);
+    await d.handle({ type: "run.start", goal: "g" });
+    await settle(() => (last("lease.state") as { owner?: string } | undefined)?.owner === "agent");
+    const pending = fw!.askClient("gate.check", { command: "git push", cwd: "/workspace", pid: 1 });
+    await settle(() => last("approval.request") !== undefined);
+    const req = last("approval.request") as { id: string; command: string };
+    expect(req.command).toBe("git push");
+    await d.handle({ type: "approval.decide", id: req.id, decision: "once" });
+    expect(await pending).toEqual({ decision: "allow" });
+    expect(last("approval.resolved")).toMatchObject({ id: req.id, decision: "once" });
+    expect(last("gate.event")).toMatchObject({ command: "git push", bucket: "approval", decision: "allow" });
+    expect(await fw!.askClient("gate.check", { command: "ls", cwd: "/workspace", pid: 1 })).toEqual({ decision: "allow" });
+    await d.handle({ type: "run.stop" });
+    await settle(() => (last("run.state") as { state?: string } | undefined)?.state === "stopped");
+  });
+
+  it("records a git snapshot on run.start and restores it on run.restore", async () => {
+    const adapter = new FakeModelAdapter([{ text: "done" }]);
+    const { d, last, workspace } = await bootWith(adapter, (dir) => {
+      execFileSync("git", ["-C", dir, "init", "-q"]);
+      fs.writeFileSync(path.join(dir, "f.txt"), "keep\n");
+      execFileSync("git", ["-C", dir, "add", "."]);
+      execFileSync("git", ["-C", dir, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-qm", "i"]);
+    });
+    await d.handle({ type: "run.start", goal: "g" });
+    await settle(() => (last("run.state") as { state?: string } | undefined)?.state === "completed");
+    expect(last("run.state")).toMatchObject({ snapshot: true });
+    fs.writeFileSync(path.join(workspace, "f.txt"), "damaged\n");
+    await d.handle({ type: "run.restore", runId: (last("run.state") as { runId: string }).runId });
+    expect(last("run.restored")).toMatchObject({ ok: true });
+    expect(fs.readFileSync(path.join(workspace, "f.txt"), "utf8")).toBe("keep\n");
   });
 
   it("refuses run.start without a ready session", async () => {
