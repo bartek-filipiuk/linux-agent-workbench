@@ -33,3 +33,7 @@ export type { GateEvent } from "./policy/gate.js";
 export { NestedPromptPolicy, composePolicies, detectNestedPrompt } from "./policy/nested-prompts.js";
 export { snapshotWorkspace, restoreSnapshot } from "./session/snapshot.js";
 export type { Snapshot } from "./session/snapshot.js";
+export { BrowserSessionManager } from "./session/browser-session-manager.js";
+export type { BrowserState, BrowserStatus, BrowserFrame, BrowserManagerDeps } from "./session/browser-session-manager.js";
+export { BrowserStart, BrowserStop, BrowserNavigateMsg, BrowserInputMsg } from "./ipc.js";
+export type { BrowserStateMsg, BrowserFrameMsg } from "./ipc.js";

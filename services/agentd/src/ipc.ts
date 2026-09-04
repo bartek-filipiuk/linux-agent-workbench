@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { ApprovalDecision, NetworkMode, type ApprovalRequest, type RunState } from "@law/protocol";
+import { ApprovalDecision, BrowserInputEvent, NetworkMode, type ApprovalRequest, type RunState } from "@law/protocol";
+import type { BrowserSessionManager, BrowserStatus } from "./session/browser-session-manager.js";
 import type { Store } from "./storage/store.js";
 import type { SessionStatus, TerminalSessionManager } from "./session/terminal-session-manager.js";
 import type { ModelAdapter } from "./provider/types.js";
@@ -34,8 +35,15 @@ export const RunResume = z.object({ type: z.literal("run.resume") });
 export const LeaseTake = z.object({ type: z.literal("lease.take"), owner: z.enum(["agent", "human"]) });
 export const ApprovalDecide = z.object({ type: z.literal("approval.decide"), id: z.string().min(1), decision: ApprovalDecision });
 export const RunRestore = z.object({ type: z.literal("run.restore"), runId: z.string().min(1) });
+export const BrowserStart = z.object({ type: z.literal("browser.start") });
+export const BrowserStop = z.object({ type: z.literal("browser.stop") });
+export const BrowserNavigateMsg = z.object({ type: z.literal("browser.navigate"), url: z.string().min(1).max(4096) });
+export const BrowserInputMsg = z.object({ type: z.literal("browser.input"), event: BrowserInputEvent });
 
-export const MainToAgentd = z.discriminatedUnion("type", [ConfigInit, SessionStart, SessionStop, TerminalWrite, TerminalResizeMsg, RunStart, RunStop, RunResume, LeaseTake, ApprovalDecide, RunRestore]);
+export const MainToAgentd = z.discriminatedUnion("type", [
+  ConfigInit, SessionStart, SessionStop, TerminalWrite, TerminalResizeMsg, RunStart, RunStop, RunResume, LeaseTake, ApprovalDecide, RunRestore,
+  BrowserStart, BrowserStop, BrowserNavigateMsg, BrowserInputMsg,
+]);
 export type MainToAgentd = z.infer<typeof MainToAgentd>;
 
 export const AgentdReady = z.object({
@@ -59,9 +67,11 @@ export type ApprovalRequestMsg = { type: "approval.request" } & ApprovalRequest;
 export type ApprovalResolved = { type: "approval.resolved"; id: string; decision: ApprovalDecision };
 export type GateEventMsg = { type: "gate.event" } & GateEvent;
 export type RunRestored = { type: "run.restored"; runId: string; ok: boolean; message?: string };
+export type BrowserStateMsg = { type: "browser.state" } & BrowserStatus;
+export type BrowserFrameMsg = { type: "browser.frame"; width: number; height: number; data: Uint8Array };
 export type AgentdToMain =
   | AgentdReady | AgentdError | SessionStateMsg | TerminalData | RunStateMsg | RunCommentary | RunTool | RunHandoff | LeaseStateMsg
-  | ApprovalRequestMsg | ApprovalResolved | GateEventMsg | RunRestored;
+  | ApprovalRequestMsg | ApprovalResolved | GateEventMsg | RunRestored | BrowserStateMsg | BrowserFrameMsg;
 
 export type AgentdRuntime = { store: Store; model: string; apiKey: string; prices: PriceTable };
 
@@ -82,6 +92,7 @@ export function handleConfigInit(msg: unknown, openStore: (dbPath: string) => St
 export type DaemonDeps = {
   openStore: (dbPath: string) => Store;
   makeManager: (imageId: string, runtimeRoot: string) => TerminalSessionManager;
+  makeBrowser?: (runtimeRoot: string) => BrowserSessionManager;
   makeAdapter: (model: string, apiKey: string) => ModelAdapter;
   post: (msg: AgentdToMain) => void;
 };
@@ -96,6 +107,7 @@ export class Daemon {
   private approvals: ApprovalManager | undefined;
   private gate: CommandGate | undefined;
   private unhookGate: (() => void) | undefined;
+  private browser: BrowserSessionManager | undefined;
 
   constructor(private readonly deps: DaemonDeps) {
     this.lease.on("change", (s: { owner: LeaseOwner; reason?: string }) =>
@@ -130,6 +142,11 @@ export class Daemon {
             networkMode: () => this.manager?.status.networkMode ?? "open",
           });
           this.gate.on("event", (e: GateEvent) => this.deps.post({ type: "gate.event", ...e }));
+          if (this.deps.makeBrowser) {
+            this.browser = this.deps.makeBrowser(msg.runtimeRoot);
+            this.browser.on("status", (s: BrowserStatus) => this.deps.post({ type: "browser.state", ...s }));
+            this.browser.on("frame", (f: { width: number; height: number; jpeg: Uint8Array }) => this.deps.post({ type: "browser.frame", width: f.width, height: f.height, data: f.jpeg }));
+          }
           this.manager.on("status", (s: SessionStatus) => {
             if (s.state !== "ready" || !this.manager?.worker || !this.gate) return;
             this.unhookGate?.();
@@ -158,6 +175,24 @@ export class Daemon {
         return;
       case "run.start":
         await this.startRun(msg.goal);
+        return;
+      case "browser.start":
+        if (!this.browser) return this.deps.post({ type: "agentd.error", message: "browser support not configured" });
+        await this.browser.start();
+        return;
+      case "browser.stop":
+        await this.browser?.stop();
+        return;
+      case "browser.navigate":
+        if (!this.browser) return;
+        try {
+          await this.browser.navigate(msg.url);
+        } catch (e) {
+          this.deps.post({ type: "browser.state", ...this.browser.status, message: e instanceof Error ? e.message : String(e) });
+        }
+        return;
+      case "browser.input":
+        this.browser?.input(msg.event);
         return;
       case "approval.decide":
         if (!this.approvals?.decide(msg.id, msg.decision)) this.deps.post({ type: "agentd.error", message: "approval not pending" });

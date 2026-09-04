@@ -4,6 +4,10 @@ import { Daemon } from "./ipc.js";
 import { PodmanRuntime } from "./runtime/podman.js";
 import { TerminalSessionManager } from "./session/terminal-session-manager.js";
 import { OpenAIResponsesAdapter } from "./provider/openai.js";
+import { BrowserSessionManager } from "./session/browser-session-manager.js";
+import { dataDir } from "./paths.js";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 type Port = {
   on(ev: "message", cb: (e: { data: unknown }) => void): void;
@@ -35,6 +39,12 @@ parentPort.once("message", (e) => {
     openStore: (p) => new Store(p),
     makeManager: (imageId, runtimeRoot) => new TerminalSessionManager({ runtime: new PodmanRuntime(), runtimeRoot, imageId }),
     makeAdapter: (model, apiKey) => new OpenAIResponsesAdapter({ model, apiKey }),
+    makeBrowser: (runtimeRoot) =>
+      new BrowserSessionManager({
+        runtimeRoot: path.join(runtimeRoot, "browser"),
+        profileDir: path.join(dataDir(), "profiles", "browser", "default", "user-data"),
+        workerEntry: fileURLToPath(new URL("../../browser-worker/dist/main.js", import.meta.url)),
+      }),
     post: (m) => port.postMessage(m),
   });
   port.on("message", ({ data }) => {
