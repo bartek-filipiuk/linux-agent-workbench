@@ -11,7 +11,8 @@ const PERMISSION = /do you want to proceed\?|yes, allow|don't ask again|allow co
 const OPTION_LINE = /^\s*(?:❯|>|›)?\s*(\d{1,2})[.)]\s+(\S.*?)\s*$/;
 const MENU_FOOTER = /enter to select|use arrow keys|↑\/↓|\[y\/n\]|\(y\/n\)|\[yes\/no\]/i;
 const BUSY = /esc to interrupt|\b(working|thinking|running|loading)(…|\.\.\.)|[⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏]/i;
-const NESTED_IDLE = /^\s*[│┃]?\s*[>›]\s*(\S.*)?[│┃]?\s*$|\? for shortcuts|ask codex to do anything/im;
+// Claude Code 2.x: "❯ Try ..." input line, footer "auto mode on (shift+tab to cycle)" / "? for shortcuts"; Codex: "› Ask Codex ...".
+const NESTED_IDLE = /^\s*[│┃]?\s*[>›❯]\s*(\S.*)?[│┃]?\s*$|\? for shortcuts|shift\+tab to cycle|ask codex to do anything/im;
 const SHELL_PROMPT = /(\$|#|%)\s*$/;
 
 // Heuristics over the visible screen. The last 40 non-empty lines carry the state.

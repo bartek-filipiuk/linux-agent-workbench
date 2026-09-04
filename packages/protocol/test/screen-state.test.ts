@@ -22,6 +22,20 @@ const claudeIdle = `
 ╰──────────────────────────────╯
   ? for shortcuts
 `;
+const claudeCodeReal = `
+ Claude Code v2.1.260
+ Opus 5 (1M context) · Claude Max
+ /workspace
+
+ ● Created /workspace/hello.txt containing hello\n (verified with cat -A).
+
+ ✻ Brewed for 3s · done 11:21 AM
+
+────────────────────────────────────────────────────
+❯ Try "create a util logging.py that..."
+────────────────────────────────────────────────────
+  auto mode on (shift+tab to cycle) · ← for agents               /rc active
+`;
 const busy = `
 ⠋ Thinking… (esc to interrupt)
 `;
@@ -42,6 +56,7 @@ describe("classifyScreen", () => {
     ["Allow command?\n  [y] yes  [n] no", "permission_prompt"],
     [busy, "busy"],
     [claudeIdle, "nested_agent_idle"],
+    [claudeCodeReal, "nested_agent_idle"],
     ["› Ask Codex to do anything\n  ? for shortcuts", "nested_agent_idle"],
     [shell, "idle_shell"],
     ["root@box:/# ", "idle_shell"],
