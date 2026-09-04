@@ -155,6 +155,7 @@ export class RunController extends EventEmitter {
       if (e instanceof HandoffRequested) {
         store.finishToolCall(rowId, "done", { handoff: e.reason });
         const observation = await this.handoff(e.reason, worker);
+        this.emit("tool", { name: call.name, status: "done", callId: call.callId });
         return { callId: call.callId, output: JSON.stringify({ resumed: true, observation }) };
       }
       const error = ProtocolError.is(e)

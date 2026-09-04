@@ -35,6 +35,8 @@ describe.skipIf(!enabled || !imageId)("terminal container", { timeout: 90_000 },
     const status = await manager.start(workspace, "none");
     expect(status.state, status.message).toBe("ready");
     sessionId = status.sessionId!;
+    // This suite tests the worker, not the policy: answer the shell's gate checks permissively.
+    manager.worker!.onRequest("gate.check", async () => ({ decision: "allow" }));
     const name = containerName(sessionId);
     const env = execFileSync("podman", ["exec", name, "env"]).toString();
     expect(env).not.toMatch(/OPENAI|ANTHROPIC/);
@@ -58,6 +60,7 @@ describe.skipIf(!enabled || !imageId)("terminal container", { timeout: 90_000 },
     await until(() => manager.status.state === "disconnected", 10_000);
     const status = await manager.start(workspace, "none");
     expect(status.state, status.message).toBe("ready");
+    manager.worker!.onRequest("gate.check", async () => ({ decision: "allow" }));
     await until(async () => (await manager.worker!.observe({})).screen.includes("KEEP_ME"));
   });
 });

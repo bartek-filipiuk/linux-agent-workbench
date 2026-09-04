@@ -34,3 +34,14 @@ pnpm test:container      # Podman-backed tests (needs the image)
 The app starts one container per workspace (`law-terminal-<id>`), keeps it running when the window closes, and reconnects to the same tmux session on the next start. "Destroy sandbox" removes it.
 
 Host notes (Ubuntu 22.04, Podman 3.4 rootless): the build tolerates tar's directory chmod failure on rootless overlay, and no CPU quota is applied because the user's cgroup delegates only `memory` and `pids`.
+
+### Policy gate
+
+Every simple command of the interactive shell in the sandbox is checked by agentd before it runs (a bash `DEBUG` trap calls `/opt/law/gate.cjs`, which asks the worker, which asks agentd):
+
+- commands typed by the human are always allowed and logged;
+- for the agent: read-only prefixes run silently (`auto`), most commands run and are logged (`log`), risky ones wait for your decision in the drawer (`approval`: pushes, publishes, `curl | sh`, `sudo`, recursive `rm`/`chmod`, `git reset --hard`, remote shells, raw disk writes), and nested agents started with permission-bypass flags are refused (`deny`);
+- an approval is `Allow once` (this exact command), `Allow for this run` (this rule until the run ends) or `Deny`; no answer within 120 s denies;
+- when a nested tool shows a permission or password prompt, the agent's next keystroke is blocked and the run hands off to you.
+
+Ceiling: the gate covers the interactive shell only. `bash -c`, scripts, other shells and processes started by nested agents are governed by the container, mounts and network profile. Before each run on a git workspace a snapshot (`HEAD` + `git stash create`) is recorded; "Restore pre-run state" brings tracked files back, untracked files are left alone.

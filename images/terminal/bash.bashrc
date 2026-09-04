@@ -9,7 +9,12 @@ if [ -n "$PS1" ]; then
   # Ceiling: bash -c, scripts, other shells and nested agents' own processes are not covered; the
   # container, mounts and network profile are the boundary for those.
   if [ -S /run/law/gate.sock ]; then
-    __law_gate() { node /opt/law/gate.cjs "$BASH_COMMAND" || return 1; }
+    __law_gate() {
+      case "$BASH_COMMAND" in
+        __law_*|"shopt -s extdebug"|"trap "*|PROMPT_COMMAND=*) return 0 ;;
+      esac
+      node /opt/law/gate.cjs "$BASH_COMMAND" || return 1
+    }
     __law_arm() { shopt -s extdebug; trap '__law_gate' DEBUG; PROMPT_COMMAND="${PROMPT_COMMAND#__law_arm;}"; }
     PROMPT_COMMAND="__law_arm;${PROMPT_COMMAND}"
   fi
