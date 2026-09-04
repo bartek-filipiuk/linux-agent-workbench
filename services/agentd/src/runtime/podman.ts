@@ -77,6 +77,9 @@ export function buildRunArgs(spec: RunSpec): string[] {
     "--network", spec.networkMode === "none" ? "none" : "slirp4netns",
     "--env", "TERM=xterm-256color",
     "--env", "HOME=/home/agent",
+    // Claude Code keeps its account/onboarding state in ~/.claude.json, outside ~/.claude; point it at the volume.
+    "--env", "CLAUDE_CONFIG_DIR=/home/agent/.claude",
+    "--env", "CODEX_HOME=/home/agent/.codex",
     "--workdir", "/workspace",
     spec.imageId,
   ];

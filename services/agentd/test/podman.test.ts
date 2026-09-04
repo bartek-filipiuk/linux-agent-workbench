@@ -46,6 +46,7 @@ describe("buildRunArgs", () => {
     expect(args).toContain(`${spec.runtimeDir}:/run/law:rw`);
     expect(args).toContain("law-auth-claude:/home/agent/.claude");
     expect(args[args.indexOf("--network") + 1]).toBe("slirp4netns");
+    expect(args).toContain("CLAUDE_CONFIG_DIR=/home/agent/.claude");
     expect(args.at(-1)).toBe("sha256:deadbeef");
     expect(args.join(" ")).not.toMatch(/OPENAI|ANTHROPIC/);
   });
