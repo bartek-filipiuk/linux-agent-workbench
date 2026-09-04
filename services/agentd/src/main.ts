@@ -3,6 +3,7 @@ import { Store } from "./storage/store.js";
 import { Daemon } from "./ipc.js";
 import { PodmanRuntime } from "./runtime/podman.js";
 import { TerminalSessionManager } from "./session/terminal-session-manager.js";
+import { OpenAIResponsesAdapter } from "./provider/openai.js";
 
 type Port = {
   on(ev: "message", cb: (e: { data: unknown }) => void): void;
@@ -33,6 +34,7 @@ parentPort.once("message", (e) => {
   const daemon = new Daemon({
     openStore: (p) => new Store(p),
     makeManager: (imageId, runtimeRoot) => new TerminalSessionManager({ runtime: new PodmanRuntime(), runtimeRoot, imageId }),
+    makeAdapter: (model, apiKey) => new OpenAIResponsesAdapter({ model, apiKey }),
     post: (m) => port.postMessage(m),
   });
   port.on("message", ({ data }) => {

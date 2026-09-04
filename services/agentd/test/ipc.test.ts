@@ -9,7 +9,7 @@ import { tmpDir } from "./helpers/tmp.js";
 
 describe("handleConfigInit", () => {
   it("opens the store, marks interrupted runs and never echoes the key", () => {
-    const reply = handleConfigInit(
+    const { reply } = handleConfigInit(
       { type: "config.init", apiKey: "sk-test-secret-value-1234567890", model: "gpt-5.6-sol", dbPath: ":memory:", imageId: "sha256:x", runtimeRoot: "/tmp" },
       (p) => new Store(p),
     );
@@ -19,7 +19,7 @@ describe("handleConfigInit", () => {
   });
 
   it("returns agentd.error on invalid config", () => {
-    expect(handleConfigInit({ type: "config.init" }, (p) => new Store(p))).toMatchObject({ type: "agentd.error" });
+    expect(handleConfigInit({ type: "config.init" }, (p) => new Store(p)).reply).toMatchObject({ type: "agentd.error" });
   });
 });
 
@@ -38,6 +38,7 @@ describe("Daemon", () => {
     const d = new Daemon({
       openStore: (p) => new Store(p),
       makeManager: (imageId, root) => new TerminalSessionManager({ runtime, runtimeRoot: root, imageId, connect: (p) => SocketTerminalWorker.connect(p) }),
+      makeAdapter: () => { throw new Error("unused"); },
       post: (m) => posted.push(m),
     });
     await d.handle({ type: "config.init", apiKey: "sk-x", model: "m", dbPath: ":memory:", imageId: "sha256:x", runtimeRoot });

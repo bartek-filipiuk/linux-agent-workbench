@@ -18,8 +18,8 @@ export { PodmanRuntime, buildRunArgs, sessionIdFor, validateWorkspacePath, conta
 export type { RunSpec, Exec } from "./runtime/podman.js";
 export { TerminalSessionManager } from "./session/terminal-session-manager.js";
 export type { SessionState, SessionStatus, ManagerDeps } from "./session/terminal-session-manager.js";
-export { Daemon, MainToAgentd, ConfigInit, SessionStart, SessionStop, TerminalWrite, TerminalResizeMsg, AgentdReady, AgentdError } from "./ipc.js";
-export type { AgentdToMain, SessionStateMsg, TerminalData, DaemonDeps } from "./ipc.js";
+export { Daemon, MainToAgentd, ConfigInit, SessionStart, SessionStop, TerminalWrite, TerminalResizeMsg, RunStart, RunStop, RunResume, LeaseTake, AgentdReady, AgentdError } from "./ipc.js";
+export type { AgentdToMain, SessionStateMsg, TerminalData, RunStateMsg, RunCommentary, RunTool, RunHandoff, LeaseStateMsg, DaemonDeps } from "./ipc.js";
 export { OpenAIResponsesAdapter } from "./provider/openai.js";
 export type { OpenAIAdapterOptions } from "./provider/openai.js";
 export { Lease, LeasePolicy } from "./policy/lease.js";

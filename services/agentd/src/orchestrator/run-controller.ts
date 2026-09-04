@@ -32,6 +32,7 @@ export class RunController extends EventEmitter {
   private readonly prices: PriceTable;
   private readonly system: string;
   private handoffResume: (() => void) | undefined;
+  private costKnown = true;
 
   constructor(
     private readonly deps: RunControllerDeps,
@@ -53,6 +54,10 @@ export class RunController extends EventEmitter {
 
   get state(): RunState {
     return this._state;
+  }
+
+  get stats(): { turns: number; toolCalls: number; costUsd: number | null } {
+    return { turns: this.budget.turns, toolCalls: this.budget.toolCalls, costUsd: this.costKnown ? this.budget.costUsd : null };
   }
 
   stop(): void {
@@ -87,8 +92,10 @@ export class RunController extends EventEmitter {
         previousResponseId = turn.responseId;
         this.budget.addTurn();
         const usd = costOf(adapter.model, turn.usage, this.prices);
-        if (usd === undefined) store.appendEvent(this.runId, "cost.unknown_model", { model: adapter.model });
-        else this.budget.addCost(usd);
+        if (usd === undefined) {
+          this.costKnown = false;
+          store.appendEvent(this.runId, "cost.unknown_model", { model: adapter.model });
+        } else this.budget.addCost(usd);
         store.recordUsage(this.runId, { responseId: turn.responseId, ...turn.usage, costUsd: usd ?? 0 });
         store.addRunTotals(this.runId, { turns: 1, costUsd: usd ?? 0 });
         store.appendEvent(this.runId, "model.turn", {
