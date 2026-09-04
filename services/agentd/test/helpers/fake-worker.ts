@@ -26,6 +26,10 @@ export class FakeWorker {
     this.conns.add(conn);
     conn.on("close", () => this.conns.delete(conn));
     conn.on("message", (env: Envelope) => this.handle(conn, env));
+    conn.on("keys", (bytes: Uint8Array) => {
+      this.screen += new TextDecoder().decode(bytes);
+      this.revision++;
+    });
   }
 
   private observation(): TerminalObservation {
