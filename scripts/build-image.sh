@@ -7,7 +7,7 @@ cd "$(dirname "$0")/.."
 NAME="${1:-terminal}"            # terminal | browser
 IMAGE="localhost/law-${NAME}"
 MIN_FREE_GB=5
-MAX_STORAGE_GB=10  # two images + their bases + one previous image still used by a running sandbox
+MAX_STORAGE_GB=14  # terminal + browser images, their bases, and one previous image still used by a running sandbox
 
 free_gb() { df --output=avail -BG / | tail -1 | tr -dc '0-9'; }
 storage_gb() { podman system df --format '{{.Size}}' 2>/dev/null | head -1 | awk '{v=$1; if (v ~ /GB/) {sub(/GB/,"",v); print v+0} else if (v ~ /MB/) {sub(/MB/,"",v); print v/1000} else print 0}'; }
