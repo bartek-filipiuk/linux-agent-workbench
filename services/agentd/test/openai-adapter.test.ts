@@ -54,6 +54,17 @@ describe("OpenAIResponsesAdapter", () => {
     expect(turn).toMatchObject({ text: "Done", toolCalls: [] });
   });
 
+  it("sends a screenshot as an image part of the tool output", async () => {
+    const { f, calls } = fakeFetch([ok({ id: "r", status: "completed", output: [], usage: { input_tokens: 1, output_tokens: 1 } })]);
+    const a = new OpenAIResponsesAdapter({ apiKey: "k", model: "m", fetch: f });
+    await a.turn({ toolResults: [{ callId: "c", output: "{}", imageJpegBase64: "AAAA" }] }, ctx(undefined, "r0"));
+    const item = (calls[0]!.body.input as Array<{ output: unknown }>)[0]!;
+    expect(item.output).toEqual([
+      { type: "input_text", text: "{}" },
+      { type: "input_image", image_url: "data:image/jpeg;base64,AAAA", detail: "auto" },
+    ]);
+  });
+
   it("retries transport failures with backoff and gives up after maxAttempts", async () => {
     const { f, calls } = fakeFetch([{ status: 429, json: { error: { message: "slow down" } } }, new Error("ECONNRESET"), ok({ id: "r", status: "completed", output: [], usage: { input_tokens: 0, output_tokens: 0 } })]);
     const a = new OpenAIResponsesAdapter({ apiKey: "k", model: "m", fetch: f, backoffMs: 1 });

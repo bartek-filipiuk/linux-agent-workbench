@@ -1,10 +1,10 @@
 import { EventEmitter } from "node:events";
 import { DEFAULT_BUDGETS, ProtocolError, type Budgets, type NetworkMode, type RunState } from "@law/protocol";
 import type { Store } from "../storage/store.js";
-import type { ModelAdapter, ModelTurnInput, ToolCall, ToolResult } from "../provider/types.js";
+import type { ModelAdapter, ModelTurnInput, ToolCall, ToolExecutor, ToolResult } from "../provider/types.js";
 import type { TerminalWorker } from "../worker/types.js";
 import { allowAllPolicy, type Policy } from "../policy/types.js";
-import { TERMINAL_TOOLS, HandoffRequested, executeTerminalTool } from "../tools/terminal-tools.js";
+import { HandoffRequested, terminalExecutor } from "../tools/terminal-tools.js";
 import { BudgetExceededError, BudgetTracker, costOf, type PriceTable } from "./budgets.js";
 import { SYSTEM_PROMPT } from "./system-prompt.js";
 
@@ -12,6 +12,7 @@ export type RunControllerDeps = {
   store: Store;
   adapter: ModelAdapter;
   worker: TerminalWorker;
+  tools?: ToolExecutor;
   policy?: Policy;
   budgets?: Budgets;
   prices?: PriceTable;
@@ -31,6 +32,7 @@ export class RunController extends EventEmitter {
   private readonly policy: Policy;
   private readonly prices: PriceTable;
   private readonly system: string;
+  private readonly tools: ToolExecutor;
   private handoffResume: (() => void) | undefined;
   private costKnown: boolean;
 
@@ -43,6 +45,7 @@ export class RunController extends EventEmitter {
     this.prices = deps.prices ?? {};
     this.costKnown = deps.adapter.model in this.prices;
     this.system = deps.systemPrompt ?? SYSTEM_PROMPT;
+    this.tools = deps.tools ?? terminalExecutor(deps.worker);
     this.budget = new BudgetTracker(deps.budgets ?? DEFAULT_BUDGETS, deps.now);
     this.runId = deps.store.createRun({
       workspaceId: input.workspaceId,
@@ -86,7 +89,7 @@ export class RunController extends EventEmitter {
 
         const turn = await adapter.turn(next, {
           ...(previousResponseId ? { previousResponseId } : {}),
-          tools: TERMINAL_TOOLS,
+          tools: this.tools.specs,
           system: this.system,
           signal,
         });
@@ -148,11 +151,11 @@ export class RunController extends EventEmitter {
     }
 
     try {
-      const output = await executeTerminalTool(call, worker, signal);
-      store.finishToolCall(rowId, "done", JSON.parse(output));
-      store.appendEvent(this.runId, "tool.done", { name: call.name, bytes: output.length });
+      const result = await this.tools.execute(call, signal);
+      store.finishToolCall(rowId, "done", safeJson(result.output));
+      store.appendEvent(this.runId, "tool.done", { name: call.name, bytes: result.output.length, image: result.imageJpegBase64 !== undefined });
       tool("done");
-      return { callId: call.callId, output };
+      return { callId: call.callId, output: result.output, ...(result.imageJpegBase64 ? { imageJpegBase64: result.imageJpegBase64 } : {}) };
     } catch (e) {
       if (e instanceof HandoffRequested) {
         store.finishToolCall(rowId, "done", { handoff: e.reason });
@@ -201,10 +204,18 @@ export class RunController extends EventEmitter {
   }
 }
 
+function safeJson(text: string): unknown {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
+  }
+}
+
 // A short, human-readable summary of what a tool call does, for the UI log.
 function previewOf(call: ToolCall): string {
   const a = (call.args ?? {}) as Record<string, unknown>;
-  const clip = (v: unknown, n = 60) => String(v).replace(/\s+/g, " ").slice(0, n);
+  const clip = (v: unknown, n = 60) => String(v ?? "").replace(/\s+/g, " ").slice(0, n);
   switch (call.name) {
     case "terminal_input":
       return a.kind === "key" ? `key ${String(a.key)}` : clip(a.text);
@@ -212,6 +223,12 @@ function previewOf(call: ToolCall): string {
       return a.until ? `until /${clip(a.until, 40)}/` : `idle ${String(a.idleMs ?? 1500)}ms`;
     case "request_human":
       return clip(a.reason);
+    case "browser_act": {
+      const act = (a.action ?? {}) as Record<string, unknown>;
+      return clip([act.kind, act.ref, act.url, act.text, act.key, act.pageId].filter((v) => v !== undefined).join(" "));
+    }
+    case "browser_wait":
+      return a.text ? `text /${clip(a.text, 40)}/` : a.selector ? `selector ${clip(a.selector, 40)}` : String(a.state ?? "load");
     default:
       return "";
   }

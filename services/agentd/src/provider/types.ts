@@ -5,7 +5,7 @@ export type ToolSpec = {
 };
 
 export type ToolCall = { callId: string; name: string; args: unknown };
-export type ToolResult = { callId: string; output: string };
+export type ToolResult = { callId: string; output: string; imageJpegBase64?: string };
 
 export type ModelTurnInput = { goal: string } | { toolResults: ToolResult[] };
 
@@ -28,4 +28,22 @@ export type TurnContext = {
 export interface ModelAdapter {
   readonly model: string;
   turn(input: ModelTurnInput, ctx: TurnContext): Promise<ModelTurn>;
+}
+
+/** What a run can call: tool specs for the model plus the executor that runs them. */
+export type ToolOutput = { output: string; imageJpegBase64?: string };
+export interface ToolExecutor {
+  readonly specs: ToolSpec[];
+  execute(call: ToolCall, signal: AbortSignal): Promise<ToolOutput>;
+}
+
+export function composeExecutors(...executors: ToolExecutor[]): ToolExecutor {
+  return {
+    specs: executors.flatMap((e) => e.specs),
+    async execute(call, signal) {
+      const owner = executors.find((e) => e.specs.some((s) => s.name === call.name));
+      if (!owner) throw new Error(`unknown tool ${call.name}`);
+      return owner.execute(call, signal);
+    },
+  };
 }

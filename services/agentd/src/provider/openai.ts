@@ -58,7 +58,16 @@ export class OpenAIResponsesAdapter implements ModelAdapter {
       input:
         "goal" in input
           ? [{ role: "user", content: input.goal }]
-          : input.toolResults.map((r) => ({ type: "function_call_output", call_id: r.callId, output: r.output })),
+          : input.toolResults.map((r) => ({
+              type: "function_call_output",
+              call_id: r.callId,
+              output: r.imageJpegBase64
+                ? [
+                    { type: "input_text", text: r.output },
+                    { type: "input_image", image_url: `data:image/jpeg;base64,${r.imageJpegBase64}`, detail: "auto" },
+                  ]
+                : r.output,
+            })),
     };
     const raw = await this.post(body, ctx.signal);
     const parsed = ResponseBody.parse(raw);

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ProtocolError, TerminalInput, TerminalObserveInput, TerminalWaitInput } from "@law/protocol";
-import type { ToolCall, ToolSpec } from "../provider/types.js";
+import type { ToolCall, ToolExecutor, ToolSpec } from "../provider/types.js";
 import type { TerminalWorker } from "../worker/types.js";
 
 export const RequestHumanArgs = z.object({ reason: z.string().min(1).max(500) });
@@ -71,4 +71,11 @@ export async function executeTerminalTool(call: ToolCall, worker: TerminalWorker
     default:
       throw new ProtocolError("INVALID_INPUT", `unknown tool ${call.name}`);
   }
+}
+
+export function terminalExecutor(worker: TerminalWorker): ToolExecutor {
+  return {
+    specs: TERMINAL_TOOLS,
+    execute: async (call, signal) => ({ output: await executeTerminalTool(call, worker, signal) }),
+  };
 }
