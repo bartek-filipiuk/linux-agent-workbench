@@ -78,7 +78,7 @@ export class FramedConnection extends EventEmitter {
     this.writeJson(msg);
   }
 
-  sendRaw(kind: 1 | 2, bytes: Uint8Array): void {
+  sendRaw(kind: 1 | 2 | 3 | 4, bytes: Uint8Array): void {
     if (this.closed) return;
     this.socket.write(encodeFrame(kind, bytes));
   }
@@ -97,6 +97,8 @@ export class FramedConnection extends EventEmitter {
   private dispatch(frame: Frame): void {
     if (frame.kind === FrameKind.PtyOut) return void this.emit("pty", frame.payload);
     if (frame.kind === FrameKind.KeyIn) return void this.emit("keys", frame.payload);
+    if (frame.kind === FrameKind.BrowserFrame) return void this.emit("browser-frame", frame.payload);
+    if (frame.kind === FrameKind.BrowserInput) return void this.emit("browser-input", frame.payload);
     let raw: unknown;
     try {
       raw = decodeJson(frame.payload);

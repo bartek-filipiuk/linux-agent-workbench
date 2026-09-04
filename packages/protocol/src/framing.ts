@@ -1,4 +1,4 @@
-export const FrameKind = { Json: 0, PtyOut: 1, KeyIn: 2 } as const;
+export const FrameKind = { Json: 0, PtyOut: 1, KeyIn: 2, BrowserFrame: 3, BrowserInput: 4 } as const;
 export type FrameKind = (typeof FrameKind)[keyof typeof FrameKind];
 
 export const MAX_FRAME_BYTES = 8 * 1024 * 1024;
@@ -21,7 +21,7 @@ export function encodeFrame(kind: FrameKind, payload: Uint8Array): Uint8Array {
 }
 
 function isFrameKind(n: number): n is FrameKind {
-  return n === 0 || n === 1 || n === 2;
+  return n >= 0 && n <= 4;
 }
 
 export class FrameDecoder {

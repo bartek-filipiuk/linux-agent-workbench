@@ -44,6 +44,7 @@ describe("framing", () => {
     expect(() => new FrameDecoder().push(zero)).toThrow(RangeError);
     const unknown = encodeFrame(FrameKind.Json, new Uint8Array());
     unknown[4] = 9;
+    expect(new FrameDecoder().push(encodeFrame(FrameKind.BrowserFrame, new Uint8Array([1])))[0]!.kind).toBe(3);
     expect(() => new FrameDecoder().push(unknown)).toThrow(RangeError);
   });
 });
