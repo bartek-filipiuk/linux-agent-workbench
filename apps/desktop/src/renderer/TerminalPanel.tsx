@@ -25,6 +25,14 @@ export function TerminalPanel({ owner, visible = true }: { owner: "human" | "age
       theme: { background: "#0b0d10", foreground: "#e6e8eb", cursor: "#3b82f6" },
     });
     termRef.current = term;
+    // Ctrl+V would otherwise go to the shell as \x16 (readline quoted-insert) and Ctrl+Shift+C as a key; returning
+    // false hands them to the browser, whose Edit menu roles turn them into a paste event (which xterm handles) and a copy.
+    term.attachCustomKeyEventHandler((e) => {
+      const k = e.key.toLowerCase();
+      if ((e.ctrlKey || e.metaKey) && !e.altKey && (k === "v" || (k === "c" && e.shiftKey))) return false;
+      if (e.shiftKey && e.key === "Insert") return false;
+      return true;
+    });
     const fit = new FitAddon();
     fitRef.current = fit;
     term.loadAddon(fit);

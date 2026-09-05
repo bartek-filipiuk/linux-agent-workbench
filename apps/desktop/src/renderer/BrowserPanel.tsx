@@ -70,8 +70,12 @@ export function BrowserPanel({ status, owner, runActive }: { status: BrowserStat
     moveFrame.current ??= requestAnimationFrame(() => { moveFrame.current = null; flushMove(); });
   };
 
+  const isPaste = (e: React.KeyboardEvent) => ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "v") || (e.shiftKey && e.key === "Insert");
   const onKey = (kind: "keydown" | "keyup") => (e: React.KeyboardEvent<HTMLCanvasElement>) => {
     if (!human || e.key === "Escape" || (e.ctrlKey && e.key.toLowerCase() === "l")) return; // leave app shortcuts alone
+    // Ctrl+V is handled by the Edit menu's paste role, which lands in onPaste below with the host text; the
+    // sandbox Chromium has no clipboard of its own, so the key itself must not travel there.
+    if (isPaste(e)) return;
     e.preventDefault();
     send({ kind, key: KEY_MAP[e.key] ?? e.key });
   };
@@ -119,6 +123,12 @@ export function BrowserPanel({ status, owner, runActive }: { status: BrowserStat
           onWheel={(e) => live && human && send({ kind: "wheel", ...toViewport(e), deltaX: Math.round(e.deltaX), deltaY: Math.round(e.deltaY) })}
           onKeyDown={onKey("keydown")}
           onKeyUp={onKey("keyup")}
+          onPaste={(e) => {
+            // Host clipboard text is typed into the focused field of the sandbox page; it never reaches the model or the logs.
+            e.preventDefault();
+            const text = e.clipboardData.getData("text");
+            if (live && human && text) send({ kind: "insert", text: text.slice(0, 4096) });
+          }}
         />
       </div>
     </section>

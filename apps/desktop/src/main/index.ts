@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain, MessageChannelMain, safeStorage, utilityProcess, type MessagePortMain } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, Menu, MessageChannelMain, safeStorage, utilityProcess, type MessagePortMain } from "electron";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -326,6 +326,9 @@ ipcMain.on("terminal:resize", (_e, cols: unknown, rows: unknown) => {
 });
 
 app.whenReady().then(() => {
+  // Without an Edit menu Chromium on Linux has no Ctrl+C/V/X/A accelerators at all: nothing pasted into the goal,
+  // the URL bar, the terminal or the sandbox browser. The bar stays hidden (autoHideMenuBar); the roles still fire.
+  Menu.setApplicationMenu(Menu.buildFromTemplate([{ role: "fileMenu" }, { role: "editMenu" }, { role: "viewMenu" }, { role: "windowMenu" }]));
   settings = readSettings(settingsFile());
   createWindow();
   startAgentd();
