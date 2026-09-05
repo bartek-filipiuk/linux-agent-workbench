@@ -46,6 +46,22 @@ describe("RunController", () => {
     expect(everything).not.toContain("QUJDREVGR0hJSktMTU5PUA");
   });
 
+  it("compacts the context every N turns: pending tool results plus a summary request, then a fresh chain from the goal", async () => {
+    const { ws, store, worker } = await setup();
+    const observe = { toolCalls: [{ name: "terminal_observe", args: {} }] };
+    const adapter = new FakeModelAdapter([observe, observe, { text: "STATE: two observes done" }, observe, { text: "finished" }]);
+    const rc = new RunController({ store, adapter, worker, compactEvery: 2 }, input(ws));
+    const out = await rc.start();
+    expect(out.state).toBe("completed");
+    // inputs: goal, results, results+summary request, fresh goal (with the summary), results
+    expect(adapter.inputs.map((i) => ("goal" in i ? "goal" : "message" in i && i.message ? "results+message" : "results"))).toEqual(["goal", "results", "results+message", "goal", "results"]);
+    expect((adapter.inputs[3] as { goal: string }).goal).toContain("STATE: two observes done");
+    expect((adapter.inputs[3] as { goal: string }).goal).toContain("list files");
+    expect(adapter.contexts[3]?.previousResponseId).toBeUndefined(); // the chain restarted
+    expect(adapter.contexts[4]?.previousResponseId).toMatch(/^fake-resp-/); // and continues from the fresh turn
+    expect(store.listEvents(out.runId).some((e) => e.type === "context.compacted")).toBe(true);
+  });
+
   it("runs a scripted session to completion and persists everything", async () => {
     const { ws, store, worker, fw } = await setup();
     const adapter = new FakeModelAdapter([

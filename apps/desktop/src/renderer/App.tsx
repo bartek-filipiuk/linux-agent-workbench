@@ -27,7 +27,7 @@ declare global {
       terminalWrite(data: string): void;
       terminalResize(cols: number, rows: number): void;
       terminalRefresh(): void;
-      startRun(goal: string): Promise<void>;
+      startRun(goal: string, opts?: { profile?: "quick" | "research" | "project"; maxTurns?: number }): Promise<void>;
       stopRun(): Promise<void>;
       resumeRun(): Promise<void>;
       takeControl(surface?: "terminal" | "browser"): Promise<void>;

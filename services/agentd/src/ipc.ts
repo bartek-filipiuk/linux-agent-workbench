@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ApprovalDecision, BrowserInputEvent, NetworkMode, type ApprovalRequest, type RunState } from "@law/protocol";
+import { ApprovalDecision, BrowserInputEvent, DEFAULT_BUDGETS, NetworkMode, type ApprovalRequest, type RunState } from "@law/protocol";
 import type { BrowserSessionManager, BrowserStatus } from "./session/browser-session-manager.js";
 import type { Store } from "./storage/store.js";
 import type { SessionStatus, TerminalSessionManager } from "./session/terminal-session-manager.js";
@@ -11,7 +11,10 @@ import { SessionEgress } from "./egress/session-egress.js";
 import { markSessionUsed, stopOrphans, type ContainerLister } from "./maintenance/orphans.js";
 import { makeEgressDecider } from "./egress/host-gate.js";
 import { HostAllowlist } from "./policy/host-allowlist.js";
-import { buildSystemPrompt } from "./orchestrator/system-prompt.js";
+import { buildSystemPrompt, type RunProfile as RunProfileName } from "./orchestrator/system-prompt.js";
+
+// Turns per conversation chain before the context is compacted to a summary (0 = never).
+const COMPACT_EVERY: Record<RunProfileName, number> = { quick: 0, research: 12, project: 20 };
 import { Notifier } from "./notify/notifier.js";
 
 const APPROVAL_TTL_MS = 120_000;
@@ -30,6 +33,7 @@ import type { Policy } from "./policy/types.js";
 import { restoreSnapshot, snapshotWorkspace, type Snapshot } from "./session/snapshot.js";
 
 const Prices = z.object({ inputUsdPerMTok: z.number().nonnegative(), outputUsdPerMTok: z.number().nonnegative() });
+const ProfileModel = z.object({ model: z.string().min(1), prices: Prices.optional() });
 
 export const ConfigInit = z.object({
   type: z.literal("config.init"),
@@ -42,6 +46,10 @@ export const ConfigInit = z.object({
   browserImageId: z.string().min(1).optional(),
   browserDomainMode: z.enum(["open", "ask"]).optional(),
   notify: z.object({ url: z.string().url(), replyUrl: z.string().url().optional(), token: z.string().min(1).optional() }).optional(),
+  /** Models used by profiles instead of the default one (a cheaper model for research, say), with their prices. */
+  profileModels: z
+    .object({ quick: ProfileModel.optional(), research: ProfileModel.optional(), project: ProfileModel.optional() })
+    .optional(),
 });
 export type ConfigInit = z.infer<typeof ConfigInit>;
 
@@ -50,7 +58,13 @@ export const SessionStop = z.object({ type: z.literal("session.stop"), destroy: 
 export const TerminalWrite = z.object({ type: z.literal("terminal.write"), data: z.instanceof(Uint8Array) });
 export const TerminalResizeMsg = z.object({ type: z.literal("terminal.resize"), cols: z.number().int().min(20).max(500), rows: z.number().int().min(5).max(200) });
 export const TerminalRefreshMsg = z.object({ type: z.literal("terminal.refresh") });
-export const RunStart = z.object({ type: z.literal("run.start"), goal: z.string().min(1).max(4000) });
+export const RunProfile = z.enum(["quick", "research", "project"]);
+export const RunStart = z.object({
+  type: z.literal("run.start"),
+  goal: z.string().min(1).max(4000),
+  profile: RunProfile.optional(),
+  maxTurns: z.number().int().min(5).max(400).optional(),
+});
 export const RunStop = z.object({ type: z.literal("run.stop") });
 export const RunResume = z.object({ type: z.literal("run.resume") });
 export const LeaseTake = z.object({ type: z.literal("lease.take"), owner: z.enum(["agent", "human"]), surface: z.enum(["terminal", "browser"]).optional() });
@@ -144,6 +158,7 @@ export class Daemon {
   private lastUsedTimer: NodeJS.Timeout | undefined;
   private notifier: Notifier | undefined;
   private startingRun = false;
+  private profileModels: { [K in RunProfileName]?: { model: string; prices?: { inputUsdPerMTok: number; outputUsdPerMTok: number } | undefined } | undefined } = {};
 
   constructor(private readonly deps: DaemonDeps) {
     for (const [surface, lease] of [["terminal", this.lease], ["browser", this.browserLease]] as const) {
@@ -205,6 +220,7 @@ export class Daemon {
           });
           this.gate.on("event", (e: GateEvent) => this.deps.post({ type: "gate.event", ...e }));
           this.browserImageId = msg.browserImageId;
+          this.profileModels = msg.profileModels ?? {};
           this.domainMode = msg.browserDomainMode ?? "open";
           this.runtimeRoot = msg.runtimeRoot;
           const store = runtime.store;
@@ -288,7 +304,7 @@ export class Daemon {
         await this.requireManager().refresh();
         return;
       case "run.start":
-        await this.startRun(msg.goal);
+        await this.startRun(msg.goal, { ...(msg.profile ? { profile: msg.profile } : {}), ...(msg.maxTurns ? { maxTurns: msg.maxTurns } : {}) });
         return;
       case "browser.start": {
         const st = this.manager?.status;
@@ -370,7 +386,7 @@ export class Daemon {
     this.browser.on("frame", (f: { width: number; height: number; jpeg: Uint8Array }) => this.deps.post({ type: "browser.frame", width: f.width, height: f.height, data: f.jpeg }));
   }
 
-  private async startRun(goal: string): Promise<void> {
+  private async startRun(goal: string, opts: { profile?: RunProfileName; maxTurns?: number } = {}): Promise<void> {
     const manager = this.manager;
     const runtime = this.runtime;
     const status = manager?.status;
@@ -400,19 +416,25 @@ export class Daemon {
       policies.push(new BrowserActionPolicy({ lastObservation: () => browser.lastObservation, approvals, domainMode: () => this.domainMode, hosts: () => this.allowlist }));
       executors.push(browserExecutor(browser));
     }
+    const profile: RunProfileName = opts.profile ?? "quick";
+    const profileModel = this.profileModels[profile];
+    if (profileModel?.prices) runtime.prices[profileModel.model] = profileModel.prices;
     const rc = new RunController(
       {
         store: runtime.store,
-        adapter: this.deps.makeAdapter(runtime.model, runtime.apiKey),
+        adapter: this.deps.makeAdapter(profileModel?.model ?? runtime.model, runtime.apiKey),
         worker,
         tools: composeExecutors(...executors),
         policy: composePolicies(...policies),
         prices: runtime.prices,
-        systemPrompt: buildSystemPrompt({ nestedAutonomy: this.nestedAutonomy }),
+        systemPrompt: buildSystemPrompt({ nestedAutonomy: this.nestedAutonomy, profile }),
+        budgets: { ...DEFAULT_BUDGETS, ...(opts.maxTurns ? { maxTurns: opts.maxTurns, maxToolCalls: Math.max(DEFAULT_BUDGETS.maxToolCalls, opts.maxTurns * 3) } : {}) },
+        compactEvery: COMPACT_EVERY[profile],
         ...(this.approvals ? { approvals: this.approvals } : {}),
       },
       { workspaceId, goal, networkMode: status.networkMode ?? "open", ...(snapshot ? { snapshot } : {}) },
     );
+    console.error(`[agentd] run ${rc.runId.slice(0, 8)}: profile ${profile}, model ${profileModel?.model ?? runtime.model}, maxTurns ${opts.maxTurns ?? DEFAULT_BUDGETS.maxTurns}, compact every ${COMPACT_EVERY[profile] || "never"}`);
     this.run = rc;
     const postState = (state: RunState, extra: { endReason?: string; finalText?: string } = {}) =>
       this.deps.post({ type: "run.state", runId: rc.runId, state, ...extra, ...rc.stats, snapshot: snapshot !== null });

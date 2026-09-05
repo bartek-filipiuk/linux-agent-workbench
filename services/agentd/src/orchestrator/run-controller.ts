@@ -20,7 +20,16 @@ export type RunControllerDeps = {
   now?: () => number;
   /** When given, a pending approval card parks the run in awaiting_approval instead of letting the model poll. */
   approvals?: { hasPending(runId: string): boolean; once(event: "resolved", cb: () => void): unknown; off(event: "resolved", cb: () => void): unknown };
+  /**
+   * Context compaction: every N turns the model writes a short state summary and the conversation chain is
+   * restarted from the goal plus that summary. Long runs then cost a few thousand tokens per turn instead
+   * of the whole history. 0 or undefined = never.
+   */
+  compactEvery?: number;
 };
+
+const COMPACT_PROMPT =
+  "Pause. Write a compact state summary for yourself (plain text, no tool calls, at most 15 lines): what the goal is, what is done and verified (with file paths), what is in progress, what remains, and any facts you must not lose (ids, revisions, URLs, decisions). Your next message will start a fresh context with only the goal and this summary.";
 
 export type RunInput = { workspaceId: string; goal: string; networkMode: NetworkMode; snapshot?: unknown };
 
@@ -83,27 +92,46 @@ export class RunController extends EventEmitter {
     const signal = this.abort.signal;
     let previousResponseId: string | undefined;
     let next: ModelTurnInput = { goal: this.input.goal };
+    const compactEvery = this.deps.compactEvery ?? 0;
+    let turnsInChain = 0;
+
+    const callModel = async (input: ModelTurnInput) => {
+      const turn = await adapter.turn(input, {
+        ...(previousResponseId ? { previousResponseId } : {}),
+        tools: this.tools.specs,
+        system: this.system,
+        signal,
+      });
+      previousResponseId = turn.responseId;
+      turnsInChain++;
+      this.budget.addTurn();
+      const usd = costOf(adapter.model, turn.usage, this.prices);
+      if (usd === undefined) {
+        this.costKnown = false;
+        store.appendEvent(this.runId, "cost.unknown_model", { model: adapter.model });
+      } else this.budget.addCost(usd);
+      store.recordUsage(this.runId, { responseId: turn.responseId, ...turn.usage, costUsd: usd ?? 0 });
+      store.addRunTotals(this.runId, { turns: 1, costUsd: usd ?? 0 });
+      return turn;
+    };
 
     try {
       for (;;) {
         this.throwIfStopped();
         this.budget.check();
 
-        const turn = await adapter.turn(next, {
-          ...(previousResponseId ? { previousResponseId } : {}),
-          tools: this.tools.specs,
-          system: this.system,
-          signal,
-        });
-        previousResponseId = turn.responseId;
-        this.budget.addTurn();
-        const usd = costOf(adapter.model, turn.usage, this.prices);
-        if (usd === undefined) {
-          this.costKnown = false;
-          store.appendEvent(this.runId, "cost.unknown_model", { model: adapter.model });
-        } else this.budget.addCost(usd);
-        store.recordUsage(this.runId, { responseId: turn.responseId, ...turn.usage, costUsd: usd ?? 0 });
-        store.addRunTotals(this.runId, { turns: 1, costUsd: usd ?? 0 });
+        // Compaction: the chain carries every observation so far; past the limit, replace it with a summary.
+        if (compactEvery > 0 && turnsInChain >= compactEvery && "toolResults" in next) {
+          // The pending tool results travel with the request, so no function call is left unanswered.
+          const summary = await callModel({ toolResults: next.toolResults, message: COMPACT_PROMPT });
+          store.appendEvent(this.runId, "context.compacted", { turnsInChain, summaryChars: summary.text.length });
+          this.emit("commentary", `[context compacted after ${turnsInChain} turns]`);
+          previousResponseId = undefined;
+          turnsInChain = 0;
+          next = { goal: `${this.input.goal}\n\nYou have already been working on this. Your own state summary from the previous context:\n${summary.text}\n\nContinue from there; re-observe before acting.` };
+        }
+
+        const turn = await callModel(next);
         store.appendEvent(this.runId, "model.turn", {
           responseId: turn.responseId,
           text: turn.text,

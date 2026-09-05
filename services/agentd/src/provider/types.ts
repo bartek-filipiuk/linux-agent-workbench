@@ -7,7 +7,11 @@ export type ToolSpec = {
 export type ToolCall = { callId: string; name: string; args: unknown };
 export type ToolResult = { callId: string; output: string; imageJpegBase64?: string };
 
-export type ModelTurnInput = { goal: string } | { toolResults: ToolResult[] };
+/**
+ * goal: first turn of a chain; toolResults: continue the chain; message: a user message appended after the
+ * pending tool results (context compaction asks for a state summary this way, so no function call is left unanswered).
+ */
+export type ModelTurnInput = { goal: string } | { toolResults: ToolResult[]; message?: string };
 
 /** cachedInputTokens: the part of inputTokens served from the provider's prompt cache (billed at a fraction). */
 export type ModelUsage = { inputTokens: number; outputTokens: number; cachedInputTokens?: number };

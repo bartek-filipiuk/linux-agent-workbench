@@ -239,7 +239,13 @@ function startAgentd() {
   const notify = env.LAW_NTFY_URL
     ? { url: env.LAW_NTFY_URL, ...(env.LAW_NTFY_REPLY_URL ? { replyUrl: env.LAW_NTFY_REPLY_URL } : {}), ...(env.LAW_NTFY_TOKEN ? { token: env.LAW_NTFY_TOKEN } : {}) }
     : undefined;
-  toAgentd({ type: "config.init", apiKey, model, dbPath: dbPath(), imageId, runtimeRoot: runtimeRoot(), ...(prices ? { prices } : {}), ...(browserImageId ? { browserImageId } : {}), ...(notify ? { notify } : {}) });
+  // A cheaper model for the research profile, if configured: LAW_RESEARCH_MODEL plus its prices.
+  const rin = Number(env.LAW_RESEARCH_PRICE_INPUT_PER_MTOK);
+  const rout = Number(env.LAW_RESEARCH_PRICE_OUTPUT_PER_MTOK);
+  const profileModels = env.LAW_RESEARCH_MODEL
+    ? { research: { model: env.LAW_RESEARCH_MODEL, ...(Number.isFinite(rin) && Number.isFinite(rout) && env.LAW_RESEARCH_PRICE_INPUT_PER_MTOK ? { prices: { inputUsdPerMTok: rin, outputUsdPerMTok: rout } } : {}) } }
+    : undefined;
+  toAgentd({ type: "config.init", apiKey, model, dbPath: dbPath(), imageId, runtimeRoot: runtimeRoot(), ...(prices ? { prices } : {}), ...(browserImageId ? { browserImageId } : {}), ...(notify ? { notify } : {}), ...(profileModels ? { profileModels } : {}) });
   child.on("exit", (code) => onAgentdExit(code));
 }
 
@@ -292,8 +298,12 @@ ipcMain.handle("policy:set", (_e, patch: unknown) => {
 });
 ipcMain.handle("sandbox:destroy", () => toAgentd({ type: "session.stop", destroy: true }));
 ipcMain.handle("lease:get", () => leases);
-ipcMain.handle("run:start", (_e, goal: unknown) => {
-  if (typeof goal === "string" && goal.trim()) toAgentd({ type: "run.start", goal: goal.trim().slice(0, 4000) });
+ipcMain.handle("run:start", (_e, goal: unknown, opts: unknown) => {
+  if (typeof goal !== "string" || !goal.trim()) return;
+  const o = (opts ?? {}) as { profile?: unknown; maxTurns?: unknown };
+  const profile = o.profile === "research" || o.profile === "project" || o.profile === "quick" ? o.profile : undefined;
+  const maxTurns = Number.isInteger(o.maxTurns) && (o.maxTurns as number) >= 5 && (o.maxTurns as number) <= 400 ? (o.maxTurns as number) : undefined;
+  toAgentd({ type: "run.start", goal: goal.trim().slice(0, 4000), ...(profile ? { profile } : {}), ...(maxTurns ? { maxTurns } : {}) });
 });
 ipcMain.handle("run:stop", () => toAgentd({ type: "run.stop" }));
 ipcMain.handle("run:resume", () => toAgentd({ type: "run.resume" }));

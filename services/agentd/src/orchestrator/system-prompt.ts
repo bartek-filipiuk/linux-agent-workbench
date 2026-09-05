@@ -1,9 +1,26 @@
-/** The base prompt plus the paragraph that matches the session's nested-agent setting. */
-export function buildSystemPrompt(opts: { nestedAutonomy: boolean }): string {
+export type RunProfile = "quick" | "research" | "project";
+
+/** Per-profile working rules: how the model should spend turns, which is what the run costs. */
+export const PROFILE_RULES: Record<RunProfile, string> = {
+  quick: "",
+  research: `Working style for research and data collection (cost matters: every turn resends the whole context):
+- Repetitive fetching is a script, not a click-through: write a small curl or node script that fetches the pages, extracts what you need (grep, regexes, a few lines of node) and writes results to a file; run it once. Use the browser only for pages the script could not read (JavaScript-only content, blocked requests) and never for more than one page per decision.
+- Save every finished unit of work (one record, one page, one item) to its file immediately; never keep results only in your head or wait for a whole batch.
+- Work in batches of about five items; after each batch note the state in a progress file the next run can read.
+- Browser observations: no screenshot unless the layout matters; maxElements 40; prefer one observe per page.
+- Batch shell commands with && and use terminal_input with submit and wait, so one command is one turn.`,
+  project: `Working style for coordinating a build:
+- You coordinate; the nested coding agent writes the code. Verify its claims with commands you run, keep the hand-over file accurate, and log decisions.
+- Wait for long steps with one terminal_wait (until the shell prompt or the agent's idle prompt, generous timeoutMs) instead of polling.`,
+};
+
+/** The base prompt plus the paragraphs for the session's nested-agent setting and the run's profile. */
+export function buildSystemPrompt(opts: { nestedAutonomy: boolean; profile?: RunProfile }): string {
   const nested = opts.nestedAutonomy
     ? `- Nested agents run autonomously inside the sandbox: start them as "claude --dangerously-skip-permissions" and "codex --dangerously-bypass-approvals-and-sandbox". The sandbox (read-only root, /workspace only, egress proxy) is the boundary, so their own permission prompts are unnecessary. Answer their question menus yourself.`
     : `- Nested agents run supervised: start "claude" and "codex" without permission-bypass flags; a bypass flag needs the human's approval.`;
-  return `${SYSTEM_PROMPT}\n${nested}`;
+  const profile = PROFILE_RULES[opts.profile ?? "quick"];
+  return `${SYSTEM_PROMPT}\n${nested}${profile ? `\n\n${profile}` : ""}`;
 }
 
 export const SYSTEM_PROMPT = `You operate a Linux terminal and, when browser_* tools are listed, a sandboxed web browser, on behalf of a human.

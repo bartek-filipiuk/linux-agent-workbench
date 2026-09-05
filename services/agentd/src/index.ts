@@ -46,7 +46,8 @@ export type { EgressDecision, EgressLogEntry, EgressProxyOptions } from "./egres
 export { SessionEgress, egressSocketPaths } from "./egress/session-egress.js";
 export { makeEgressDecider, EGRESS_RULE } from "./egress/host-gate.js";
 export { HostAllowlist } from "./policy/host-allowlist.js";
-export { buildSystemPrompt } from "./orchestrator/system-prompt.js";
+export { buildSystemPrompt, PROFILE_RULES } from "./orchestrator/system-prompt.js";
+export type { RunProfile } from "./orchestrator/system-prompt.js";
 export { PolicySet } from "./ipc.js";
 export { Notifier, parseReply } from "./notify/notifier.js";
 export type { NotifyConfig, Notification } from "./notify/notifier.js";

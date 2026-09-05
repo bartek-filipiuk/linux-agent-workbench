@@ -29,6 +29,16 @@ const fcResponse = {
 };
 
 describe("OpenAIResponsesAdapter", () => {
+  it("appends a user message after the tool results when asked (context compaction)", async () => {
+    const { f, calls } = fakeFetch([ok({ id: "resp_9", status: "completed", output: [{ type: "message", content: [{ type: "output_text", text: "summary" }] }], usage: { input_tokens: 1, output_tokens: 1 } })]);
+    const a = new OpenAIResponsesAdapter({ apiKey: "sk-test", model: "gpt-5.6-sol", fetch: f });
+    await a.turn({ toolResults: [{ callId: "call_a", output: "{}" }], message: "Summarise." }, { ...ctx(), previousResponseId: "resp_8" });
+    const items = calls[0]!.body.input as Array<Record<string, unknown>>;
+    expect(items.map((i) => i.type ?? i.role)).toEqual(["function_call_output", "user"]);
+    expect(items[1]).toEqual({ role: "user", content: "Summarise." });
+    expect(calls[0]!.body.previous_response_id).toBe("resp_8");
+  });
+
   it("sends the first turn with instructions and tools, parses calls, text and usage", async () => {
     const { f, calls } = fakeFetch([ok(fcResponse)]);
     const a = new OpenAIResponsesAdapter({ apiKey: "sk-test", model: "gpt-5.6-sol", fetch: f });

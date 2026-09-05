@@ -124,6 +124,10 @@ const Row = memo(function Row({ row: l }: { row: LogRow }) {
 
 export function RunDrawer({ run, sandboxReady }: { run: RunView; sandboxReady: boolean }) {
   const [goal, setGoal] = useState("Run ls -al and tell me how many entries are listed.");
+  // Profile = working rules (and possibly a cheaper model) for the run; max turns = the per-run budget.
+  const [profile, setProfile] = useState<"quick" | "research" | "project">("quick");
+  const [maxTurns, setMaxTurns] = useState(40);
+  const runOpts = () => ({ profile, maxTurns });
   // Autopilot: keep restarting the same goal until the agent says PROJECT DONE or the run limit is hit,
   // and hand control back on handoffs by itself. For long builds where nobody sits at the keyboard.
   const [autopilot, setAutopilot] = useState(false);
@@ -133,8 +137,8 @@ export function RunDrawer({ run, sandboxReady }: { run: RunView; sandboxReady: b
   // never re-run (and cancel its own timers) because a counter or the goal text changed.
   const prevState = useRef<string | undefined>(undefined);
   const pilotRef = useRef({ runs: 0, spent: 0, handoffs: 0 });
-  const latest = useRef({ goal, maxRuns, run });
-  latest.current = { goal, maxRuns, run };
+  const latest = useRef({ goal, maxRuns, run, opts: runOpts() });
+  latest.current = { goal, maxRuns, run, opts: runOpts() };
   const logRef = useRef<HTMLOListElement>(null);
   const busy = run.state !== undefined && RUNNING.has(run.state);
 
@@ -143,7 +147,7 @@ export function RunDrawer({ run, sandboxReady }: { run: RunView; sandboxReady: b
     prevState.current = run.state;
     if (!autopilot || run.state === was) return;
     const p = pilotRef.current;
-    const { maxRuns: limit, goal: goalNow, run: r } = latest.current;
+    const { maxRuns: limit, goal: goalNow, run: r, opts: optsNow } = latest.current;
     if (run.state === "running" && was !== "handoff" && was !== "awaiting_approval") {
       p.runs += 1;
       p.handoffs = 0;
@@ -166,7 +170,7 @@ export function RunDrawer({ run, sandboxReady }: { run: RunView; sandboxReady: b
       const more = !done && p.runs < limit;
       setPilot({ runs: p.runs, spent: p.spent, note: done ? "project done" : more ? "restarting in 5 s" : "run limit reached" });
       if (!more) return;
-      const t = setTimeout(() => void window.workbench.startRun(goalNow), 5000);
+      const t = setTimeout(() => void window.workbench.startRun(goalNow, optsNow), 5000);
       return () => clearTimeout(t);
     }
     if (run.state === "failed" || run.state === "stopped" || run.state === "interrupted") setPilot({ runs: p.runs, spent: p.spent, note: `stopped: run ${run.state}` });
@@ -194,9 +198,22 @@ export function RunDrawer({ run, sandboxReady }: { run: RunView; sandboxReady: b
       <label className="label" htmlFor="goal">Goal</label>
       <textarea id="goal" value={goal} onChange={(e) => setGoal(e.target.value)} rows={4} disabled={busy} placeholder="What should the agent do in this workspace?" />
       <div className="row">
-        <button className="btn primary" disabled={!sandboxReady || busy || !goal.trim()} onClick={() => void window.workbench.startRun(goal)}>Start run</button>
+        <button className="btn primary" disabled={!sandboxReady || busy || !goal.trim()} onClick={() => void window.workbench.startRun(goal, runOpts())}>Start run</button>
         <button className="btn danger" disabled={!busy} onClick={() => void window.workbench.stopRun()} title="Shortcut: Esc while the agent has the terminal">Stop</button>
         {canRestore && <button className="btn" onClick={restore}>Restore pre-run state</button>}
+      </div>
+      <div className="row autopilot" title="Profile: working rules for the run. research = scripts over clicking, save each item at once, compact context every 12 turns (and a cheaper model when LAW_RESEARCH_MODEL is set); project = coordinate a nested coding agent, compact every 20 turns; quick = as is. Max turns: the per-run budget.">
+        <label>
+          profile{" "}
+          <select value={profile} onChange={(e) => setProfile(e.target.value as "quick" | "research" | "project")} disabled={busy}>
+            <option value="quick">quick</option>
+            <option value="research">research</option>
+            <option value="project">project</option>
+          </select>
+        </label>
+        <label>
+          max turns <input type="number" min={5} max={400} value={maxTurns} onChange={(e) => setMaxTurns(Math.min(400, Math.max(5, Number(e.target.value) || 40)))} disabled={busy} />
+        </label>
       </div>
       <div className="row autopilot" title="Restart the same goal after each completed run until the agent's final reply contains PROJECT DONE or the run limit is hit; handoffs are given back after 10 s.">
         <label>
