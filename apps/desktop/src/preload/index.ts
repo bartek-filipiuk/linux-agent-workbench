@@ -16,6 +16,7 @@ const api = {
   destroySandbox: () => ipcRenderer.invoke("sandbox:destroy"),
   terminalWrite: (data: string) => ipcRenderer.send("terminal:write", data),
   terminalResize: (cols: number, rows: number) => ipcRenderer.send("terminal:resize", cols, rows),
+  terminalRefresh: () => ipcRenderer.send("terminal:refresh"),
   getLease: () => ipcRenderer.invoke("lease:get"),
   startRun: (goal: string) => ipcRenderer.invoke("run:start", goal),
   stopRun: () => ipcRenderer.invoke("run:stop"),

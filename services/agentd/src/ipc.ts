@@ -49,6 +49,7 @@ export const SessionStart = z.object({ type: z.literal("session.start"), workspa
 export const SessionStop = z.object({ type: z.literal("session.stop"), destroy: z.boolean() });
 export const TerminalWrite = z.object({ type: z.literal("terminal.write"), data: z.instanceof(Uint8Array) });
 export const TerminalResizeMsg = z.object({ type: z.literal("terminal.resize"), cols: z.number().int().min(20).max(500), rows: z.number().int().min(5).max(200) });
+export const TerminalRefreshMsg = z.object({ type: z.literal("terminal.refresh") });
 export const RunStart = z.object({ type: z.literal("run.start"), goal: z.string().min(1).max(4000) });
 export const RunStop = z.object({ type: z.literal("run.stop") });
 export const RunResume = z.object({ type: z.literal("run.resume") });
@@ -63,7 +64,7 @@ export const PolicySet = z.object({ type: z.literal("policy.set"), nestedAutonom
 
 export const MainToAgentd = z.discriminatedUnion("type", [
   ConfigInit, SessionStart, SessionStop, TerminalWrite, TerminalResizeMsg, RunStart, RunStop, RunResume, LeaseTake, ApprovalDecide, RunRestore,
-  BrowserStart, BrowserStop, BrowserNavigateMsg, BrowserInputMsg, PolicySet,
+  BrowserStart, BrowserStop, BrowserNavigateMsg, BrowserInputMsg, PolicySet, TerminalRefreshMsg,
 ]);
 export type MainToAgentd = z.infer<typeof MainToAgentd>;
 
@@ -242,6 +243,7 @@ export class Daemon {
               this.lastUsedTimer.unref();
             }
             if (s.state === "ready" && s.sessionId) this.ensureBrowserManager(s.sessionId, s.networkMode ?? "open");
+            if (s.state === "ready") void this.manager?.refresh(); // a reconnected UI starts blank until tmux repaints
             if (s.state === "ready" && s.workspacePath) this.allowlist = new HostAllowlist(store, store.createWorkspace(s.workspacePath));
             if (s.state !== "ready" || !this.manager?.worker || !this.gate) return;
             this.unhookGate?.();
@@ -280,6 +282,9 @@ export class Daemon {
         return;
       case "terminal.resize":
         await this.requireManager().resize(msg.cols, msg.rows);
+        return;
+      case "terminal.refresh":
+        await this.requireManager().refresh();
         return;
       case "run.start":
         await this.startRun(msg.goal);

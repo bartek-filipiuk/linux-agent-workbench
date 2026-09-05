@@ -26,6 +26,7 @@ declare global {
       destroySandbox(): Promise<void>;
       terminalWrite(data: string): void;
       terminalResize(cols: number, rows: number): void;
+      terminalRefresh(): void;
       startRun(goal: string): Promise<void>;
       stopRun(): Promise<void>;
       resumeRun(): Promise<void>;
@@ -169,9 +170,10 @@ export function App() {
       )}
       <main className="main">
         {view !== "terminal" && <BrowserPanel status={browser} owner={agentOwnsBrowser ? "agent" : "human"} runActive={runActive || run.state === "handoff"} />}
-        {view === "browser" ? null : live ? (
-          <TerminalPanel owner={agentOwns ? "agent" : "human"} />
-        ) : (
+        {/* The terminal stays mounted across view switches: unmounting would throw away the screen. */}
+        {live ? (
+          <TerminalPanel owner={agentOwns ? "agent" : "human"} visible={view !== "browser"} />
+        ) : view === "browser" ? null : (
           <div className="empty">
             {session.state === "error" && <pre className="error">{session.message}</pre>}
             {session.state === "starting" && <p>Starting sandbox…</p>}

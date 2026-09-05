@@ -97,6 +97,10 @@ export class TerminalSessionManager extends EventEmitter {
     await this._worker?.resize({ cols, rows });
   }
 
+  async refresh(): Promise<void> {
+    await this._worker?.refresh().catch(() => undefined); // cosmetic: never fail a session over a repaint
+  }
+
   detach(): void {
     for (const u of this.unsubscribe.splice(0)) u();
     const w = this._worker;

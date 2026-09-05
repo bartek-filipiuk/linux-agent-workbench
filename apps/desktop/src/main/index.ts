@@ -103,6 +103,35 @@ function readImageId(name: "terminal" | "browser" = "terminal"): string | undefi
 const send = (channel: string, payload: unknown) => win?.webContents.send(channel, payload);
 const toAgentd = (msg: MainToAgentd) => port?.postMessage(msg);
 
+// PTY output arrives as many small chunks (a TUI spinner alone is dozens per second); one IPC message
+// per chunk starves the renderer. Coalesce per frame, and if the renderer falls far behind, drop the
+// backlog and ask tmux to repaint instead of replaying minutes of spinner frames.
+const TERMINAL_FLUSH_MS = 16;
+const TERMINAL_BACKLOG_CAP = 2 * 1024 * 1024;
+let terminalChunks: Uint8Array[] = [];
+let terminalBacklog = 0;
+let terminalFlushTimer: NodeJS.Timeout | undefined;
+function queueTerminalData(data: Uint8Array): void {
+  terminalChunks.push(data);
+  terminalBacklog += data.byteLength;
+  if (terminalBacklog > TERMINAL_BACKLOG_CAP) {
+    terminalChunks = [];
+    terminalBacklog = 0;
+    toAgentd({ type: "terminal.refresh" });
+    return;
+  }
+  terminalFlushTimer ??= setTimeout(() => {
+    terminalFlushTimer = undefined;
+    if (terminalChunks.length === 0) return;
+    const out = new Uint8Array(terminalBacklog);
+    let off = 0;
+    for (const c of terminalChunks) { out.set(c, off); off += c.byteLength; }
+    terminalChunks = [];
+    terminalBacklog = 0;
+    send("terminal:data", out);
+  }, TERMINAL_FLUSH_MS);
+}
+
 function onAgentd(msg: AgentdToMain) {
   switch (msg.type) {
     case "agentd.ready":
@@ -121,7 +150,7 @@ function onAgentd(msg: AgentdToMain) {
       return;
     }
     case "terminal.data":
-      send("terminal:data", msg.data);
+      queueTerminalData(msg.data);
       return;
     case "run.state":
     case "run.commentary":
@@ -192,6 +221,8 @@ function createWindow() {
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
+      // A covered or background window must keep drawing the terminal; otherwise IPC piles up and the UI looks hung.
+      backgroundThrottling: false,
     },
   });
   if (process.env.ELECTRON_RENDERER_URL) void win.loadURL(process.env.ELECTRON_RENDERER_URL);
@@ -255,6 +286,7 @@ ipcMain.handle("run:restore", (_e, runId: unknown) => {
 ipcMain.on("terminal:write", (_e, data: unknown) => {
   if (typeof data === "string" && data.length <= 65_536) toAgentd({ type: "terminal.write", data: new TextEncoder().encode(data) });
 });
+ipcMain.on("terminal:refresh", () => toAgentd({ type: "terminal.refresh" }));
 ipcMain.on("terminal:resize", (_e, cols: unknown, rows: unknown) => {
   if (Number.isInteger(cols) && Number.isInteger(rows)) toAgentd({ type: "terminal.resize", cols: cols as number, rows: rows as number });
 });

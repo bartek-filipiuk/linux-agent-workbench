@@ -6,6 +6,8 @@ export interface TerminalWorker {
   wait(input: TerminalWaitInput, signal?: AbortSignal): Promise<TerminalWaitResult>;
   interrupt(signal?: AbortSignal): Promise<void>;
   resize(size: TerminalResize): Promise<void>;
+  /** Have tmux repaint the screen (after a reconnect or when the UI panel comes back). */
+  refresh(): Promise<void>;
   health(): Promise<WorkerHealth>;
   cancel(): void;
   writeRaw(bytes: Uint8Array): void;

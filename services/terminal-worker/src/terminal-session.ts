@@ -107,6 +107,18 @@ export class TerminalSession {
     this.revision++;
   }
 
+  /** Ask tmux to repaint the whole screen for our client: a freshly (re)attached UI starts from a blank xterm. */
+  refresh(): Promise<void> {
+    return new Promise((resolve) => {
+      execFile("tmux", ["-S", this.opts.tmuxSocket, "list-clients", "-F", "#{client_name}"], (err, stdout) => {
+        const clients = err ? [] : stdout.split("\n").map((s) => s.trim()).filter(Boolean);
+        if (clients.length === 0) return resolve();
+        let left = clients.length;
+        for (const c of clients) execFile("tmux", ["-S", this.opts.tmuxSocket, "refresh-client", "-t", c], () => --left === 0 && resolve());
+      });
+    });
+  }
+
   async observe(input: TerminalObserveInput = {}): Promise<TerminalObservation> {
     await new Promise<void>((resolve) => this.term.write("", resolve));
     const buf = this.term.buffer.active;

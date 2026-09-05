@@ -52,6 +52,8 @@ describe("TerminalSessionManager", () => {
     await expect.poll(() => fw!.screen).toContain("ls");
     await m.resize(100, 30);
     expect(fw!.received.some((e) => e.type === "terminal.resize")).toBe(true);
+    await m.refresh();
+    expect(fw!.received.some((e) => e.type === "terminal.refresh")).toBe(true);
     expect(statuses).toEqual(["starting", "ready"]);
     m.detach();
     expect(m.status.state).toBe("disconnected");

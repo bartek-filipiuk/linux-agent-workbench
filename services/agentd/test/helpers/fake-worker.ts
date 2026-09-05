@@ -76,6 +76,7 @@ export class FakeWorker {
         this.revision++;
         return conn.reply(id!, { ok: true });
       case "terminal.resize":
+      case "terminal.refresh":
         return conn.reply(id!, { ok: true });
       case "worker.health":
         return conn.reply(id!, { ok: true, payload: { uptimeMs: 1, ptyAlive: true, tmuxAlive: true, bufferBytes: 0, droppedBytes: 0 } });

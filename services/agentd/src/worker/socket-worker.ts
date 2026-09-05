@@ -78,6 +78,10 @@ export class SocketTerminalWorker implements TerminalWorker {
     await this.req("terminal.resize", size);
   }
 
+  async refresh() {
+    await this.req("terminal.refresh", {});
+  }
+
   async health() {
     return WorkerHealth.parse(await this.req("worker.health", {}));
   }

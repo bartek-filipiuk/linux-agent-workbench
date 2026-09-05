@@ -78,6 +78,9 @@ export class WorkerServer {
         case "terminal.resize":
           this.session.resize(TerminalResize.parse(env.payload));
           return conn.reply(id, { ok: true });
+        case "terminal.refresh":
+          await this.session.refresh();
+          return conn.reply(id, { ok: true });
         case "worker.health":
           return conn.reply(id, { ok: true, payload: this.session.health() });
         default:
