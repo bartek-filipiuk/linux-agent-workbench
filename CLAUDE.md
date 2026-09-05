@@ -13,7 +13,7 @@
 - `images/<name>/` — Containerfile + `image.json` (pinned image id). `scripts/build-image.sh <name>` builds, prunes, checks disk.
 
 ### Przepływy krytyczne
-- Run: renderer `run.start` → `Daemon` → `RunController` → `OpenAIResponsesAdapter` → tool call → policies (`LeasePolicy`, `CommandGate`, `NestedPromptPolicy`, `BrowserActionPolicy`) → executor (`tools/terminal-tools.ts` | `tools/browser-tools.ts`) → worker socket → result back to the model; events to `Store` and the UI.
+- Run: renderer `run.start {goal, profile, maxTurns}` → `Daemon` (profile → prompt rules, model, compactEvery) → `RunController` (context compaction every N turns) → `OpenAIResponsesAdapter` → tool call → policies (`LeasePolicy`, `CommandGate`, `NestedPromptPolicy`, `BrowserActionPolicy`) → executor (`tools/terminal-tools.ts` | `tools/browser-tools.ts`) → worker socket → result back to the model; events to `Store` and the UI.
 - Approval: policy → `ApprovalManager.request` (TTL 120 s) → `approval.request` to the UI → `ApprovalCard` (y/n, once/session/deny) → `approval.decide`.
 - Handoff: a policy returns `LEASE_DENIED` with `handoff`, or the model calls `request_human` → run state `handoff`, both leases go to the human, no observations reach the model until "Give control back".
 - Browser observe: `BrowserSession.walkFrames` (main frame, then every iframe, refs `e<n>` bound to `revision`) → `observationHints` (login_form, captcha, two_factor) appended by `browserExecutor`.

@@ -62,6 +62,12 @@ The top-bar setting DOMAINS `open | ask` governs both the browser and the proxy.
 
 What works: curl, git, apt, pip, npm/pnpm, Claude Code, Codex, Chromium (launched with `--proxy-server`), and ssh through the `ProxyCommand` shipped in `/etc/ssh/ssh_config.d/law-egress.conf`. What does not: anything that ignores proxy variables, ping, UDP, and tools that resolve names themselves before connecting.
 
+### Run profiles, budgets and cost
+
+The drawer's **profile** adds working rules to the system prompt: `research` (script repetitive fetching instead of clicking through pages, save every item at once, small observations, context compacted every 12 turns), `project` (coordinate a nested coding agent, compact every 20 turns) or `quick` (as is). **Max turns** is the per-run budget (default 40). Context compaction asks the model for a short state summary and restarts the response chain from the goal plus that summary, so long runs stop resending the whole history; the event `context.compacted` marks it in the run log.
+
+Set `LAW_RESEARCH_MODEL` (plus `LAW_RESEARCH_PRICE_INPUT_PER_MTOK` / `LAW_RESEARCH_PRICE_OUTPUT_PER_MTOK`) to run the research profile on a cheaper model. With prices in `.env` the drawer shows the cost live and `scripts/bench-report.mjs` prints per-run cost; cached input is billed at a tenth of the input price.
+
 ### Notifications on your phone (ntfy)
 
 Set in `.env`: `LAW_NTFY_URL` (topic the app publishes to, e.g. `https://ntfy.sh/law-<random>`), `LAW_NTFY_REPLY_URL` (a second topic your phone publishes decisions to) and optionally `LAW_NTFY_TOKEN`. Approval cards, handoffs and run endings are pushed; approval notifications carry "Allow once / Allow for run / Deny" buttons that post `once|session|deny <approvalId>` to the reply topic, which agentd streams and applies. With notifications configured an approval waits 10 minutes instead of 2. The topic names are the secret: pick long random ones, and use a self-hosted ntfy or an access token if summaries of your commands must not leave your machines.
