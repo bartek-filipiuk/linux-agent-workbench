@@ -153,6 +153,11 @@ function onAgentd(msg: AgentdToMain) {
       queueTerminalData(msg.data);
       return;
     case "run.state":
+      activeRun = ["completed", "stopped", "failed", "budget_exceeded", "interrupted"].includes(msg.state)
+        ? null
+        : { runId: msg.runId, turns: msg.turns, toolCalls: msg.toolCalls, costUsd: msg.costUsd, snapshot: msg.snapshot };
+      send("run:event", msg);
+      return;
     case "run.commentary":
     case "run.tool":
     case "run.handoff":
@@ -175,9 +180,37 @@ function onAgentd(msg: AgentdToMain) {
       return;
     }
     case "browser.frame":
-      send("browser:frame", { width: msg.width, height: msg.height, data: msg.data });
+      if (framesWanted) send("browser:frame", { width: msg.width, height: msg.height, data: msg.data }); // nobody is looking in terminal-only view
       return;
   }
+}
+
+let framesWanted = false;
+let activeRun: { runId: string; turns: number; toolCalls: number; costUsd: number | null; snapshot: boolean } | null = null;
+let agentdCrashes: number[] = [];
+
+/** agentd died under a run: tell the UI the truth (run interrupted, keyboard back to the human) and bring agentd back. */
+function onAgentdExit(code: number | undefined): void {
+  port = null;
+  const message = `agentd exited with code ${code ?? "?"}`;
+  if (activeRun) {
+    send("run:event", { type: "run.state", ...activeRun, state: "interrupted", endReason: "agentd_exit" });
+    activeRun = null;
+  }
+  for (const surface of ["terminal", "browser"] as const) {
+    leases = { ...leases, [surface]: { surface, owner: "human", reason: "agentd exited" } };
+    send("lease:state", leases[surface]);
+  }
+  session = { state: "error", message };
+  send("session:state", session);
+  onAgentd({ type: "agentd.error", message });
+  const now = Date.now();
+  agentdCrashes = agentdCrashes.filter((t) => now - t < 60_000).concat(now);
+  if (agentdCrashes.length > 3) {
+    onAgentd({ type: "agentd.error", message: `${message}; not restarting after ${agentdCrashes.length} crashes in a minute` });
+    return;
+  }
+  setTimeout(() => { if (!port) startAgentd(); }, 1000);
 }
 
 function startAgentd() {
@@ -207,7 +240,7 @@ function startAgentd() {
     ? { url: env.LAW_NTFY_URL, ...(env.LAW_NTFY_REPLY_URL ? { replyUrl: env.LAW_NTFY_REPLY_URL } : {}), ...(env.LAW_NTFY_TOKEN ? { token: env.LAW_NTFY_TOKEN } : {}) }
     : undefined;
   toAgentd({ type: "config.init", apiKey, model, dbPath: dbPath(), imageId, runtimeRoot: runtimeRoot(), ...(prices ? { prices } : {}), ...(browserImageId ? { browserImageId } : {}), ...(notify ? { notify } : {}) });
-  child.on("exit", (code) => onAgentd({ type: "agentd.error", message: `agentd exited with code ${code}` }));
+  child.on("exit", (code) => onAgentdExit(code));
 }
 
 function createWindow() {
@@ -287,6 +320,7 @@ ipcMain.on("terminal:write", (_e, data: unknown) => {
   if (typeof data === "string" && data.length <= 65_536) toAgentd({ type: "terminal.write", data: new TextEncoder().encode(data) });
 });
 ipcMain.on("terminal:refresh", () => toAgentd({ type: "terminal.refresh" }));
+ipcMain.on("browser:frames", (_e, on: unknown) => { framesWanted = on === true; });
 ipcMain.on("terminal:resize", (_e, cols: unknown, rows: unknown) => {
   if (Number.isInteger(cols) && Number.isInteger(rows)) toAgentd({ type: "terminal.resize", cols: cols as number, rows: rows as number });
 });

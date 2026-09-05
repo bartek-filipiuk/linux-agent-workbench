@@ -35,13 +35,23 @@ export function TerminalPanel({ owner, visible = true }: { owner: "human" | "age
 
     const offData = window.workbench.onTerminalData((data) => term.write(data));
     const inputDisposable = term.onData((d) => window.workbench.terminalWrite(d));
+    // Debounced: a window drag fires dozens of observations, each of which would be a SIGWINCH, a full
+    // tmux repaint and a revision bump the model may be holding an expectedRevision against.
+    let resizeTimer: ReturnType<typeof setTimeout> | undefined;
+    let last = { cols: term.cols, rows: term.rows };
     const ro = new ResizeObserver(() => {
       if (el.clientWidth === 0 || el.clientHeight === 0) return; // hidden: keep the last real size
-      fit.fit();
-      window.workbench.terminalResize(term.cols, term.rows);
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        fit.fit();
+        if (term.cols === last.cols && term.rows === last.rows) return;
+        last = { cols: term.cols, rows: term.rows };
+        window.workbench.terminalResize(term.cols, term.rows);
+      }, 90);
     });
     ro.observe(el);
     return () => {
+      clearTimeout(resizeTimer);
       ro.disconnect();
       inputDisposable.dispose();
       offData();

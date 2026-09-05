@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { ApprovalCard, type ApprovalView } from "./ApprovalCard";
 import { END_REASON_LABEL, STATE_LABEL, label, renderInline } from "./labels";
 
@@ -12,7 +12,8 @@ export type RunEvent =
   | { type: "gate.event"; command: string; bucket: "auto" | "log" | "approval" | "deny"; actor: "human" | "agent"; decision: "allow" | "deny"; ruleId?: string; reason?: string }
   | { type: "run.restored"; runId: string; ok: boolean; message?: string };
 
-export type LogRow = { kind: "commentary" | "tool" | "gate"; text: string; status?: string; preview?: string };
+export type LogRow = { id: number; kind: "commentary" | "tool" | "gate"; text: string; status?: string; preview?: string };
+let nextRowId = 1; // stable keys so React can skip unchanged rows instead of re-rendering the whole log
 
 export type RunView = {
   runId?: string;
@@ -34,7 +35,10 @@ const TERMINAL = new Set(["completed", "stopped", "failed", "budget_exceeded", "
 const RUNNING = new Set(["running", "awaiting_approval", "handoff"]);
 const MAX_LOG_ROWS = 500; // a shell loop can emit thousands of gate events; the drawer keeps the tail
 
-const appendLog = (log: LogRow[], row: LogRow): LogRow[] => (log.length >= MAX_LOG_ROWS ? [...log.slice(-(MAX_LOG_ROWS - 1)), row] : [...log, row]);
+const appendLog = (log: LogRow[], row: Omit<LogRow, "id">): LogRow[] => {
+  const full: LogRow = { id: nextRowId++, ...row };
+  return log.length >= MAX_LOG_ROWS ? [...log.slice(-(MAX_LOG_ROWS - 1)), full] : [...log, full];
+};
 
 export function reduceRun(prev: RunView, e: RunEvent): RunView {
   const eventRun = "runId" in e ? e.runId : undefined;
@@ -57,13 +61,16 @@ export function reduceRun(prev: RunView, e: RunEvent): RunView {
     case "run.commentary":
       return { ...view, log: appendLog(view.log, { kind: "commentary", text: e.text }) };
     case "run.tool": {
-      const log = view.log.length >= MAX_LOG_ROWS ? view.log.slice(-(MAX_LOG_ROWS - 1)) : [...view.log];
       const key = `${e.name} ${e.callId}`;
-      const i = log.findIndex((l) => l.kind === "tool" && l.text === key);
-      const row: LogRow = { kind: "tool", text: key, status: e.status, ...(e.preview ? { preview: e.preview } : {}) };
-      if (i >= 0) log[i] = row;
-      else log.push(row);
-      return { ...view, log, turns: e.turns, toolCalls: e.toolCalls, costUsd: e.costUsd };
+      // A tool's row is updated in place (executing → done); it is almost always near the end.
+      let i = -1;
+      for (let j = view.log.length - 1; j >= 0; j--) if (view.log[j]!.kind === "tool" && view.log[j]!.text === key) { i = j; break; }
+      if (i >= 0) {
+        const log = [...view.log];
+        log[i] = { ...log[i]!, status: e.status, ...(e.preview ? { preview: e.preview } : {}) };
+        return { ...view, log, turns: e.turns, toolCalls: e.toolCalls, costUsd: e.costUsd };
+      }
+      return { ...view, log: appendLog(view.log, { kind: "tool", text: key, status: e.status, ...(e.preview ? { preview: e.preview } : {}) }), turns: e.turns, toolCalls: e.toolCalls, costUsd: e.costUsd };
     }
     case "run.handoff":
       return { ...view, log: appendLog(view.log, { kind: "commentary", text: `Agent asks for help: ${e.reason}` }) };
@@ -94,6 +101,27 @@ function Inline({ text }: { text: string }) {
 
 const DONE_MARKER = /PROJECT DONE/i;
 
+// Memoised: an event touches one row; the other few hundred must not re-render.
+const Row = memo(function Row({ row: l }: { row: LogRow }) {
+  return (
+    <li className={l.kind === "tool" ? `tool ${l.status ?? ""}` : l.kind === "gate" ? `gate ${l.status?.endsWith("blocked") ? "deny" : ""}` : "commentary"}>
+      {l.kind === "tool" ? (
+        <>
+          <code>{l.text.split(" ")[0]}</code>
+          {l.preview && <span className="preview">{l.preview}</span>}
+          <span className="st">{l.status}</span>
+        </>
+      ) : l.kind === "gate" ? (
+        <>
+          <span className="st">{l.status}</span> <code>{l.text}</code>
+        </>
+      ) : (
+        <Inline text={l.text} />
+      )}
+    </li>
+  );
+});
+
 export function RunDrawer({ run, sandboxReady }: { run: RunView; sandboxReady: boolean }) {
   const [goal, setGoal] = useState("Run ls -al and tell me how many entries are listed.");
   // Autopilot: keep restarting the same goal until the agent says PROJECT DONE or the run limit is hit,
@@ -101,7 +129,12 @@ export function RunDrawer({ run, sandboxReady }: { run: RunView; sandboxReady: b
   const [autopilot, setAutopilot] = useState(false);
   const [maxRuns, setMaxRuns] = useState(20);
   const [pilot, setPilot] = useState({ runs: 0, spent: 0, note: "" });
+  // Everything the autopilot effect reads lives in refs: the effect must react to state transitions only,
+  // never re-run (and cancel its own timers) because a counter or the goal text changed.
   const prevState = useRef<string | undefined>(undefined);
+  const pilotRef = useRef({ runs: 0, spent: 0, handoffs: 0 });
+  const latest = useRef({ goal, maxRuns, run });
+  latest.current = { goal, maxRuns, run };
   const logRef = useRef<HTMLOListElement>(null);
   const busy = run.state !== undefined && RUNNING.has(run.state);
 
@@ -109,23 +142,36 @@ export function RunDrawer({ run, sandboxReady }: { run: RunView; sandboxReady: b
     const was = prevState.current;
     prevState.current = run.state;
     if (!autopilot || run.state === was) return;
-    if (run.state === "running" && was !== "handoff" && was !== "awaiting_approval") setPilot((p) => ({ ...p, runs: p.runs + 1 }));
+    const p = pilotRef.current;
+    const { maxRuns: limit, goal: goalNow, run: r } = latest.current;
+    if (run.state === "running" && was !== "handoff" && was !== "awaiting_approval") {
+      p.runs += 1;
+      p.handoffs = 0;
+      setPilot({ runs: p.runs, spent: p.spent, note: "" });
+    }
     if (run.state === "handoff") {
+      p.handoffs += 1;
+      // The same run asking three times means nobody can answer (a password, a locked surface): stop pretending.
+      if (p.handoffs >= 3) {
+        const why = [...r.log].reverse().find((l) => l.kind === "commentary" && l.text.startsWith("Agent asks for help"))?.text ?? "";
+        setPilot({ runs: p.runs, spent: p.spent, note: `needs you: ${why.replace("Agent asks for help: ", "").slice(0, 80) || "repeated handoff"}` });
+        return;
+      }
       const t = setTimeout(() => void window.workbench.resumeRun(), 10_000);
       return () => clearTimeout(t);
     }
     if (run.state === "completed" || run.state === "budget_exceeded") {
-      const spent = pilot.spent + (run.costUsd ?? 0);
-      const done = DONE_MARKER.test(run.finalText ?? "");
-      const more = !done && pilot.runs < maxRuns;
-      setPilot((p) => ({ ...p, spent, note: done ? "project done" : more ? "restarting in 5 s" : "run limit reached" }));
+      p.spent += r.costUsd ?? 0;
+      const done = DONE_MARKER.test(r.finalText ?? "");
+      const more = !done && p.runs < limit;
+      setPilot({ runs: p.runs, spent: p.spent, note: done ? "project done" : more ? "restarting in 5 s" : "run limit reached" });
       if (!more) return;
-      const t = setTimeout(() => void window.workbench.startRun(goal), 5000);
+      const t = setTimeout(() => void window.workbench.startRun(goalNow), 5000);
       return () => clearTimeout(t);
     }
-    if (run.state === "failed" || run.state === "stopped") setPilot((p) => ({ ...p, note: `stopped: run ${run.state}` }));
+    if (run.state === "failed" || run.state === "stopped" || run.state === "interrupted") setPilot({ runs: p.runs, spent: p.spent, note: `stopped: run ${run.state}` });
     return undefined;
-  }, [run.state, autopilot, maxRuns, goal, pilot.runs, pilot.spent, run.costUsd, run.finalText]);
+  }, [run.state, autopilot]);
   const thinking = busy && run.approvals.length === 0 && run.state !== "handoff" && !run.log.some((l) => l.kind === "tool" && l.status === "executing");
   const canRestore = run.runId !== undefined && run.snapshot && run.state !== undefined && TERMINAL.has(run.state);
 
@@ -154,7 +200,7 @@ export function RunDrawer({ run, sandboxReady }: { run: RunView; sandboxReady: b
       </div>
       <div className="row autopilot" title="Restart the same goal after each completed run until the agent's final reply contains PROJECT DONE or the run limit is hit; handoffs are given back after 10 s.">
         <label>
-          <input type="checkbox" checked={autopilot} onChange={(e) => { setAutopilot(e.target.checked); setPilot({ runs: 0, spent: 0, note: "" }); }} /> Autopilot
+          <input type="checkbox" checked={autopilot} onChange={(e) => { setAutopilot(e.target.checked); pilotRef.current = { runs: 0, spent: 0, handoffs: 0 }; setPilot({ runs: 0, spent: 0, note: "" }); }} /> Autopilot
         </label>
         <label>
           max runs <input type="number" min={1} max={200} value={maxRuns} onChange={(e) => setMaxRuns(Math.max(1, Number(e.target.value) || 1))} disabled={!autopilot} />
@@ -170,22 +216,8 @@ export function RunDrawer({ run, sandboxReady }: { run: RunView; sandboxReady: b
       </div>
       {run.restored && <div className="notice">{run.restored}</div>}
       <ol className="log" ref={logRef}>
-        {run.log.map((l, i) => (
-          <li key={i} className={l.kind === "tool" ? `tool ${l.status ?? ""}` : l.kind === "gate" ? `gate ${l.status?.endsWith("blocked") ? "deny" : ""}` : "commentary"}>
-            {l.kind === "tool" ? (
-              <>
-                <code>{l.text.split(" ")[0]}</code>
-                {l.preview && <span className="preview">{l.preview}</span>}
-                <span className="st">{l.status}</span>
-              </>
-            ) : l.kind === "gate" ? (
-              <>
-                <span className="st">{l.status}</span> <code>{l.text}</code>
-              </>
-            ) : (
-              <Inline text={l.text} />
-            )}
-          </li>
+        {run.log.map((l) => (
+          <Row key={l.id} row={l} />
         ))}
         {thinking && (
           <li className="tool executing thinking">

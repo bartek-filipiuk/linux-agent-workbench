@@ -30,6 +30,7 @@ const api = {
   stopBrowser: () => ipcRenderer.invoke("browser:stop"),
   navigate: (url: string) => ipcRenderer.invoke("browser:navigate", url),
   browserInput: (event: unknown) => ipcRenderer.send("browser:input", event),
+  browserFrames: (on: boolean) => ipcRenderer.send("browser:frames", on),
   writeDiagnostics: (): Promise<string> => ipcRenderer.invoke("diagnostics:write"),
   getPolicy: () => ipcRenderer.invoke("policy:get"),
   setPolicy: (patch: { nestedAutonomy?: boolean; domainMode?: "open" | "ask" }) => ipcRenderer.invoke("policy:set", patch),

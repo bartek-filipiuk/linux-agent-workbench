@@ -19,6 +19,7 @@ export function BrowserPanel({ status, owner, runActive }: { status: BrowserStat
   }, [status.url, status.state]);
 
   useEffect(() => {
+    window.workbench.browserFrames(true); // frames only flow to the renderer while this panel is on screen
     const off = window.workbench.onBrowserFrame(({ width, height, data }) => {
       frameCount.current++;
       if (decoding.current) return; // drop the frame; a newer one is on its way
@@ -43,6 +44,7 @@ export function BrowserPanel({ status, owner, runActive }: { status: BrowserStat
       frameCount.current = 0;
     }, 1000);
     return () => {
+      window.workbench.browserFrames(false);
       off();
       clearInterval(t);
     };
@@ -55,6 +57,18 @@ export function BrowserPanel({ status, owner, runActive }: { status: BrowserStat
   };
   const button = (e: React.MouseEvent) => (e.button === 1 ? "middle" : e.button === 2 ? "right" : "left");
   const send = (event: unknown) => window.workbench.browserInput(event);
+  // Pointer moves arrive faster than frames can show them; keep only the latest per animation frame and
+  // flush it before any button event so the order stays right.
+  const pendingMove = useRef<{ x: number; y: number } | null>(null);
+  const moveFrame = useRef<number | null>(null);
+  const flushMove = () => {
+    if (moveFrame.current !== null) { cancelAnimationFrame(moveFrame.current); moveFrame.current = null; }
+    if (pendingMove.current) { send({ kind: "mousemove", ...pendingMove.current }); pendingMove.current = null; }
+  };
+  const queueMove = (p: { x: number; y: number }) => {
+    pendingMove.current = p;
+    moveFrame.current ??= requestAnimationFrame(() => { moveFrame.current = null; flushMove(); });
+  };
 
   const onKey = (kind: "keydown" | "keyup") => (e: React.KeyboardEvent<HTMLCanvasElement>) => {
     if (!human || e.key === "Escape" || (e.ctrlKey && e.key.toLowerCase() === "l")) return; // leave app shortcuts alone
@@ -95,12 +109,12 @@ export function BrowserPanel({ status, owner, runActive }: { status: BrowserStat
           tabIndex={0}
           width={1280}
           height={800}
-          onMouseMove={(e) => live && human && send({ kind: "mousemove", ...toViewport(e) })}
+          onMouseMove={(e) => live && human && queueMove(toViewport(e))}
           onMouseDown={(e) => {
             e.currentTarget.focus();
-            if (live && human) send({ kind: "mousedown", ...toViewport(e), button: button(e) });
+            if (live && human) { flushMove(); send({ kind: "mousedown", ...toViewport(e), button: button(e) }); }
           }}
-          onMouseUp={(e) => live && human && send({ kind: "mouseup", ...toViewport(e), button: button(e) })}
+          onMouseUp={(e) => { if (live && human) { flushMove(); send({ kind: "mouseup", ...toViewport(e), button: button(e) }); } }}
           onContextMenu={(e) => e.preventDefault()}
           onWheel={(e) => live && human && send({ kind: "wheel", ...toViewport(e), deltaX: Math.round(e.deltaX), deltaY: Math.round(e.deltaY) })}
           onKeyDown={onKey("keydown")}

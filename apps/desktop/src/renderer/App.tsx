@@ -39,6 +39,7 @@ declare global {
       stopBrowser(): Promise<void>;
       navigate(url: string): Promise<void>;
       browserInput(event: unknown): void;
+      browserFrames(on: boolean): void;
       writeDiagnostics(): Promise<string>;
       getPolicy(): Promise<PolicySettings>;
       setPolicy(patch: Partial<PolicySettings>): Promise<PolicySettings>;
