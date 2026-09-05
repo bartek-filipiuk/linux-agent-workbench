@@ -7,7 +7,7 @@
 ### Architektura
 - `packages/protocol` — Zod schemas + framed Unix-socket protocol (u32 len, u8 kind: 0 JSON, 1 PTY out, 2 keys, 3 browser JPEG frame). `FramedConnection` in `src/node/connection.ts`.
 - `services/agentd` — the daemon (Electron utilityProcess). `ipc.ts` (`Daemon`) routes main-process messages; `orchestrator/run-controller.ts` runs the model loop; `policy/*` decides what a tool call may do; `session/*` owns the podman containers; `egress/*` is the HTTP proxy the containers use for all network traffic; `maintenance/*` is startup cleanup (idle containers); `storage/store.ts` is SQLite (node:sqlite, WAL).
-- `services/terminal-worker` — node-pty + tmux inside `law-terminal-<session>`; bash gate (`images/terminal/gate.cjs` → `gate.sock` → agentd `gate.check`).
+- `services/terminal-worker` — node-pty + tmux inside `law-terminal-<session>`; bash gate (`images/terminal/gate.c`, a static binary → `gate.sock` → agentd `gate.check`).
 - `services/browser-worker` — Playwright Chromium inside `law-browser-<session>`; screencast frames, DOM-walk observation, ref-based actions.
 - `apps/desktop` — Electron 44 + React 19 + xterm.js; `main/index.ts` spawns agentd and forwards IPC, `renderer/*` is the UI.
 - `images/<name>/` — Containerfile + `image.json` (pinned image id). `scripts/build-image.sh <name>` builds, prunes, checks disk.
@@ -17,7 +17,7 @@
 - Approval: policy → `ApprovalManager.request` (TTL 120 s) → `approval.request` to the UI → `ApprovalCard` (y/n, once/session/deny) → `approval.decide`.
 - Handoff: a policy returns `LEASE_DENIED` with `handoff`, or the model calls `request_human` → run state `handoff`, both leases go to the human, no observations reach the model until "Give control back".
 - Browser observe: `BrowserSession.walkFrames` (main frame, then every iframe, refs `e<n>` bound to `revision`) → `observationHints` (login_form, captcha, two_factor) appended by `browserExecutor`.
-- Shell gate: bash DEBUG trap → `gate.cjs` → worker → agentd `classify` (auto/log/approval/deny) → `ApprovalManager`.
+- Shell gate: bash DEBUG trap → `/opt/law/gate` (C) → worker → agentd `classify` (auto/log/approval/deny) → `ApprovalManager`.
 - Egress: tool → `127.0.0.1:3128` (forwarder in the worker) → `/run/law/egress.sock` → `EgressProxy` in agentd (`SessionEgress` per session) → host DNS + private-range check → upstream; decisions in `egress_log`.
 
 ### Konwencje

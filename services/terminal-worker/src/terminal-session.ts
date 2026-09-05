@@ -61,12 +61,14 @@ export class TerminalSession {
       rows: this.rows,
       ...(this.opts.cwd ? { cwd: this.opts.cwd } : {}),
       env: { ...(this.opts.env ?? (process.env as Record<string, string>)), TERM: "xterm-256color" },
+      // Raw bytes: no decode-then-re-encode per chunk on the hottest loop; xterm keeps UTF-8 decoder state itself.
+      encoding: null,
     });
-    this.proc.onData((data) => {
+    this.proc.onData((data: string | Buffer) => {
       this.lastDataAt = Date.now();
       this.revision++;
-      this.term.write(data);
-      const bytes = new TextEncoder().encode(data);
+      const bytes = typeof data === "string" ? new TextEncoder().encode(data) : new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+      this.term.write(bytes);
       for (const l of this.listeners) l(bytes);
     });
     this.proc.onExit(({ exitCode }) => {
@@ -131,7 +133,8 @@ export class TerminalSession {
       revision: this.revision,
       screen,
       hint: classifyScreen(screen),
-      scrollbackTail: await this.history(maxLines),
+      // History means a tmux capture-pane fork; only when asked for, never on wait() polls.
+      ...(input.scrollback ? { scrollbackTail: await this.history(maxLines) } : {}),
       cursor: { row: buf.cursorY, col: buf.cursorX },
       size: { rows: this.term.rows, cols: this.term.cols },
       idleMs: Date.now() - this.lastDataAt,
@@ -146,14 +149,16 @@ export class TerminalSession {
     const timeoutMs = input.timeoutMs ?? 60_000;
     const until = input.until ? new RegExp(input.until, "im") : undefined;
     const deadline = Date.now() + timeoutMs;
+    const finish = async (obs: TerminalObservation, timedOut: boolean, matched: boolean): Promise<TerminalWaitResult> =>
+      input.scrollback ? { ...(await this.observe({ scrollback: true })), timedOut, matched } : { ...obs, timedOut, matched };
     for (;;) {
       const obs = await this.observe();
-      if (until && until.test(obs.screen)) return { ...obs, timedOut: false, matched: true };
+      if (until && until.test(obs.screen)) return finish(obs, false, true);
       const quietFor = Date.now() - this.lastDataAt;
-      if (!until && quietFor >= idleMs) return { ...obs, timedOut: false, matched: false };
-      if (until && this.exited) return { ...obs, timedOut: false, matched: false };
+      if (!until && quietFor >= idleMs) return finish(obs, false, false);
+      if (until && this.exited) return finish(obs, false, false);
       const now = Date.now();
-      if (now >= deadline) return { ...obs, timedOut: true, matched: false };
+      if (now >= deadline) return finish(obs, true, false);
       const next = Math.min(deadline - now, Math.max(50, idleMs - quietFor), 500);
       await new Promise((r) => setTimeout(r, next));
     }

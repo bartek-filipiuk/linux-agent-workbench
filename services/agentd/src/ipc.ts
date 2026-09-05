@@ -143,6 +143,7 @@ export class Daemon {
   private egress: SessionEgress | undefined;
   private lastUsedTimer: NodeJS.Timeout | undefined;
   private notifier: Notifier | undefined;
+  private startingRun = false;
 
   constructor(private readonly deps: DaemonDeps) {
     for (const [surface, lease] of [["terminal", this.lease], ["browser", this.browserLease]] as const) {
@@ -349,6 +350,11 @@ export class Daemon {
           if (msg.owner === "human") l.take("human", "taken by human");
           else if (this.run && this.run.state !== "handoff" && !TERMINAL.has(this.run.state)) l.take("agent", "given back by human");
         }
+        // A run parked by the human taking a surface resumes when that surface is given back.
+        if (msg.owner === "agent" && this.run?.state === "handoff") {
+          this.takeBoth("agent", "given back by human");
+          this.run.resumeFromHandoff();
+        }
         return;
       }
     }
@@ -372,13 +378,19 @@ export class Daemon {
       this.deps.post({ type: "agentd.error", message: "no ready sandbox session; open a workspace first" });
       return;
     }
-    if (this.run && !TERMINAL.has(this.run.state)) {
+    if (this.startingRun || (this.run && !TERMINAL.has(this.run.state))) {
       this.deps.post({ type: "agentd.error", message: "a run is already running; stop it first" });
       return;
     }
+    this.startingRun = true; // the snapshot below awaits; a second click in that window must not create a second run
     const workspaceId = runtime.store.createWorkspace(status.workspacePath);
     const worker = manager.worker;
-    const snapshot = await snapshotWorkspace(status.workspacePath);
+    let snapshot: Awaited<ReturnType<typeof snapshotWorkspace>>;
+    try {
+      snapshot = await snapshotWorkspace(status.workspacePath);
+    } finally {
+      this.startingRun = false;
+    }
     const browser = this.browser;
     const policies: Policy[] = [new LeasePolicy(this.lease, "terminal"), new NestedPromptPolicy(() => worker.observe({}))];
     const executors = [terminalExecutor(worker)];
@@ -397,6 +409,7 @@ export class Daemon {
         policy: composePolicies(...policies),
         prices: runtime.prices,
         systemPrompt: buildSystemPrompt({ nestedAutonomy: this.nestedAutonomy }),
+        ...(this.approvals ? { approvals: this.approvals } : {}),
       },
       { workspaceId, goal, networkMode: status.networkMode ?? "open", ...(snapshot ? { snapshot } : {}) },
     );
@@ -405,6 +418,7 @@ export class Daemon {
       this.deps.post({ type: "run.state", runId: rc.runId, state, ...extra, ...rc.stats, snapshot: snapshot !== null });
     rc.on("state", (state: RunState) => {
       if (state === "handoff" || TERMINAL.has(state)) this.takeBoth("human", state === "handoff" ? "agent asked for help" : `run ${state}`);
+      if (TERMINAL.has(state)) this.approvals?.denyPending(rc.runId); // nothing can use an answer now; close the cards
       if (!TERMINAL.has(state)) postState(state);
     });
     rc.on("commentary", (text: string) => this.deps.post({ type: "run.commentary", runId: rc.runId, text }));

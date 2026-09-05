@@ -13,7 +13,7 @@ if [ -n "$PS1" ]; then
       case "$BASH_COMMAND" in
         __law_*|"shopt -s extdebug"|"trap "*|PROMPT_COMMAND=*) return 0 ;;
       esac
-      node /opt/law/gate.cjs "$BASH_COMMAND" || return 1
+      /opt/law/gate "$BASH_COMMAND" || return 1
     }
     __law_arm() { shopt -s extdebug; trap '__law_gate' DEBUG; PROMPT_COMMAND="${PROMPT_COMMAND#__law_arm;}"; }
     PROMPT_COMMAND="__law_arm;${PROMPT_COMMAND}"

@@ -4,6 +4,10 @@ import { FramedConnection } from "@law/protocol/node";
 import { ProtocolError, TerminalInput, TerminalObserveInput, TerminalResize, TerminalWaitInput, type Envelope } from "@law/protocol";
 import type { TerminalSession } from "./terminal-session.js";
 
+// How long a shell command may wait for the human's approval; the gate client and agentd's approval
+// TTL follow the same number (LAW_GATE_TIMEOUT_MS in the container env) so the card and the shell agree.
+const GATE_TIMEOUT_MS = Number(process.env.LAW_GATE_TIMEOUT_MS) || 605_000;
+
 export class WorkerServer {
   private readonly server = net.createServer();
   private current: FramedConnection | undefined;
@@ -43,7 +47,7 @@ export class WorkerServer {
     const conn = this.current;
     if (!conn || conn.closed) return { decision: "deny", reason: "no policy connection" };
     try {
-      const r = await conn.request("gate.check", req, { timeoutMs: 180_000 });
+      const r = await conn.request("gate.check", req, { timeoutMs: GATE_TIMEOUT_MS });
       return r.decision === "allow" ? { decision: "allow" } : { decision: "deny", reason: typeof r.reason === "string" ? r.reason : "denied by policy" };
     } catch (e) {
       return { decision: "deny", reason: e instanceof Error ? e.message : String(e) };

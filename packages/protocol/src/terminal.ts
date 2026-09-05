@@ -40,13 +40,15 @@ export type TerminalInputResult = z.infer<typeof TerminalInputResult>;
 export const TerminalObserveInput = z.object({
   sinceRevision: z.number().int().nonnegative().optional(),
   maxLines: z.number().int().min(1).max(500).optional(),
+  /** Include the tmux history above the viewport (costs a tmux capture-pane per call). */
+  scrollback: z.boolean().optional(),
 });
 export type TerminalObserveInput = z.infer<typeof TerminalObserveInput>;
 
 export const TerminalObservation = z.object({
   revision: z.number().int().nonnegative(),
   screen: z.string(),
-  scrollbackTail: z.string(),
+  scrollbackTail: z.string().optional(),
   cursor: z.object({ row: z.number().int(), col: z.number().int() }),
   size: z.object({ rows: z.number().int().positive(), cols: z.number().int().positive() }),
   idleMs: z.number().nonnegative(),
@@ -71,6 +73,7 @@ export const TerminalWaitInput = z.object({
       }
     }, "until must be a valid regular expression")
     .optional(),
+  scrollback: z.boolean().optional(),
 });
 export type TerminalWaitInput = z.infer<typeof TerminalWaitInput>;
 

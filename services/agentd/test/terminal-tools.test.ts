@@ -43,6 +43,15 @@ describe("terminal tools", () => {
     expect(inputs[1]).toMatchObject({ kind: "key", key: "ENTER" });
   });
 
+  it("submit + wait runs the command and returns the settled screen in one call", async () => {
+    await setup();
+    const out = JSON.parse(await executeTerminalTool({ callId: "1", name: "terminal_input", args: { kind: "text", text: "pwd", submit: true, wait: { idleMs: 100, timeoutMs: 1000 } } }, w, sig));
+    expect(out.screen).toContain("pwd");
+    expect(out).toHaveProperty("timedOut");
+    const kinds = fw.received.map((r) => (r as { type?: string }).type);
+    expect(kinds.slice(-3)).toEqual(["terminal.input", "terminal.input", "terminal.wait"]);
+  });
+
   it("slims observations: trailing blanks go, scrollback only on request", () => {
     const obs = { revision: 1, screen: "$ ls   \nfile.txt\n\n\n   \n", scrollbackTail: "older\nlines", cursor: { row: 1, col: 0 } };
     expect(slimTerminal(obs, false)).toEqual({ revision: 1, screen: "$ ls\nfile.txt", cursor: { row: 1, col: 0 } });

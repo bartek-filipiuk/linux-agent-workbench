@@ -82,10 +82,11 @@ describe("TerminalSession", () => {
     await s.input({ kind: "text", text: "for i in $(seq 1 60); do echo LINE_$i; done" });
     await s.input({ kind: "key", key: "ENTER" });
     await until(async () => (await s.observe()).screen.includes("LINE_60"));
-    const capped = await s.observe({ maxLines: 10 });
-    expect(capped.scrollbackTail.split("\n").length).toBeLessThanOrEqual(10);
+    expect((await s.observe()).scrollbackTail).toBeUndefined(); // history only on request
+    const capped = await s.observe({ maxLines: 10, scrollback: true });
+    expect(capped.scrollbackTail!.split("\n").length).toBeLessThanOrEqual(10);
     expect(capped.scrollbackTail).not.toContain("LINE_1\n");
-    const full = await s.observe({ maxLines: 200 });
+    const full = await s.observe({ maxLines: 200, scrollback: true });
     expect(full.scrollbackTail + "\n" + full.screen).toContain("LINE_1\n");
   });
 

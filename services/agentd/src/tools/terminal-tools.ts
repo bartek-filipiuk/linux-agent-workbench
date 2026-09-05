@@ -5,22 +5,22 @@ import type { TerminalWorker } from "../worker/types.js";
 
 export const RequestHumanArgs = z.object({ reason: z.string().min(1).max(500) });
 const NoArgs = z.object({}).strict();
-// submit=true runs the line: ENTER is sent after the text or paste, saving the model a turn per command.
-export const TerminalInputArgs = z.intersection(TerminalInput, z.object({ submit: z.boolean().optional() }));
-// scrollback=true adds the history tail; by default only the visible screen travels to the model.
-const Scrollback = z.object({ scrollback: z.boolean().optional() });
-export const TerminalObserveArgs = z.intersection(TerminalObserveInput, Scrollback);
-export const TerminalWaitArgs = z.intersection(TerminalWaitInput, Scrollback);
+// submit=true runs the line: ENTER is sent after the text or paste; wait={...} then waits for the result in
+// the same call, so one command costs one model turn instead of two.
+export const TerminalInputArgs = z.intersection(TerminalInput, z.object({ submit: z.boolean().optional(), wait: TerminalWaitInput.optional() }));
+// scrollback=true adds the history tail (the worker only captures it when asked); by default only the visible screen travels.
+export const TerminalObserveArgs = TerminalObserveInput;
+export const TerminalWaitArgs = TerminalWaitInput;
 
-/** Trailing whitespace and empty lines carry nothing; the scrollback tail only when asked for. */
-export function slimTerminal<T extends { screen: string; scrollbackTail?: string }>(obs: T, scrollback: boolean): T {
+/** Trailing whitespace and empty lines carry nothing; an empty scrollback tail is dropped. */
+export function slimTerminal<T extends { screen: string; scrollbackTail?: string | undefined }>(obs: T, scrollback: boolean): T {
   const screen = obs.screen
     .split("\n")
     .map((l) => l.replace(/\s+$/, ""))
     .join("\n")
     .replace(/\n+$/, "");
   const out = { ...obs, screen };
-  if (!scrollback) delete out.scrollbackTail;
+  if (!scrollback || !out.scrollbackTail) delete out.scrollbackTail;
   return out;
 }
 
@@ -44,7 +44,7 @@ export const TERMINAL_TOOLS: ToolSpec[] = [
   {
     name: "terminal_input",
     description:
-      "Send input to the terminal. kind=text types characters (no control characters); kind=key sends one named key (ENTER, TAB, ESC, CTRL_C, CTRL_D, arrows); kind=paste pastes a block. Set submit=true to press ENTER right after the text or paste (one call runs the command).",
+      "Send input to the terminal. kind=text types characters (no control characters); kind=key sends one named key (ENTER, TAB, ESC, CTRL_C, CTRL_D, arrows); kind=paste pastes a block. Set submit=true to press ENTER right after the text or paste, and wait={idleMs?, until?, timeoutMs?} to get the settled screen back in the same call (one call = type, run, read).",
     parameters: schema(TerminalInputArgs),
   },
   {
@@ -75,18 +75,19 @@ function parseArgs<T>(s: z.ZodType<T>, args: unknown, tool: string): T {
 export async function executeTerminalTool(call: ToolCall, worker: TerminalWorker, signal: AbortSignal): Promise<string> {
   switch (call.name) {
     case "terminal_observe": {
-      const { scrollback, ...input } = parseArgs(TerminalObserveArgs, call.args, call.name);
-      return JSON.stringify(slimTerminal(await worker.observe(input, signal), scrollback === true));
+      const input = parseArgs(TerminalObserveArgs, call.args, call.name);
+      return JSON.stringify(slimTerminal(await worker.observe(input, signal), input.scrollback === true));
     }
     case "terminal_input": {
-      const { submit, ...input } = parseArgs(TerminalInputArgs, call.args, call.name);
-      const typed = await worker.input(input, signal);
-      if (!submit || input.kind === "key") return JSON.stringify(typed);
-      return JSON.stringify(await worker.input({ kind: "key", key: "ENTER" }, signal));
+      const { submit, wait, ...input } = parseArgs(TerminalInputArgs, call.args, call.name);
+      let result = await worker.input(input, signal);
+      if (submit && input.kind !== "key") result = await worker.input({ kind: "key", key: "ENTER" }, signal);
+      if (wait) return JSON.stringify(slimTerminal(await worker.wait(wait, signal), wait.scrollback === true));
+      return JSON.stringify(result);
     }
     case "terminal_wait": {
-      const { scrollback, ...input } = parseArgs(TerminalWaitArgs, call.args, call.name);
-      return JSON.stringify(slimTerminal(await worker.wait(input, signal), scrollback === true));
+      const input = parseArgs(TerminalWaitArgs, call.args, call.name);
+      return JSON.stringify(slimTerminal(await worker.wait(input, signal), input.scrollback === true));
     }
     case "terminal_interrupt":
       parseArgs(NoArgs, call.args, call.name);

@@ -61,6 +61,17 @@ export class ApprovalManager extends EventEmitter {
     return true;
   }
 
+  /** A run that ended cannot use an answer any more: close its cards so nothing keeps counting down. */
+  denyPending(runId: string): number {
+    const ids = [...this.pendingMap.values()].filter((p) => p.runId === runId).map((p) => p.request.id);
+    for (const id of ids) this.finish(id, "deny");
+    return ids.length;
+  }
+
+  hasPending(runId: string): boolean {
+    return [...this.pendingMap.values()].some((p) => p.runId === runId);
+  }
+
   private pendingRule(ruleId: string): Rule | undefined {
     return this.rules.get(ruleId);
   }

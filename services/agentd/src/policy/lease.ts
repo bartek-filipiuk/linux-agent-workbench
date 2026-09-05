@@ -32,7 +32,10 @@ export class LeasePolicy implements Policy {
     const prefix = this.surface === "browser" ? "browser_" : "terminal_";
     if (!call.name.startsWith(prefix)) return { allow: true };
     if (this.lease.state.owner !== "agent") {
-      return { allow: false, code: "LEASE_DENIED", reason: `the human holds the ${this.surface}; wait for control to be handed back` };
+      // A handoff parks the run instead of letting the model burn turns against a locked surface;
+      // "Give control back" resumes it with a fresh observation.
+      const reason = `the human holds the ${this.surface}; the run waits until control is handed back`;
+      return { allow: false, code: "LEASE_DENIED", reason, handoff: reason };
     }
     return { allow: true };
   }

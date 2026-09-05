@@ -41,7 +41,7 @@ Host notes (Ubuntu 22.04, Podman 3.4 rootless): the build tolerates tar's direct
 
 ### Policy gate
 
-Every simple command of the interactive shell in the sandbox is checked by agentd before it runs (a bash `DEBUG` trap calls `/opt/law/gate.cjs`, which asks the worker, which asks agentd):
+Every simple command of the interactive shell in the sandbox is checked by agentd before it runs (a bash `DEBUG` trap calls `/opt/law/gate`, a small static binary that asks the worker, which asks agentd):
 
 - commands typed by the human are always allowed and logged;
 - for the agent: read-only prefixes run silently (`auto`), most commands run and are logged (`log`), risky ones wait for your decision in the drawer (`approval`: pushes, publishes, `curl | sh`, `sudo`, recursive `rm`/`chmod`, `git reset --hard`, remote shells, raw disk writes); a nested agent started with a permission-bypass flag is logged when the top-bar setting AGENTS is `autonomous` (the default: the sandbox is the boundary, and the operator model is told to start `claude --dangerously-skip-permissions`) and asks for approval when it is `supervised`;

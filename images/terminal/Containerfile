@@ -35,7 +35,9 @@ RUN cd /opt/law && npm install --omit=dev --no-audit --no-fund
 COPY packages/protocol/package.json /opt/law/node_modules/@law/protocol/package.json
 COPY packages/protocol/dist /opt/law/node_modules/@law/protocol/dist
 COPY services/terminal-worker/dist /opt/law/worker
-COPY images/terminal/gate.cjs /opt/law/gate.cjs
+# The gate client is a static C binary: the DEBUG trap runs it for every simple command, so a Node start-up per command would dominate.
+COPY images/terminal/gate.c /tmp/gate.c
+RUN gcc -O2 -static -Wall -o /opt/law/gate /tmp/gate.c && rm /tmp/gate.c
 COPY images/terminal/bash.bashrc /tmp/law.bashrc
 RUN cat /tmp/law.bashrc >> /etc/bash.bashrc && rm /tmp/law.bashrc && chown -R root:root /opt/law
 # The container has no network namespace of its own: ssh reaches hosts through the egress proxy (B6 H1).

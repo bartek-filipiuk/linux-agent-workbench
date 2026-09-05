@@ -1,4 +1,4 @@
-import { DatabaseSync } from "node:sqlite";
+import { DatabaseSync, type StatementSync } from "node:sqlite";
 import { randomUUID } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -45,10 +45,24 @@ export class Store {
     if (file !== ":memory:") fs.mkdirSync(path.dirname(file), { recursive: true });
     this.db = new DatabaseSync(file);
     this.db.exec("PRAGMA journal_mode = WAL");
+    // WAL + NORMAL: durable against an app crash, may lose the last transactions on power loss. The audit
+    // log is not a ledger, and FULL would fsync on the single thread that also forwards terminal output.
+    this.db.exec("PRAGMA synchronous = NORMAL");
     this.db.exec("PRAGMA foreign_keys = ON");
     this.db.exec("PRAGMA busy_timeout = 5000");
     this.schemaVersion = migrate(this.db);
+    // Hot-path statements are prepared once; node:sqlite has no statement cache.
+    this.stmts = {
+      event: this.db.prepare(`INSERT INTO run_events (run_id, ts, type, payload_json, sensitivity) VALUES (?, ?, ?, ?, ?)`),
+      egress: this.db.prepare(`INSERT INTO egress_log (ts, session_id, host, port, allowed, reason) VALUES (?, ?, ?, ?, ?, ?)`),
+      beginTool: this.db.prepare(`INSERT INTO tool_calls (id, run_id, call_id, name, input_json, status, started_at) VALUES (?, ?, ?, ?, ?, 'executing', ?)`),
+      finishTool: this.db.prepare(`UPDATE tool_calls SET status = ?, output_json = ?, ended_at = ?, error_code = ? WHERE id = ?`),
+      usage: this.db.prepare(`INSERT INTO provider_usage (run_id, response_id, input_tokens, output_tokens, cached_tokens, cost_usd, ts) VALUES (?, ?, ?, ?, ?, ?, ?)`),
+      totals: this.db.prepare(`UPDATE runs SET turns = turns + ?, tool_calls = tool_calls + ?, cost_usd = cost_usd + ? WHERE id = ?`),
+    };
   }
+
+  private readonly stmts: Record<"event" | "egress" | "beginTool" | "finishTool" | "usage" | "totals", StatementSync>;
 
   createWorkspace(wsPath: string): string {
     const now = Date.now();
@@ -96,15 +110,11 @@ export class Store {
   }
 
   logEgress(sessionId: string, e: { host: string; port: number; allowed: boolean; reason?: string }): void {
-    this.db
-      .prepare(`INSERT INTO egress_log (ts, session_id, host, port, allowed, reason) VALUES (?, ?, ?, ?, ?, ?)`)
-      .run(Date.now(), sessionId, e.host, e.port, e.allowed ? 1 : 0, e.reason ?? null);
+    this.stmts.egress.run(Date.now(), sessionId, e.host, e.port, e.allowed ? 1 : 0, e.reason ?? null);
   }
 
   appendEvent(runId: string, type: string, payload: Record<string, unknown>, sensitivity: Sensitivity = "normal"): number {
-    const r = this.db
-      .prepare(`INSERT INTO run_events (run_id, ts, type, payload_json, sensitivity) VALUES (?, ?, ?, ?, ?)`)
-      .run(runId, Date.now(), type, JSON.stringify(payload), sensitivity);
+    const r = this.stmts.event.run(runId, Date.now(), type, JSON.stringify(payload), sensitivity);
     return Number(r.lastInsertRowid);
   }
 
@@ -117,16 +127,12 @@ export class Store {
 
   beginToolCall(runId: string, call: { callId: string; name: string; args: unknown }): string {
     const id = randomUUID();
-    this.db
-      .prepare(`INSERT INTO tool_calls (id, run_id, call_id, name, input_json, status, started_at) VALUES (?, ?, ?, ?, ?, 'executing', ?)`)
-      .run(id, runId, call.callId, call.name, JSON.stringify(call.args ?? null), Date.now());
+    this.stmts.beginTool.run(id, runId, call.callId, call.name, JSON.stringify(call.args ?? null), Date.now());
     return id;
   }
 
   finishToolCall(id: string, status: "done" | "denied" | "error", output: unknown, errorCode?: ErrorCode): void {
-    this.db
-      .prepare(`UPDATE tool_calls SET status = ?, output_json = ?, ended_at = ?, error_code = ? WHERE id = ?`)
-      .run(status, JSON.stringify(output ?? null), Date.now(), errorCode ?? null, id);
+    this.stmts.finishTool.run(status, JSON.stringify(output ?? null), Date.now(), errorCode ?? null, id);
   }
 
   listToolCalls(runId: string): ToolCallRow[] {
@@ -134,15 +140,11 @@ export class Store {
   }
 
   recordUsage(runId: string, u: { responseId: string; inputTokens: number; outputTokens: number; cachedInputTokens?: number; costUsd: number }): void {
-    this.db
-      .prepare(`INSERT INTO provider_usage (run_id, response_id, input_tokens, output_tokens, cached_tokens, cost_usd, ts) VALUES (?, ?, ?, ?, ?, ?, ?)`)
-      .run(runId, u.responseId, u.inputTokens, u.outputTokens, u.cachedInputTokens ?? 0, u.costUsd, Date.now());
+    this.stmts.usage.run(runId, u.responseId, u.inputTokens, u.outputTokens, u.cachedInputTokens ?? 0, u.costUsd, Date.now());
   }
 
   addRunTotals(runId: string, d: { turns?: number; toolCalls?: number; costUsd?: number }): void {
-    this.db
-      .prepare(`UPDATE runs SET turns = turns + ?, tool_calls = tool_calls + ?, cost_usd = cost_usd + ? WHERE id = ?`)
-      .run(d.turns ?? 0, d.toolCalls ?? 0, d.costUsd ?? 0, runId);
+    this.stmts.totals.run(d.turns ?? 0, d.toolCalls ?? 0, d.costUsd ?? 0, runId);
   }
 
   createApproval(a: { id: string; runId: string; commandHash: string; command: string; category: string; ruleId: string; expiresAt: number }): void {

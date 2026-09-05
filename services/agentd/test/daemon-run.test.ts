@@ -100,7 +100,7 @@ describe("Daemon run flow", () => {
     await settle(() => (last("run.state") as { state?: string } | undefined)?.state === "completed");
   });
 
-  it("human can take the lease mid-run; the next agent tool call is denied and fed back", async () => {
+  it("human can take the lease mid-run: the run parks in handoff and resumes when control is given back", async () => {
     const adapter = new FakeModelAdapter([
       { text: "wait", delayMs: 300, toolCalls: [{ name: "terminal_observe", args: {} }] },
       { text: "ok" },
@@ -109,8 +109,12 @@ describe("Daemon run flow", () => {
     await d.handle({ type: "run.start", goal: "g" });
     await settle(() => (last("lease.state") as { owner?: string } | undefined)?.owner === "agent");
     await d.handle({ type: "lease.take", owner: "human" });
-    await settle(() => (last("run.state") as { state?: string } | undefined)?.state === "completed");
+    // Instead of burning turns against a locked surface the run waits for the human.
+    await settle(() => (last("run.state") as { state?: string } | undefined)?.state === "handoff");
     expect(last("run.tool")).toMatchObject({ name: "terminal_observe", status: "denied" });
+    expect(last("run.handoff")).toMatchObject({ reason: expect.stringMatching(/human holds the terminal/) });
+    await d.handle({ type: "lease.take", owner: "agent" });
+    await settle(() => (last("run.state") as { state?: string } | undefined)?.state === "completed");
   });
 
   it("routes gate checks from the worker through approvals and back", async () => {

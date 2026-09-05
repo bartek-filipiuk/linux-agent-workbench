@@ -25,7 +25,7 @@ const byName = (obs: { elements: Array<{ ref: string; name: string; role: string
 describe("observe and act", { timeout: 30_000 }, () => {
   it("observes elements with refs, roles, names, viewport flags and a screenshot", async () => {
     await s.navigate(`${site.url}/index.html`);
-    const obs = await s.observe();
+    const obs = await s.observe({ screenshot: true });
     expect(obs.title).toBe("Fixture Home");
     expect(obs.pages).toHaveLength(1);
     expect(obs.activePageId).toBe(obs.pages[0]!.id);
@@ -37,9 +37,9 @@ describe("observe and act", { timeout: 30_000 }, () => {
     expect(obs.elements.map((e) => e.ref)).toEqual(obs.elements.map((_, i) => `e${i + 1}`));
     expect(obs.screenshotJpegBase64!.length).toBeGreaterThan(1000);
     expect(obs.scroll.maxY).toBeGreaterThan(1000);
-    const again = await s.observe({ screenshot: false });
+    const again = await s.observe();
     expect(again.revision).toBe(obs.revision + 1);
-    expect(again.screenshotJpegBase64).toBeUndefined();
+    expect(again.screenshotJpegBase64).toBeUndefined(); // default: no screenshot
   });
 
   it("clicks by ref, and refuses stale refs", async () => {

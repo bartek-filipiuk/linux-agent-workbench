@@ -263,7 +263,8 @@ export class BrowserSession {
     this.revision++;
     const max = input.maxElements ?? 200;
     const { elements, scroll } = await this.walkFrames(page, max);
-    const screenshot = input.screenshot === false ? undefined : (await page.screenshot({ type: "jpeg", quality: 50 })).toString("base64");
+    // Opt-in, as the tool contract says: a screenshot costs 100-300 ms here and an image in the model's context.
+    const screenshot = input.screenshot === true ? (await page.screenshot({ type: "jpeg", quality: 50 })).toString("base64") : undefined;
     const pages = await Promise.all(this.pages.map(async (e) => ({ id: e.id, url: e.page.url(), title: await e.page.title().catch(() => "") })));
     const dialog = this.lastDialog;
     this.lastDialog = undefined;

@@ -72,17 +72,29 @@ export class TerminalSessionManager extends EventEmitter {
       });
       const outdated = started === "outdated";
       if (outdated) console.error("[agentd] sandbox container runs an older image; destroy the sandbox to upgrade it");
-      const worker = await this.waitForWorker(path.join(runtimeDir, "worker.sock"), sessionId);
-      this._worker = worker;
-      this.unsubscribe.push(worker.onPtyData((b) => this.emit("data", b)));
-      this.unsubscribe.push(
-        worker.onClose(() => {
-          if (this._worker === worker) {
+      const socketPath = path.join(runtimeDir, "worker.sock");
+      const bind = (worker: TerminalWorker) => {
+        this._worker = worker;
+        this.unsubscribe.push(worker.onPtyData((b) => this.emit("data", b)));
+        this.unsubscribe.push(
+          worker.onClose(() => {
+            if (this._worker !== worker) return;
             this._worker = undefined;
-            if (this._status.state === "ready") this.setStatus({ state: "disconnected", ...base, message: "worker connection closed" });
-          }
-        }),
-      );
+            if (this._status.state !== "ready") return;
+            // The worker restarts under its supervisor loop; try to pick it up again before giving up on the session.
+            this.setStatus({ state: "disconnected", ...base, message: "worker connection lost; reconnecting" });
+            void this.waitForWorker(socketPath, sessionId)
+              .then((again) => {
+                if (this._status.state !== "disconnected") return again.close();
+                bind(again);
+                this.setStatus({ state: "ready", ...base, message: "reconnected to the sandbox worker" });
+                void again.refresh().catch(() => undefined);
+              })
+              .catch((e) => this.setStatus({ state: "disconnected", ...base, message: `worker connection closed (${e instanceof Error ? e.message : String(e)})` }));
+          }),
+        );
+      };
+      bind(await this.waitForWorker(socketPath, sessionId));
       return this.setStatus({ state: "ready", ...base, ...(outdated ? { message: "sandbox runs an older image; Destroy sandbox and reopen to upgrade" } : {}) });
     } catch (e) {
       return this.setStatus({ state: "error", ...base, message: e instanceof Error ? e.message : String(e) });

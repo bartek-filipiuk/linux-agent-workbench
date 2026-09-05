@@ -69,6 +69,8 @@ export const EGRESS_ENV = [
   "--env", `HTTP_PROXY=${PROXY_URL}`, "--env", `HTTPS_PROXY=${PROXY_URL}`, "--env", `http_proxy=${PROXY_URL}`, "--env", `https_proxy=${PROXY_URL}`,
   "--env", "NO_PROXY=localhost,127.0.0.1,::1", "--env", "no_proxy=localhost,127.0.0.1,::1",
   "--env", "LAW_EGRESS_SOCKET=/run/law/egress.sock", "--env", "LAW_EGRESS_PORT=3128",
+  // The shell gate waits this long for an approval: longer than the remote approval TTL (10 min), so the card decides, not the shell.
+  "--env", "LAW_GATE_TIMEOUT_MS=605000",
 ];
 
 // The browser container sees no workspace and no keys: only its profile volume, a downloads dir and the socket dir.

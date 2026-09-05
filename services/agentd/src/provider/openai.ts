@@ -12,6 +12,8 @@ export type OpenAIAdapterOptions = {
   fetch?: FetchLike;
   maxAttempts?: number;
   backoffMs?: number;
+  /** Per-attempt deadline for one HTTP round trip (default 180 s). */
+  attemptTimeoutMs?: number;
 };
 
 const OutputItem = z.discriminatedUnion("type", [
@@ -48,7 +50,10 @@ export class OpenAIResponsesAdapter implements ModelAdapter {
     this.fetchImpl = opts.fetch ?? fetch;
     this.maxAttempts = opts.maxAttempts ?? 3;
     this.backoffMs = opts.backoffMs ?? 500;
+    this.attemptTimeoutMs = opts.attemptTimeoutMs ?? 180_000;
   }
+
+  private readonly attemptTimeoutMs: number;
 
   async turn(input: ModelTurnInput, ctx: TurnContext): Promise<ModelTurn> {
     const body = {
@@ -74,6 +79,7 @@ export class OpenAIResponsesAdapter implements ModelAdapter {
     const raw = await this.post(body, ctx.signal);
     const parsed = ResponseBody.parse(raw);
     if (parsed.status === "failed") throw new Error(`model response failed: ${parsed.error?.message ?? "unknown error"}`);
+    if (parsed.status === "incomplete") throw new Error(`model response incomplete: ${(raw as { incomplete_details?: { reason?: string } }).incomplete_details?.reason ?? "unknown reason"}`);
 
     const texts: string[] = [];
     const toolCalls: ToolCall[] = [];
@@ -108,21 +114,23 @@ export class OpenAIResponsesAdapter implements ModelAdapter {
     let lastError = "";
     for (let attempt = 1; attempt <= this.maxAttempts; attempt++) {
       if (signal.aborted) throw new ProtocolError("CANCELLED", "model request aborted");
+      // A stalled connection must not hold the run in "thinking" forever: each attempt has its own deadline.
+      const attemptSignal = AbortSignal.any([signal, AbortSignal.timeout(this.attemptTimeoutMs)]);
       let res: Response;
       try {
         res = await this.fetchImpl(this.url, {
           method: "POST",
           headers: { authorization: `Bearer ${this.apiKey}`, "content-type": "application/json" },
           body: JSON.stringify(body),
-          signal,
+          signal: attemptSignal,
         });
+        if (res.ok) return await res.json();
       } catch (e) {
         if (signal.aborted) throw new ProtocolError("CANCELLED", "model request aborted");
-        lastError = e instanceof Error ? e.message : String(e);
+        lastError = attemptSignal.aborted ? `model request timed out after ${this.attemptTimeoutMs / 1000}s` : e instanceof Error ? e.message : String(e);
         await this.backoff(attempt, signal);
         continue;
       }
-      if (res.ok) return await res.json();
       const text = await res.text();
       let message = text;
       try {

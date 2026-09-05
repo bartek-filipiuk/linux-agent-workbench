@@ -18,6 +18,8 @@ export type RunControllerDeps = {
   prices?: PriceTable;
   systemPrompt?: string;
   now?: () => number;
+  /** When given, a pending approval card parks the run in awaiting_approval instead of letting the model poll. */
+  approvals?: { hasPending(runId: string): boolean; once(event: "resolved", cb: () => void): unknown; off(event: "resolved", cb: () => void): unknown };
 };
 
 export type RunInput = { workspaceId: string; goal: string; networkMode: NetworkMode; snapshot?: unknown };
@@ -151,6 +153,7 @@ export class RunController extends EventEmitter {
     }
 
     try {
+      await this.waitForApprovals(signal);
       const result = await this.tools.execute(call, signal);
       store.finishToolCall(rowId, "done", safeJson(result.output));
       store.appendEvent(this.runId, "tool.done", { name: call.name, bytes: result.output.length, image: result.imageJpegBase64 !== undefined });
@@ -170,8 +173,29 @@ export class RunController extends EventEmitter {
       store.appendEvent(this.runId, "tool.error", { name: call.name, ...error });
       tool("error");
       if (signal.aborted) throw e;
+      // A lost worker is not something the model can retry its way out of: end the run with a clear reason.
+      if (error.code === "WORKER_UNAVAILABLE") throw new Error(`sandbox worker unavailable: ${error.message}`);
       return { callId: call.callId, output: JSON.stringify({ error }) };
     }
+  }
+
+  /** While a card is open for this run, hold the tool instead of letting the model poll the terminal. */
+  private async waitForApprovals(signal: AbortSignal): Promise<void> {
+    const approvals = this.deps.approvals;
+    if (!approvals || !approvals.hasPending(this.runId)) return;
+    this.setState("awaiting_approval");
+    try {
+      while (approvals.hasPending(this.runId) && !signal.aborted) {
+        await new Promise<void>((resolve) => {
+          const done = () => { signal.removeEventListener("abort", done); approvals.off("resolved", done); resolve(); };
+          approvals.once("resolved", done);
+          signal.addEventListener("abort", done, { once: true });
+        });
+      }
+    } finally {
+      if (!signal.aborted) this.setState("running");
+    }
+    this.throwIfStopped();
   }
 
   private async handoff(reason: string, worker: TerminalWorker) {
