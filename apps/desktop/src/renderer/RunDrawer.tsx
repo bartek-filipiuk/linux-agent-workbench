@@ -32,6 +32,9 @@ export const emptyRun: RunView = { turns: 0, toolCalls: 0, costUsd: null, snapsh
 
 const TERMINAL = new Set(["completed", "stopped", "failed", "budget_exceeded", "interrupted"]);
 const RUNNING = new Set(["running", "awaiting_approval", "handoff"]);
+const MAX_LOG_ROWS = 500; // a shell loop can emit thousands of gate events; the drawer keeps the tail
+
+const appendLog = (log: LogRow[], row: LogRow): LogRow[] => (log.length >= MAX_LOG_ROWS ? [...log.slice(-(MAX_LOG_ROWS - 1)), row] : [...log, row]);
 
 export function reduceRun(prev: RunView, e: RunEvent): RunView {
   const eventRun = "runId" in e ? e.runId : undefined;
@@ -52,9 +55,9 @@ export function reduceRun(prev: RunView, e: RunEvent): RunView {
       };
     }
     case "run.commentary":
-      return { ...view, log: [...view.log, { kind: "commentary", text: e.text }] };
+      return { ...view, log: appendLog(view.log, { kind: "commentary", text: e.text }) };
     case "run.tool": {
-      const log = [...view.log];
+      const log = view.log.length >= MAX_LOG_ROWS ? view.log.slice(-(MAX_LOG_ROWS - 1)) : [...view.log];
       const key = `${e.name} ${e.callId}`;
       const i = log.findIndex((l) => l.kind === "tool" && l.text === key);
       const row: LogRow = { kind: "tool", text: key, status: e.status, ...(e.preview ? { preview: e.preview } : {}) };
@@ -63,15 +66,17 @@ export function reduceRun(prev: RunView, e: RunEvent): RunView {
       return { ...view, log, turns: e.turns, toolCalls: e.toolCalls, costUsd: e.costUsd };
     }
     case "run.handoff":
-      return { ...view, log: [...view.log, { kind: "commentary", text: `Agent asks for help: ${e.reason}` }] };
+      return { ...view, log: appendLog(view.log, { kind: "commentary", text: `Agent asks for help: ${e.reason}` }) };
     case "approval.request":
       return { ...view, approvals: [...view.approvals, { id: e.id, command: e.command, category: e.category, summary: e.summary, expiresAt: e.expiresAt }] };
     case "approval.resolved":
       return { ...view, approvals: view.approvals.filter((a) => a.id !== e.id) };
     case "gate.event":
-      // Read-only commands are noise in the log; the event log in SQLite keeps them.
+      // Read-only commands are noise, and so is everything the human types that simply ran; the drawer
+      // shows the agent's commands plus anything blocked or approved. The event log in SQLite keeps the rest.
       if (e.bucket === "auto") return view;
-      return { ...view, log: [...view.log, { kind: "gate", text: e.command, status: `${e.actor} · ${e.decision === "deny" ? "blocked" : e.bucket === "approval" ? "approved" : "ran"}` }] };
+      if (e.actor === "human" && e.decision === "allow" && e.bucket !== "approval") return view;
+      return { ...view, log: appendLog(view.log, { kind: "gate", text: e.command, status: `${e.actor} · ${e.decision === "deny" ? "blocked" : e.bucket === "approval" ? "approved" : "ran"}` }) };
     case "run.restored":
       return { ...view, restored: e.ok ? "Workspace restored to the pre-run snapshot." : `Restore failed: ${e.message ?? "unknown error"}` };
   }
