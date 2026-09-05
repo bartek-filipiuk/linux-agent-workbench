@@ -17,7 +17,7 @@
 - Approval: policy → `ApprovalManager.request` (TTL 120 s) → `approval.request` to the UI → `ApprovalCard` (y/n, once/session/deny) → `approval.decide`.
 - Handoff: a policy returns `LEASE_DENIED` with `handoff`, or the model calls `request_human` → run state `handoff`, both leases go to the human, no observations reach the model until "Give control back".
 - Browser observe: `BrowserSession.walkFrames` (main frame, then every iframe, refs `e<n>` bound to `revision`) → `observationHints` (login_form, captcha, two_factor) appended by `browserExecutor`.
-- Shell gate: bash DEBUG trap → `/opt/law/gate` (C) → worker → agentd `classify` (auto/log/approval/deny) → `ApprovalManager`.
+- Shell gate: bash DEBUG trap → `/opt/law/gate` (static C, ~2 ms round trip) → worker → agentd `classify` (auto/log/approval/deny) → `ApprovalManager`; the gate waits `LAW_GATE_TIMEOUT_MS` (605 s), longer than any approval TTL.
 - Egress: tool → `127.0.0.1:3128` (forwarder in the worker) → `/run/law/egress.sock` → `EgressProxy` in agentd (`SessionEgress` per session) → host DNS + private-range check → upstream; decisions in `egress_log`.
 
 ### Konwencje
