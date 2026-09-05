@@ -1,9 +1,9 @@
-import { afterAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
-import { BrowserSessionManager, PodmanRuntime, browserContainerName, podmanLauncher } from "@law/agentd";
+import { BrowserSessionManager, PodmanRuntime, SessionEgress, browserContainerName, podmanLauncher } from "@law/agentd";
 
 const enabled = process.env.LAW_CONTAINER_TESTS === "1";
 const imageJson = path.resolve(__dirname, "../../images/browser/image.json");
@@ -14,16 +14,22 @@ describe.skipIf(!enabled || !imageId)("browser container", { timeout: 120_000 },
   const runtime = new PodmanRuntime();
   const root = fs.mkdtempSync(path.join(process.env.XDG_RUNTIME_DIR ?? os.tmpdir(), "law-bc-"));
   const downloads = fs.mkdtempSync(path.join(os.tmpdir(), "law-bcdl-"));
+  // The container has no network of its own: its only way out is the session's egress proxy socket.
+  const egress = new SessionEgress({ runtimeRoot: root, log: () => undefined });
   const make = () =>
     new BrowserSessionManager({
-      socketDir: path.join(root, "browser"),
+      socketDir: path.join(root, sessionId, "browser"),
       launcher: podmanLauncher({ runtime, sessionId, imageId, networkMode: "open", downloadsDir: downloads }),
       connectTimeoutMs: 60_000,
     });
   let m = make();
 
+  beforeAll(async () => {
+    await egress.ensure(sessionId, "open");
+  });
   afterAll(async () => {
     await m.destroy();
+    await egress.close();
     fs.rmSync(root, { recursive: true, force: true });
   }, 60_000);
 
