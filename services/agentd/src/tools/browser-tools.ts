@@ -1,3 +1,4 @@
+import { HandoffRequested } from "./terminal-tools.js";
 import { z } from "zod";
 import { BrowserAction, BrowserObserveInput, BrowserWaitInput, ProtocolError, type BrowserObservation } from "@law/protocol";
 import type { ToolCall, ToolExecutor, ToolSpec } from "../provider/types.js";
@@ -80,6 +81,7 @@ export function browserExecutor(browser: BrowserToolTarget): ToolExecutor {
     specs: BROWSER_TOOLS,
     async execute(call: ToolCall, signal: AbortSignal) {
       await ready();
+      if (browser.status.manual || browser.status.transitioning) throw new HandoffRequested("Finish manual browser login, then resume the agent.");
       switch (call.name) {
         case "browser_observe": {
           const input = parseArgs(BrowserObserveInput, call.args, call.name);

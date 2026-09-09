@@ -57,6 +57,7 @@ export function browserContainerName(sessionId: string): string {
 }
 
 export type BrowserRunSpec = {
+  profileVolume?: string;
   sessionId: string;
   runtimeDir: string;
   downloadsDir: string;
@@ -94,7 +95,7 @@ export function buildBrowserRunArgs(spec: BrowserRunSpec): string[] {
     "--tmpfs", "/tmp:rw,nosuid,nodev,size=1g",
     "--tmpfs", "/run:rw,nosuid,nodev,size=64m",
     "--tmpfs", "/home/agent:rw,nosuid,nodev,size=256m",
-    "--volume", "law-browser-profile-default:/profile",
+    "--volume", `${spec.profileVolume ?? "law-browser-profile-default"}:/profile`,
     "--volume", `${spec.downloadsDir}:/downloads:rw`,
     "--volume", `${spec.runtimeDir}:/run/law:rw`,
     // No network namespace of its own: everything leaves through the egress proxy socket in /run/law (B6 H1).

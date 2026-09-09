@@ -4,10 +4,10 @@ import { Daemon } from "./ipc.js";
 import { PodmanRuntime } from "./runtime/podman.js";
 import { TerminalSessionManager } from "./session/terminal-session-manager.js";
 import { OpenAIResponsesAdapter } from "./provider/openai.js";
-import { BrowserSessionManager, hostLauncher, podmanLauncher } from "./session/browser-session-manager.js";
+import { CodexAppServerAdapter } from "./provider/codex.js";
+import { BrowserSessionManager, podmanLauncher } from "./session/browser-session-manager.js";
 import { dataDir } from "./paths.js";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 type Port = {
   on(ev: "message", cb: (e: { data: unknown }) => void): void;
@@ -38,16 +38,13 @@ parentPort.once("message", (e) => {
   const daemon = new Daemon({
     openStore: (p) => new Store(p),
     makeManager: (imageId, runtimeRoot) => new TerminalSessionManager({ runtime: new PodmanRuntime(), runtimeRoot, imageId }),
-    makeAdapter: (model, apiKey) => new OpenAIResponsesAdapter({ model, apiKey }),
+    makeAdapter: (model, apiKey, config) => config.provider === "codex"
+      ? new CodexAppServerAdapter({ model, ...config.codex, ...(config.effort ? { effort: config.effort } : {}) })
+      : new OpenAIResponsesAdapter({ model, apiKey }),
     makeBrowser: ({ runtimeRoot, sessionId, networkMode, browserImageId }) =>
       new BrowserSessionManager({
         socketDir: path.join(runtimeRoot, sessionId, "browser"),
-        launcher: browserImageId
-          ? podmanLauncher({ runtime: new PodmanRuntime(), sessionId, imageId: browserImageId, networkMode, downloadsDir: path.join(dataDir(), "downloads", sessionId) })
-          : hostLauncher({
-              workerEntry: fileURLToPath(new URL("../../browser-worker/dist/main.js", import.meta.url)),
-              profileDir: path.join(dataDir(), "profiles", "browser", "default", "user-data"),
-            }),
+        launcher: podmanLauncher({ runtime: new PodmanRuntime(), sessionId, imageId: browserImageId, networkMode, downloadsDir: path.join(dataDir(), "downloads", sessionId) }),
       }),
     post: (m) => port.postMessage(m),
     podman: new PodmanRuntime(),

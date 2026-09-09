@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Report a security vulnerability privately
+    url: https://github.com/bartek-filipiuk/linux-agent-workbench/security/advisories/new
+    about: Use this channel for sensitive security reports instead of a public issue.
+  - name: User guide
+    url: https://github.com/bartek-filipiuk/linux-agent-workbench/blob/main/docs/USER_GUIDE.md
+    about: Setup, authentication, task controls and troubleshooting.

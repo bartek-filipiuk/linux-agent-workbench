@@ -1,6 +1,7 @@
 import type { TerminalInput, TerminalInputResult, TerminalObservation, TerminalObserveInput, TerminalResize, TerminalWaitInput, TerminalWaitResult, WorkerHealth } from "@law/protocol";
 
 export interface TerminalWorker {
+  setOutputPaused?(paused: boolean): void;
   observe(input: TerminalObserveInput, signal?: AbortSignal): Promise<TerminalObservation>;
   input(input: TerminalInput, signal?: AbortSignal): Promise<TerminalInputResult>;
   wait(input: TerminalWaitInput, signal?: AbortSignal): Promise<TerminalWaitResult>;

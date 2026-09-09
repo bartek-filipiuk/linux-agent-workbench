@@ -64,6 +64,6 @@ apps/desktop/src/renderer/App.tsx                                    banner show
 
 ### Task 5: Manual acceptance with Claude Code (with Bartek)
 
-1. `pnpm dev`, open workspace `/home/bartek/law-demo-ws`, "Take control", type `claude`, complete the login flow inside the container (the URL from the TUI opened on the host; the token lands in the `law-auth-claude` volume). Exit claude, "Give control back".
+1. `pnpm dev`, open workspace `/home/developer/law-demo-ws`, "Take control", type `claude`, complete the login flow inside the container (the URL from the TUI opened on the host; the token lands in the `law-auth-claude` volume). Exit claude, "Give control back".
 2. Goal: "Run `claude` in the terminal, ask it to create hello.txt containing the word hello, wait for it to finish, then run ls -al and report."
 3. Expected: `terminal_wait` calls instead of observe storms; on Claude Code's permission prompt the run hands off with the prompt state in the banner; you answer, give control back; the agent verifies with `ls -al`.

@@ -1,13 +1,14 @@
 import fs from "node:fs";
 import net from "node:net";
 import { FramedConnection } from "@law/protocol/node";
-import { BrowserAction, BrowserInputEvent, BrowserNavigate, BrowserObserveInput, BrowserWaitInput, ProtocolError, encodeBrowserFrame, type Envelope } from "@law/protocol";
+import { BrowserAction, BrowserControl, BrowserInputEvent, BrowserNavigate, BrowserObserveInput, BrowserWaitInput, ProtocolError, encodeBrowserFrame, type Envelope } from "@law/protocol";
 import type { BrowserSession } from "./browser-session.js";
 
 export class BrowserWorkerServer {
   private readonly server = net.createServer();
   private current: FramedConnection | undefined;
   private unsubscribe: (() => void) | undefined;
+  private unsubscribeState: (() => void) | undefined;
 
   constructor(
     private readonly socketPath: string,
@@ -30,21 +31,28 @@ export class BrowserWorkerServer {
   }
 
   close(): Promise<void> {
-    this.unsubscribe?.();
+    this.unsubscribe?.(); this.unsubscribeState?.();
     this.current?.close();
     return new Promise((r) => this.server.close(() => r()));
   }
 
   private accept(socket: net.Socket): void {
-    this.unsubscribe?.();
+    this.unsubscribe?.(); this.unsubscribeState?.();
     this.current?.close();
     const conn = new FramedConnection(socket);
     this.current = conn;
-    this.unsubscribe = this.session.onFrame((f) => conn.sendRaw(3, encodeBrowserFrame(f.width, f.height, f.jpeg)));
+    void this.session.setFramesEnabled(false);
+    conn.on("close", () => { if (this.current === conn) { this.unsubscribe?.(); this.unsubscribeState?.(); void this.session.setFramesEnabled(false); } });
+    this.unsubscribeState = this.session.onState(info => conn.notify("browser.state", info));
+    this.unsubscribe = this.session.onFrame((f) => conn.sendRaw(3, encodeBrowserFrame(f.width, f.height, f.jpeg, f.generation, f.sequence)));
     conn.on("message", (env: Envelope) => void this.handle(conn, env));
   }
 
   private async handle(conn: FramedConnection, env: Envelope): Promise<void> {
+    if (env.type === "browser.frames") {
+      if (typeof env.payload.enabled === "boolean") await this.session.setFramesEnabled(env.payload.enabled);
+      return;
+    }
     if (env.type === "browser.input") {
       const parsed = BrowserInputEvent.safeParse(env.payload);
       if (parsed.success) await this.session.input(parsed.data).catch(() => {});
@@ -54,6 +62,8 @@ export class BrowserWorkerServer {
     if (!id) return;
     try {
       switch (env.type) {
+        case "browser.control":
+          return conn.reply(id, { ok: true, payload: await this.session.control(BrowserControl.parse(env.payload)) });
         case "browser.navigate":
           return conn.reply(id, { ok: true, payload: await this.session.navigate(BrowserNavigate.parse(env.payload).url) });
         case "browser.info":

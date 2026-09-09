@@ -5,6 +5,7 @@ export const RunState = z.enum([
   "running",
   "awaiting_approval",
   "handoff",
+  "budget_paused",
   "completed",
   "stopped",
   "failed",
@@ -21,12 +22,22 @@ export const NetworkMode = z.enum(["open", "none"]);
 export type NetworkMode = z.infer<typeof NetworkMode>;
 
 export const Budgets = z.object({
-  maxTurns: z.number().int().positive(),
-  maxToolCalls: z.number().int().positive(),
-  maxDurationMs: z.number().int().positive(),
-  maxCostUsd: z.number().nonnegative(),
+  maxTurns: z.number().int().positive().nullable(),
+  maxToolCalls: z.number().int().positive().nullable(),
+  maxDurationMs: z.number().int().positive().nullable(),
+  maxCostUsd: z.number().nonnegative().nullable(),
 });
 export type Budgets = z.infer<typeof Budgets>;
+
+/** null is deliberately unlimited; omitted limits preserve older clients' defaults. */
+export const RunLimits = z.object({
+  maxTurns: z.number().int().min(1).max(10000).nullable(),
+  maxDurationMinutes: z.number().int().min(1).max(1440).nullable(),
+}).strict();
+export type RunLimits = z.infer<typeof RunLimits>;
+export const BudgetAction = z.enum(["add_steps", "unlimited_steps", "add_time", "unlimited_time", "add_cost"]);
+export type BudgetAction = z.infer<typeof BudgetAction>;
+export type RunBudgetStatus = { limits: Budgets; elapsedMs: number; reason: keyof Budgets | null };
 
 export const DEFAULT_BUDGETS: Budgets = {
   maxTurns: 40,

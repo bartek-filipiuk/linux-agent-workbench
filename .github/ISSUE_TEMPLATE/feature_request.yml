@@ -1,0 +1,26 @@
+name: Feature proposal
+description: Discuss a focused improvement before implementation.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please write in English and check [the roadmap](https://github.com/bartek-filipiuk/linux-agent-workbench/blob/main/ROADMAP.md) and existing issues first.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: Describe the user workflow and the limitation you encounter.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Include alternatives and a concrete example of the desired result.
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Integration, security and performance considerations
+      description: For providers, link the supported integration and authentication mechanism, and explain subscription versus API billing. Never include tokens.

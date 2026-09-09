@@ -14,6 +14,7 @@ import {
   ProtocolError,
   decodeBrowserFrame,
   type BrowserAction,
+  type BrowserControl,
   type BrowserInputEvent,
   type BrowserObserveInput,
   type BrowserWaitInput,
@@ -23,8 +24,8 @@ import { z } from "zod";
 import { browserContainerName, buildBrowserRunArgs, type PodmanRuntime } from "../runtime/podman.js";
 
 export type BrowserState = "idle" | "starting" | "ready" | "stopped" | "error";
-export type BrowserStatus = { state: BrowserState; url?: string; title?: string; message?: string };
-export type BrowserFrame = { width: number; height: number; jpeg: Uint8Array };
+export type BrowserStatus = { state: BrowserState; message?: string } & Partial<BrowserInfo>;
+export type BrowserFrame = ReturnType<typeof decodeBrowserFrame>;
 
 /** Whatever runs the worker: a host process (B1) or a container (B2). The socket contract is the same. */
 export type LaunchHandle = {
@@ -67,17 +68,19 @@ export function hostLauncher(opts: { workerEntry: string; profileDir: string; sp
 export function podmanLauncher(opts: {
   runtime: PodmanRuntime;
   sessionId: string;
-  imageId: string;
+  imageId: string | undefined;
   networkMode: NetworkMode;
   downloadsDir: string;
+  profileVolume?: string;
 }): BrowserLauncher {
   return async ({ socketDir }) => {
+    if (!opts.imageId) throw new Error("Browser image missing; run pnpm images:build:browser. Host browser fallback is disabled.");
     fs.mkdirSync(opts.downloadsDir, { recursive: true, mode: 0o700 });
     const name = browserContainerName(opts.sessionId);
     // The browser container holds no state outside its profile volume: an outdated image is simply replaced.
     const result = await opts.runtime.ensureRunningWith(
       name,
-      buildBrowserRunArgs({ sessionId: opts.sessionId, runtimeDir: socketDir, downloadsDir: opts.downloadsDir, imageId: opts.imageId, networkMode: opts.networkMode }),
+      buildBrowserRunArgs({ sessionId: opts.sessionId, runtimeDir: socketDir, downloadsDir: opts.downloadsDir, imageId: opts.imageId, networkMode: opts.networkMode, ...(opts.profileVolume ? { profileVolume: opts.profileVolume } : {}) }),
       { imageId: opts.imageId, recreateOnImageMismatch: true },
     );
     console.error(`[agentd] browser container ${name}: ${result}`);
@@ -102,6 +105,11 @@ export class BrowserSessionManager extends EventEmitter {
   lastObservation: BrowserObservation | undefined;
   private handle: LaunchHandle | undefined;
   private conn: FramedConnection | undefined;
+  private framesEnabled = false;
+  setFramesEnabled(enabled: boolean): void {
+    this.framesEnabled = enabled;
+    this.conn?.notify("browser.frames", { enabled });
+  }
 
   constructor(private readonly deps: BrowserManagerDeps) {
     super();
@@ -123,12 +131,23 @@ export class BrowserSessionManager extends EventEmitter {
       if (!this.handle?.alive()) this.handle = await this.deps.launcher({ socketDir: this.deps.socketDir, socketPath });
       const conn = await this.waitForSocket(socketPath);
       this.conn = conn;
-      conn.on("browser-frame", (bytes: Uint8Array) => this.emit("frame", decodeBrowserFrame(bytes)));
+      conn.on("message", env => {
+        if (env.type === "browser.state") {
+          const result = BrowserInfo.safeParse(env.payload);
+          if (result.success) this.setStatus({ state: "ready", ...result.data });
+        }
+      });
+      conn.on("browser-frame", (bytes: Uint8Array) => {
+        const frame = decodeBrowserFrame(bytes);
+        if (frame.generation !== this._status.generation) this.setStatus({ ...this._status, generation: frame.generation });
+        this.emit("frame", frame);
+      });
       conn.on("close", () => {
         if (this.conn === conn && this._status.state === "ready") this.setStatus({ state: "error", message: "browser worker connection closed" });
       });
+      this.conn.notify("browser.frames", { enabled: this.framesEnabled });
       const info = BrowserInfo.parse(await conn.request("browser.info", {}));
-      return this.setStatus({ state: "ready", url: info.url, title: info.title });
+      return this.setStatus({ state: "ready", ...info });
     } catch (e) {
       const logs = await this.handle?.logs().catch(() => "");
       await this.stop("error");
@@ -138,8 +157,13 @@ export class BrowserSessionManager extends EventEmitter {
 
   async navigate(url: string): Promise<BrowserInfo> {
     const info = BrowserInfo.parse(await this.requireConn().request("browser.navigate", { url }, { timeoutMs: 40_000 }));
-    this.setStatus({ state: "ready", url: info.url, title: info.title });
+    this.setStatus({ state: "ready", ...info });
     return info;
+  }
+
+  async control(command: BrowserControl): Promise<BrowserInfo> {
+    const info = BrowserInfo.parse(await this.requireConn().request("browser.control", command, { timeoutMs: 60000 }));
+    this.setStatus({ state: "ready", ...info }); return info;
   }
 
   input(event: BrowserInputEvent): void {
@@ -154,7 +178,7 @@ export class BrowserSessionManager extends EventEmitter {
 
   async act(action: BrowserAction, signal?: AbortSignal): Promise<BrowserActResult> {
     const r = BrowserActResult.parse(await this.requireConn().request("browser.act", action, { timeoutMs: 45_000, ...(signal ? { signal } : {}) }));
-    this.setStatus({ state: "ready", url: r.url, title: r.title });
+    this.setStatus({ ...this._status, state: "ready", url: r.url, title: r.title, activePageId: r.activePageId });
     return r;
   }
 
@@ -217,7 +241,7 @@ export class BrowserSessionManager extends EventEmitter {
   }
 
   private setStatus(s: BrowserStatus): BrowserStatus {
-    console.error(`[agentd] browser ${s.state}${s.message ? `: ${s.message}` : ""}`);
+    if (s.state !== this._status.state || s.message !== this._status.message) console.error(`[agentd] browser ${s.state}${s.message ? `: ${s.message}` : ""}`);
     this._status = s;
     this.emit("status", s);
     return s;

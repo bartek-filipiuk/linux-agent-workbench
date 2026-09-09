@@ -1,8 +1,10 @@
+import { EventEmitter } from "node:events";
+import type { BrowserSessionManager } from "../src/session/browser-session-manager.js";
 import { afterEach, describe, expect, it } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
-import { Daemon } from "../src/ipc.js";
+import { Daemon, type ProviderConfig } from "../src/ipc.js";
 import { Store } from "../src/storage/store.js";
 import { TerminalSessionManager } from "../src/session/terminal-session-manager.js";
 import { SocketTerminalWorker } from "../src/worker/socket-worker.js";
@@ -16,7 +18,7 @@ afterEach(async () => {
   fw = undefined;
 });
 
-async function bootWith(adapter: FakeModelAdapter, prepareWorkspace?: (dir: string) => void) {
+async function bootWith(adapter: FakeModelAdapter, prepareWorkspace?: (dir: string) => void, browser?: BrowserSessionManager, provider?: "codex") {
   const posted: Array<Record<string, unknown>> = [];
   const runtimeRoot = tmpDir("law-rt-");
   const workspace = tmpDir("law-ws-");
@@ -28,21 +30,113 @@ async function bootWith(adapter: FakeModelAdapter, prepareWorkspace?: (dir: stri
     logs: async () => "",
     imageExists: async () => true,
   };
+  const adapterCalls: { model: string; config: ProviderConfig }[] = [];
   const d = new Daemon({
     openStore: (p) => new Store(p),
     makeManager: (imageId, root) => new TerminalSessionManager({ runtime, runtimeRoot: root, imageId, connect: (p) => SocketTerminalWorker.connect(p) }),
-    makeAdapter: () => adapter,
+    makeAdapter: (model, _key, config) => { adapterCalls.push({ model, config }); return adapter; },
+    ...(browser ? { makeBrowser: () => browser } : {}),
     post: (m) => posted.push(m as Record<string, unknown>),
   });
-  await d.handle({ type: "config.init", apiKey: "sk-x", model: "fake", dbPath: ":memory:", imageId: "sha256:x", runtimeRoot });
+  await d.handle({ type: "config.init", provider, apiKey: "sk-x", model: "fake", dbPath: ":memory:", imageId: "sha256:x", runtimeRoot });
   await d.handle({ type: "session.start", workspacePath: workspace, networkMode: "open" });
   const last = (type: string) => [...posted].reverse().find((p) => p.type === type);
-  return { d, posted, last, workspace };
+  return { d, posted, last, workspace, adapterCalls };
 }
 const boot = (adapter: FakeModelAdapter) => bootWith(adapter);
 const settle = (pred: () => boolean, ms = 3000) => expect.poll(pred, { timeout: ms }).toBe(true);
 
 describe("Daemon run flow", () => {
+  it("keeps a budget pause isolated from stale requests, ordinary resume and manual login", async () => {
+    class BrowserStub extends EventEmitter {
+      status = { state: "ready", manual: false };
+      setFramesEnabled() {}
+      async control(command: { kind: string; enabled?: boolean }) {
+        this.status = { state: "ready", manual: !!command.enabled }; this.emit("status", this.status); return this.status;
+      }
+    }
+    const browser = new BrowserStub();
+    const adapter = new FakeModelAdapter([{ toolCalls: [{ name: "terminal_observe", args: {} }] }, { text: "done" }]);
+    const { d, last, adapterCalls } = await bootWith(adapter, undefined, browser as unknown as BrowserSessionManager, "codex");
+    await d.handle({ type: "run.start", goal: "g", limits: { maxTurns: 1, maxDurationMinutes: 30 } });
+    await settle(() => last("run.state")?.state === "budget_paused");
+    const runId = last("run.state")!.runId;
+    expect(last("run.state")).toMatchObject({ budget: { reason: "maxTurns", limits: { maxCostUsd: null, maxDurationMs: 1800000 } } });
+    await d.handle({ type: "run.budget", runId: "stale-run", action: "unlimited_steps" });
+    expect(last("agentd.error")?.message).toMatch(/no longer paused/);
+    await d.handle({ type: "run.resume" });
+    await d.handle({ type: "lease.take", owner: "agent" });
+    expect(last("lease.state")).toMatchObject({ owner: "human" });
+    expect(adapter.inputs).toHaveLength(1);
+    await d.handle({ type: "run.start", goal: "replace paused task" });
+    expect(adapterCalls).toHaveLength(1);
+    await d.handle({ type: "ui.query", requestId: "manual", kind: "browser", command: { kind: "manual", enabled: true } });
+    await d.handle({ type: "run.budget", runId, action: "unlimited_steps" });
+    expect(last("agentd.error")?.message).toMatch(/Finish manual login/);
+    expect(adapter.inputs).toHaveLength(1);
+    await d.handle({ type: "ui.query", requestId: "finish", kind: "browser", command: { kind: "manual", enabled: false } });
+    await d.handle({ type: "run.budget", runId, action: "unlimited_steps" });
+    await settle(() => last("run.state")?.state === "completed");
+    expect(last("run.state")).toMatchObject({ runId, budget: { limits: { maxTurns: null, maxToolCalls: null, maxDurationMs: 1800000 } } });
+    expect(adapterCalls).toHaveLength(1);
+  });
+
+  it("routes per-run model choices without changing defaults for later runs", async () => {
+    const { d, last, adapterCalls } = await bootWith(new FakeModelAdapter([{ text: "done" }]), undefined, undefined, "codex");
+    await d.handle({ type: "run.start", goal: "g", modelSelection: { model: "gpt-6-astra", effort: "medium" } });
+    await settle(() => last("run.state")?.state === "completed");
+    expect(adapterCalls[0]).toMatchObject({ model: "gpt-6-astra", config: { provider: "codex", effort: "medium" } });
+    await d.handle({ type: "run.start", goal: "use configured settings" });
+    expect(adapterCalls[1]).toMatchObject({ model: "fake" });
+    expect(adapterCalls[1]!.config).not.toHaveProperty("effort");
+    await d.handle({ type: "run.stop" });
+  });
+  it("rejects subscription model overrides under the API provider", async () => {
+    const { d, last, adapterCalls } = await boot(new FakeModelAdapter([]));
+    await d.handle({ type: "run.start", goal: "g", modelSelection: { model: "gpt-6-astra", effort: "medium" } });
+    expect(last("agentd.error")?.message).toContain("Codex provider only");
+    expect(adapterCalls).toHaveLength(0);
+  });
+  it("pauses before opening manual login and blocks resume/start/agent leases until it finishes", async () => {
+    class BrowserStub extends EventEmitter {
+      status = { state: "ready", manual: false };
+      setFramesEnabled() {}
+      async control(command: { kind: string; enabled?: boolean }) {
+        this.status = { state: "ready", manual: !!command.enabled }; this.emit("status", this.status); return this.status;
+      }
+    }
+    const browser = new BrowserStub();
+    const adapter = new FakeModelAdapter([{ delayMs: 100, toolCalls: [{ name: "terminal_input", args: { kind: "text", text: "STALE" } }] }, { text: "done" }]);
+    const { d, last } = await bootWith(adapter, undefined, browser as unknown as BrowserSessionManager);
+    await d.handle({ type: "run.start", goal: "g" });
+    await d.handle({ type: "ui.query", requestId: "manual", kind: "browser", command: { kind: "manual", enabled: true } });
+    expect(last("ui.reply")).toMatchObject({ result: { manual: true } });
+    expect(last("run.state")).toMatchObject({ state: "handoff" });
+    expect(fw!.screen).not.toContain("STALE");
+    for (const message of [{ type: "run.resume" }, { type: "lease.take", owner: "agent" }, { type: "run.start", goal: "new" }]) {
+      await d.handle(message); expect(last("agentd.error")?.message).toMatch(/Finish manual login/);
+    }
+    await d.handle({ type: "ui.query", requestId: "finish", kind: "browser", command: { kind: "manual", enabled: false } });
+    expect(last("run.state")).toMatchObject({ state: "handoff" });
+    await d.handle({ type: "run.resume" });
+    await settle(() => last("run.state")?.state === "completed");
+  });
+
+  it("ignores stale frame acknowledgements across preview generations", async () => {
+    class BrowserStub extends EventEmitter { status = { state: "ready" }; setFramesEnabled() {} }
+    const browser = new BrowserStub();
+    const { d, posted } = await bootWith(new FakeModelAdapter([]), undefined, browser as unknown as BrowserSessionManager);
+    await d.handle({ type: "browser.frames", enabled: true });
+    const frame = (generation: number) => browser.emit("frame", { width: 1280, height: 800, generation, jpeg: new Uint8Array([255,216]) });
+    const frames = () => posted.filter(m => m.type === "browser.frame");
+    browser.emit("status", { state: "ready", generation: 1 }); frame(1); frame(1);
+    const oldId = frames()[0]!.id;
+    browser.emit("status", { state: "ready", generation: 2 }); frame(2); frame(2);
+    await d.handle({ type: "browser.frameAck", id: oldId }); expect(frames()).toHaveLength(2);
+    await d.handle({ type: "browser.frameAck", id: frames()[1]!.id }); expect(frames()).toHaveLength(3);
+    expect(frames()[2]!.generation).toBe(2);
+  });
+
   it("runs a goal to completion, moving the lease agent -> human and streaming events", async () => {
     const adapter = new FakeModelAdapter([
       { text: "Listing.", toolCalls: [{ name: "terminal_input", args: { kind: "text", text: "ls -al" } }, { name: "terminal_input", args: { kind: "key", key: "ENTER" } }] },
@@ -60,6 +154,13 @@ describe("Daemon run flow", () => {
     expect(posted.filter((p) => p.type === "run.tool" && p.status === "done")).toHaveLength(3);
     expect(last("run.state")).toMatchObject({ state: "completed", finalText: "Two entries.", turns: 3, toolCalls: 3, costUsd: null });
     expect(fw!.screen).toBe("$ ls -al\n$ ");
+    await d.handle({ type: "ui.query", requestId: "history", kind: "history" });
+    const history = last("ui.reply")!.result as Array<{ id: string }>;
+    expect(history).toHaveLength(1);
+    await d.handle({ type: "ui.query", requestId: "detail", kind: "detail", runId: history[0]!.id });
+    expect(last("ui.reply")).toMatchObject({ result: { goal: "count files", state: "completed", finalText: "Two entries." } });
+    await d.handle({ type: "ui.query", requestId: "other", kind: "detail", runId: "not-in-this-workspace" });
+    expect(last("ui.reply")).toHaveProperty("error");
   });
 
   it("drops human keystrokes while the agent owns the lease, accepts them afterwards", async () => {
@@ -79,6 +180,9 @@ describe("Daemon run flow", () => {
     const { d, last } = await boot(adapter);
     await d.handle({ type: "run.start", goal: "g" });
     await settle(() => (last("run.state") as { state?: string } | undefined)?.state === "running");
+    await d.handle({ type: "session.network", networkMode: "none" });
+    expect(last("agentd.error")).toMatchObject({ message: expect.stringMatching(/Finish or stop/) });
+    expect(last("session.state")).toMatchObject({ state: "ready", networkMode: "open" });
     await d.handle({ type: "run.start", goal: "again" });
     expect(last("agentd.error")).toMatchObject({ message: expect.stringMatching(/already running/) });
     await d.handle({ type: "run.stop" });
@@ -96,6 +200,8 @@ describe("Daemon run flow", () => {
     await settle(() => (last("run.handoff") as { reason?: string } | undefined)?.reason === "please log in");
     expect(last("lease.state")).toMatchObject({ owner: "human" });
     expect(last("run.state")).toMatchObject({ state: "handoff" });
+    await d.handle({ type: "session.network", networkMode: "none" });
+    expect(last("agentd.error")).toMatchObject({ message: expect.stringMatching(/Finish or stop/) });
     await d.handle({ type: "run.resume" });
     await settle(() => (last("run.state") as { state?: string } | undefined)?.state === "completed");
   });

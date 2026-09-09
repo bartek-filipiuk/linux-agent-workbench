@@ -21,6 +21,8 @@ export type { SessionState, SessionStatus, ManagerDeps } from "./session/termina
 export { Daemon, MainToAgentd, ConfigInit, SessionStart, SessionStop, TerminalWrite, TerminalResizeMsg, RunStart, RunStop, RunResume, LeaseTake, ApprovalDecide, RunRestore, AgentdReady, AgentdError } from "./ipc.js";
 export type { AgentdToMain, SessionStateMsg, TerminalData, RunStateMsg, RunCommentary, RunTool, RunHandoff, LeaseStateMsg, ApprovalRequestMsg, ApprovalResolved, GateEventMsg, RunRestored, DaemonDeps } from "./ipc.js";
 export { OpenAIResponsesAdapter } from "./provider/openai.js";
+export { CodexAppServerAdapter } from "./provider/codex.js";
+export type { CodexAdapterOptions } from "./provider/codex.js";
 export type { OpenAIAdapterOptions } from "./provider/openai.js";
 export { Lease, LeasePolicy } from "./policy/lease.js";
 export type { LeaseOwner, LeaseState } from "./policy/lease.js";
@@ -59,3 +61,6 @@ export { terminalExecutor } from "./tools/terminal-tools.js";
 export { composeExecutors } from "./provider/types.js";
 export type { ToolExecutor, ToolOutput } from "./provider/types.js";
 export type { Surface } from "./policy/lease.js";
+
+export { CodexProcess } from "./provider/codex-process.js";
+export type { CodexOptions } from "./provider/codex-process.js";

@@ -36,6 +36,9 @@ importers:
       '@law/agentd':
         specifier: workspace:*
         version: link:../../services/agentd
+      '@law/protocol':
+        specifier: workspace:*
+        version: link:../../packages/protocol
       '@types/react':
         specifier: ^19.2.0
         version: 19.2.18

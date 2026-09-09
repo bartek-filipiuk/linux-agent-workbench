@@ -8,6 +8,16 @@ import { FakeWorker } from "./helpers/fake-worker.js";
 import { tmpDir } from "./helpers/tmp.js";
 
 describe("handleConfigInit", () => {
+  it("accepts subscription without an API key and discards API credentials and prices", () => {
+    const config = { type: "config.init", provider: "codex", model: "codex-default", dbPath: ":memory:", imageId: "sha256:x", runtimeRoot: "/tmp" };
+    const first = handleConfigInit(config, (p) => new Store(p));
+    expect(first.reply).toMatchObject({ type: "agentd.ready", model: "Codex subscription · default model" });
+    first.runtime?.store.close();
+    const second = handleConfigInit({ ...config, apiKey: "sk-ignore", prices: { inputUsdPerMTok: 99, outputUsdPerMTok: 99 } }, (p) => new Store(p));
+    expect(second.runtime).toMatchObject({ apiKey: "", prices: {} });
+    second.runtime?.store.close();
+    expect(handleConfigInit({ ...config, provider: "openai" }, (p) => new Store(p)).reply).toMatchObject({ type: "agentd.error" });
+  });
   it("opens the store, marks interrupted runs and never echoes the key", () => {
     const { reply } = handleConfigInit(
       { type: "config.init", apiKey: "sk-test-secret-value-1234567890", model: "gpt-5.6-sol", dbPath: ":memory:", imageId: "sha256:x", runtimeRoot: "/tmp" },
@@ -50,6 +60,14 @@ describe("Daemon", () => {
     await expect.poll(() => fw!.screen).toContain("pwd");
     fw!.emitPty("OUT");
     await expect.poll(() => posted.some((p) => (p as { type: string }).type === "terminal.data")).toBe(true);
+    fw!.emitPty("X".repeat(256 * 1024));
+    await expect.poll(() => fw!.received.some(m => m.type === "terminal.flow" && m.payload.paused === true)).toBe(true);
+    for (let i = 0; i < 4; i++) await d.handle({ type: "terminal.ack", bytes: 65536 });
+    await expect.poll(() => fw!.received.some(m => m.type === "terminal.flow" && m.payload.paused === false)).toBe(true);
+    await d.handle({ type: "session.network", networkMode: "none" });
+    expect(posted.at(-1)).toMatchObject({ type: "session.state", state: "ready", networkMode: "none" });
+    await d.handle({ type: "session.network", networkMode: "open" });
+    expect(posted.at(-1)).toMatchObject({ type: "session.state", state: "ready", networkMode: "open" });
     await d.handle({ type: "session.stop", destroy: false });
     expect(posted.at(-1)).toMatchObject({ type: "session.state", state: "disconnected" });
     await d.handle({ type: "bogus" });

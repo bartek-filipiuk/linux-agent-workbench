@@ -73,7 +73,7 @@ describe("observe and act", { timeout: 30_000 }, () => {
     const lang = obs.elements.find((e) => e.role === "combobox")!;
     await s.act({ kind: "select", ref: lang.ref, revision: obs.revision, values: ["pl"] });
     obs = await s.observe({ screenshot: false });
-    expect(obs.elements.find((e) => e.role === "combobox")!.value).toBe("Polski");
+    expect(obs.elements.find((e) => e.role === "combobox")!.value).toBe("Polish");
     await s.act({ kind: "type", ref: byName(obs, "Query").ref, revision: obs.revision, text: "hello", submit: true });
     const w = await s.wait({ text: "QUERY=hello LANG=pl", timeoutMs: 5000 });
     expect(w.matched).toBe(true);
@@ -113,7 +113,10 @@ describe("observe and act", { timeout: 30_000 }, () => {
     await expect.poll(() => s.listDownloads().length, { timeout: 5000 }).toBe(1);
     expect(s.listDownloads()[0]).toMatchObject({ name: "report.txt", bytes: 15 });
     obs = await s.observe({ screenshot: false });
-    await s.act({ kind: "click", ref: byName(obs, "Show alert").ref, revision: obs.revision });
+    const click = s.act({ kind: "click", ref: byName(obs, "Show alert").ref, revision: obs.revision });
+    await new Promise<void>(resolve => { const off = s.onState(info => { if (info.dialog) { off(); resolve(); } }); });
+    await s.control({ kind: "dialog", accept: false });
+    await click;
     obs = await s.observe({ screenshot: false });
     expect(obs.lastDialog).toEqual({ type: "alert", message: "hello from alert" });
     expect((await s.observe({ screenshot: false })).lastDialog).toBeUndefined();

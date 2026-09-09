@@ -6,6 +6,10 @@
     "node": ">=24.0.0"
   },
   "scripts": {
+    "codex": "pnpm --filter @law/protocol build && pnpm --filter @law/agentd build && node scripts/codex.mjs",
+    "codex:login": "pnpm codex login",
+    "codex:status": "pnpm codex status",
+    "codex:smoke": "pnpm codex smoke",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "pnpm --filter @law/protocol build && pnpm --filter @law/agentd build && pnpm -r --if-present typecheck",

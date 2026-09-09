@@ -1,8 +1,9 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import fs from "node:fs";
+import type { PodmanRuntime } from "../src/runtime/podman.js";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { BrowserSessionManager, hostLauncher } from "../src/session/browser-session-manager.js";
+import { BrowserSessionManager, hostLauncher, podmanLauncher } from "../src/session/browser-session-manager.js";
 import { tmpDir } from "./helpers/tmp.js";
 import { startFixtureServer } from "../../browser-worker/test/helpers/fixture-server.js";
 
@@ -19,6 +20,7 @@ describe.skipIf(!built)("BrowserSessionManager (host worker)", { timeout: 60_000
   it("spawns the worker, streams frames, navigates and stops cleanly", async () => {
     const root = tmpDir("law-br-");
     m = new BrowserSessionManager({ socketDir: path.join(root, "rt"), launcher: hostLauncher({ workerEntry, profileDir: path.join(root, "profile") }) });
+    m.setFramesEnabled(true);
     const frames: number[] = [];
     m.on("frame", (f: { width: number; height: number; jpeg: Uint8Array }) => frames.push(f.jpeg.length));
     const status = await m.start();
@@ -55,4 +57,11 @@ describe.skipIf(!built)("BrowserSessionManager (host worker)", { timeout: 60_000
     const status = await m.start();
     expect(status.state).toBe("error");
   });
+});
+
+it("refuses to launch a browser without a container image instead of falling back to the host", async () => {
+  const runtime = { ensureRunningWith: vi.fn() };
+  const launch = podmanLauncher({ runtime: runtime as unknown as PodmanRuntime, sessionId: "0123456789abcdef", imageId: undefined, networkMode: "open", downloadsDir: "/tmp/unused-downloads" });
+  await expect(launch({ socketDir: "/tmp/unused-runtime", socketPath: "/tmp/unused-runtime/browser.sock" })).rejects.toThrow(/Host browser fallback is disabled/);
+  expect(runtime.ensureRunningWith).not.toHaveBeenCalled();
 });

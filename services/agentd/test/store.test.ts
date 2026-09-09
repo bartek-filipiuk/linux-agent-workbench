@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import path from "node:path";
+import fs from "node:fs";
 import { Store } from "../src/storage/store.js";
 import { tmpDir } from "./helpers/tmp.js";
 
@@ -12,6 +13,19 @@ function mkRun(store: Store) {
 }
 
 describe("Store", () => {
+  it("protects the database and WAL files, including previously world-readable databases", () => {
+    const dir = path.join(tmpDir(), "private");
+    const file = path.join(dir, "state.sqlite");
+    const first = new Store(file);
+    first.close();
+    expect(fs.statSync(dir).mode & 0o777).toBe(0o700);
+    fs.chmodSync(file, 0o644);
+    const second = new Store(file);
+    try {
+      mkRun(second);
+      for (const suffix of ["", "-wal", "-shm"]) expect(fs.statSync(file + suffix).mode & 0o777).toBe(0o600);
+    } finally { second.close(); }
+  });
   it("migrates to the current schema version and is idempotent", () => {
     const s = mkStore();
     expect(s.schemaVersion).toBe(4);
@@ -56,12 +70,15 @@ describe("Store", () => {
     const a = new Store(file);
     const runId = mkRun(a);
     a.beginToolCall(runId, { callId: "c1", name: "terminal_input", args: { kind: "text", text: "ls" } });
+    const pausedRun = mkRun(a);
+    a.setRunState(pausedRun, "budget_paused");
     const doneRun = mkRun(a);
     a.setRunState(doneRun, "completed", "final");
     a.close();
 
     const b = new Store(file);
-    expect(b.markInterruptedRuns("agentd_restart")).toBe(1);
+    expect(b.markInterruptedRuns("agentd_restart")).toBe(2);
+    expect(b.getRun(pausedRun)).toMatchObject({ state: "interrupted", end_reason: "agentd_restart" });
     expect(b.getRun(runId)).toMatchObject({ state: "interrupted", end_reason: "agentd_restart" });
     expect(b.getRun(doneRun)?.state).toBe("completed");
     expect(b.listToolCalls(runId)[0]?.status).toBe("unknown");

@@ -1,0 +1,45 @@
+name: Bug report
+description: Report a reproducible problem with the application.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please write in English and search existing issues first.
+        For security vulnerabilities, use [private reporting](https://github.com/bartek-filipiuk/linux-agent-workbench/security/advisories/new).
+        Remove credentials, cookies, private task content and account details from logs and screenshots.
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior
+      description: What did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Include a minimal example using synthetic data where possible.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include the commit, Linux distribution, Node, pnpm, Podman and Codex CLI versions. Do not include credentials.
+    validations:
+      required: true
+  - type: dropdown
+    id: provider
+    attributes:
+      label: Provider
+      options:
+        - Codex with ChatGPT subscription sign-in
+        - OpenAI Responses API
+        - Not applicable or unknown
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Relevant logs or screenshots
+      description: Review and redact evidence yourself; automatic redaction is not a guarantee.

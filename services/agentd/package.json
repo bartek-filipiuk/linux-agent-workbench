@@ -3,7 +3,10 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    "./codex-process": { "types": "./dist/provider/codex-process.d.ts", "import": "./dist/provider/codex-process.js" }
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json && mkdir -p dist/storage/migrations && cp src/storage/migrations/*.sql dist/storage/migrations/",
     "typecheck": "tsc -p tsconfig.json --noEmit"

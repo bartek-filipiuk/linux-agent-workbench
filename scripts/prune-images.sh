@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Removes every podman image except: the ids pinned in images/*/image.json, the base images they
-# build from, and images used by running containers (podman refuses those; they are reported).
-# Intermediate build-cache images are removed too: podman 3.4 otherwise keeps every historical layer.
+# Removes only images whose known repository tags all belong to LAW.
+# Pinned/base images, other projects, shared tags and unowned build cache are retained.
+# Never use --force: Podman must retain any image still used by a container.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 KEEP=""
@@ -10,7 +10,12 @@ for base in $(grep -h '^FROM ' images/*/Containerfile | awk '{print $2}' | sort 
   id="$(podman image inspect "$base" --format '{{.Id}}' 2>/dev/null || true)"; [ -n "$id" ] && KEEP="$KEEP $id"
 done
 removed=0; kept=0
-for id in $(podman images -a --format '{{.ID}}' | sort -u); do
+# Repository provenance matters: an unused image is not necessarily ours.
+for id in $(podman images -a --format '{{.ID}} {{.Repository}}' | awk '
+  $2 == "localhost/law-terminal" || $2 == "localhost/law-browser" { law[$1] = 1; next }
+  { foreign[$1] = 1 }
+  END { for (id in law) if (!foreign[id]) print id }
+' | sort -u); do
   keep=0; for k in $KEEP; do case "$k" in "${id}"*) keep=1 ;; esac; done
   [ "$keep" = 1 ] && continue
   if podman rmi "$id" >/dev/null 2>&1; then removed=$((removed+1)); else kept=$((kept+1)); echo "kept ${id}: still in use by a container" >&2; fi

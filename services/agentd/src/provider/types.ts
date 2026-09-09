@@ -32,6 +32,8 @@ export type TurnContext = {
 
 export interface ModelAdapter {
   readonly model: string;
+  readonly managesContext?: boolean;
+  close?(): void;
   turn(input: ModelTurnInput, ctx: TurnContext): Promise<ModelTurn>;
 }
 

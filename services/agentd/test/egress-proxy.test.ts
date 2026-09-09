@@ -72,6 +72,10 @@ function request(raw: string, opts: { after?: string; waitFor?: (got: string) =>
 }
 
 describe("parseTarget", () => {
+  it("rejects ports that would throw in net.connect", () => {
+    expect(parseTarget("CONNECT", "public.test:99999")).toBeUndefined();
+    expect(parseTarget("CONNECT", "public.test:0")).toBeUndefined();
+  });
   it("parses CONNECT authorities and absolute URIs", () => {
     expect(parseTarget("CONNECT", "example.com:443")).toEqual({ host: "example.com", port: 443, path: "" });
     expect(parseTarget("CONNECT", "[::1]:22")).toEqual({ host: "::1", port: 22, path: "" });
@@ -89,6 +93,13 @@ describe("EgressProxy", { timeout: 15_000 }, () => {
     expect(log.at(-1)).toEqual({ host: "public.test", port: echoPort, allowed: true });
   });
 
+  it("rejects mapped private IPv6 and oversized complete headers before connecting", async () => {
+    const before = upstreamConnections;
+    expect(await request("CONNECT [::ffff:ac10:1]:443 HTTP/1.1\r\n\r\n")).toMatch(/403 Forbidden: private address/);
+    expect(await request("CONNECT public.test:99999 HTTP/1.1\r\n\r\n")).toMatch(/400 Bad Request/);
+    expect(await request(`GET http://public.test/ HTTP/1.1\r\nX: ${"a".repeat(20000)}\r\n\r\n`)).toMatch(/431/);
+    expect(upstreamConnections).toBe(before);
+  });
   it("refuses literal private addresses without opening an upstream", async () => {
     const before = upstreamConnections;
     const got = await request(`CONNECT 127.0.0.1:${echoPort} HTTP/1.1\r\n\r\n`);

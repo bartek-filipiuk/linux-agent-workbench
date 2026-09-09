@@ -94,6 +94,8 @@ export class SocketTerminalWorker implements TerminalWorker {
     this.conn.sendRaw(2, bytes);
   }
 
+  setOutputPaused(paused: boolean): void { this.conn.notify("terminal.flow", { paused }); }
+
   onPtyData(cb: (bytes: Uint8Array) => void) {
     this.conn.on("pty", cb);
     return () => void this.conn.off("pty", cb);

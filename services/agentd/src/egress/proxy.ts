@@ -37,7 +37,7 @@ function respond(socket: net.Socket, status: number, text: string): void {
 export function parseTarget(method: string, target: string): { host: string; port: number; path: string } | undefined {
   if (method === "CONNECT") {
     const m = /^(\[[^\]]+\]|[^:]+):(\d{1,5})$/.exec(target);
-    if (!m) return undefined;
+    if (!m || Number(m[2]) < 1 || Number(m[2]) > 65535) return undefined;
     return { host: m[1]!.replace(/^\[|\]$/g, ""), port: Number(m[2]), path: "" };
   }
   let u: URL;
@@ -53,6 +53,7 @@ export function parseTarget(method: string, target: string): { host: string; por
 export class EgressProxy {
   private readonly servers: net.Server[] = [];
   private upstreams = 0;
+  private readonly clients = new Set<net.Socket>();
   private readonly lookup: Lookup;
 
   constructor(private readonly opts: EgressProxyOptions) {
@@ -74,11 +75,14 @@ export class EgressProxy {
   }
 
   async close(): Promise<void> {
+    for (const client of this.clients) client.destroy();
     await Promise.all(this.servers.map((s) => new Promise<void>((r) => s.close(() => r()))));
     this.servers.length = 0;
   }
 
   private handle(client: net.Socket): void {
+    this.clients.add(client);
+    client.once("close", () => this.clients.delete(client));
     let buf = Buffer.alloc(0);
     client.on("error", () => client.destroy());
     const onData = (chunk: Buffer) => {
@@ -88,9 +92,10 @@ export class EgressProxy {
         if (buf.length > HEADER_CAP) respond(client, 431, "Request Header Fields Too Large");
         return;
       }
+      if (end + 4 > HEADER_CAP) { client.off("data", onData); respond(client, 431, "Request Header Fields Too Large"); return; }
       client.off("data", onData);
       client.pause();
-      void this.route(client, buf.subarray(0, end + 4).toString("latin1"), buf.subarray(end + 4));
+      void this.route(client, buf.subarray(0, end + 4).toString("latin1"), buf.subarray(end + 4)).catch(() => respond(client, 502, "Bad Gateway"));
     };
     client.on("data", onData);
   }
@@ -107,6 +112,7 @@ export class EgressProxy {
     };
     if (isPrivateHost(host)) return deny("private address");
     const decision = await this.opts.decide(host, port);
+    if (client.destroyed) return;
     if (!decision.allow) return deny(decision.reason);
     let addresses: string[];
     try {
@@ -114,6 +120,7 @@ export class EgressProxy {
     } catch {
       return deny("name not found");
     }
+    if (client.destroyed) return;
     if (addresses.length === 0) return deny("name not found");
     if (addresses.some(isPrivateIp)) return deny("private address");
     if (this.upstreams >= (this.opts.maxUpstreams ?? 256)) return deny("too many connections");

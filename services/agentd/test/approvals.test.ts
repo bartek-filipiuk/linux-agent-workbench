@@ -28,6 +28,33 @@ describe("ApprovalManager", () => {
     expect(rows[0]?.payload).toMatchObject({ decision: "once", ruleId: "git-push" });
   });
 
+  it("a decision resolves just its request; duplicate decisions cannot touch the queue", async () => {
+    const { store, runId, am } = setup(5000);
+    const first = am.request({ runId, command: "git push origin main", rule });
+    const second = am.request({ runId, command: "git push origin release", rule });
+    const [a, b] = am.pending;
+    expect(am.decide(a!.id, "once")).toBe(true);
+    expect(am.decide(a!.id, "session")).toBe(false);
+    await expect(first).resolves.toBe("once");
+    expect(am.pending.map((r) => r.id)).toEqual([b!.id]);
+    am.decide(b!.id, "deny");
+    await expect(second).resolves.toBe("deny");
+    store.close();
+  });
+
+  it("denies expired decisions even before the expiry timer runs", async () => {
+    const store = new Store(":memory:");
+    const runId = store.createRun({ workspaceId: store.createWorkspace("/w"), goal: "g", model: "m", networkMode: "open" });
+    let now = 100;
+    const am = new ApprovalManager(store, { ttlMs: 5000, now: () => now });
+    const decision = am.request({ runId, command: "git push", rule });
+    now = 5100;
+    expect(am.decide(am.pending[0]!.id, "session")).toBe(false);
+    await expect(decision).resolves.toBe("deny");
+    expect(am.isSessionAllowed(runId, rule.id)).toBe(false);
+    store.close();
+  });
+
   it("session decision remembers the rule for the run only", async () => {
     const { runId, am, store } = setup(5000);
     am.on("request", (r) => am.decide(r.id, "session"));

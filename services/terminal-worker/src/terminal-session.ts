@@ -78,6 +78,8 @@ export class TerminalSession {
     });
   }
 
+  setOutputPaused(paused: boolean): void { if (paused) this.proc?.pause(); else this.proc?.resume(); }
+
   onData(cb: Listener): () => void {
     this.listeners.add(cb);
     return () => void this.listeners.delete(cb);

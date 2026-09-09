@@ -60,12 +60,15 @@ export class WorkerServer {
     this.current?.close();
     const conn = new FramedConnection(socket);
     this.current = conn;
+    this.session.setOutputPaused(false);
+    conn.on("close", () => { if (this.current === conn) this.session.setOutputPaused(false); });
     this.unsubscribe = this.session.onData((bytes) => conn.sendRaw(1, bytes));
     conn.on("keys", (bytes: Uint8Array) => this.session.writeRaw(bytes));
     conn.on("message", (env: Envelope) => void this.handle(conn, env));
   }
 
   private async handle(conn: FramedConnection, env: Envelope): Promise<void> {
+    if (env.type === "terminal.flow") { this.session.setOutputPaused(env.payload.paused === true); return; }
     const id = env.id;
     if (!id) return; // notifications (worker.cancel) need no reply in M2
     try {

@@ -14,8 +14,8 @@ describe("TerminalInput", () => {
     expect(TerminalInput.safeParse({ kind: "text", text: "x\x7f" }).success).toBe(false);
   });
   it("rejects text over the byte limit (multi-byte aware)", () => {
-    const ok = "ę".repeat(TERMINAL_TEXT_MAX / 2); // 2 bytes each
-    const tooBig = "ę".repeat(TERMINAL_TEXT_MAX / 2 + 1);
+    const ok = "\u00e9".repeat(TERMINAL_TEXT_MAX / 2); // 2 bytes each
+    const tooBig = "\u00e9".repeat(TERMINAL_TEXT_MAX / 2 + 1);
     expect(TerminalInput.safeParse({ kind: "text", text: ok }).success).toBe(true);
     expect(TerminalInput.safeParse({ kind: "text", text: tooBig }).success).toBe(false);
   });
@@ -47,7 +47,7 @@ describe("Envelope", () => {
 describe("run schemas", () => {
   it("has the closed state set and default budgets", () => {
     expect(RunState.options).toEqual([
-      "idle", "running", "awaiting_approval", "handoff",
+      "idle", "running", "awaiting_approval", "handoff", "budget_paused",
       "completed", "stopped", "failed", "budget_exceeded", "interrupted",
     ]);
     expect(DEFAULT_BUDGETS).toEqual({ maxTurns: 40, maxToolCalls: 200, maxDurationMs: 1_800_000, maxCostUsd: 10 });

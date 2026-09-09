@@ -56,7 +56,12 @@ export class ApprovalManager extends EventEmitter {
   }
 
   decide(id: string, decision: ApprovalDecision): boolean {
-    if (!this.pendingMap.has(id)) return false;
+    const pending = this.pendingMap.get(id);
+    if (!pending) return false;
+    if (this.now() >= pending.request.expiresAt) {
+      this.finish(id, "deny");
+      return false;
+    }
     this.finish(id, decision);
     return true;
   }

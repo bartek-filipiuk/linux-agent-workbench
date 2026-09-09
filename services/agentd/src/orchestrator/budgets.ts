@@ -1,4 +1,4 @@
-import type { Budgets } from "@law/protocol";
+import type { Budgets, BudgetAction } from "@law/protocol";
 import type { ModelUsage } from "../provider/types.js";
 
 export type PriceTable = Record<string, { inputUsdPerMTok: number; outputUsdPerMTok: number }>;
@@ -21,9 +21,12 @@ export class BudgetTracker {
   toolCalls = 0;
   costUsd = 0;
   private readonly startedAt: number;
+  private pausedAt: number | undefined;
+  private pausedMs = 0;
+  private pauseDepth = 0;
 
   constructor(
-    private readonly budgets: Budgets,
+    private budgets: Budgets,
     private readonly now: () => number = Date.now,
   ) {
     this.startedAt = now();
@@ -33,15 +36,36 @@ export class BudgetTracker {
   addToolCall() { this.toolCalls++; }
   addCost(usd: number) { this.costUsd += usd; }
 
-  elapsedMs() { return this.now() - this.startedAt; }
+  elapsedMs() { return (this.pausedAt ?? this.now()) - this.startedAt - this.pausedMs; }
+  get limits(): Budgets { return { ...this.budgets }; }
+  pauseClock() { if (this.pauseDepth++ === 0) this.pausedAt = this.now(); }
+  resumeClock() {
+    if (!this.pauseDepth || --this.pauseDepth) return;
+    this.pausedMs += this.now() - this.pausedAt!;
+    this.pausedAt = undefined;
+  }
 
-  check(): void {
+  extend(action: BudgetAction): void {
     const b = this.budgets;
-    if (this.turns >= b.maxTurns) throw new BudgetExceededError("maxTurns", this.turns, b.maxTurns);
-    if (this.toolCalls >= b.maxToolCalls) throw new BudgetExceededError("maxToolCalls", this.toolCalls, b.maxToolCalls);
+    switch (action) {
+      case "add_steps":
+        b.maxTurns = b.maxTurns === null ? null : Math.max(b.maxTurns, this.turns) + 100;
+        b.maxToolCalls = b.maxToolCalls === null ? null : Math.max(b.maxToolCalls, this.toolCalls) + 300;
+        break;
+      case "unlimited_steps": b.maxTurns = null; b.maxToolCalls = null; break;
+      case "add_time": b.maxDurationMs = Math.max(b.maxDurationMs ?? 0, this.elapsedMs()) + 30 * 60_000; break;
+      case "unlimited_time": b.maxDurationMs = null; break;
+      case "add_cost": b.maxCostUsd = Math.max(b.maxCostUsd ?? 0, this.costUsd) + 10; break;
+    }
+  }
+
+  check(phase: "model" | "tool" = "model"): void {
+    const b = this.budgets;
+    if (phase === "model" && b.maxTurns !== null && this.turns >= b.maxTurns) throw new BudgetExceededError("maxTurns", this.turns, b.maxTurns);
+    if (b.maxToolCalls !== null && this.toolCalls >= b.maxToolCalls) throw new BudgetExceededError("maxToolCalls", this.toolCalls, b.maxToolCalls);
     const elapsed = this.elapsedMs();
-    if (elapsed > b.maxDurationMs) throw new BudgetExceededError("maxDurationMs", elapsed, b.maxDurationMs);
-    if (this.costUsd > b.maxCostUsd) throw new BudgetExceededError("maxCostUsd", this.costUsd, b.maxCostUsd);
+    if (b.maxDurationMs !== null && elapsed >= b.maxDurationMs) throw new BudgetExceededError("maxDurationMs", elapsed, b.maxDurationMs);
+    if (b.maxCostUsd !== null && this.costUsd > b.maxCostUsd) throw new BudgetExceededError("maxCostUsd", this.costUsd, b.maxCostUsd);
   }
 }
 

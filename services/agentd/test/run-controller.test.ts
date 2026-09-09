@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_BUDGETS } from "@law/protocol";
 import { Store } from "../src/storage/store.js";
 import { FakeModelAdapter } from "../src/provider/fake.js";
@@ -30,6 +30,33 @@ const input = (workspaceId: string) => ({ workspaceId, goal: "list files", netwo
 const toolResultsOf = (i: unknown) => (i as { toolResults: { callId: string; output: string }[] }).toolResults;
 
 describe("RunController", () => {
+  it("parks for manual login, skips actions from an in-flight model turn and waits for explicit resume", async () => {
+    const { ws, store, worker, fw } = await setup();
+    const adapter = new FakeModelAdapter([
+      { delayMs: 100, toolCalls: [{ name: "terminal_input", args: { kind: "text", text: "STALE" } }, { name: "terminal_observe", args: {} }] },
+      { text: "done" },
+    ]);
+    const rc = new RunController({ store, adapter, worker }, input(ws));
+    const running = rc.start();
+    await rc.pauseForHuman("manual login");
+    expect(rc.state).toBe("handoff");
+    expect(fw.screen).not.toContain("STALE");
+    expect(adapter.inputs).toHaveLength(1);
+    rc.resumeFromHandoff();
+    expect((await running).state).toBe("completed");
+    expect(toolResultsOf(adapter.inputs[1]).every(r => r.output.includes("Human took control"))).toBe(true);
+  });
+
+  it("lets persistent providers manage context and closes them at completion", async () => {
+    const { ws, store, worker } = await setup();
+    const observe = { toolCalls: [{ name: "terminal_observe", args: {} }] };
+    const adapter = Object.assign(new FakeModelAdapter([observe, observe, { text: "done" }]), { managesContext: true, close: vi.fn() });
+    const rc = new RunController({ store, adapter, worker, compactEvery: 1 }, input(ws));
+    expect((await rc.start()).state).toBe("completed");
+    expect(adapter.inputs.map((i) => "goal" in i ? "goal" : "results")).toEqual(["goal", "results", "results"]);
+    expect(store.listEvents(rc.runId).some((e) => e.type === "context.compacted")).toBe(false);
+    expect(adapter.close).toHaveBeenCalledOnce();
+  });
   it("never persists a tool result's image, only its text", async () => {
     const { ws, store, worker } = await setup();
     const tools = {
@@ -86,13 +113,14 @@ describe("RunController", () => {
 
   it("stops while the model call is pending", async () => {
     const { ws, store, worker, fw } = await setup();
-    const adapter = new FakeModelAdapter([{ text: "slow", delayMs: 5_000 }]);
+    const adapter = Object.assign(new FakeModelAdapter([{ text: "slow", delayMs: 5_000 }]), { close: vi.fn() });
     const rc = new RunController({ store, adapter, worker }, input(ws));
     const p = rc.start();
     setTimeout(() => rc.stop(), 20);
     const out = await p;
     expect(out.state).toBe("stopped");
     expect(store.getRun(out.runId)?.state).toBe("stopped");
+    expect(adapter.close).toHaveBeenCalledOnce();
   });
 
   it("stops while a tool call is executing and records it as error", async () => {
@@ -108,13 +136,75 @@ describe("RunController", () => {
     await expect.poll(() => fw.received.some((e) => e.type === "worker.cancel")).toBe(true);
   });
 
-  it("ends with budget_exceeded when turns run out", async () => {
-    const { ws, store, worker, fw } = await setup();
-    const adapter = new FakeModelAdapter(Array.from({ length: 5 }, () => ({ toolCalls: [{ name: "terminal_observe", args: {} }] })));
+  it("parks after the last permitted step, then resumes the same context exactly once", async () => {
+    const { ws, store, worker } = await setup();
+    const observe = { toolCalls: [{ name: "terminal_observe", args: {} }] };
+    const adapter = Object.assign(new FakeModelAdapter([observe, observe, { text: "done" }]), { managesContext: true, close: vi.fn() });
     const rc = new RunController({ store, adapter, worker, budgets: { ...DEFAULT_BUDGETS, maxTurns: 2 } }, input(ws));
-    const out = await rc.start();
-    expect(out).toMatchObject({ state: "budget_exceeded", endReason: "maxTurns" });
-    expect(adapter.inputs).toHaveLength(2);
+    const running = rc.start();
+    await expect.poll(() => rc.state).toBe("budget_paused");
+    expect(rc.stats).toMatchObject({ turns: 2, toolCalls: 2 });
+    expect(adapter.close).not.toHaveBeenCalled();
+    rc.resumeFromHandoff();
+    expect(rc.state).toBe("budget_paused");
+    expect(() => rc.resumeBudget("unlimited_time")).toThrow(/reached limit/);
+    rc.resumeBudget("add_steps");
+    expect(() => rc.resumeBudget("add_steps")).toThrow(/not paused/);
+    expect(await running).toMatchObject({ runId: rc.runId, state: "completed" });
+    expect(adapter.inputs).toHaveLength(3);
+    expect(adapter.inputs.filter(i => "goal" in i)).toHaveLength(1);
+    expect(toolResultsOf(adapter.inputs[2])).toHaveLength(1);
+    expect(adapter.inputs[2]).toMatchObject({ message: expect.stringContaining("Re-observe") });
+    expect(adapter.contexts[2]?.previousResponseId).toBe("fake-resp-3");
+    expect(rc.budgetStatus.limits).toMatchObject({ maxTurns: 102, maxDurationMs: DEFAULT_BUDGETS.maxDurationMs, maxCostUsd: 10 });
+    expect(adapter.close).toHaveBeenCalledOnce();
+  });
+
+  it("stop releases a parked provider without another model call", async () => {
+    const { ws, store, worker } = await setup();
+    const adapter = Object.assign(new FakeModelAdapter([{ toolCalls: [{ name: "terminal_observe", args: {} }] }]), { close: vi.fn() });
+    const rc = new RunController({ store, adapter, worker, budgets: { ...DEFAULT_BUDGETS, maxTurns: 1 } }, input(ws));
+    const running = rc.start();
+    await expect.poll(() => rc.state).toBe("budget_paused");
+    await rc.pauseForHuman("manual");
+    rc.stop();
+    expect((await running).state).toBe("stopped");
+    expect(adapter.inputs).toHaveLength(1);
+    expect(adapter.close).toHaveBeenCalledOnce();
+  });
+
+  it("skips stale actions in a batch after a time pause and rechecks policy on new actions", async () => {
+    const { ws, store, worker, fw } = await setup();
+    let now = 0;
+    const adapter = new FakeModelAdapter([
+      { toolCalls: [{ name: "terminal_observe", args: {} }, { name: "terminal_input", args: { kind: "text", text: "STALE" } }] },
+      { toolCalls: [{ name: "terminal_input", args: { kind: "text", text: "DENIED" } }] }, { text: "done" },
+    ]);
+    const policy = { authorize: vi.fn(async () => ({ allow: true as const })) };
+    const rc = new RunController({ store, adapter, worker, policy, now: () => now, budgets: { ...DEFAULT_BUDGETS, maxDurationMs: 10 } }, input(ws));
+    rc.on("tool", event => { if (event.status === "done") now = 11; });
+    const running = rc.start();
+    await expect.poll(() => rc.state).toBe("budget_paused");
+    now = 100000;
+    expect(rc.budgetStatus.elapsedMs).toBe(11);
+    // A policy change while the human owns the sandbox must apply after resume.
+    policy.authorize.mockImplementation(async () => ({ allow: false, code: "POLICY_DENIED", reason: "changed" }) as never);
+    rc.resumeBudget("add_time");
+    expect((await running).state).toBe("completed");
+    expect(fw.screen).not.toMatch(/STALE|DENIED/);
+    expect(toolResultsOf(adapter.inputs[1])[1]?.output).toContain("skipped");
+    expect(policy.authorize).toHaveBeenCalledTimes(2);
+    expect(rc.budgetStatus.limits.maxTurns).toBe(DEFAULT_BUDGETS.maxTurns);
+  });
+
+  it("unlimited steps cross both old caps without removing the spending or time limit", async () => {
+    const { ws, store, worker } = await setup();
+    const adapter = new FakeModelAdapter([...Array.from({ length: 205 }, () => ({ toolCalls: [{ name: "peek", args: {} }] })), { text: "done" }]);
+    const rc = new RunController({ store, adapter, worker, tools: { specs: [], execute: async () => ({ output: "ok" }) }, budgets: { ...DEFAULT_BUDGETS, maxTurns: null, maxToolCalls: null } }, input(ws));
+    expect((await rc.start()).state).toBe("completed");
+    expect(rc.stats).toMatchObject({ turns: 206, toolCalls: 205 });
+    expect(store.listEvents(rc.runId).filter(e => e.type === "cost.unknown_model")).toHaveLength(1);
+    expect(rc.budgetStatus.limits.maxCostUsd).toBe(10);
   });
 
   it("feeds denials and invalid args back to the model instead of failing", async () => {
@@ -190,10 +280,11 @@ describe("RunController", () => {
 
   it("fails cleanly when the model adapter throws", async () => {
     const { ws, store, worker, fw } = await setup();
-    const adapter = { model: "boom", turn: async () => { throw new Error("upstream 500"); } };
+    const adapter = { model: "boom", close: vi.fn(), turn: async () => { throw new Error("upstream 500"); } };
     const rc = new RunController({ store, adapter, worker }, input(ws));
     const out = await rc.start();
     expect(out).toMatchObject({ state: "failed", endReason: "upstream 500" });
+    expect(adapter.close).toHaveBeenCalledOnce();
   });
 });
 
@@ -207,6 +298,22 @@ describe("costOf", () => {
 });
 
 describe("BudgetTracker", () => {
+  it("excludes nested human pauses and separates unlimited steps from time and cost", () => {
+    let now = 0;
+    const tracker = new BudgetTracker({ ...DEFAULT_BUDGETS }, () => now);
+    now = 20; tracker.pauseClock(); tracker.pauseClock();
+    now = 500; tracker.resumeClock();
+    expect(tracker.elapsedMs()).toBe(20);
+    now = 1000; tracker.resumeClock(); now = 1020;
+    expect(tracker.elapsedMs()).toBe(40);
+    tracker.extend("unlimited_steps");
+    expect(tracker.limits).toEqual({ ...DEFAULT_BUDGETS, maxTurns: null, maxToolCalls: null });
+    tracker.addCost(11);
+    expect(() => tracker.check()).toThrow(/maxCostUsd/);
+    tracker.extend("add_cost");
+    expect(() => tracker.check()).not.toThrow();
+    expect(tracker.limits.maxCostUsd).toBe(21);
+  });
   it("throws the specific limit", () => {
     let t = 0;
     const b = new BudgetTracker({ maxTurns: 1, maxToolCalls: 1, maxDurationMs: 10, maxCostUsd: 0.5 }, () => t);

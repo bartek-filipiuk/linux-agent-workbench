@@ -8,6 +8,13 @@ describe("browser protocol", () => {
     expect(Array.from(f.jpeg)).toEqual([0xff, 0xd8]);
     expect(() => decodeBrowserFrame(new Uint8Array(2))).toThrow(RangeError);
   });
+  it("preserves stream generation and sequence and rejects incomplete metadata", () => {
+    const f = decodeBrowserFrame(encodeBrowserFrame(1280, 800, new Uint8Array([255, 216, 255, 217]), 4294967295, 42));
+    expect(f).toMatchObject({ width: 1280, height: 800, generation: 4294967295, sequence: 42 });
+    expect(Array.from(f.jpeg)).toEqual([255, 216, 255, 217]);
+    expect(() => decodeBrowserFrame(new Uint8Array(10))).toThrow();
+    expect(() => decodeBrowserFrame(new Uint8Array(16))).toThrow();
+  });
   it("normalises navigable urls and rejects other schemes", () => {
     expect(normaliseNavigableUrl("example.com")).toBe("https://example.com/");
     expect(normaliseNavigableUrl("http://x.test/a?b=1")).toBe("http://x.test/a?b=1");

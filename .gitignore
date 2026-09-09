@@ -3,3 +3,17 @@ node_modules/
 dist/
 out/
 *.tsbuildinfo
+
+# Local credentials, state and unpublished review evidence
+.env.*
+!.env.example
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+*.pem
+*.key
+auth.json
+.impeccable/
+*.log
+.DS_Store

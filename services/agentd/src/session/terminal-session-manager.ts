@@ -82,15 +82,15 @@ export class TerminalSessionManager extends EventEmitter {
             this._worker = undefined;
             if (this._status.state !== "ready") return;
             // The worker restarts under its supervisor loop; try to pick it up again before giving up on the session.
-            this.setStatus({ state: "disconnected", ...base, message: "worker connection lost; reconnecting" });
+            this.setStatus({ ...this._status, state: "disconnected", message: "worker connection lost; reconnecting" });
             void this.waitForWorker(socketPath, sessionId)
               .then((again) => {
                 if (this._status.state !== "disconnected") return again.close();
                 bind(again);
-                this.setStatus({ state: "ready", ...base, message: "reconnected to the sandbox worker" });
+                this.setStatus({ ...this._status, state: "ready", message: "reconnected to the sandbox worker" });
                 void again.refresh().catch(() => undefined);
               })
-              .catch((e) => this.setStatus({ state: "disconnected", ...base, message: `worker connection closed (${e instanceof Error ? e.message : String(e)})` }));
+              .catch((e) => this.setStatus({ ...this._status, state: "disconnected", message: `worker connection closed (${e instanceof Error ? e.message : String(e)})` }));
           }),
         );
       };
@@ -99,6 +99,11 @@ export class TerminalSessionManager extends EventEmitter {
     } catch (e) {
       return this.setStatus({ state: "error", ...base, message: e instanceof Error ? e.message : String(e) });
     }
+  }
+
+  /** Called only after the daemon has successfully changed the session egress policy. */
+  setNetworkMode(networkMode: NetworkMode): void {
+    this.setStatus({ ...this._status, networkMode });
   }
 
   write(bytes: Uint8Array): void {

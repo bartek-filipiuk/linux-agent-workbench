@@ -1,0 +1,40 @@
+import { expect, it } from "vitest";
+import { TerminalDelivery } from "../src/main/terminal-delivery";
+it("fails explicitly at the memory limit instead of dropping part of a terminal stream", () => {
+  let failures = 0, sent = 0;
+  const d = new TerminalDelivery(() => sent++, () => {}, () => failures++);
+  d.push(new Uint8Array(4 * 1024 * 1024));
+  d.push(new Uint8Array(1));
+  d.setReady(true);
+  expect(failures).toBe(1);
+  expect(sent).toBe(0);
+});
+it("sends one chunk at a time and returns credit only for its matching ack", () => {
+  const sent: Array<{ id: number; data: Uint8Array }> = [], credits: number[] = [];
+  const delivery = new TerminalDelivery(c => sent.push(c), n => credits.push(n));
+  delivery.push(new Uint8Array(130000));
+  expect(sent).toHaveLength(0);
+  delivery.setReady(true);
+  expect(sent).toHaveLength(1);
+  expect(sent[0]!.data.length).toBe(65536);
+  delivery.acknowledge(99);
+  expect(credits).toEqual([]);
+  delivery.acknowledge(sent[0]!.id);
+  expect(sent).toHaveLength(2);
+  expect(credits).toEqual([65536]);
+  delivery.acknowledge(sent[0]!.id);
+  expect(credits).toEqual([65536]);
+  delivery.acknowledge(sent[1]!.id);
+  expect(credits.reduce((a,b)=>a+b,0)).toBe(130000);
+});
+it("replays an unacknowledged chunk after renderer reload and ignores stale ack", () => {
+  const sent: Array<{ id: number; data: Uint8Array }> = [], credits: number[] = [];
+  const d = new TerminalDelivery(c => sent.push(c), n => credits.push(n));
+  d.setReady(true); d.push(new Uint8Array([1,2,3]));
+  d.setReady(false); d.setReady(true);
+  expect(sent[1]!.data).toEqual(sent[0]!.data);
+  d.acknowledge(sent[0]!.id);
+  expect(credits).toEqual([]);
+  d.acknowledge(sent[1]!.id);
+  expect(credits).toEqual([3]);
+});

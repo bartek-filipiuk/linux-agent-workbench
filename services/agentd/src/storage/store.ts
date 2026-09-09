@@ -35,16 +35,24 @@ export type ToolCallRow = {
   error_code: string | null;
 };
 
-const NON_TERMINAL: RunState[] = ["idle", "running", "awaiting_approval", "handoff"];
+const NON_TERMINAL: RunState[] = ["idle", "running", "awaiting_approval", "handoff", "budget_paused"];
 
 export class Store {
   private readonly db: DatabaseSync;
   readonly schemaVersion: number;
 
   constructor(file: string) {
-    if (file !== ":memory:") fs.mkdirSync(path.dirname(file), { recursive: true });
+    if (file !== ":memory:") {
+      fs.mkdirSync(path.dirname(file), { recursive: true, mode: 0o700 });
+      const fd = fs.openSync(file, "a", 0o600);
+      try { fs.fchmodSync(fd, 0o600); } finally { fs.closeSync(fd); }
+    }
     this.db = new DatabaseSync(file);
     this.db.exec("PRAGMA journal_mode = WAL");
+    if (file !== ":memory:") for (const suffix of ["-wal", "-shm"]) {
+      try { fs.chmodSync(file + suffix, 0o600); }
+      catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }
+    }
     // WAL + NORMAL: durable against an app crash, may lose the last transactions on power loss. The audit
     // log is not a ledger, and FULL would fsync on the single thread that also forwards terminal output.
     this.db.exec("PRAGMA synchronous = NORMAL");
@@ -99,6 +107,15 @@ export class Store {
 
   getRun(runId: string): RunRow | undefined {
     return this.db.prepare(`SELECT * FROM runs WHERE id = ?`).get(runId) as RunRow | undefined;
+  }
+
+  listRecentRuns(workspacePath: string, limit = 30): RunRow[] {
+    return this.db.prepare(`SELECT r.* FROM runs r JOIN workspaces w ON w.id = r.workspace_id WHERE w.path = ? ORDER BY r.started_at DESC LIMIT ?`).all(workspacePath, limit) as RunRow[];
+  }
+
+  listRecentEvents(runId: string, limit = 500): RunEvent[] {
+    const rows = this.db.prepare(`SELECT seq, run_id, ts, type, payload_json, sensitivity FROM run_events WHERE run_id = ? ORDER BY seq DESC LIMIT ?`).all(runId, limit) as Array<{ seq: number; run_id: string; ts: number; type: string; payload_json: string; sensitivity: RunEvent["sensitivity"] }>;
+    return rows.reverse().map(r => ({ seq: r.seq, runId: r.run_id, ts: r.ts, type: r.type, payload: JSON.parse(r.payload_json), sensitivity: r.sensitivity }));
   }
 
   listAllowedHosts(workspaceId: string): string[] {

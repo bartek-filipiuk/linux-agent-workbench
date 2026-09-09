@@ -4,6 +4,7 @@
 FROM mcr.microsoft.com/playwright:v1.62.1-noble
 
 ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends xvfb openbox ffmpeg xdotool python3-minimal && rm -rf /var/lib/apt/lists/*
 # uid 1000 is "ubuntu" in the base image (pwuser is 1001). --userns=keep-id maps the host user to uid 1000,
 # so that is the account we rename to "agent". No -m: /home/agent is a tmpfs at runtime.
 RUN userdel -r pwuser 2>/dev/null || true \
@@ -20,6 +21,6 @@ RUN chown -R root:root /opt/law
 
 USER agent
 WORKDIR /home/agent
-ENV HOME=/home/agent LAW_BROWSER_SOCKET=/run/law/browser.sock LAW_BROWSER_PROFILE=/profile/user-data LAW_BROWSER_DOWNLOADS=/downloads LAW_BROWSER_CHANNEL=chromium PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+ENV LAW_BROWSER_MANUAL=1 HOME=/home/agent LAW_BROWSER_SOCKET=/run/law/browser.sock LAW_BROWSER_PROFILE=/profile/user-data LAW_BROWSER_DOWNLOADS=/downloads LAW_BROWSER_CHANNEL=chromium PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 # ponytail: bash loop as supervisor, same as the terminal image
 CMD ["bash", "-c", "while true; do node /opt/law/worker/main.js; echo 'browser-worker exited, restarting in 1s'; sleep 1; done"]

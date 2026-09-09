@@ -29,8 +29,16 @@ describe("BrowserSession", { timeout: 30_000 }, () => {
   it("streams frames with the viewport size", async () => {
     const frames: Array<{ width: number; height: number; jpeg: Uint8Array }> = [];
     const off = s.onFrame((f) => frames.push(f));
+    await s.setFramesEnabled(true);
     await s.navigate(`${site.url}/input.html`);
     await until(() => frames.length > 0);
+    await s.setFramesEnabled(false);
+    const count = frames.length;
+    await new Promise(r => setTimeout(r, 250));
+    expect(frames.length).toBe(count);
+    await s.setFramesEnabled(true);
+    await s.navigate(`${site.url}/input.html`);
+    await until(() => frames.length > count);
     off();
     expect(frames[0]).toMatchObject({ width: 640, height: 400 });
     expect(frames[0]!.jpeg[0]).toBe(0xff);

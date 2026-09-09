@@ -3,9 +3,28 @@ import { z } from "zod";
 export const BrowserNavigate = z.object({ url: z.string().min(1).max(4096) });
 export type BrowserNavigate = z.infer<typeof BrowserNavigate>;
 
+export const BrowserPageInfo = z.object({ id: z.string(), url: z.string(), title: z.string() });
+export type BrowserPageInfo = z.infer<typeof BrowserPageInfo>;
+export const BrowserControl = z.discriminatedUnion("kind", [
+  z.object({ kind: z.literal("switch"), pageId: z.string().min(1) }),
+  z.object({ kind: z.literal("close"), pageId: z.string().min(1) }),
+  z.object({ kind: z.literal("refresh") }),
+  z.object({ kind: z.literal("manual"), enabled: z.boolean() }),
+  z.object({ kind: z.literal("dialog"), accept: z.boolean() }),
+]);
+export type BrowserControl = z.infer<typeof BrowserControl>;
 export const BrowserInfo = z.object({
   url: z.string(),
   title: z.string(),
+  activePageId: z.string().optional(),
+  pages: z.array(BrowserPageInfo).optional(),
+  generation: z.number().int().nonnegative().optional(),
+  manual: z.boolean().optional(),
+  manualAvailable: z.boolean().optional(),
+  transitioning: z.boolean().optional(),
+  frameError: z.string().nullable().optional(),
+  dialog: z.object({ type: z.string(), message: z.string() }).nullable().optional(),
+  diagnostics: z.array(z.object({ ts: z.number(), message: z.string() })).optional(),
   viewport: z.object({ width: z.number().int().positive(), height: z.number().int().positive() }),
 });
 export type BrowserInfo = z.infer<typeof BrowserInfo>;
@@ -40,19 +59,22 @@ export function normaliseNavigableUrl(input: string): string | null {
   return u.toString();
 }
 
-// kind-3 frame payload: u16 width, u16 height (big-endian), then JPEG bytes.
-export function encodeBrowserFrame(width: number, height: number, jpeg: Uint8Array): Uint8Array {
-  const out = new Uint8Array(4 + jpeg.length);
-  new DataView(out.buffer).setUint16(0, width);
-  new DataView(out.buffer).setUint16(2, height);
-  out.set(jpeg, 4);
+// Legacy 4-byte headers remain readable. A zero-width sentinel identifies v1 metadata.
+export function encodeBrowserFrame(width: number, height: number, jpeg: Uint8Array, generation?: number, sequence = 0): Uint8Array {
+  const size = generation === undefined ? 4 : 16;
+  const out = new Uint8Array(size + jpeg.length);
+  const dv = new DataView(out.buffer);
+  if (generation === undefined) { dv.setUint16(0, width); dv.setUint16(2, height); }
+  else { dv.setUint16(2, 1); dv.setUint16(4, width); dv.setUint16(6, height); dv.setUint32(8, generation); dv.setUint32(12, sequence); }
+  out.set(jpeg, size);
   return out;
 }
-
-export function decodeBrowserFrame(bytes: Uint8Array): { width: number; height: number; jpeg: Uint8Array } {
+export function decodeBrowserFrame(bytes: Uint8Array): { width: number; height: number; jpeg: Uint8Array; generation: number; sequence: number } {
   if (bytes.length < 4) throw new RangeError("browser frame too short");
   const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-  return { width: dv.getUint16(0), height: dv.getUint16(2), jpeg: bytes.subarray(4) };
+  if (dv.getUint16(0) !== 0) return { width: dv.getUint16(0), height: dv.getUint16(2), jpeg: bytes.subarray(4), generation: 0, sequence: 0 };
+  if (bytes.length < 16 || dv.getUint16(2) !== 1) throw new RangeError("unsupported browser frame header");
+  return { width: dv.getUint16(4), height: dv.getUint16(6), generation: dv.getUint32(8), sequence: dv.getUint32(12), jpeg: bytes.subarray(16) };
 }
 
 // ---- B3: semantic observation and structured actions ----
@@ -71,8 +93,7 @@ export const BrowserElement = z.object({
 });
 export type BrowserElement = z.infer<typeof BrowserElement>;
 
-export const BrowserPageInfo = z.object({ id: z.string(), url: z.string(), title: z.string() });
-export type BrowserPageInfo = z.infer<typeof BrowserPageInfo>;
+
 
 export const BrowserObservation = z.object({
   revision: z.number().int().nonnegative(),

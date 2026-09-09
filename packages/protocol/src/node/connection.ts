@@ -14,6 +14,11 @@ export class FramedConnection extends EventEmitter {
   private readonly decoder = new FrameDecoder();
   private readonly pending = new Map<string, Pending>();
   private seq = 0;
+  private blocked = false;
+  private outgoing: Array<{ kind: number; data: Uint8Array }> = [];
+  private queuedBytes = 0;
+  private readonly queueLimit = 8 * 1024 * 1024;
+  get bufferedBytes(): number { return this.queuedBytes + this.socket.writableLength; }
   closed = false;
 
   constructor(private readonly socket: net.Socket) {
@@ -28,9 +33,12 @@ export class FramedConnection extends EventEmitter {
       }
       for (const f of frames) this.dispatch(f);
     });
+    socket.on("drain", () => { this.blocked = false; this.flush(); });
     socket.on("error", (e) => this.emit("error", e));
     socket.on("close", () => {
       this.closed = true;
+      this.outgoing = [];
+      this.queuedBytes = 0;
       const err = new ProtocolError("CANCELLED", "connection closed");
       for (const p of this.pending.values()) {
         p.cleanup();
@@ -80,7 +88,7 @@ export class FramedConnection extends EventEmitter {
 
   sendRaw(kind: 1 | 2 | 3 | 4, bytes: Uint8Array): void {
     if (this.closed) return;
-    this.socket.write(encodeFrame(kind, bytes));
+    this.enqueue(kind, encodeFrame(kind, bytes));
   }
 
   close(): void {
@@ -91,7 +99,33 @@ export class FramedConnection extends EventEmitter {
 
   private writeJson(msg: unknown): void {
     if (this.closed) return;
-    this.socket.write(encodeFrame(FrameKind.Json, encodeJson(msg)));
+    this.enqueue(FrameKind.Json, encodeFrame(FrameKind.Json, encodeJson(msg)));
+  }
+
+  private enqueue(kind: number, data: Uint8Array): void {
+    // Images are disposable observations. Reliable frames retain FIFO ordering.
+    if (kind === FrameKind.BrowserFrame) {
+      const old = this.outgoing.findIndex((f) => f.kind === kind);
+      if (old >= 0) { this.queuedBytes -= this.outgoing[old]!.data.byteLength; this.outgoing.splice(old, 1); }
+    }
+    if (this.queuedBytes + data.byteLength > this.queueLimit) {
+      if (kind === FrameKind.BrowserFrame) return;
+      this.closed = true;
+      this.socket.destroy(new Error("Reliable stream queue exceeded 8 MiB; reconnect required"));
+      return;
+    }
+    this.outgoing.push({ kind, data });
+    this.queuedBytes += data.byteLength;
+    this.flush();
+  }
+
+  private flush(): void {
+    while (!this.closed && !this.blocked && this.outgoing.length) {
+      const frame = this.outgoing.shift()!;
+      this.queuedBytes -= frame.data.byteLength;
+      this.blocked = !this.socket.write(frame.data);
+    }
+    if (!this.blocked && !this.outgoing.length) this.emit("drained");
   }
 
   private dispatch(frame: Frame): void {

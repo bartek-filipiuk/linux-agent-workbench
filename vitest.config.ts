@@ -8,6 +8,7 @@ export default defineConfig({
     alias: {
       "@law/protocol/node": r("./packages/protocol/src/node/index.ts"),
       "@law/protocol": r("./packages/protocol/src/index.ts"),
+      "@law/agentd/codex-process": r("./services/agentd/src/provider/codex-process.ts"),
       "@law/agentd": r("./services/agentd/src/index.ts"),
       "@law/terminal-worker": r("./services/terminal-worker/src/index.ts"),
     },

@@ -30,6 +30,7 @@ export const STATE_LABEL: Record<string, string> = {
   completed: "completed",
   stopped: "stopped",
   failed: "failed",
+  budget_paused: "paused at limit",
   budget_exceeded: "budget exceeded",
   interrupted: "interrupted",
 };

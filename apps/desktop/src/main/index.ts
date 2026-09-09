@@ -1,10 +1,18 @@
-import { app, BrowserWindow, dialog, ipcMain, Menu, MessageChannelMain, safeStorage, utilityProcess, type MessagePortMain } from "electron";
+import { app, BrowserWindow, dialog, shell, ipcMain, Menu, MessageChannelMain, safeStorage, utilityProcess, type MessagePortMain } from "electron";
 import fs from "node:fs";
+import { pathToFileURL } from "node:url";
+import { isRendererUrl, isTrustedRenderer } from "./renderer-security";
 import os from "node:os";
 import path from "node:path";
+import { RunLimits, BudgetAction, ModelSelection, validateModelSelection, type ModelCatalog, type BrowserControl, type BrowserInfo } from "@law/protocol";
 import type { AgentdToMain, MainToAgentd, SessionStatus } from "@law/agentd";
+import { TerminalDelivery } from "./terminal-delivery";
+import { CodexAccount, type AccountState } from "./codex-account";
+import { command } from "./commands";
+import { emptyRun, reduceRun, type RunEvent } from "../renderer/run-view";
 import { parseEnvFile } from "./env-file";
-import { execFileSync } from "node:child_process";
+import { providerConfig } from "./provider-config";
+import { collectDiagnostics, type DiagnosticsState } from "./diagnostics";
 import { resolveApiKey, stripEnvKey, type KeyStore } from "./key-store";
 import { RingBuffer, redact } from "./redact";
 import { DEFAULT_SETTINGS, readSettings, writeSettings, type Settings } from "./settings";
@@ -17,41 +25,71 @@ type AgentdStatus =
 let status: AgentdStatus = { type: "agentd.starting" };
 let session: SessionStatus = { state: "idle" };
 let win: BrowserWindow | null = null;
+let rendererEntryUrl = "";
+function handleTrusted(channel: string, listener: Parameters<typeof ipcMain.handle>[1]) {
+  ipcMain.handle(channel, (event, ...args) => {
+    if (!isTrustedRenderer(event, win?.webContents, rendererEntryUrl)) throw new Error("Untrusted IPC sender");
+    return listener(event, ...args);
+  });
+}
+function onTrusted(channel: string, listener: Parameters<typeof ipcMain.on>[1]) {
+  ipcMain.on(channel, (event, ...args) => {
+    if (isTrustedRenderer(event, win?.webContents, rendererEntryUrl)) listener(event, ...args);
+  });
+}
+
 let port: MessagePortMain | null = null;
 let settings: Settings = { ...DEFAULT_SETTINGS };
 type LeaseState = { surface: "terminal" | "browser"; owner: "agent" | "human"; reason?: string };
 let leases: Record<"terminal" | "browser", LeaseState> = { terminal: { surface: "terminal", owner: "human" }, browser: { surface: "browser", owner: "human" } };
-let browser: { state: string; url?: string; title?: string; message?: string } = { state: "idle" };
+let browser: { state: string; message?: string } & Partial<BrowserInfo> = { state: "idle" };
 let keyInfo: { keyStore: KeyStore; keyBackend: string } = { keyStore: "none", keyBackend: "unknown" };
+let currentRun = emptyRun;
+let currentGoal = "";
+let handoffReason: string | null = null;
+let runSequence = 0;
+let querySequence = 0;
+const queries = new Map<string, { resolve: (value: unknown) => void; reject: (e: Error) => void; timer: NodeJS.Timeout }>();
+function queryDaemon(kind: "history" | "detail" | "browser", runId?: string, command?: BrowserControl): Promise<unknown> {
+  if (!port) return Promise.reject(new Error("Agent service is unavailable. Recheck setup first."));
+  const requestId = String(++querySequence);
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => { queries.delete(requestId); reject(new Error("History request timed out")); }, kind === "browser" ? 90000 : 10000);
+    queries.set(requestId, { resolve, reject, timer });
+    toAgentd({ type: "ui.query", requestId, kind, ...(runId ? { runId } : {}), ...(command ? { command } : {}) });
+  });
+}
+function publishRun(event: RunEvent) {
+  currentRun = reduceRun(currentRun, event);
+  if (event.type === "run.handoff") handoffReason = event.reason;
+  if (event.type === "run.state" && event.state !== "handoff") handoffReason = null;
+  send("run:event", { ...event, ...(event.type === "run.state" ? { goal: currentGoal } : {}), sequence: ++runSequence });
+}
 const agentdLog = new RingBuffer(500);
 
-function sh(cmd: string, args: string[]): string {
-  try {
-    return execFileSync(cmd, args, { encoding: "utf8", timeout: 10_000 }).trim();
-  } catch (e) {
-    return `(${cmd} failed: ${e instanceof Error ? e.message.split("\n")[0] : String(e)})`;
-  }
-}
-
 /** Versions, images, containers, settings without the key and the agentd log tail; every line redacted. */
-function writeDiagnostics(): string {
+let diagnosticsAbort: AbortController | undefined;
+let diagnosticsState: DiagnosticsState = { running: false, step: "" };
+async function writeDiagnostics(): Promise<string> {
+  if (diagnosticsAbort) throw new Error("Diagnostics are already running");
+  diagnosticsAbort = new AbortController();
   const dir = path.join(path.dirname(dbPath()), "diagnostics");
-  fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
-  const file = path.join(dir, `law-diagnostics-${new Date().toISOString().replace(/[:.]/g, "-")}.txt`);
+
   const { openaiKeyEncrypted: _k, ...settingsNoKey } = settings;
   const sections: [string, string][] = [
-    ["versions", `app ${app.getVersion()}\nelectron ${process.versions.electron}\nnode ${process.versions.node}\n${sh("podman", ["--version"])}\n${sh("uname", ["-sr"])}`],
+    ["versions", `app ${app.getVersion()}\nelectron ${process.versions.electron}\nnode ${process.versions.node}`],
     ["images", `terminal ${readImageId("terminal") ?? "missing"}\nbrowser ${readImageId("browser") ?? "missing"}`],
-    ["containers", sh("podman", ["ps", "-a", "--filter", "label=law.app=1", "--format", "{{.Names}} {{.Status}} {{.Image}}"])],
     ["settings", JSON.stringify(settingsNoKey, null, 2)],
     ["key", `store ${keyInfo.keyStore}, backend ${keyInfo.keyBackend}`],
     ["state", `${dbPath()} ${fs.existsSync(dbPath()) ? `${fs.statSync(dbPath()).size} bytes` : "missing"}; agentd ${status.type}${status.type === "agentd.ready" ? ` schema ${status.schemaVersion}` : ""}`],
     ["session", JSON.stringify({ ...session, browser: browser.state, leases: { terminal: leases.terminal.owner, browser: leases.browser.owner } })],
     ["agentd log (last 500 lines)", agentdLog.text()],
   ];
-  const text = sections.map(([title, body]) => `== ${title} ==\n${body}\n`).join("\n");
-  fs.writeFileSync(file, redact(text), { mode: 0o600 });
-  return file;
+  try {
+    return await collectDiagnostics(dir, sections, diagnosticsAbort.signal, (state) => { diagnosticsState = state; send("diagnostics:state", state); });
+  } catch (e) { diagnosticsState = { running: false, step: "Failed to save report", error: String(e) }; send("diagnostics:state", diagnosticsState); throw e; }
+  finally { diagnosticsAbort = undefined; }
+
 }
 
 const repoRoot = () => path.resolve(__dirname, "..", "..", "..", "..");
@@ -103,60 +141,47 @@ function readImageId(name: "terminal" | "browser" = "terminal"): string | undefi
 const send = (channel: string, payload: unknown) => win?.webContents.send(channel, payload);
 const toAgentd = (msg: MainToAgentd) => port?.postMessage(msg);
 
-// PTY output arrives as many small chunks (a TUI spinner alone is dozens per second); one IPC message
-// per chunk starves the renderer. Coalesce per frame, and if the renderer falls far behind, drop the
-// backlog and ask tmux to repaint instead of replaying minutes of spinner frames.
-const TERMINAL_FLUSH_MS = 16;
-const TERMINAL_BACKLOG_CAP = 2 * 1024 * 1024;
-let terminalChunks: Uint8Array[] = [];
-let terminalBacklog = 0;
-let terminalFlushTimer: NodeJS.Timeout | undefined;
-function queueTerminalData(data: Uint8Array): void {
-  terminalChunks.push(data);
-  terminalBacklog += data.byteLength;
-  if (terminalBacklog > TERMINAL_BACKLOG_CAP) {
-    terminalChunks = [];
-    terminalBacklog = 0;
-    toAgentd({ type: "terminal.refresh" });
-    return;
-  }
-  terminalFlushTimer ??= setTimeout(() => {
-    terminalFlushTimer = undefined;
-    if (terminalChunks.length === 0) return;
-    const out = new Uint8Array(terminalBacklog);
-    let off = 0;
-    for (const c of terminalChunks) { out.set(c, off); off += c.byteLength; }
-    terminalChunks = [];
-    terminalBacklog = 0;
-    send("terminal:data", out);
-  }, TERMINAL_FLUSH_MS);
-}
+const terminalDelivery = new TerminalDelivery(
+  (chunk) => send("terminal:data", chunk),
+  (bytes) => toAgentd({ type: "terminal.ack", bytes }),
+  () => {
+    toAgentd({ type: "session.stop", destroy: false });
+    onAgentd({ type: "agentd.error", message: "Terminal output exceeded its buffer. Reconnect to repaint the terminal; rebuild worker images if this repeats." });
+  },
+);
 
 function onAgentd(msg: AgentdToMain) {
   switch (msg.type) {
+    case "ui.reply": {
+      const q = queries.get(msg.requestId);
+      if (q) { clearTimeout(q.timer); queries.delete(msg.requestId); if (msg.error) q.reject(new Error(msg.error)); else q.resolve(msg.result); }
+      return;
+    }
     case "agentd.ready":
     case "agentd.error":
       status = msg.type === "agentd.ready" ? { ...msg, ...keyInfo } : msg;
       send("agentd:event", status);
       if (msg.type === "agentd.ready") {
+        syncFrameVisibility();
         toAgentd({ type: "policy.set", nestedAutonomy: settings.nestedAutonomy, domainMode: settings.domainMode });
         if (settings.lastWorkspace) toAgentd({ type: "session.start", workspacePath: settings.lastWorkspace, networkMode: settings.networkMode });
       }
       return;
     case "session.state": {
       const { type: _t, ...rest } = msg;
+      if (rest.workspacePath && session.workspacePath && rest.workspacePath !== session.workspacePath) { currentRun = emptyRun; currentGoal = ""; handoffReason = null; }
       session = rest;
       send("session:state", session);
       return;
     }
     case "terminal.data":
-      queueTerminalData(msg.data);
+      terminalDelivery.push(msg.data);
       return;
     case "run.state":
       activeRun = ["completed", "stopped", "failed", "budget_exceeded", "interrupted"].includes(msg.state)
         ? null
         : { runId: msg.runId, turns: msg.turns, toolCalls: msg.toolCalls, costUsd: msg.costUsd, snapshot: msg.snapshot };
-      send("run:event", msg);
+      publishRun(msg);
       return;
     case "run.commentary":
     case "run.tool":
@@ -165,7 +190,7 @@ function onAgentd(msg: AgentdToMain) {
     case "approval.resolved":
     case "gate.event":
     case "run.restored":
-      send("run:event", msg);
+      publishRun(msg);
       return;
     case "lease.state": {
       const l: LeaseState = { surface: msg.surface, owner: msg.owner, ...(msg.reason ? { reason: msg.reason } : {}) };
@@ -180,21 +205,27 @@ function onAgentd(msg: AgentdToMain) {
       return;
     }
     case "browser.frame":
-      if (framesWanted) send("browser:frame", { width: msg.width, height: msg.height, data: msg.data }); // nobody is looking in terminal-only view
+      if (framesWanted) send("browser:frame", { id: msg.id, generation: msg.generation, width: msg.width, height: msg.height, data: msg.data });
+      else toAgentd({ type: "browser.frameAck", id: msg.id }); // nobody is looking in terminal-only view
       return;
   }
 }
 
 let framesWanted = false;
+function syncFrameVisibility() {
+  toAgentd({ type: "browser.frames", enabled: framesWanted && !!win && win.isVisible() && !win.isMinimized() && win.isFocused() });
+}
 let activeRun: { runId: string; turns: number; toolCalls: number; costUsd: number | null; snapshot: boolean } | null = null;
 let agentdCrashes: number[] = [];
 
 /** agentd died under a run: tell the UI the truth (run interrupted, keyboard back to the human) and bring agentd back. */
 function onAgentdExit(code: number | undefined): void {
   port = null;
+  for (const q of queries.values()) { clearTimeout(q.timer); q.reject(new Error("Agent service restarted")); }
+  queries.clear();
   const message = `agentd exited with code ${code ?? "?"}`;
   if (activeRun) {
-    send("run:event", { type: "run.state", ...activeRun, state: "interrupted", endReason: "agentd_exit" });
+    publishRun({ type: "run.state", ...activeRun, state: "interrupted", endReason: "agentd_exit" });
     activeRun = null;
   }
   for (const surface of ["terminal", "browser"] as const) {
@@ -213,12 +244,29 @@ function onAgentdExit(code: number | undefined): void {
   setTimeout(() => { if (!port) startAgentd(); }, 1000);
 }
 
+let accountState: AccountState = { state: "signed_out" };
+const account = new CodexAccount(() => providerConfig(loadEnv().env).codex ?? {}, (state) => { accountState = state; send("setup:account", state); });
+async function checkSetup() {
+  const config = providerConfig(loadEnv().env);
+  const podman = await command("podman", ["info", "--format", "{{.Host.Arch}}"], { timeout: 10000 });
+  const imageId = readImageId();
+  const image = imageId ? await command("podman", ["image", "exists", imageId]) : { ok: false };
+  if (config.provider === "codex" && accountState.state !== "waiting") {
+    try { accountState = await account.read(); }
+    catch (e) { accountState = { state: "error", message: e instanceof Error ? e.message : String(e) }; }
+  }
+  const providerReady = config.provider === "codex" ? accountState.state === "ready" : !!loadApiKey(loadEnv().env, loadEnv().file);
+  return { provider: config.provider, account: accountState, podman: podman.ok, image: image.ok, providerReady, workspace: session.workspacePath ?? settings.lastWorkspace ?? null };
+}
+
 function startAgentd() {
   const { env, file: envFile } = loadEnv();
-  const apiKey = loadApiKey(env, envFile);
-  const model = env.OPENAI_MODEL ?? "gpt-5.6-sol";
+  let provider: ReturnType<typeof providerConfig>;
+  try { provider = providerConfig(env); }
+  catch (e) { return onAgentd({ type: "agentd.error", message: e instanceof Error ? e.message : String(e) }); }
+  const apiKey = provider.provider === "openai" ? loadApiKey(env, envFile) : "";
   const imageId = readImageId();
-  if (!apiKey) return onAgentd({ type: "agentd.error", message: "OPENAI_API_KEY missing: put it in .env once; it is moved to the OS keyring on the next start" });
+  if (provider.provider === "openai" && !apiKey) return onAgentd({ type: "agentd.error", message: "OPENAI_API_KEY missing: put it in .env once; it is moved to the OS keyring on the next start" });
   if (!imageId) return onAgentd({ type: "agentd.error", message: "images/terminal/image.json missing; run pnpm images:build" });
   const entry = path.join(repoRoot(), "services", "agentd", "dist", "main.js");
   const child = utilityProcess.fork(entry, [], { serviceName: "agentd", stdio: "pipe" });
@@ -242,10 +290,10 @@ function startAgentd() {
   // A cheaper model for the research profile, if configured: LAW_RESEARCH_MODEL plus its prices.
   const rin = Number(env.LAW_RESEARCH_PRICE_INPUT_PER_MTOK);
   const rout = Number(env.LAW_RESEARCH_PRICE_OUTPUT_PER_MTOK);
-  const profileModels = env.LAW_RESEARCH_MODEL
+  const profileModels = provider.provider === "openai" && env.LAW_RESEARCH_MODEL
     ? { research: { model: env.LAW_RESEARCH_MODEL, ...(Number.isFinite(rin) && Number.isFinite(rout) && env.LAW_RESEARCH_PRICE_INPUT_PER_MTOK ? { prices: { inputUsdPerMTok: rin, outputUsdPerMTok: rout } } : {}) } }
     : undefined;
-  toAgentd({ type: "config.init", apiKey, model, dbPath: dbPath(), imageId, runtimeRoot: runtimeRoot(), ...(prices ? { prices } : {}), ...(browserImageId ? { browserImageId } : {}), ...(notify ? { notify } : {}), ...(profileModels ? { profileModels } : {}) });
+  toAgentd({ type: "config.init", apiKey, ...provider, dbPath: dbPath(), imageId, runtimeRoot: runtimeRoot(), ...(provider.provider === "openai" && prices ? { prices } : {}), ...(browserImageId ? { browserImageId } : {}), ...(notify ? { notify } : {}), ...(profileModels ? { profileModels } : {}) });
   child.on("exit", (code) => onAgentdExit(code));
 }
 
@@ -264,13 +312,30 @@ function createWindow() {
       backgroundThrottling: false,
     },
   });
-  if (process.env.ELECTRON_RENDERER_URL) void win.loadURL(process.env.ELECTRON_RENDERER_URL);
-  else void win.loadFile(path.join(__dirname, "../renderer/index.html"));
+  win.on("minimize", syncFrameVisibility);
+  win.on("restore", syncFrameVisibility);
+  win.on("hide", syncFrameVisibility);
+  win.on("show", syncFrameVisibility);
+  win.on("focus", syncFrameVisibility);
+  win.on("blur", syncFrameVisibility);
+  win.webContents.on("did-start-loading", () => { framesWanted = false; syncFrameVisibility(); terminalDelivery.setReady(false); });
+  rendererEntryUrl = (!app.isPackaged && process.env.ELECTRON_RENDERER_URL) || pathToFileURL(path.join(__dirname, "../renderer/index.html")).href;
+  win.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
+  win.webContents.on("will-navigate", (event, url) => { if (!isRendererUrl(url, rendererEntryUrl)) event.preventDefault(); });
+  win.webContents.on("will-frame-navigate", event => { if (!event.isMainFrame || !isRendererUrl(event.url, rendererEntryUrl)) event.preventDefault(); });
+  win.webContents.on("will-redirect", (event, url) => { if (!isRendererUrl(url, rendererEntryUrl)) event.preventDefault(); });
+  win.webContents.on("will-attach-webview", event => event.preventDefault());
+  void win.loadURL(rendererEntryUrl);
 }
 
-ipcMain.handle("agentd:status", () => status);
-ipcMain.handle("session:get", () => session);
-ipcMain.handle("workspace:select", async () => {
+handleTrusted("setup:check", () => checkSetup());
+handleTrusted("setup:login", async () => { const url = await account.login(); await shell.openExternal(url); return accountState; });
+handleTrusted("setup:cancel", () => { account.cancel(); accountState = { state: "signed_out" }; send("setup:account", accountState); });
+handleTrusted("setup:retry", () => { if (!port) startAgentd(); else if (settings.lastWorkspace && session.state !== "ready") toAgentd({ type: "session.start", workspacePath: settings.lastWorkspace, networkMode: settings.networkMode }); });
+handleTrusted("agentd:status", () => status);
+handleTrusted("session:get", () => session);
+handleTrusted("workspace:select", async () => {
+  if (activeRun) throw new Error("Finish or stop the current run before changing workspace");
   const r = await dialog.showOpenDialog({ properties: ["openDirectory"], title: "Choose workspace" });
   const dir = r.filePaths[0];
   if (r.canceled || !dir) return;
@@ -278,17 +343,18 @@ ipcMain.handle("workspace:select", async () => {
   writeSettings(settingsFile(), settings);
   toAgentd({ type: "session.start", workspacePath: dir, networkMode: settings.networkMode });
 });
-ipcMain.handle("workspace:reopen", () => {
+handleTrusted("workspace:reopen", () => {
   if (settings.lastWorkspace) toAgentd({ type: "session.start", workspacePath: settings.lastWorkspace, networkMode: settings.networkMode });
 });
-ipcMain.handle("network:set", (_e, mode: unknown) => {
+handleTrusted("network:set", (_e, mode: unknown) => {
   settings = { ...settings, networkMode: mode === "none" ? "none" : "open" };
   writeSettings(settingsFile(), settings);
   return settings.networkMode;
 });
-ipcMain.handle("network:get", () => settings.networkMode);
-ipcMain.handle("policy:get", () => ({ nestedAutonomy: settings.nestedAutonomy, domainMode: settings.domainMode }));
-ipcMain.handle("policy:set", (_e, patch: unknown) => {
+handleTrusted("network:get", () => settings.networkMode);
+handleTrusted("network:apply", () => toAgentd({ type: "session.network", networkMode: settings.networkMode }));
+handleTrusted("policy:get", () => ({ nestedAutonomy: settings.nestedAutonomy, domainMode: settings.domainMode }));
+handleTrusted("policy:set", (_e, patch: unknown) => {
   const p = (patch ?? {}) as { nestedAutonomy?: unknown; domainMode?: unknown };
   if (typeof p.nestedAutonomy === "boolean") settings = { ...settings, nestedAutonomy: p.nestedAutonomy };
   if (p.domainMode === "open" || p.domainMode === "ask") settings = { ...settings, domainMode: p.domainMode };
@@ -296,42 +362,93 @@ ipcMain.handle("policy:set", (_e, patch: unknown) => {
   toAgentd({ type: "policy.set", nestedAutonomy: settings.nestedAutonomy, domainMode: settings.domainMode });
   return { nestedAutonomy: settings.nestedAutonomy, domainMode: settings.domainMode };
 });
-ipcMain.handle("sandbox:destroy", () => toAgentd({ type: "session.stop", destroy: true }));
-ipcMain.handle("lease:get", () => leases);
-ipcMain.handle("run:start", (_e, goal: unknown, opts: unknown) => {
+handleTrusted("sandbox:destroy", () => toAgentd({ type: "session.stop", destroy: true }));
+handleTrusted("lease:get", () => leases);
+let modelCatalog: Promise<ModelCatalog> | undefined;
+let modelCatalogAt = 0;
+function getModels(refresh = false): Promise<ModelCatalog> {
+  if (!modelCatalog || refresh || Date.now() - modelCatalogAt > 60_000) {
+    const config = providerConfig(loadEnv().env);
+    modelCatalogAt = Date.now();
+    const request = (async (): Promise<ModelCatalog> => ({ provider: config.provider, configuredModel: config.model, models: config.provider === "codex" ? await account.models() : [] }))();
+    modelCatalog = request;
+    void request.catch(() => { if (modelCatalog === request) modelCatalog = undefined; });
+  }
+  return modelCatalog;
+}
+handleTrusted("models:list", (_e, refresh: unknown) => getModels(refresh === true));
+handleTrusted("run:start", async (_e, goal: unknown, opts: unknown) => {
+  if (activeRun) throw new Error("A run is already active");
   if (typeof goal !== "string" || !goal.trim()) return;
-  const o = (opts ?? {}) as { profile?: unknown; maxTurns?: unknown };
+  const o = (opts ?? {}) as { profile?: unknown; maxTurns?: unknown; modelSelection?: unknown; limits?: unknown };
+  const modelSelection = ModelSelection.parse(o.modelSelection ?? {});
+  const limits = o.limits === undefined ? undefined : RunLimits.parse(o.limits);
+  if (modelSelection.model) {
+    const catalog = await getModels();
+    if (catalog.provider !== "codex") throw new Error("Model selection is available for the Codex provider only");
+    validateModelSelection(modelSelection, catalog.models);
+  }
+  if (activeRun) throw new Error("A run is already active");
   const profile = o.profile === "research" || o.profile === "project" || o.profile === "quick" ? o.profile : undefined;
   const maxTurns = Number.isInteger(o.maxTurns) && (o.maxTurns as number) >= 5 && (o.maxTurns as number) <= 400 ? (o.maxTurns as number) : undefined;
-  toAgentd({ type: "run.start", goal: goal.trim().slice(0, 4000), ...(profile ? { profile } : {}), ...(maxTurns ? { maxTurns } : {}) });
+  currentGoal = goal.trim().slice(0, 4000);
+  toAgentd({ type: "run.start", goal: goal.trim().slice(0, 4000), ...(profile ? { profile } : {}), ...(maxTurns ? { maxTurns } : {}), modelSelection, ...(limits ? { limits } : {}) });
 });
-ipcMain.handle("run:stop", () => toAgentd({ type: "run.stop" }));
-ipcMain.handle("run:resume", () => toAgentd({ type: "run.resume" }));
-ipcMain.handle("lease:take", (_e, owner: unknown, surface: unknown) =>
+handleTrusted("run:get", () => ({ run: currentRun, goal: currentGoal, handoff: handoffReason, sequence: runSequence }));
+handleTrusted("run:history", () => queryDaemon("history"));
+handleTrusted("run:detail", (_e, id: unknown) => { if (typeof id !== "string") throw new Error("Invalid run id"); return queryDaemon("detail", id); });
+handleTrusted("workspace:changes", async () => {
+  if (!session.workspacePath) throw new Error("Open a workspace first");
+  const result = await command("git", ["status", "--short"], { cwd: session.workspacePath });
+  const diff = await command("git", ["diff", "--stat"], { cwd: session.workspacePath });
+  return `${result.output || "No working tree changes."}\n\n${diff.output}`;
+});
+handleTrusted("workspace:output", async (_e, relative: unknown) => {
+  if (!session.workspacePath || typeof relative !== "string") throw new Error("Open a workspace first");
+  const root = await fs.promises.realpath(session.workspacePath);
+  const file = await fs.promises.realpath(path.resolve(root, relative));
+  if (file !== root && !file.startsWith(root + path.sep)) throw new Error("Choose an output inside this workspace");
+  shell.showItemInFolder(file);
+});
+handleTrusted("run:stop", () => toAgentd({ type: "run.stop" }));
+handleTrusted("run:budget", (_e, runId: unknown, action: unknown) => {
+  const parsed = BudgetAction.parse(action);
+  if (typeof runId !== "string" || currentRun.runId !== runId || currentRun.state !== "budget_paused") throw new Error("This task is no longer paused at a limit");
+  if (browser.manual || browser.transitioning) throw new Error("Finish manual login before resuming the task");
+  toAgentd({ type: "run.budget", runId, action: parsed });
+});
+handleTrusted("run:resume", () => toAgentd({ type: "run.resume" }));
+handleTrusted("lease:take", (_e, owner: unknown, surface: unknown) =>
   toAgentd({ type: "lease.take", owner: owner === "agent" ? "agent" : "human", ...(surface === "terminal" || surface === "browser" ? { surface } : {}) }),
 );
-ipcMain.handle("approval:decide", (_e, id: unknown, decision: unknown) => {
+handleTrusted("approval:decide", (_e, id: unknown, decision: unknown) => {
   if (typeof id === "string" && (decision === "once" || decision === "session" || decision === "deny")) toAgentd({ type: "approval.decide", id, decision });
 });
-ipcMain.handle("browser:get", () => browser);
-ipcMain.handle("browser:start", () => toAgentd({ type: "browser.start" }));
-ipcMain.handle("browser:stop", () => toAgentd({ type: "browser.stop" }));
-ipcMain.handle("browser:navigate", (_e, url: unknown) => {
+handleTrusted("browser:control", (_e, command: BrowserControl) => queryDaemon("browser", undefined, command));
+handleTrusted("browser:get", () => browser);
+handleTrusted("browser:start", () => toAgentd({ type: "browser.start" }));
+handleTrusted("browser:stop", () => toAgentd({ type: "browser.stop" }));
+handleTrusted("browser:navigate", (_e, url: unknown) => {
   if (typeof url === "string" && url.trim()) toAgentd({ type: "browser.navigate", url: url.trim().slice(0, 4096) });
 });
-ipcMain.on("browser:input", (_e, event: unknown) => {
+onTrusted("browser:input", (_e, event: unknown) => {
   if (event && typeof event === "object") toAgentd({ type: "browser.input", event: event as never });
 });
-ipcMain.handle("diagnostics:write", () => writeDiagnostics());
-ipcMain.handle("run:restore", (_e, runId: unknown) => {
+handleTrusted("diagnostics:get", () => diagnosticsState);
+handleTrusted("diagnostics:cancel", () => diagnosticsAbort?.abort());
+handleTrusted("diagnostics:write", () => writeDiagnostics());
+handleTrusted("run:restore", (_e, runId: unknown) => {
   if (typeof runId === "string" && runId) toAgentd({ type: "run.restore", runId });
 });
-ipcMain.on("terminal:write", (_e, data: unknown) => {
+onTrusted("terminal:write", (_e, data: unknown) => {
   if (typeof data === "string" && data.length <= 65_536) toAgentd({ type: "terminal.write", data: new TextEncoder().encode(data) });
 });
-ipcMain.on("terminal:refresh", () => toAgentd({ type: "terminal.refresh" }));
-ipcMain.on("browser:frames", (_e, on: unknown) => { framesWanted = on === true; });
-ipcMain.on("terminal:resize", (_e, cols: unknown, rows: unknown) => {
+onTrusted("terminal:ack", (_e, id: unknown) => { if (typeof id === "number") terminalDelivery.acknowledge(id); });
+onTrusted("terminal:subscribe", (_e, on: unknown) => terminalDelivery.setReady(on === true));
+onTrusted("terminal:refresh", () => toAgentd({ type: "terminal.refresh" }));
+onTrusted("browser:frameAck", (_e, id: number) => { if (Number.isSafeInteger(id)) toAgentd({ type: "browser.frameAck", id }); });
+onTrusted("browser:frames", (_e, on: unknown) => { framesWanted = on === true; syncFrameVisibility(); });
+onTrusted("terminal:resize", (_e, cols: unknown, rows: unknown) => {
   if (Number.isInteger(cols) && Number.isInteger(rows)) toAgentd({ type: "terminal.resize", cols: cols as number, rows: rows as number });
 });
 
@@ -344,4 +461,4 @@ app.whenReady().then(() => {
   startAgentd();
 });
 
-app.on("window-all-closed", () => app.quit());
+app.on("window-all-closed", () => { account.cancel(); diagnosticsAbort?.abort(); app.quit(); });

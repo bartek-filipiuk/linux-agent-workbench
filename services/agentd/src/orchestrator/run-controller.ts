@@ -1,5 +1,5 @@
 import { EventEmitter } from "node:events";
-import { DEFAULT_BUDGETS, ProtocolError, type Budgets, type NetworkMode, type RunState } from "@law/protocol";
+import { DEFAULT_BUDGETS, ProtocolError, type Budgets, type BudgetAction, type RunBudgetStatus, type NetworkMode, type RunState } from "@law/protocol";
 import type { Store } from "../storage/store.js";
 import type { ModelAdapter, ModelTurnInput, ToolCall, ToolExecutor, ToolResult } from "../provider/types.js";
 import type { TerminalWorker } from "../worker/types.js";
@@ -46,6 +46,24 @@ export class RunController extends EventEmitter {
   private readonly tools: ToolExecutor;
   private handoffResume: (() => void) | undefined;
   private costKnown: boolean;
+  private unknownCostLogged = false;
+  private budgetResume: (() => void) | undefined;
+  private budgetReason: keyof Budgets | null = null;
+  private reobserveAfterBudget = false;
+  private controlRevision = 0;
+  private humanPause: { reason: string; promise: Promise<void>; resolve: () => void } | undefined;
+
+  /** Resolve only after all in-flight work is finished and the run is parked (or has ended). */
+  pauseForHuman(reason: string): Promise<void> {
+    if (this.state === "handoff" || this.state === "budget_paused" || ["completed", "failed", "stopped", "budget_exceeded"].includes(this.state)) return Promise.resolve();
+    if (this.humanPause) return this.humanPause.promise;
+    let resolve!: () => void;
+    const promise = new Promise<void>(r => { resolve = r; });
+    this.controlRevision++;
+    this.humanPause = { reason, promise, resolve };
+    return promise;
+  }
+
 
   constructor(
     private readonly deps: RunControllerDeps,
@@ -57,7 +75,7 @@ export class RunController extends EventEmitter {
     this.costKnown = deps.adapter.model in this.prices;
     this.system = deps.systemPrompt ?? SYSTEM_PROMPT;
     this.tools = deps.tools ?? terminalExecutor(deps.worker);
-    this.budget = new BudgetTracker(deps.budgets ?? DEFAULT_BUDGETS, deps.now);
+    this.budget = new BudgetTracker({ ...(deps.budgets ?? DEFAULT_BUDGETS) }, deps.now);
     this.runId = deps.store.createRun({
       workspaceId: input.workspaceId,
       goal: input.goal,
@@ -75,11 +93,28 @@ export class RunController extends EventEmitter {
     return { turns: this.budget.turns, toolCalls: this.budget.toolCalls, costUsd: this.costKnown ? this.budget.costUsd : null };
   }
 
+  get budgetStatus(): RunBudgetStatus {
+    return { limits: this.budget.limits, elapsedMs: this.budget.elapsedMs(), reason: this.budgetReason };
+  }
+
+  resumeBudget(action: BudgetAction): void {
+    if (this.state !== "budget_paused" || !this.budgetResume) throw new Error("This task is not paused at a limit");
+    const allowed = this.budgetReason === "maxDurationMs" ? ["add_time", "unlimited_time"]
+      : this.budgetReason === "maxCostUsd" ? ["add_cost"] : ["add_steps", "unlimited_steps"];
+    if (!allowed.includes(action)) throw new Error("Choose an action for the reached limit");
+    this.budget.extend(action);
+    this.deps.store.appendEvent(this.runId, "budget.extended", { action, limits: this.budget.limits });
+    const resume = this.budgetResume;
+    this.budgetResume = undefined; // rapid duplicate clicks cannot increase the allowance twice
+    resume();
+  }
+
   stop(): void {
     if (this.abort.signal.aborted) return;
     this.abort.abort();
     this.deps.worker.cancel();
     this.handoffResume?.();
+    this.budgetResume?.();
   }
 
   resumeFromHandoff(): void {
@@ -92,7 +127,7 @@ export class RunController extends EventEmitter {
     const signal = this.abort.signal;
     let previousResponseId: string | undefined;
     let next: ModelTurnInput = { goal: this.input.goal };
-    const compactEvery = this.deps.compactEvery ?? 0;
+    const compactEvery = adapter.managesContext ? 0 : this.deps.compactEvery ?? 0;
     let turnsInChain = 0;
 
     const callModel = async (input: ModelTurnInput) => {
@@ -108,7 +143,8 @@ export class RunController extends EventEmitter {
       const usd = costOf(adapter.model, turn.usage, this.prices);
       if (usd === undefined) {
         this.costKnown = false;
-        store.appendEvent(this.runId, "cost.unknown_model", { model: adapter.model });
+        if (!this.unknownCostLogged) store.appendEvent(this.runId, "cost.unknown_model", { model: adapter.model });
+        this.unknownCostLogged = true;
       } else this.budget.addCost(usd);
       store.recordUsage(this.runId, { responseId: turn.responseId, ...turn.usage, costUsd: usd ?? 0 });
       store.addRunTotals(this.runId, { turns: 1, costUsd: usd ?? 0 });
@@ -118,7 +154,11 @@ export class RunController extends EventEmitter {
     try {
       for (;;) {
         this.throwIfStopped();
-        this.budget.check();
+        if (this.humanPause) {
+          await this.handoff(this.humanPause.reason, worker);
+          if ("toolResults" in next) next = { ...next, message: "The human changed the browser during manual login. Re-observe before acting." };
+        }
+        await this.checkBudget("model");
 
         // Compaction: the chain carries every observation so far; past the limit, replace it with a summary.
         if (compactEvery > 0 && turnsInChain >= compactEvery && "toolResults" in next) {
@@ -131,6 +171,12 @@ export class RunController extends EventEmitter {
           next = { goal: `${this.input.goal}\n\nYou have already been working on this. Your own state summary from the previous context:\n${summary.text}\n\nContinue from there; re-observe before acting.` };
         }
 
+        await this.checkBudget("model");
+        if (this.reobserveAfterBudget && "toolResults" in next) {
+          next = { ...next, message: "The human resumed this task after a limit pause. Re-observe affected surfaces before taking actions; they may have changed while paused." };
+          this.reobserveAfterBudget = false;
+        }
+        const controlRevision = this.controlRevision;
         const turn = await callModel(next);
         store.appendEvent(this.runId, "model.turn", {
           responseId: turn.responseId,
@@ -146,7 +192,11 @@ export class RunController extends EventEmitter {
         const results: ToolResult[] = [];
         for (const call of turn.toolCalls) {
           this.throwIfStopped();
-          this.budget.check();
+          await this.checkBudget("tool");
+          if (this.humanPause || controlRevision !== this.controlRevision) {
+            results.push({ callId: call.callId, output: JSON.stringify({ skipped: "Human took control. Re-observe after resuming before acting." }) });
+            continue;
+          }
           results.push(await this.runTool(call, worker, signal));
           this.budget.addToolCall();
           store.addRunTotals(this.runId, { toolCalls: 1 });
@@ -155,8 +205,39 @@ export class RunController extends EventEmitter {
       }
     } catch (e) {
       if (signal.aborted) return this.finish("stopped", "user_stop");
-      if (e instanceof BudgetExceededError) return this.finish("budget_exceeded", e.limit);
       return this.finish("failed", e instanceof Error ? e.message : String(e));
+    } finally {
+      this.humanPause?.resolve(); this.humanPause = undefined;
+      this.budgetResume = undefined;
+      adapter.close?.();
+    }
+  }
+
+  /** Park without closing the adapter: pending tool results and the same thread remain in memory. */
+  private async checkBudget(phase: "model" | "tool"): Promise<void> {
+    for (;;) {
+      this.throwIfStopped();
+      try { this.budget.check(phase); return; }
+      catch (e) {
+        if (!(e instanceof BudgetExceededError)) throw e;
+        this.budgetReason = e.limit;
+        this.controlRevision++; // human controls the surfaces while paused; pending actions become stale
+        this.budget.pauseClock();
+        try {
+          await new Promise<void>(resolve => {
+            this.budgetResume = resolve;
+            this.setState("budget_paused");
+            this.humanPause?.resolve(); this.humanPause = undefined;
+          });
+        } finally {
+          this.budgetResume = undefined;
+          this.budget.resumeClock();
+        }
+        this.throwIfStopped();
+        this.budgetReason = null;
+        this.reobserveAfterBudget = true;
+        this.setState("running");
+      }
     }
   }
 
@@ -182,6 +263,7 @@ export class RunController extends EventEmitter {
 
     try {
       await this.waitForApprovals(signal);
+      if (this.humanPause) throw new ProtocolError("INVALID_INPUT", "Human took control; re-observe after resuming");
       const result = await this.tools.execute(call, signal);
       store.finishToolCall(rowId, "done", safeJson(result.output));
       store.appendEvent(this.runId, "tool.done", { name: call.name, bytes: result.output.length, image: result.imageJpegBase64 !== undefined });
@@ -211,6 +293,7 @@ export class RunController extends EventEmitter {
   private async waitForApprovals(signal: AbortSignal): Promise<void> {
     const approvals = this.deps.approvals;
     if (!approvals || !approvals.hasPending(this.runId)) return;
+    this.budget.pauseClock();
     this.setState("awaiting_approval");
     try {
       while (approvals.hasPending(this.runId) && !signal.aborted) {
@@ -221,19 +304,24 @@ export class RunController extends EventEmitter {
         });
       }
     } finally {
+      this.budget.resumeClock();
       if (!signal.aborted) this.setState("running");
     }
     this.throwIfStopped();
   }
 
   private async handoff(reason: string, worker: TerminalWorker) {
+    this.controlRevision++;
     this.deps.store.appendEvent(this.runId, "handoff.start", { reason });
+    this.budget.pauseClock();
     this.setState("handoff");
     this.emit("handoff", { reason });
     await new Promise<void>((resolve) => {
       this.handoffResume = resolve;
+      this.humanPause?.resolve(); this.humanPause = undefined;
     });
     this.handoffResume = undefined;
+    this.budget.resumeClock();
     this.throwIfStopped();
     this.deps.store.appendEvent(this.runId, "handoff.end", {});
     this.setState("running");
@@ -252,6 +340,7 @@ export class RunController extends EventEmitter {
 
   private finish(state: RunState, endReason: string, finalText?: string): RunOutcome {
     this.setState(state, endReason);
+    if (finalText !== undefined) this.deps.store.appendEvent(this.runId, "run.result", { text: finalText });
     return { runId: this.runId, state, endReason, ...(finalText !== undefined ? { finalText } : {}) };
   }
 }

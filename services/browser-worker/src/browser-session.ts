@@ -1,13 +1,16 @@
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
+import os from "node:os";
+import { ManualBrowser, type ManualBrowserOptions } from "./manual-browser.js";
 import path from "node:path";
 import { randomBytes } from "node:crypto";
 import { setTimeout as sleep } from "node:timers/promises";
-import { chromium, type BrowserContext, type ElementHandle, type Frame, type Page } from "playwright";
+import { chromium, type BrowserContext, type ElementHandle, type Frame, type Page, type Dialog } from "playwright";
 import {
   ProtocolError,
   normaliseNavigableUrl,
   type BrowserAction,
+  type BrowserControl,
   type BrowserActResult,
   type BrowserDownload,
   type BrowserElement,
@@ -20,7 +23,7 @@ import {
   type BrowserWaitResult,
 } from "@law/protocol";
 
-export type FrameListener = (frame: { width: number; height: number; jpeg: Uint8Array }) => void;
+export type FrameListener = (frame: { width: number; height: number; jpeg: Uint8Array; generation: number; sequence: number }) => void;
 
 export type BrowserSessionOptions = {
   profileDir: string;
@@ -33,9 +36,11 @@ export type BrowserSessionOptions = {
   headless?: boolean;
   activeFps?: number;
   idleFps?: number;
+  manualAvailable?: boolean;
+  manualFactory?: (opts: ManualBrowserOptions) => ManualBrowser;
 };
 
-type PageEntry = { id: string; page: Page };
+type PageEntry = { id: string; page: Page; opener?: Page | null };
 
 // Playwright errors carry a multi-line, ANSI-coloured call log; the model and the UI need the first line only.
 const firstLine = (m: string) => m.replace(/\u001b\[[0-9;]*m/g, "").split("\n")[0]!.trim();
@@ -80,7 +85,7 @@ const OBSERVE_SCRIPT = `
     const editable = t === "input" || t === "textarea" || t === "select" || el.isContentEditable === true;
     const item = { el, role: roleOf(el), name: clip(nameOf(el)), text: clip(el.innerText), enabled: !(el.disabled === true || el.getAttribute("aria-disabled") === "true"), editable, inViewport, bounds: { x: Math.round(r.x), y: Math.round(r.y), width: Math.round(r.width), height: Math.round(r.height) } };
     if (t === "a") item.href = clip(el.getAttribute("href") || "", 400);
-    if (editable && t !== "select") item.value = clip(el.value || "");
+    if (editable && t !== "select" && el.type !== "password" && el.autocomplete !== "one-time-code") item.value = clip(el.value || "");
     if (t === "select") item.value = clip(el.options[el.selectedIndex]?.text || "");
     out.push(item);
   }
@@ -120,6 +125,67 @@ export class BrowserSession {
   private readonly registryKey = `__law_${randomBytes(6).toString("hex")}`;
   private refFrames = new Map<string, Frame>(); // which frame registered each ref of the current revision
   private screencast: BrowserScreencastOptions = {};
+  private framesEnabled = false;
+  private generation = randomBytes(4).readUInt32BE(0);
+  private frameSequence = 0;
+  private frameError: string | null = null;
+  private pendingDialog: Dialog | undefined;
+  private readonly stateListeners = new Set<(info: BrowserInfo) => void>();
+  private diagnostics: Array<{ ts: number; message: string }> = [];
+  private stateTimer: ReturnType<typeof setTimeout> | undefined;
+  private inputQueue: Promise<void> = Promise.resolve();
+  private closing = false;
+  private manual: ManualBrowser | undefined;
+  private manualMode = false;
+  private transitioning = false;
+  private returnUrl = "https://example.com";
+  private get markerPath(): string { return path.join(this.opts.profileDir, ".law-manual.json"); }
+  private get manualAvailable(): boolean { return this.opts.manualAvailable ?? process.env.LAW_BROWSER_MANUAL === "1"; }
+
+
+  onState(cb: (info: BrowserInfo) => void): () => void { this.stateListeners.add(cb); return () => { this.stateListeners.delete(cb); }; }
+  private publishState(): void {
+    clearTimeout(this.stateTimer);
+    this.stateTimer = setTimeout(() => {
+      const generation = this.generation;
+      void this.info().then(info => { if (generation === this.generation) for (const cb of this.stateListeners) cb(info); }).catch(() => {});
+    }, 30);
+  }
+  private diagnostic(message: string): void {
+    this.diagnostics = [...this.diagnostics.slice(-19), { ts: Date.now(), message }];
+    this.publishState();
+  }
+  private changedPage(): void {
+    this.revision++; this.refFrames.clear(); this.generation = (this.generation + 1) >>> 0;
+    this.frameError = null; this.publishState();
+    void this.attachScreencast(this.active?.page, true);
+  }
+  async control(command: BrowserControl): Promise<BrowserInfo> {
+    if (this.transitioning) throw new ProtocolError("INVALID_INPUT", "Browser mode is changing; please wait");
+    if (command.kind === "manual") { await this.setManual(command.enabled); return this.info(); }
+    if (command.kind === "refresh" && this.manualMode) {
+      this.generation = (this.generation + 1) >>> 0; this.frameError = null; this.publishState();
+      await this.manual?.setFramesEnabled(this.framesEnabled); return this.info();
+    }
+    if (command.kind === "switch" || command.kind === "close") {
+      await this.act({ kind: command.kind === "switch" ? "switchPage" : "closePage", pageId: command.pageId });
+    } else if (command.kind === "refresh") { this.changedPage(); await this.castTransition; }
+    else if (command.kind === "dialog") {
+      const d = this.pendingDialog; this.pendingDialog = undefined;
+      if (d) { if (command.accept) await d.accept(); else await d.dismiss(); }
+      this.publishState();
+    } else throw new ProtocolError("INVALID_INPUT", "Manual login is not available in this worker yet");
+    return this.info();
+  }
+  private castPage: Page | undefined;
+  private castTransition: Promise<void> = Promise.resolve();
+
+  setFramesEnabled(enabled: boolean): Promise<void> {
+    if (this.framesEnabled !== enabled) { this.generation = (this.generation + 1) >>> 0; this.publishState(); }
+    this.framesEnabled = enabled;
+    if (this.manualMode) return this.manual?.setFramesEnabled(enabled) ?? Promise.resolve();
+    return this.attachScreencast(this.active?.page, true);
+  }
   private lastDialog: { type: string; message: string } | undefined;
   private readonly downloadsDir: string;
   private readonly downloads: BrowserDownload[] = [];
@@ -135,12 +201,91 @@ export class BrowserSession {
 
   async start(screencast: BrowserScreencastOptions = {}): Promise<void> {
     this.screencast = screencast;
+    if (fs.existsSync(this.markerPath)) {
+      this.manualMode = true;
+      try { this.returnUrl = normaliseNavigableUrl(JSON.parse(fs.readFileSync(this.markerPath, "utf8")).url) ?? this.returnUrl; } catch {}
+      await this.waitForProfile();
+      await this.openManual(); return;
+    }
+    await this.startAutomated(screencast);
+  }
+
+  private async waitForProfile(): Promise<void> {
+    const lock = path.join(this.opts.profileDir, "SingletonLock");
+    const deadline = Date.now() + 6500;
+    for (;;) {
+      let live = false;
+      try {
+        const value = fs.readlinkSync(lock); const pid = Number(value.slice(value.lastIndexOf("-") + 1));
+        if (value.startsWith(`${os.hostname()}-`) && pid > 1) { try { process.kill(pid, 0); live = true; } catch {} }
+      } catch {}
+      if (!live) break;
+      if (Date.now() >= deadline) throw new Error("The previous browser still owns this profile; close it before retrying");
+      await sleep(150);
+    }
+    for (const f of ["SingletonLock", "SingletonSocket", "SingletonCookie"]) fs.rmSync(path.join(this.opts.profileDir, f), { force: true });
+  }
+
+  private async openManual(): Promise<void> {
+    const options: ManualBrowserOptions = {
+      executablePath: chromium.executablePath(), profileDir: this.opts.profileDir, url: this.returnUrl,
+      viewport: this.viewport, ...(this.opts.proxyServer ? { proxyServer: this.opts.proxyServer } : {}),
+      onFrame: jpeg => {
+        if (!this.framesEnabled || !this.manualMode || this.transitioning) return;
+        for (const l of this.listeners) l({ ...this.viewport, jpeg, generation: this.generation, sequence: ++this.frameSequence });
+      },
+      onError: message => { this.frameError = message; this.publishState(); },
+    };
+    this.manual = this.opts.manualFactory?.(options) ?? new ManualBrowser(options);
+    try { await this.manual.start(); await this.manual.setFramesEnabled(this.framesEnabled); }
+    catch (e) { await this.manual.close(); this.manual = undefined; throw e; }
+  }
+
+  private async setManual(enabled: boolean): Promise<void> {
+    if (!this.manualAvailable) throw new ProtocolError("INVALID_INPUT", "Manual login requires the updated browser image");
+    if (enabled === this.manualMode) return;
+    this.transitioning = true; this.generation = (this.generation + 1) >>> 0;
+    this.frameError = null; this.refFrames.clear(); this.revision++; this.publishState();
+    try {
+      await this.inputQueue;
+      if (enabled) {
+        // Only a regular return URL is persisted, never the OAuth query/fragment or credentials.
+        const target = normaliseNavigableUrl(this.active?.page.url() ?? "");
+        if (target) { const u = new URL(target); u.search = ""; u.hash = ""; u.username = ""; u.password = ""; this.returnUrl = u.toString(); }
+        fs.writeFileSync(this.markerPath, JSON.stringify({ url: this.returnUrl }), { mode: 0o600 });
+        this.closing = true;
+        if (this.pendingDialog) { await this.pendingDialog.dismiss().catch(() => {}); this.pendingDialog = undefined; }
+        await this.castTransition;
+        await this.context?.close(); this.context = undefined; this.active = undefined; this.pages.length = 0;
+        this.manualMode = true;
+        await this.waitForProfile(); await this.openManual();
+      } else {
+        await this.manual?.finish(); this.manual = undefined;
+        await this.startAutomated(this.screencast);
+        this.manualMode = false;
+        fs.rmSync(this.markerPath, { force: true });
+      }
+    } catch (e) {
+      this.closing = true;
+      await this.context?.close().catch(() => {}); this.context = undefined; this.active = undefined; this.pages.length = 0;
+      // Keep manual mode/marker on a failed transition: the agent must not resume into a login.
+      this.manualMode = true;
+      this.frameError = "Browser mode could not switch. Choose Finish manual login to recover.";
+      throw e;
+    } finally { this.transitioning = false; this.generation = (this.generation + 1) >>> 0; this.publishState(); }
+    if (!enabled) {
+      await this.navigate(this.returnUrl).catch(() => { this.frameError = "Login was saved, but the return page could not load. Enter its address to retry."; this.publishState(); });
+      await this.attachScreencast(this.active?.page, true);
+    }
+  }
+
+  private async startAutomated(screencast: BrowserScreencastOptions = {}): Promise<void> {
+    this.closing = false;
+    this.screencast = screencast;
     fs.mkdirSync(this.downloadsDir, { recursive: true });
     // One Chromium per profile is guaranteed by the session; a lock left by a killed container
     // (different hostname in the symlink) would otherwise make Chromium refuse the profile.
-    for (const f of ["SingletonLock", "SingletonSocket", "SingletonCookie"]) {
-      fs.rmSync(path.join(this.opts.profileDir, f), { force: true });
-    }
+    await this.waitForProfile();
     const channel = this.opts.channel ?? process.env.LAW_BROWSER_CHANNEL;
     this.context = await chromium.launchPersistentContext(this.opts.profileDir, {
       headless: this.opts.headless ?? true,
@@ -159,12 +304,27 @@ export class BrowserSession {
   }
 
   private async registerPage(page: Page): Promise<void> {
-    const entry: PageEntry = { id: `p${++this.pageSeq}`, page };
+    if (this.pages.some(e => e.page === page)) return;
+    const opener = await page.opener();
+    if (this.pages.some(e => e.page === page) || page.isClosed()) return;
+    const entry: PageEntry = { id: `p${++this.pageSeq}`, page, opener };
     this.pages.push(entry);
-    this.active = entry; // new pages (popups) take focus, like a real browser
+    this.active = entry;
+    this.changedPage();
+    page.on("framenavigated", frame => { if (frame === page.mainFrame()) { if (this.active === entry) this.changedPage(); else this.publishState(); } });
+    page.on("domcontentloaded", () => this.publishState());
+    page.on("load", () => this.publishState());
+    page.on("response", response => { if (response.status() >= 400) { const url = new URL(response.url()); this.diagnostic(`${url.hostname}: HTTP ${response.status()}`); } });
+    page.on("requestfailed", request => { try { this.diagnostic(`${new URL(request.url()).hostname}: ${request.failure()?.errorText.match(/ERR_[A-Z_]+/)?.[0] ?? "connection failed"}`); } catch {} });
+    // SPA title/history updates do not necessarily create a navigation event.
+    await page.exposeBinding("__lawPageChanged", () => this.publishState()).then(() => page.addInitScript(`
+      document.addEventListener("DOMContentLoaded", () => {
+        if (document.head) new MutationObserver(() => { window.__lawPageChanged(); }).observe(document.head, { childList: true, subtree: true, characterData: true });
+      });
+    `)).catch(() => {});
     page.on("dialog", (d) => {
       this.lastDialog = { type: d.type(), message: d.message() };
-      void d.dismiss().catch(() => {});
+      this.pendingDialog = d; this.publishState();
     });
     page.on("download", (d) => {
       const name = path.basename(d.suggestedFilename()).replace(/[^\w.\-]+/g, "_") || "download";
@@ -178,30 +338,45 @@ export class BrowserSession {
       const i = this.pages.findIndex((e) => e.page === page);
       if (i >= 0) this.pages.splice(i, 1);
       if (this.active?.page === page) {
-        this.active = this.pages.at(-1);
-        if (this.active) void this.attachScreencast(this.active.page);
+        this.active = this.pages.find(e => e.page === entry.opener) ?? this.pages.at(-1);
+        if (this.active) this.changedPage();
+        else if (!this.closing) void this.context?.newPage();
       }
+      this.publishState();
     });
     await this.attachScreencast(page);
   }
 
-  private async attachScreencast(page: Page): Promise<void> {
-    try {
+  private attachScreencast(_page?: Page, force = false): Promise<void> {
+    const next = this.castTransition.then(async () => {
+      const page = this.framesEnabled ? this.active?.page : undefined;
+      if (!force && this.castPage === page) return;
+      await this.castPage?.screencast.stop().catch(() => {});
+      this.castPage = undefined;
+      if (!page) return;
+      this.castPage = page;
+      this.lastFrameAt = 0;
+      const generation = this.generation;
+      try {
       await page.screencast.start({
         size: this.screencast.size ?? { width: 1024, height: 640 },
         quality: this.screencast.quality ?? 60,
         onFrame: ({ data, viewportWidth, viewportHeight }) => {
-          if (this.active?.page !== page) return;
+          if (!this.framesEnabled || this.active?.page !== page || generation !== this.generation) return;
           const now = Date.now();
           const fps = now - this.lastInputAt < 2000 ? this.activeFps : this.idleFps;
           if (now - this.lastFrameAt < 1000 / fps) return;
           this.lastFrameAt = now;
-          for (const l of this.listeners) l({ width: viewportWidth, height: viewportHeight, jpeg: new Uint8Array(data) });
+          for (const l of this.listeners) l({ width: viewportWidth, height: viewportHeight, jpeg: new Uint8Array(data), generation, sequence: ++this.frameSequence });
         },
       });
     } catch {
-      // a page that closed while we were attaching; nothing to stream
-    }
+        this.frameError = "Preview could not start. Refresh the preview to retry."; this.publishState();
+        this.castPage = undefined;
+      }
+    });
+    this.castTransition = next.catch(() => {});
+    return next;
   }
 
   onFrame(cb: FrameListener): () => void {
@@ -232,19 +407,39 @@ export class BrowserSession {
   }
 
   async info(): Promise<BrowserInfo> {
+    if (this.manualMode || this.transitioning) return {
+      url: this.returnUrl, title: this.transitioning ? "Switching browser mode" : "Manual login", viewport: this.viewport,
+      generation: this.generation, pages: [], manual: this.manualMode, manualAvailable: this.manualAvailable,
+      transitioning: this.transitioning, frameError: this.frameError, dialog: null, diagnostics: this.diagnostics,
+    };
     const page = this.requirePage();
-    return { url: page.url(), title: await page.title().catch(() => ""), viewport: page.viewportSize() ?? this.viewport };
+    return { url: page.url(), title: this.pendingDialog ? "Browser dialog" : await page.title().catch(() => ""), viewport: page.viewportSize() ?? this.viewport,
+      generation: this.generation, activePageId: this.active!.id,
+      pages: await Promise.all(this.pages.map(async e => ({ id: e.id, url: e.page.url(), title: this.pendingDialog ? e.page.url() : await e.page.title().catch(() => "") }))),
+      frameError: this.frameError, manual: false, manualAvailable: this.manualAvailable, transitioning: false,
+      dialog: this.pendingDialog ? { type: this.pendingDialog.type(), message: this.pendingDialog.message().slice(0, 500) } : null,
+      diagnostics: this.diagnostics,
+    };
   }
 
-  async input(e: BrowserInputEvent): Promise<void> {
+  input(e: BrowserInputEvent): Promise<void> {
+    if (this.transitioning) return Promise.resolve();
+    const next = this.inputQueue.then(() => this.manualMode ? this.manual?.input(e) : this.applyInput(e)).catch(() => {
+      this.diagnostic("Browser input could not be delivered. Refresh the preview and try again.");
+    });
+    this.inputQueue = next.catch(() => {}); return next;
+  }
+  private async applyInput(e: BrowserInputEvent): Promise<void> {
     const page = this.requirePage();
     this.lastInputAt = Date.now();
     switch (e.kind) {
       case "mousemove":
         return page.mouse.move(e.x, e.y);
       case "mousedown":
+        await page.mouse.move(e.x, e.y);
         return page.mouse.down({ button: e.button ?? "left" });
       case "mouseup":
+        await page.mouse.move(e.x, e.y);
         return page.mouse.up({ button: e.button ?? "left" });
       case "wheel":
         await page.mouse.move(e.x, e.y);
@@ -356,7 +551,8 @@ export class BrowserSession {
         if (!entry) throw new ProtocolError("INVALID_INPUT", `no page ${action.pageId}`);
         this.active = entry;
         await entry.page.bringToFront();
-        await this.attachScreencast(entry.page);
+        this.changedPage();
+        await this.castTransition;
         break;
       }
       case "closePage": {
@@ -401,10 +597,13 @@ export class BrowserSession {
   }
 
   listDownloads(): BrowserDownload[] {
+    this.requirePage();
     return [...this.downloads];
   }
 
   async close(): Promise<void> {
+    this.closing = true; clearTimeout(this.stateTimer);
+    await this.manual?.close(); this.manual = undefined;
     await this.context?.close();
     this.context = undefined;
     this.pages.length = 0;
@@ -412,6 +611,7 @@ export class BrowserSession {
   }
 
   private requirePage(): Page {
+    if (this.manualMode || this.transitioning) throw new ProtocolError("INVALID_INPUT", "Manual login active; wait for the human to finish and resume the agent");
     if (!this.active) throw new ProtocolError("WORKER_UNAVAILABLE", "browser not started");
     return this.active.page;
   }

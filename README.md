@@ -1,77 +1,112 @@
 # Linux Agent Workbench
 
-Desktop app where an LLM drives a sandboxed terminal (and later a browser) under human supervision.
+A Linux desktop workspace where an AI agent operates a containerized terminal and browser while you watch, review approvals, and take control.
 
-Design: `docs/superpowers/specs/2026-09-04-terminal-stage-design.md`.
-Full architecture: `linux-agent-workbench-architecture.md`.
+**The primary provider is Codex with ChatGPT subscription sign-in.** The separately billed OpenAI Responses API is also supported. Switching providers currently uses configuration files; a unified provider setup in Settings is the first major [roadmap](ROADMAP.md) item.
 
-## Development
+This is an early source-build project. It is not affiliated with or endorsed by OpenAI. Read the [security model](SECURITY.md) before connecting accounts or opening a workspace containing sensitive data. Release packaging and license selection are tracked in the [publication checklist](CONTRIBUTING.md#before-publishing).
+
+## What works today
+
+- A real terminal with PTY/tmux, interactive applications, and a persistent workspace.
+- A separate Chromium browser with tabs, screenshots, DOM observations, downloads, and manual sign-in.
+- Codex subscription authentication, account-specific model choices, and reasoning effort selection.
+- Human takeover, approval cards, activity history, output inspection, and tracked-file restoration for Git workspaces.
+- A growing task editor, saved preferences, explained working styles, and separate step/time limits.
+- Pausing at a limit and continuing the same live task, with explicit Stop throughout.
+
+## Requirements
+
+Use a Linux desktop with:
+
+- Node.js **24** (`.nvmrc`) and pnpm **10.24.0** (`packageManager`).
+- Rootless Podman configured for your user; `podman info` must work without sudo.
+- Git, a C/C++ toolchain, Python 3, and Linux libraries needed by Electron and `node-pty`.
+- [Codex CLI](https://learn.chatgpt.com/docs/cli) installed on the host for the subscription provider. Follow its official installation instructions. The integration was tested with **0.153.4**; model availability depends on the account.
+- Space for both container images. The build script requires at least **5 GB free on `/`** before each build and checks a **14 GB** image-storage ceiling afterward.
+
+Development has been exercised on Ubuntu with rootless Podman. Other Linux distributions may need different packages. There are no Windows/macOS support or packaged-release claims.
+
+## Run from source
+
+Clone this repository and run the commands below. They assume nvm is installed; if you installed Node 24 another way, skip the two nvm commands and ensure that version is on PATH:
 
 ```bash
-source ~/.nvm/nvm.sh && nvm use     # Node 24
-pnpm install
-cp .env.example .env                 # then fill OPENAI_API_KEY
+git clone https://github.com/bartek-filipiuk/linux-agent-workbench.git
+cd linux-agent-workbench
+nvm install
+nvm use
+npm install --global pnpm@10.24.0
+pnpm install --frozen-lockfile
+cp .env.example .env
+
+# Build both isolated environments; the generated image IDs are local to your machine.
+pnpm images:build
+pnpm images:build:browser
+
+pnpm dev
+```
+
+The image build scripts also prune unused older LAW images/build cache after a successful build. Review [maintenance](docs/USER_GUIDE.md#maintenance-and-diagnostics) before running them on a host with other Podman projects.
+
+In the app:
+
+1. Expand the setup/account panel and choose **Sign in to Codex**. Finish authentication yourself in the system browser.
+2. Choose **Open workspace…** and select a dedicated project directory. The agent can change files there.
+3. Choose **Browser** or **Both**, then **Open browser** if your task needs it.
+4. Under **New task**, enter a goal, review **Working style**, limits, and **Model & reasoning**, then choose **Start task**.
+
+A first task that needs no website account:
+
+> Inspect the current terminal directory without changing anything. Report the working directory and the names of the files you can see.
+
+For terminal-based authentication and an optional subscription-consuming connection test:
+
+```bash
+pnpm codex:login
+pnpm codex:status
+pnpm codex:smoke
+# Remote login, if supported by your account:
+pnpm codex:login --device-auth
+```
+
+The app uses a dedicated Codex home, separate from your usual coding-agent login. There is **no automatic paid API fallback**. Subscription sign-in and API-key billing are different authentication paths; quota and access depend on your account. [Official OpenAI authentication documentation](https://learn.chatgpt.com/docs/auth).
+
+## Documentation
+
+| Document | What it covers |
+| --- | --- |
+| [User guide](docs/USER_GUIDE.md) | Installation details, daily workflow, browser login, approvals, limits, history, troubleshooting |
+| [Configuration](docs/CONFIGURATION.md) | Current Settings controls, environment variables, providers, credentials and local data |
+| [Codex integration](docs/codex-integration.md) | Dedicated sign-in, App Server, model/effort selection and tool boundary |
+| [Architecture](linux-agent-workbench-architecture.md) | Processes, tools, policies, network and storage |
+| [Security](SECURITY.md) | Trust model, known limitations, disclosure and safer operation |
+| [Security review](docs/security-review.md) | Review scope, findings, fixes and verification limits |
+| [Roadmap](ROADMAP.md) | Planned multi-provider subscription/API setup and later priorities |
+| [Contributing](CONTRIBUTING.md) | Development checks and publication prerequisites |
+
+## OpenAI API alternative
+
+Use a private app configuration file outside the workspace, or the ignored repository `.env` for development:
+
+```dotenv
+LAW_PROVIDER=openai
+OPENAI_API_KEY=your-api-key
+OPENAI_MODEL=gpt-5.6-sol
+```
+
+Restart the app after changing provider configuration. API usage is billed separately from ChatGPT. An available OS keyring encrypts the saved API key; otherwise it stays in the configuration file with a visible warning. Never open a directory containing that file as the agent workspace. See [configuration and key precedence](docs/CONFIGURATION.md).
+
+## Development checks
+
+```bash
+pnpm typecheck
 pnpm test
-pnpm dev                             # builds protocol + agentd, starts Electron
+pnpm build
 ```
 
-`.env` keys: `OPENAI_API_KEY`, `OPENAI_MODEL` (default `gpt-5.6-sol`), optional `OPENAI_PRICE_INPUT_PER_MTOK` and `OPENAI_PRICE_OUTPUT_PER_MTOK` (USD per million tokens; without them the run cost shows `n/a`). The app reads `~/.config/@law/desktop/.env` first, then the repo root; keep the key outside any directory you open as a workspace.
+Worker browser tests need a local Playwright Chromium installation; see [Contributing](CONTRIBUTING.md). Real container tests are opt-in with `pnpm test:container` after building both images. Tests normally use fake providers and do not spend model quota.
 
-On the first start with a real keyring (GNOME Keyring, KWallet), the app moves `OPENAI_API_KEY` from `.env` into the OS keyring through Electron's `safeStorage` (stored encrypted in `settings.json`) and replaces the `.env` line with a note. If the only backend is `basic_text` the key stays in `.env`, nothing is written, and the top bar shows `key in plain .env`.
+## License
 
-## Layout
-
-- `packages/protocol` — framing, Zod schemas, error codes
-- `services/agentd` — orchestrator, storage, provider adapters, policy
-- `services/terminal-worker` — PTY/tmux worker that runs inside the container (Milestone 2)
-- `apps/desktop` — Electron main/preload/renderer
-
-### Sandbox image
-
-```bash
-pnpm images:build        # builds localhost/law-terminal and pins its id in images/terminal/image.json
-pnpm test:container      # Podman-backed tests (needs the image)
-```
-
-`pnpm images:build` refuses to run with less than 5 GB free on `/`, removes previous builds and build-cache layers after a successful build (`pnpm images:prune` does the same on demand), and fails with exit 4 when podman image storage still exceeds 6 GB. An image used by a running sandbox cannot be removed until that sandbox is destroyed and reopened on the new image.
-
-The app starts one container per workspace (`law-terminal-<id>`), keeps it running when the window closes, and reconnects to the same tmux session on the next start. "Destroy sandbox" removes it.
-
-Host notes (Ubuntu 22.04, Podman 3.4 rootless): the build tolerates tar's directory chmod failure on rootless overlay, and no CPU quota is applied because the user's cgroup delegates only `memory` and `pids`.
-
-### Policy gate
-
-Every simple command of the interactive shell in the sandbox is checked by agentd before it runs (a bash `DEBUG` trap calls `/opt/law/gate`, a small static binary that asks the worker, which asks agentd):
-
-- commands typed by the human are always allowed and logged;
-- for the agent: read-only prefixes run silently (`auto`), most commands run and are logged (`log`), risky ones wait for your decision in the drawer (`approval`: pushes, publishes, `curl | sh`, `sudo`, recursive `rm`/`chmod`, `git reset --hard`, remote shells, raw disk writes); a nested agent started with a permission-bypass flag is logged when the top-bar setting AGENTS is `autonomous` (the default: the sandbox is the boundary, and the operator model is told to start `claude --dangerously-skip-permissions`) and asks for approval when it is `supervised`;
-- an approval is `Allow once` (this exact command), `Allow for this run` (this rule until the run ends) or `Deny`; no answer within 120 s denies;
-- when a nested tool shows a permission or password prompt, the agent's next keystroke is blocked and the run hands off to you.
-
-Ceiling: the gate covers the interactive shell only. `bash -c`, scripts, other shells and processes started by nested agents are governed by the container, mounts and network profile. Before each run on a git workspace a snapshot (`HEAD` + `git stash create`) is recorded; "Restore pre-run state" brings tracked files back, untracked files are left alone.
-
-### SSH and git identity in the sandbox
-
-The container mounts the named volume `law-ssh` at `/home/agent/.ssh` and, if present, the host `~/.gitconfig` read-only. Put a **dedicated deploy key** and a pinned `known_hosts` into the volume (`podman unshare` + the path from `podman volume inspect law-ssh`), never the host `~/.ssh`. `ssh`/`scp`/`rsync` are `approval` commands: prefer "Allow once", because the gate sees the connection, not what runs on the remote side.
-
-### Network
-
-Neither container has a network namespace of its own (`--network none`). The only way out is an HTTP proxy that agentd serves on a Unix socket in the session's runtime dir; a small forwarder inside each container exposes it as `127.0.0.1:3128`, and `HTTP_PROXY`/`HTTPS_PROXY` point there. The proxy resolves every hostname on the host, refuses private, loopback and link-local addresses (by name and by resolved address) with `403`, and records each decision in the `egress_log` table. With the network mode `none` agentd serves no socket, so proxy-aware tools fail immediately.
-
-The top-bar setting DOMAINS `open | ask` governs both the browser and the proxy. In `ask` mode the first connection to a host during a run shows an approval card ("Allow once" covers this app run, "Allow for this run" also remembers the host for the workspace); concurrent connections to one host share one card; traffic while no run is active is the human's and is not questioned. Hosts are matched exactly, so `www.x.com` and `api.x.com` are two entries.
-
-What works: curl, git, apt, pip, npm/pnpm, Claude Code, Codex, Chromium (launched with `--proxy-server`), and ssh through the `ProxyCommand` shipped in `/etc/ssh/ssh_config.d/law-egress.conf`. What does not: anything that ignores proxy variables, ping, UDP, and tools that resolve names themselves before connecting.
-
-### Run profiles, budgets and cost
-
-The drawer's **profile** adds working rules to the system prompt: `research` (script repetitive fetching instead of clicking through pages, save every item at once, small observations, context compacted every 12 turns), `project` (coordinate a nested coding agent, compact every 20 turns) or `quick` (as is). **Max turns** is the per-run budget (default 40). Context compaction asks the model for a short state summary and restarts the response chain from the goal plus that summary, so long runs stop resending the whole history; the event `context.compacted` marks it in the run log.
-
-Set `LAW_RESEARCH_MODEL` (plus `LAW_RESEARCH_PRICE_INPUT_PER_MTOK` / `LAW_RESEARCH_PRICE_OUTPUT_PER_MTOK`) to run the research profile on a cheaper model. With prices in `.env` the drawer shows the cost live and `scripts/bench-report.mjs` prints per-run cost; cached input is billed at a tenth of the input price.
-
-### Notifications on your phone (ntfy)
-
-Set in `.env`: `LAW_NTFY_URL` (topic the app publishes to, e.g. `https://ntfy.sh/law-<random>`), `LAW_NTFY_REPLY_URL` (a second topic your phone publishes decisions to) and optionally `LAW_NTFY_TOKEN`. Approval cards, handoffs and run endings are pushed; approval notifications carry "Allow once / Allow for run / Deny" buttons that post `once|session|deny <approvalId>` to the reply topic, which agentd streams and applies. With notifications configured an approval waits 10 minutes instead of 2. The topic names are the secret: pick long random ones, and use a self-hosted ntfy or an access token if summaries of your commands must not leave your machines.
-
-### Maintenance and diagnostics
-
-At startup agentd deletes runs that ended more than 30 days ago (with their events, tool calls, approvals and usage) and egress rows older than that, and stops containers whose session has not been used for 7 days (`last-used` marker in the session's runtime dir; volumes are kept). Screenshots are never written to the database. The "Diagnostics" button writes `~/.local/share/linux-agent-workbench/diagnostics/law-diagnostics-<timestamp>.txt` with versions, image ids, containers, settings without the key and the last 500 agentd log lines, all passed through a redactor; check it before sharing anyway.
+A license has not yet been selected. Public source availability alone does not grant an open-source license; selecting and adding `LICENSE` is a prerequisite before publishing this project as open source.

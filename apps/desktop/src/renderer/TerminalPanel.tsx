@@ -3,7 +3,7 @@ import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
 
-const OWNER_COLOR = { human: "#3b82f6", agent: "#ff3b3b" } as const;
+const OWNER_COLOR = { human: "#a9bbc9", agent: "#92b9ff" } as const;
 
 export function TerminalPanel({ owner, visible = true }: { owner: "human" | "agent"; visible?: boolean }) {
   const host = useRef<HTMLDivElement>(null);
@@ -22,7 +22,7 @@ export function TerminalPanel({ owner, visible = true }: { owner: "human" | "age
       fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
       fontSize: 14,
       scrollback: 5000,
-      theme: { background: "#0b0d10", foreground: "#e6e8eb", cursor: "#3b82f6" },
+      theme: { background: "#0b0d10", foreground: "#e6e8eb", cursor: OWNER_COLOR.human },
     });
     termRef.current = term;
     // Ctrl+V would otherwise go to the shell as \x16 (readline quoted-insert) and Ctrl+Shift+C as a key; returning
@@ -41,7 +41,7 @@ export function TerminalPanel({ owner, visible = true }: { owner: "human" | "age
     window.workbench.terminalResize(term.cols, term.rows);
     window.workbench.terminalRefresh(); // a fresh xterm is blank until tmux repaints
 
-    const offData = window.workbench.onTerminalData((data) => term.write(data));
+    const offData = window.workbench.onTerminalData((data, consumed) => term.write(data, consumed));
     const inputDisposable = term.onData((d) => window.workbench.terminalWrite(d));
     // Debounced: a window drag fires dozens of observations, each of which would be a SIGWINCH, a full
     // tmux repaint and a revision bump the model may be holding an expectedRevision against.
@@ -80,10 +80,9 @@ export function TerminalPanel({ owner, visible = true }: { owner: "human" | "age
       window.workbench.terminalResize(term.cols, term.rows);
       term.refresh(0, term.rows - 1);
       window.workbench.terminalRefresh();
-      term.focus();
     });
     return () => cancelAnimationFrame(id);
   }, [visible]);
 
-  return <div ref={host} className={`terminal ${owner}${visible ? "" : " is-hidden"}`} />;
+  return <div role="region" aria-label="Sandbox terminal" ref={host} className={`terminal-panel ${owner}${visible ? "" : " is-hidden"}`} />;
 }

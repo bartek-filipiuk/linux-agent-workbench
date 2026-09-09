@@ -9,6 +9,7 @@ const enabled = process.env.LAW_CONTAINER_TESTS === "1";
 const imageJson = path.resolve(__dirname, "../../images/browser/image.json");
 const imageId = fs.existsSync(imageJson) ? (JSON.parse(fs.readFileSync(imageJson, "utf8")) as { id: string }).id : "";
 const sessionId = "b2b2b2b2b2b2b2b2";
+const profileVolume = `law-browser-test-${process.pid}`;
 
 describe.skipIf(!enabled || !imageId)("browser container", { timeout: 120_000 }, () => {
   const runtime = new PodmanRuntime();
@@ -19,7 +20,7 @@ describe.skipIf(!enabled || !imageId)("browser container", { timeout: 120_000 },
   const make = () =>
     new BrowserSessionManager({
       socketDir: path.join(root, sessionId, "browser"),
-      launcher: podmanLauncher({ runtime, sessionId, imageId, networkMode: "open", downloadsDir: downloads }),
+      launcher: podmanLauncher({ runtime, sessionId, imageId, networkMode: "open", downloadsDir: downloads, profileVolume }),
       connectTimeoutMs: 60_000,
     });
   let m = make();
@@ -30,12 +31,14 @@ describe.skipIf(!enabled || !imageId)("browser container", { timeout: 120_000 },
   afterAll(async () => {
     await m.destroy();
     await egress.close();
+    if (execFileSync("podman", ["volume", "ls", "--format", "{{.Name}} "]).toString().split(/\s+/).includes(profileVolume)) execFileSync("podman", ["volume", "rm", profileVolume]);
     fs.rmSync(root, { recursive: true, force: true });
   }, 60_000);
 
   it("starts in a container without keys or workspace, navigates with the network open and streams frames", async () => {
     const frames: number[] = [];
     m.on("frame", (f: { jpeg: Uint8Array }) => frames.push(f.jpeg.length));
+    m.setFramesEnabled(true);
     const status = await m.start();
     expect(status.state, status.message).toBe("ready");
     const name = browserContainerName(sessionId);
@@ -47,6 +50,29 @@ describe.skipIf(!enabled || !imageId)("browser container", { timeout: 120_000 },
     expect(info.title).toMatch(/Example Domain/);
     m.input({ kind: "mousemove", x: 5, y: 5 });
     await expect.poll(() => frames.length, { timeout: 15_000 }).toBeGreaterThan(0);
+    m.setFramesEnabled(false);
+    await new Promise(r => setTimeout(r, 300));
+    const hiddenFrames = frames.length;
+    await m.navigate("https://example.com/?hidden=1");
+    expect((await m.observe({})).title).toMatch(/Example Domain/);
+    await new Promise(r => setTimeout(r, 300));
+    expect(frames.length).toBe(hiddenFrames);
+    m.setFramesEnabled(true);
+    await expect.poll(() => frames.length, { timeout: 15000 }).toBeGreaterThan(hiddenFrames);
+  });
+
+  it("uses a full manual window, routes through egress and preserves login cookies", async () => {
+    const frames: number[] = [];
+    m.on("frame", f => frames.push(f.jpeg.length)); m.setFramesEnabled(true);
+    expect((await m.control({ kind: "manual", enabled: true })).manual).toBe(true);
+    await expect(m.observe({ screenshot: true })).rejects.toThrow(/Manual login/);
+    await expect.poll(() => frames.length, { timeout: 15000 }).toBeGreaterThan(2);
+    expect((await m.control({ kind: "manual", enabled: false })).manual).toBe(false);
+    expect((await m.observe()).title).toMatch(/Example Domain/);
+    const script = fs.readFileSync(path.join(__dirname, "manual-browser-fixture.mjs"), "utf8");
+    const output = execFileSync("podman", ["exec", "-i", browserContainerName(sessionId), "node", "--input-type=module"], { input: script, timeout: 60000 }).toString();
+    expect(JSON.parse(output)).toMatchObject({ cookiesPersisted: true, automationBlocked: true, hiddenFramesPaused: true });
+    fs.copyFileSync(path.join(downloads, "manual-window.jpg"), "/tmp/law-manual-window.jpg");
   });
 
   it("keeps the profile across stop and start (container reused), and across destroy (volume)", async () => {
@@ -61,7 +87,7 @@ describe.skipIf(!enabled || !imageId)("browser container", { timeout: 120_000 },
     m = make();
     const fresh = await m.start();
     expect(fresh.state, fresh.message).toBe("ready");
-    const vol = execFileSync("podman", ["volume", "inspect", "law-browser-profile-default", "--format", "{{.Mountpoint}}"]).toString().trim();
+    const vol = execFileSync("podman", ["volume", "inspect", profileVolume, "--format", "{{.Mountpoint}}"]).toString().trim();
     expect(vol.length).toBeGreaterThan(0);
   });
 });

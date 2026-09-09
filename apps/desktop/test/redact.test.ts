@@ -2,6 +2,14 @@ import { describe, expect, it } from "vitest";
 import { RingBuffer, redact } from "../src/main/redact";
 
 describe("redact", () => {
+  it("redacts JSON credentials and OAuth query parameters without hiding the host", () => {
+    const text = '{"access_token":"fixture-token-value","password":"short"} https://auth.example/callback?code=fixture-code&state=fixture-state&scope=openid';
+    const result = redact(text);
+    expect(result).not.toMatch(/fixture-token-value|short|fixture-code|fixture-state/);
+    expect(result).toContain("https://auth.example/callback?");
+    expect(result).toContain("scope=openid");
+    expect(result).toContain('"password":"[redacted]"');
+  });
   it("hides keys, bearer tokens, assignments and the encrypted blob, keeps the rest", () => {
     const input = [
       "OPENAI_API_KEY=sk-proj-abcdefghijklmnop",
