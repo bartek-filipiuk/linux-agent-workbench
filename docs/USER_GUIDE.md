@@ -139,6 +139,8 @@ Containers can survive window closure and reconnect to the existing terminal ses
 | Browser cannot start or manual button is absent | Build the browser image; check its pinned ID and Podman logs |
 | `400 malformed` during OAuth | Start manual mode from the site's ordinary page, then begin login inside manual Chromium |
 | Preview is blank or frozen | Bring the app to the foreground, leave expanded editing, refresh preview, and check the browser status |
+| Browser shows `Page crashed` | Take browser control and choose **Recover tab**. This opens the tab's address afresh, retains the profile/cookies, and does not replay clicks or submit forms. Unsaved page input can be lost. Other tabs remain open |
+| Terminal stops updating or seems unresponsive | Choose **Reconnect display** in the terminal panel. This clears local display scrollback, returns pending flow-control credit and repaints tmux without closing its shell or nested coding agent. A missing display acknowledgment produces a warning after five seconds |
 | `node:sqlite` unavailable | Run the project and test subprocesses with Node 24 on PATH |
 | `node-pty` installation fails | Install your distribution's compiler toolchain and Python, then reinstall using Node 24 |
 | Sandbox cannot reach a site | Check applied NET mode, domain approval, and whether the tool honors the HTTP proxy; private/LAN destinations are blocked |
@@ -146,3 +148,5 @@ Containers can survive window closure and reconnect to the existing terminal ses
 | API key change seems ignored | A decryptable saved key takes precedence over `.env`; see the configuration guide before replacing saved credentials |
 
 When reporting a non-sensitive bug, include distribution, Node/Podman/Codex versions, provider mode, steps to reproduce, expected/actual behavior and sanitized diagnostics. Use the private reporting guidance in [SECURITY.md](../SECURITY.md) for security issues.
+
+Browser containers have a **4 GiB memory limit** and a separate 1 GB shared-memory mount (shared memory still counts toward the container's total). Heavy sites can still exhaust this budget. Rebuild the browser image and reconnect to replace an older container using the former 2 GiB limit. A completed agent response does not certify that every external action succeeded or that the browser is healthy; a crashed tab remains visibly flagged until recovered.

@@ -1,7 +1,7 @@
 import type { BrowserInfo, BrowserControl } from "@law/protocol";
 import { useEffect, useRef, useState } from "react";
 
-export type BrowserStatus = { state: "idle" | "starting" | "ready" | "stopped" | "error"; message?: string } & Partial<BrowserInfo>;
+export type BrowserStatus = { state: "idle" | "starting" | "ready" | "crashed" | "stopped" | "error"; message?: string } & Partial<BrowserInfo>;
 
 const KEY_MAP: Record<string, string> = { " ": "Space" };
 
@@ -133,9 +133,9 @@ export function BrowserPanel({ status, owner, runActive }: { status: BrowserStat
     if (backwards) send({ kind: "keyup", key: "Shift" });
   };
 
-  const live = status.state === "ready";
+  const live = status.state === "ready" || status.state === "crashed";
   const human = owner === "human" && !pending && !status.transitioning;
-  const previewReady = status.generation === undefined || displayedGeneration === status.generation;
+  const previewReady = !status.crashed && (status.generation === undefined || displayedGeneration === status.generation);
   return (
     <section ref={panelRef} className="browser" aria-label="Sandbox browser">
       <form
@@ -163,7 +163,7 @@ export function BrowserPanel({ status, owner, runActive }: { status: BrowserStat
       </form>
       {live && <div className="browser-tabs">
         {!status.manual && (status.pages?.length ?? 0) > 0 && <><label htmlFor="browser-pages">Tab / window</label><select id="browser-pages" value={status.activePageId ?? ""} disabled={!human} onChange={e => void control({ kind: "switch", pageId: e.target.value })}>{status.pages!.map(p => <option key={p.id} value={p.id}>{p.title || p.url}</option>)}</select><button className="btn" disabled={!human || status.pages!.length < 2} onClick={() => status.activePageId && void control({ kind: "close", pageId: status.activePageId })}>Close tab</button></>}
-        <button className="btn" disabled={pending || status.transitioning} onClick={() => void control({ kind: "refresh" })}>Refresh preview</button>
+        <button className="btn" disabled={pending || status.transitioning || (status.crashed && !human)} onClick={() => void control({ kind: status.crashed ? "recover" : "refresh" })}>{status.crashed ? "Recover tab" : "Refresh preview"}</button>
         {status.manualAvailable && <button className="btn" disabled={pending || status.transitioning} onClick={() => void control({ kind: "manual", enabled: !status.manual })}>{pending || status.transitioning ? "Switching…" : status.manual ? "Finish manual login" : "Log in manually"}</button>}
       </div>}
       {(actionError || status.message) && <p className="browser-notice error" role="alert">{actionError || status.message}</p>}
@@ -176,7 +176,7 @@ export function BrowserPanel({ status, owner, runActive }: { status: BrowserStat
         <button className="btn" disabled={!live || !human} onClick={() => { canvasRef.current?.focus(); send({ kind: "keydown", key: "Escape" }); send({ kind: "keyup", key: "Escape" }); }}>Page Esc</button>
       </div>
       <div className={`browser-stage ${owner}`}>
-        {live && (previewError || status.frameError || status.transitioning || (status.generation !== undefined && displayedGeneration !== status.generation)) && <div className="preview-notice" role="status"><p>{previewError || status.frameError || (status.transitioning ? "Switching browser mode…" : "Connecting preview…")}</p>{!status.transitioning && <button className="btn" disabled={pending} onClick={() => void control({ kind: "refresh" })}>Retry preview</button>}</div>}
+        {live && (previewError || status.frameError || status.transitioning || (status.generation !== undefined && displayedGeneration !== status.generation)) && <div className="preview-notice" role="status"><p>{status.frameError || previewError || (status.transitioning ? "Switching browser mode…" : "Connecting preview…")}</p>{!status.transitioning && <button className="btn" disabled={pending || (status.crashed && !human)} onClick={() => void control({ kind: status.crashed ? "recover" : "refresh" })}>{status.crashed ? "Recover tab" : "Retry preview"}</button>}</div>}
         <canvas
           ref={canvasRef}
           tabIndex={live ? 0 : -1}

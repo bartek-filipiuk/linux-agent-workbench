@@ -45,6 +45,10 @@ declare global {
       terminalWrite(data: string): void;
       terminalResize(cols: number, rows: number): void;
       terminalRefresh(): void;
+      terminalReconnect(): void;
+      getTerminalStalled(): Promise<boolean>;
+      onTerminalStalled(cb: (stalled: boolean) => void): () => void;
+      onTerminalReset(cb: () => void): () => void;
       startRun(goal: string, opts?: { profile?: "quick" | "research" | "project"; maxTurns?: number; modelSelection?: ModelSelection; limits?: RunLimits }): Promise<void>;
       stopRun(): Promise<void>;
       continueBudget(runId: string, action: BudgetAction): Promise<void>;
@@ -312,7 +316,7 @@ export function App() {
             {(session.state === "idle" || session.state === "stopped") && <p>Open a workspace to start a sandboxed terminal.</p>}
           </div>
         )}
-      </>} drawer={<RunDrawer key={session.workspacePath ?? "none"} run={run} activeGoal={activeGoal} workspace={session.workspacePath} sandboxReady={live && !networkApplying && providerReady && runHydrated && !browser.manual && !browser.transitioning} />} />
+      </>} drawer={<RunDrawer key={session.workspacePath ?? "none"} run={run} activeGoal={activeGoal} workspace={session.workspacePath} surfaceWarning={browser.crashed ? "Browser tab crashed. The agent's response may be incomplete; recover the tab and review the result before continuing." : undefined} sandboxReady={live && !networkApplying && providerReady && runHydrated && !browser.manual && !browser.transitioning} />} />
       <footer className="bottombar">
         <span className={`owner ${leases.terminal.owner}`}>terminal: {leases.terminal.owner.toUpperCase()}</span>
         <span className={`owner ${leases.browser.owner}`}>browser: {leases.browser.owner.toUpperCase()}</span>

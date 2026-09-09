@@ -33,6 +33,9 @@ html, body, #root { height: 100%; }
 .terminal-panel.agent { border-color: #445b78; }
 .terminal-panel.is-hidden { display: none; }
 .terminal-panel .xterm { height: 100%; }
+.terminal-panel { display: flex; flex-direction: column; }
+.terminal-screen { flex: 1; min-height: 0; }
+.terminal-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-bottom: 6px; }
 .bottombar { display: flex; gap: 16px; align-items: center; padding: 8px 16px; background: var(--panel); border-top: 1px solid var(--border); font-size: 12px; }
 .owner.human { color: var(--human); font-weight: 700; }
 .owner.agent { color: var(--agent); font-weight: 700; }

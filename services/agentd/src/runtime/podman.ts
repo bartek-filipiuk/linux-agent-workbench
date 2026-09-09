@@ -90,7 +90,7 @@ export function buildBrowserRunArgs(spec: BrowserRunSpec): string[] {
     "--security-opt=no-new-privileges",
     "--read-only",
     "--pids-limit=512",
-    "--memory=2g",
+    "--memory=4g",
     "--shm-size=1g",
     "--tmpfs", "/tmp:rw,nosuid,nodev,size=1g",
     "--tmpfs", "/run:rw,nosuid,nodev,size=64m",

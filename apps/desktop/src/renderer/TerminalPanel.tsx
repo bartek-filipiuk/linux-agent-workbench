@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
@@ -9,10 +9,14 @@ export function TerminalPanel({ owner, visible = true }: { owner: "human" | "age
   const host = useRef<HTMLDivElement>(null);
   const termRef = useRef<Terminal | null>(null);
   const fitRef = useRef<FitAddon | null>(null);
+  const [stalled, setStalled] = useState(false);
 
   useEffect(() => {
     const term = termRef.current;
-    if (term) term.options.theme = { ...term.options.theme, cursor: OWNER_COLOR[owner] };
+    if (term) {
+      term.options.theme = { ...term.options.theme, cursor: OWNER_COLOR[owner] };
+      if (owner === "human") window.workbench.terminalRefresh();
+    }
   }, [owner]);
 
   useEffect(() => {
@@ -42,6 +46,11 @@ export function TerminalPanel({ owner, visible = true }: { owner: "human" | "age
     window.workbench.terminalRefresh(); // a fresh xterm is blank until tmux repaints
 
     const offData = window.workbench.onTerminalData((data, consumed) => term.write(data, consumed));
+    const offReset = window.workbench.onTerminalReset(() => term.reset());
+    let disposed = false;
+    let updated = false;
+    const offStalled = window.workbench.onTerminalStalled(value => { updated = true; setStalled(value); });
+    void window.workbench.getTerminalStalled().then(value => { if (!disposed && !updated) setStalled(value); });
     const inputDisposable = term.onData((d) => window.workbench.terminalWrite(d));
     // Debounced: a window drag fires dozens of observations, each of which would be a SIGWINCH, a full
     // tmux repaint and a revision bump the model may be holding an expectedRevision against.
@@ -63,6 +72,7 @@ export function TerminalPanel({ owner, visible = true }: { owner: "human" | "age
       ro.disconnect();
       inputDisposable.dispose();
       offData();
+      disposed = true; offReset(); offStalled();
       termRef.current = null;
       fitRef.current = null;
       term.dispose();
@@ -84,5 +94,8 @@ export function TerminalPanel({ owner, visible = true }: { owner: "human" | "age
     return () => cancelAnimationFrame(id);
   }, [visible]);
 
-  return <div role="region" aria-label="Sandbox terminal" ref={host} className={`terminal-panel ${owner}${visible ? "" : " is-hidden"}`} />;
+  return <section aria-label="Sandbox terminal" className={`terminal-panel ${owner}${visible ? "" : " is-hidden"}`}>
+    <div className="terminal-toolbar"><span className="hint" role="status">{stalled ? "Terminal display stalled. Reconnect the display to continue." : "Sandbox terminal"}</span><button className="btn" onClick={() => window.workbench.terminalReconnect()} title="Reset the display and repaint tmux. Running processes stay open; local scrollback is cleared.">Reconnect display</button></div>
+    <div ref={host} className="terminal-screen" />
+  </section>;
 }

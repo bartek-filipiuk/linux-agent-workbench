@@ -40,7 +40,7 @@ export type BrowserSessionOptions = {
   manualFactory?: (opts: ManualBrowserOptions) => ManualBrowser;
 };
 
-type PageEntry = { id: string; page: Page; opener?: Page | null };
+type PageEntry = { id: string; page: Page; opener?: Page | null; crashed?: boolean };
 
 // Playwright errors carry a multi-line, ANSI-coloured call log; the model and the UI need the first line only.
 const firstLine = (m: string) => m.replace(/\u001b\[[0-9;]*m/g, "").split("\n")[0]!.trim();
@@ -157,11 +157,12 @@ export class BrowserSession {
   }
   private changedPage(): void {
     this.revision++; this.refFrames.clear(); this.generation = (this.generation + 1) >>> 0;
-    this.frameError = null; this.publishState();
+    this.frameError = this.active?.crashed ? "Page crashed. Recover the tab to continue; unsaved page input may be lost." : null; this.publishState();
     void this.attachScreencast(this.active?.page, true);
   }
   async control(command: BrowserControl): Promise<BrowserInfo> {
     if (this.transitioning) throw new ProtocolError("INVALID_INPUT", "Browser mode is changing; please wait");
+    if (command.kind === "recover") return this.recoverPage();
     if (command.kind === "manual") { await this.setManual(command.enabled); return this.info(); }
     if (command.kind === "refresh" && this.manualMode) {
       this.generation = (this.generation + 1) >>> 0; this.frameError = null; this.publishState();
@@ -169,13 +170,30 @@ export class BrowserSession {
     }
     if (command.kind === "switch" || command.kind === "close") {
       await this.act({ kind: command.kind === "switch" ? "switchPage" : "closePage", pageId: command.pageId });
-    } else if (command.kind === "refresh") { this.changedPage(); await this.castTransition; }
+    } else if (command.kind === "refresh") { this.requirePage(); this.changedPage(); await this.castTransition; }
     else if (command.kind === "dialog") {
       const d = this.pendingDialog; this.pendingDialog = undefined;
       if (d) { if (command.accept) await d.accept(); else await d.dismiss(); }
       this.publishState();
     } else throw new ProtocolError("INVALID_INPUT", "Manual login is not available in this worker yet");
     return this.info();
+  }
+
+  /** Explicit human recovery creates a fresh GET navigation, never replays a tool or form submission. */
+  private async recoverPage(): Promise<BrowserInfo> {
+    if (this.manualMode || !this.active?.crashed) throw new ProtocolError("INVALID_INPUT", "No crashed tab to recover");
+    const old = this.active;
+    const url = normaliseNavigableUrl(old.page.url());
+    this.transitioning = true; this.publishState();
+    try {
+      const page = await this.context!.newPage();
+      await this.registerPage(page);
+      await old.page.close().catch(() => {});
+      this.transitioning = false;
+      if (url) await this.navigate(url);
+      this.changedPage(); await this.castTransition;
+      return await this.info();
+    } finally { this.transitioning = false; this.publishState(); }
   }
   private castPage: Page | undefined;
   private castTransition: Promise<void> = Promise.resolve();
@@ -311,6 +329,11 @@ export class BrowserSession {
     this.pages.push(entry);
     this.active = entry;
     this.changedPage();
+    page.on("crash", () => {
+      entry.crashed = true;
+      if (this.active === entry) this.changedPage();
+      this.diagnostic("A browser tab crashed, possibly because its memory limit was reached. Recover the affected tab.");
+    });
     page.on("framenavigated", frame => { if (frame === page.mainFrame()) { if (this.active === entry) this.changedPage(); else this.publishState(); } });
     page.on("domcontentloaded", () => this.publishState());
     page.on("load", () => this.publishState());
@@ -349,7 +372,7 @@ export class BrowserSession {
 
   private attachScreencast(_page?: Page, force = false): Promise<void> {
     const next = this.castTransition.then(async () => {
-      const page = this.framesEnabled ? this.active?.page : undefined;
+      const page = this.framesEnabled && !this.active?.crashed ? this.active?.page : undefined;
       if (!force && this.castPage === page) return;
       await this.castPage?.screencast.stop().catch(() => {});
       this.castPage = undefined;
@@ -412,10 +435,11 @@ export class BrowserSession {
       generation: this.generation, pages: [], manual: this.manualMode, manualAvailable: this.manualAvailable,
       transitioning: this.transitioning, frameError: this.frameError, dialog: null, diagnostics: this.diagnostics,
     };
-    const page = this.requirePage();
-    return { url: page.url(), title: this.pendingDialog ? "Browser dialog" : await page.title().catch(() => ""), viewport: page.viewportSize() ?? this.viewport,
+    const page = this.requirePage(true);
+    return { url: page.url(), title: this.active?.crashed ? "Page crashed" : this.pendingDialog ? "Browser dialog" : await page.title().catch(() => ""), viewport: page.viewportSize() ?? this.viewport,
       generation: this.generation, activePageId: this.active!.id,
-      pages: await Promise.all(this.pages.map(async e => ({ id: e.id, url: e.page.url(), title: this.pendingDialog ? e.page.url() : await e.page.title().catch(() => "") }))),
+      pages: await Promise.all(this.pages.map(async e => ({ id: e.id, url: e.page.url(), title: e.crashed ? "Page crashed" : this.pendingDialog ? e.page.url() : await e.page.title().catch(() => ""), crashed: e.crashed === true }))),
+      crashed: this.active?.crashed === true,
       frameError: this.frameError, manual: false, manualAvailable: this.manualAvailable, transitioning: false,
       dialog: this.pendingDialog ? { type: this.pendingDialog.type(), message: this.pendingDialog.message().slice(0, 500) } : null,
       diagnostics: this.diagnostics,
@@ -423,8 +447,12 @@ export class BrowserSession {
   }
 
   input(e: BrowserInputEvent): Promise<void> {
-    if (this.transitioning) return Promise.resolve();
-    const next = this.inputQueue.then(() => this.manualMode ? this.manual?.input(e) : this.applyInput(e)).catch(() => {
+    if (this.transitioning || this.active?.crashed) return Promise.resolve();
+    const generation = this.generation;
+    const next = this.inputQueue.then(() => {
+      if (generation !== this.generation || this.transitioning || this.active?.crashed) return;
+      return this.manualMode ? this.manual?.input(e) : this.applyInput(e);
+    }).catch(() => {
       this.diagnostic("Browser input could not be delivered. Refresh the preview and try again.");
     });
     this.inputQueue = next.catch(() => {}); return next;
@@ -458,6 +486,7 @@ export class BrowserSession {
     this.revision++;
     const max = input.maxElements ?? 200;
     const { elements, scroll } = await this.walkFrames(page, max);
+    this.requirePage(); // A crash during observation must not become an empty successful result.
     // Opt-in, as the tool contract says: a screenshot costs 100-300 ms here and an image in the model's context.
     const screenshot = input.screenshot === true ? (await page.screenshot({ type: "jpeg", quality: 50 })).toString("base64") : undefined;
     const pages = await Promise.all(this.pages.map(async (e) => ({ id: e.id, url: e.page.url(), title: await e.page.title().catch(() => "") })));
@@ -516,7 +545,7 @@ export class BrowserSession {
   }
 
   async act(action: BrowserAction): Promise<BrowserActResult> {
-    const page = this.requirePage();
+    const page = this.requirePage(action.kind === "switchPage" || action.kind === "closePage");
     this.lastInputAt = Date.now();
     switch (action.kind) {
       case "navigate":
@@ -550,7 +579,7 @@ export class BrowserSession {
         const entry = this.pages.find((e) => e.id === action.pageId);
         if (!entry) throw new ProtocolError("INVALID_INPUT", `no page ${action.pageId}`);
         this.active = entry;
-        await entry.page.bringToFront();
+        if (!entry.crashed) await entry.page.bringToFront();
         this.changedPage();
         await this.castTransition;
         break;
@@ -569,14 +598,14 @@ export class BrowserSession {
         break;
     }
     this.revision++;
-    const current = this.requirePage();
-    return { url: current.url(), title: await current.title().catch(() => ""), activePageId: this.active!.id };
+    const current = this.requirePage(action.kind === "switchPage" || action.kind === "closePage");
+    return { url: current.url(), title: this.active?.crashed ? "Page crashed" : await current.title().catch(() => ""), activePageId: this.active!.id };
   }
 
   async wait(input: BrowserWaitInput): Promise<BrowserWaitResult> {
     const page = this.requirePage();
     const timeout = input.timeoutMs ?? 15_000;
-    const done = async (matched: boolean, timedOut: boolean): Promise<BrowserWaitResult> => ({ matched, timedOut, url: page.url(), title: await page.title().catch(() => "") });
+    const done = async (matched: boolean, timedOut: boolean): Promise<BrowserWaitResult> => { this.requirePage(); return { matched, timedOut, url: page.url(), title: await page.title().catch(() => "") }; };
     try {
       if (input.state) await page.waitForLoadState(input.state, { timeout });
       if (input.selector) await page.waitForSelector(input.selector, { timeout });
@@ -610,9 +639,10 @@ export class BrowserSession {
     this.active = undefined;
   }
 
-  private requirePage(): Page {
+  private requirePage(allowCrashed = false): Page {
     if (this.manualMode || this.transitioning) throw new ProtocolError("INVALID_INPUT", "Manual login active; wait for the human to finish and resume the agent");
     if (!this.active) throw new ProtocolError("WORKER_UNAVAILABLE", "browser not started");
+    if (!allowCrashed && this.active.crashed) throw new ProtocolError("WORKER_UNAVAILABLE", "Browser tab crashed. Ask the human to recover the tab; no action was replayed.");
     return this.active.page;
   }
 }

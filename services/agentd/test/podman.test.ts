@@ -123,7 +123,7 @@ describe("buildBrowserRunArgs", () => {
   it("isolates the browser: profile volume, downloads, socket dir, no workspace, no keys", () => {
     const args = buildBrowserRunArgs(bspec);
     expect(args[args.indexOf("--name") + 1]).toBe("law-browser-0123456789abcdef");
-    for (const flag of ["--userns=keep-id", "--cap-drop=ALL", "--security-opt=no-new-privileges", "--read-only", "--shm-size=1g"]) expect(args).toContain(flag);
+    for (const flag of ["--userns=keep-id", "--cap-drop=ALL", "--security-opt=no-new-privileges", "--read-only", "--shm-size=1g", "--memory=4g"]) expect(args).toContain(flag);
     expect(args).toContain("law-browser-profile-default:/profile");
     expect(args).toContain(`${bspec.downloadsDir}:/downloads:rw`);
     expect(args).toContain(`${bspec.runtimeDir}:/run/law:rw`);

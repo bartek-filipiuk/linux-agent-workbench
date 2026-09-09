@@ -42,7 +42,7 @@ const Row = memo(function Row({ row: l }: { row: LogRow }) {
   );
 });
 
-export function RunDrawer({ run, sandboxReady, activeGoal, workspace }: { run: RunView; sandboxReady: boolean; activeGoal: string; workspace?: string | undefined }) {
+export function RunDrawer({ run, sandboxReady, activeGoal, workspace, surfaceWarning }: { run: RunView; sandboxReady: boolean; activeGoal: string; workspace?: string | undefined; surfaceWarning?: string | undefined }) {
   const [actionError, setActionError] = useState("");
   const [changes, setChanges] = useState<string | null>(null);
   const [composing, setComposing] = useState(!run.state);
@@ -86,6 +86,7 @@ export function RunDrawer({ run, sandboxReady, activeGoal, workspace }: { run: R
       </div>
       {composing && !busy ? <TaskComposer key={workspace ?? "none"} workspace={workspace} ready={sandboxReady} expanded={expanded} onExpand={toggleExpanded} continuation={continuation} onStarted={started} /> : <>
       <RunProgress run={run} />
+      {surfaceWarning && <p className="notice" role="alert">{surfaceWarning}</p>}
       {run.state === "budget_paused" && <BudgetPause run={run} disabled={!sandboxReady} />}
       <div className="drawer-controls">
       {run.approvals[0] && <section className="approval-queue" aria-label="Approval queue">

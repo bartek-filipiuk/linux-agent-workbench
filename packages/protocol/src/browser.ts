@@ -3,12 +3,13 @@ import { z } from "zod";
 export const BrowserNavigate = z.object({ url: z.string().min(1).max(4096) });
 export type BrowserNavigate = z.infer<typeof BrowserNavigate>;
 
-export const BrowserPageInfo = z.object({ id: z.string(), url: z.string(), title: z.string() });
+export const BrowserPageInfo = z.object({ id: z.string(), url: z.string(), title: z.string(), crashed: z.boolean().optional() });
 export type BrowserPageInfo = z.infer<typeof BrowserPageInfo>;
 export const BrowserControl = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("switch"), pageId: z.string().min(1) }),
   z.object({ kind: z.literal("close"), pageId: z.string().min(1) }),
   z.object({ kind: z.literal("refresh") }),
+  z.object({ kind: z.literal("recover") }),
   z.object({ kind: z.literal("manual"), enabled: z.boolean() }),
   z.object({ kind: z.literal("dialog"), accept: z.boolean() }),
 ]);
@@ -23,6 +24,7 @@ export const BrowserInfo = z.object({
   manualAvailable: z.boolean().optional(),
   transitioning: z.boolean().optional(),
   frameError: z.string().nullable().optional(),
+  crashed: z.boolean().optional(),
   dialog: z.object({ type: z.string(), message: z.string() }).nullable().optional(),
   diagnostics: z.array(z.object({ ts: z.number(), message: z.string() })).optional(),
   viewport: z.object({ width: z.number().int().positive(), height: z.number().int().positive() }),
