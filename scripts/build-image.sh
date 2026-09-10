@@ -6,16 +6,8 @@ cd "$(dirname "$0")/.."
 
 NAME="${1:-terminal}"            # terminal | browser
 IMAGE="localhost/law-${NAME}"
-MIN_FREE_GB=5
-MAX_STORAGE_GB=14  # terminal + browser images, their bases, and one previous image still used by a running sandbox
-
-free_gb() { df --output=avail -BG / | tail -1 | tr -dc '0-9'; }
-storage_gb() { podman system df --format '{{.Size}}' 2>/dev/null | head -1 | awk '{v=$1; if (v ~ /GB/) {sub(/GB/,"",v); print v+0} else if (v ~ /MB/) {sub(/MB/,"",v); print v/1000} else print 0}'; }
-
-if [ "$(free_gb)" -lt "$MIN_FREE_GB" ]; then
-  echo "build skipped: $(free_gb) GB free on /, need at least ${MIN_FREE_GB} GB" >&2
-  exit 3
-fi
+case "$NAME" in terminal|browser) ;; *) echo "expected terminal or browser" >&2; exit 2 ;; esac
+node scripts/check-storage.mjs before-build
 
 pnpm --filter @law/protocol build
 pnpm --filter "@law/${NAME}-worker" build
@@ -26,9 +18,4 @@ printf '{ "tag": "%s", "id": "%s" }\n' "$SHA" "$ID" > "images/${NAME}/image.json
 echo "image ${IMAGE}:${SHA} id=${ID}"
 
 bash scripts/prune-images.sh
-STORAGE="$(storage_gb)"
-echo "podman image storage: ${STORAGE} GB (limit ${MAX_STORAGE_GB} GB)"
-if awk -v s="$STORAGE" -v m="$MAX_STORAGE_GB" 'BEGIN { exit !(s > m) }'; then
-  echo "podman storage exceeds ${MAX_STORAGE_GB} GB after pruning; investigate before the next build (podman images -a; podman system df -v)" >&2
-  exit 4
-fi
+node scripts/check-storage.mjs after-build

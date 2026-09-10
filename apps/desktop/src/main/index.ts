@@ -148,6 +148,7 @@ const terminalDelivery = new TerminalDelivery(
     toAgentd({ type: "session.stop", destroy: false });
     onAgentd({ type: "agentd.error", message: "Terminal output exceeded its buffer. Reconnect to repaint the terminal; rebuild worker images if this repeats." });
   },
+  (stalled) => send("terminal:stalled", stalled),
 );
 
 function onAgentd(msg: AgentdToMain) {
@@ -446,6 +447,12 @@ onTrusted("terminal:write", (_e, data: unknown) => {
 onTrusted("terminal:ack", (_e, id: unknown) => { if (typeof id === "number") terminalDelivery.acknowledge(id); });
 onTrusted("terminal:subscribe", (_e, on: unknown) => terminalDelivery.setReady(on === true));
 onTrusted("terminal:refresh", () => toAgentd({ type: "terminal.refresh" }));
+handleTrusted("terminal:stalled", () => terminalDelivery.stalled);
+onTrusted("terminal:reconnect", () => {
+  send("terminal:reset", null);
+  terminalDelivery.reset();
+  toAgentd({ type: "terminal.refresh" });
+});
 onTrusted("browser:frameAck", (_e, id: number) => { if (Number.isSafeInteger(id)) toAgentd({ type: "browser.frameAck", id }); });
 onTrusted("browser:frames", (_e, on: unknown) => { framesWanted = on === true; syncFrameVisibility(); });
 onTrusted("terminal:resize", (_e, cols: unknown, rows: unknown) => {

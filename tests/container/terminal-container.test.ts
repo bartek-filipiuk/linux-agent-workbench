@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { PodmanRuntime, TerminalSessionManager, containerName } from "@law/agentd";
+import { isolatedRuntime } from "./isolated-runtime";
 
 const enabled = process.env.LAW_CONTAINER_TESTS === "1";
 const imageJson = path.resolve(__dirname, "../../images/terminal/image.json");
@@ -19,14 +20,16 @@ const until = async (pred: () => Promise<boolean> | boolean, ms = 15_000) => {
 };
 
 describe.skipIf(!enabled || !imageId)("terminal container", { timeout: 90_000 }, () => {
-  const runtimeRoot = fs.mkdtempSync(path.join(process.env.XDG_RUNTIME_DIR ?? os.tmpdir(), "law-ct-"));
-  const workspace = fs.mkdtempSync(path.join(os.tmpdir(), "law-ctws-"));
-  const runtime = new PodmanRuntime();
+  const runtimeRoot = enabled ? fs.mkdtempSync(path.join(process.env.XDG_RUNTIME_DIR ?? os.tmpdir(), "law-ct-")) : "";
+  const workspace = enabled ? fs.mkdtempSync(path.join(os.tmpdir(), "law-ctws-")) : "";
+  const isolation = isolatedRuntime();
+  const runtime = isolation.runtime;
   let manager: TerminalSessionManager;
   let sessionId = "";
 
   afterAll(async () => {
     await manager?.destroy();
+    await isolation.cleanup();
     fs.rmSync(runtimeRoot, { recursive: true, force: true });
   }, 60_000);
 

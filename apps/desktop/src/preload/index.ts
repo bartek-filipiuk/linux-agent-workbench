@@ -1,5 +1,8 @@
 import type { ModelCatalog, ModelSelection, RunLimits, BudgetAction } from "@law/protocol";
 import { contextBridge, ipcRenderer } from "electron";
+import { subscriptionLease } from "./subscription-lease";
+
+const subscribeTerminal = subscriptionLease(on => ipcRenderer.send("terminal:subscribe", on));
 
 const on = <T,>(channel: string) => (cb: (payload: T) => void) => {
   const handler = (_e: unknown, payload: T) => cb(payload);
@@ -30,6 +33,10 @@ const api = {
   terminalWrite: (data: string) => ipcRenderer.send("terminal:write", data),
   terminalResize: (cols: number, rows: number) => ipcRenderer.send("terminal:resize", cols, rows),
   terminalRefresh: () => ipcRenderer.send("terminal:refresh"),
+  terminalReconnect: () => ipcRenderer.send("terminal:reconnect"),
+  getTerminalStalled: (): Promise<boolean> => ipcRenderer.invoke("terminal:stalled"),
+  onTerminalStalled: on<boolean>("terminal:stalled"),
+  onTerminalReset: on<null>("terminal:reset"),
   getLease: () => ipcRenderer.invoke("lease:get"),
   startRun: (goal: string, opts?: { profile?: "quick" | "research" | "project"; maxTurns?: number; modelSelection?: ModelSelection; limits?: RunLimits }) => ipcRenderer.invoke("run:start", goal, opts),
   stopRun: () => ipcRenderer.invoke("run:stop"),
@@ -62,8 +69,8 @@ const api = {
   onTerminalData: (cb: (data: Uint8Array, consumed: () => void) => void) => {
     const listener = (_e: unknown, chunk: { id: number; data: Uint8Array }) => cb(chunk.data, () => ipcRenderer.send("terminal:ack", chunk.id));
     ipcRenderer.on("terminal:data", listener);
-    ipcRenderer.send("terminal:subscribe", true);
-    return () => { ipcRenderer.removeListener("terminal:data", listener); ipcRenderer.send("terminal:subscribe", false); };
+    const release = subscribeTerminal();
+    return () => { ipcRenderer.removeListener("terminal:data", listener); release(); };
   },
 };
 

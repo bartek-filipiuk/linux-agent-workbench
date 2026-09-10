@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { execFile, execFileSync } from "node:child_process";
 import { BrowserSessionManager, PodmanRuntime, SessionEgress, TerminalSessionManager, containerName, podmanLauncher, sessionIdFor } from "@law/agentd";
+import { isolatedRuntime } from "./isolated-runtime";
 
 const enabled = process.env.LAW_CONTAINER_TESTS === "1";
 const readId = (name: string) => {
@@ -22,10 +23,11 @@ const curl = (container: string, ...args: string[]) =>
   });
 
 describe.skipIf(!enabled || !terminalImage || !browserImage)("egress gateway in containers", { timeout: 180_000 }, () => {
-  const runtimeRoot = fs.mkdtempSync(path.join(process.env.XDG_RUNTIME_DIR ?? os.tmpdir(), "law-eg-"));
-  const workspace = fs.mkdtempSync(path.join(os.tmpdir(), "law-egws-"));
-  const downloads = fs.mkdtempSync(path.join(os.tmpdir(), "law-egdl-"));
-  const runtime = new PodmanRuntime();
+  const runtimeRoot = enabled ? fs.mkdtempSync(path.join(process.env.XDG_RUNTIME_DIR ?? os.tmpdir(), "law-eg-")) : "";
+  const workspace = enabled ? fs.mkdtempSync(path.join(os.tmpdir(), "law-egws-")) : "";
+  const downloads = enabled ? fs.mkdtempSync(path.join(os.tmpdir(), "law-egdl-")) : "";
+  const isolation = isolatedRuntime();
+  const runtime = isolation.runtime;
   const sessionId = sessionIdFor(workspace);
   const decisions: string[] = [];
   const egress = new SessionEgress({ runtimeRoot, log: (_s, e) => decisions.push(`${e.host}:${e.port}:${e.allowed ? "allow" : e.reason}`) });
@@ -35,6 +37,7 @@ describe.skipIf(!enabled || !terminalImage || !browserImage)("egress gateway in 
   afterAll(async () => {
     await browser?.destroy();
     await terminal?.destroy();
+    await isolation.cleanup();
     await egress.close();
     fs.rmSync(runtimeRoot, { recursive: true, force: true });
   }, 90_000);

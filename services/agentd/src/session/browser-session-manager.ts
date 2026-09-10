@@ -23,7 +23,7 @@ import {
 import { z } from "zod";
 import { browserContainerName, buildBrowserRunArgs, type PodmanRuntime } from "../runtime/podman.js";
 
-export type BrowserState = "idle" | "starting" | "ready" | "stopped" | "error";
+export type BrowserState = "idle" | "starting" | "ready" | "crashed" | "stopped" | "error";
 export type BrowserStatus = { state: BrowserState; message?: string } & Partial<BrowserInfo>;
 export type BrowserFrame = ReturnType<typeof decodeBrowserFrame>;
 
@@ -120,7 +120,7 @@ export class BrowserSessionManager extends EventEmitter {
   }
 
   async start(): Promise<BrowserStatus> {
-    if (this._status.state === "ready" || this._status.state === "starting") return this._status;
+    if (["ready", "crashed", "starting"].includes(this._status.state)) return this._status;
     this.setStatus({ state: "starting" });
     try {
       fs.mkdirSync(this.deps.socketDir, { recursive: true, mode: 0o700 });
@@ -143,7 +143,7 @@ export class BrowserSessionManager extends EventEmitter {
         this.emit("frame", frame);
       });
       conn.on("close", () => {
-        if (this.conn === conn && this._status.state === "ready") this.setStatus({ state: "error", message: "browser worker connection closed" });
+        if (this.conn === conn && ["ready", "crashed"].includes(this._status.state)) this.setStatus({ state: "error", message: "browser worker connection closed" });
       });
       this.conn.notify("browser.frames", { enabled: this.framesEnabled });
       const info = BrowserInfo.parse(await conn.request("browser.info", {}));
@@ -241,6 +241,7 @@ export class BrowserSessionManager extends EventEmitter {
   }
 
   private setStatus(s: BrowserStatus): BrowserStatus {
+    if (s.state === "ready" && s.crashed) s = { ...s, state: "crashed" };
     if (s.state !== this._status.state || s.message !== this._status.message) console.error(`[agentd] browser ${s.state}${s.message ? `: ${s.message}` : ""}`);
     this._status = s;
     this.emit("status", s);
