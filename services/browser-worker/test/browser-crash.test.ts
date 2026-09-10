@@ -22,9 +22,12 @@ it("reports a real renderer crash, rejects tools and recovers only on explicit r
     const before = await session.observe();
     const context = (session as unknown as { context: BrowserContext }).context;
     await context.addCookies([{ name: "fixture", value: "retained", url: before.url }]);
-    const cdp = await context.newCDPSession(context.pages()[0]!);
+    const page = context.pages()[0]!;
+    const cdp = await context.newCDPSession(page);
+    const crash = page.waitForEvent("crash", { timeout: 15000 });
     void cdp.send("Page.crash").catch(() => {});
-    await expect.poll(() => states.some(s => s.crashed)).toBe(true);
+    await crash;
+    await expect.poll(() => states.some(s => s.crashed), { timeout: 5000 }).toBe(true);
     expect((await session.info()).frameError).toMatch(/Page crashed/);
     await expect(session.observe()).rejects.toThrow(/crashed/);
     await expect(session.wait({ timeoutMs: 100 })).rejects.toThrow(/crashed/);

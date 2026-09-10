@@ -20,8 +20,8 @@ const until = async (pred: () => Promise<boolean> | boolean, ms = 20_000) => {
 };
 
 describe.skipIf(!enabled || !imageId)("bash policy gate in the container", { timeout: 90_000 }, () => {
-  const runtimeRoot = fs.mkdtempSync(path.join(process.env.XDG_RUNTIME_DIR ?? os.tmpdir(), "law-gt-"));
-  const workspace = fs.mkdtempSync(path.join(os.tmpdir(), "law-gtws-"));
+  const runtimeRoot = enabled ? fs.mkdtempSync(path.join(process.env.XDG_RUNTIME_DIR ?? os.tmpdir(), "law-gt-")) : "";
+  const workspace = enabled ? fs.mkdtempSync(path.join(os.tmpdir(), "law-gtws-")) : "";
   const isolation = isolatedRuntime();
   const manager = new TerminalSessionManager({ runtime: isolation.runtime, runtimeRoot, imageId });
   const seen: string[] = [];

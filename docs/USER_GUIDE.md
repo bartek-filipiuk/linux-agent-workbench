@@ -124,6 +124,8 @@ Use Settings → diagnostics to collect a report, watch progress or cancel. Repo
 
 `pnpm images:build` and `pnpm images:build:browser` rebuild their workers and pin local image IDs. Their cleanup removes only eligible LAW-tagged images; foreign/shared tags and unidentified build cache are retained. `pnpm images:prune` invokes the same cleanup. Images used by containers are kept. If storage exceeds the build script's ceiling, inspect it yourself rather than globally pruning unrelated projects.
 
+Storage checks use the configured local Podman graph root and allocated filesystem blocks, not the sum of virtual image sizes. They require 5 GB free on both relevant filesystems and cap the full local container store at 14 GB, including profiles and orphaned layers. A failed measurement stops the build check; it is never treated as zero usage. `node scripts/check-storage.mjs after-build` reruns the check without building or deleting anything. Very old Podman versions can retain orphaned build layers that image pruning does not remove; inspect their dependencies before any manual cleanup.
+
 Containers can survive window closure and reconnect to the existing terminal session. Startup maintenance stops sufficiently old idle LAW containers; persistent volumes are kept. Removing a container is not a logout or account-data deletion operation. Manage named volumes explicitly with Podman when you intend to remove saved credentials, after stopping the application and relevant containers.
 
 ## Troubleshooting

@@ -23,9 +23,9 @@ const curl = (container: string, ...args: string[]) =>
   });
 
 describe.skipIf(!enabled || !terminalImage || !browserImage)("egress gateway in containers", { timeout: 180_000 }, () => {
-  const runtimeRoot = fs.mkdtempSync(path.join(process.env.XDG_RUNTIME_DIR ?? os.tmpdir(), "law-eg-"));
-  const workspace = fs.mkdtempSync(path.join(os.tmpdir(), "law-egws-"));
-  const downloads = fs.mkdtempSync(path.join(os.tmpdir(), "law-egdl-"));
+  const runtimeRoot = enabled ? fs.mkdtempSync(path.join(process.env.XDG_RUNTIME_DIR ?? os.tmpdir(), "law-eg-")) : "";
+  const workspace = enabled ? fs.mkdtempSync(path.join(os.tmpdir(), "law-egws-")) : "";
+  const downloads = enabled ? fs.mkdtempSync(path.join(os.tmpdir(), "law-egdl-")) : "";
   const isolation = isolatedRuntime();
   const runtime = isolation.runtime;
   const sessionId = sessionIdFor(workspace);

@@ -20,8 +20,8 @@ const until = async (pred: () => Promise<boolean> | boolean, ms = 15_000) => {
 };
 
 describe.skipIf(!enabled || !imageId)("terminal container", { timeout: 90_000 }, () => {
-  const runtimeRoot = fs.mkdtempSync(path.join(process.env.XDG_RUNTIME_DIR ?? os.tmpdir(), "law-ct-"));
-  const workspace = fs.mkdtempSync(path.join(os.tmpdir(), "law-ctws-"));
+  const runtimeRoot = enabled ? fs.mkdtempSync(path.join(process.env.XDG_RUNTIME_DIR ?? os.tmpdir(), "law-ct-")) : "";
+  const workspace = enabled ? fs.mkdtempSync(path.join(os.tmpdir(), "law-ctws-")) : "";
   const isolation = isolatedRuntime();
   const runtime = isolation.runtime;
   let manager: TerminalSessionManager;

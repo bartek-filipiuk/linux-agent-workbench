@@ -23,7 +23,7 @@ Use a Linux desktop with:
 - Rootless Podman configured for your user; `podman info` must work without sudo.
 - Git, a C/C++ toolchain, Python 3, and Linux libraries needed by Electron and `node-pty`.
 - [Codex CLI](https://learn.chatgpt.com/docs/cli) installed on the host for the subscription provider. Follow its official installation instructions. The integration was tested with **0.153.4**; model availability depends on the account.
-- Space for both container images. The build script requires at least **5 GB free on `/`** before each build and checks a **14 GB** image-storage ceiling afterward.
+- Space for both container images. The build script requires at least **5 GB free** on the workspace and Podman-storage filesystems and checks a **14 GB allocated-storage ceiling** afterward. Shared image layers are counted once; profiles and orphaned storage also count.
 
 Development has been exercised on Ubuntu with rootless Podman. Other Linux distributions may need different packages. There are no Windows/macOS support or packaged-release claims.
 

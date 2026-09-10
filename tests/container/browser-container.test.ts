@@ -13,8 +13,8 @@ const profileVolume = `law-browser-test-${process.pid}`;
 
 describe.skipIf(!enabled || !imageId)("browser container", { timeout: 120_000 }, () => {
   const runtime = new PodmanRuntime();
-  const root = fs.mkdtempSync(path.join(process.env.XDG_RUNTIME_DIR ?? os.tmpdir(), "law-bc-"));
-  const downloads = fs.mkdtempSync(path.join(os.tmpdir(), "law-bcdl-"));
+  const root = enabled ? fs.mkdtempSync(path.join(process.env.XDG_RUNTIME_DIR ?? os.tmpdir(), "law-bc-")) : "";
+  const downloads = enabled ? fs.mkdtempSync(path.join(os.tmpdir(), "law-bcdl-")) : "";
   // The container has no network of its own: its only way out is the session's egress proxy socket.
   const egress = new SessionEgress({ runtimeRoot: root, log: () => undefined });
   const make = () =>
