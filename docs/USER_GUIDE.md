@@ -167,3 +167,10 @@ Reading defaults to the first visible main/article region; the agent can request
 The reader excludes hidden content, editable fields and password values; it does not export cookies or storage. Known credential-like URL parameters are removed. Visible account information on a page can still be included, so select sources appropriate for your task. Source text remains untrusted data, including when passed to a nested coding agent.
 
 Infinite feeds and collapsed sections require scrolling/expansion and a new capture. Canvas-only content and text inside images require visual inspection. Reading is not a login, CAPTCHA or access-control bypass. To update an existing installation, rebuild the app and browser image (`pnpm build`, `pnpm images:build:browser`) and restart the application so it uses the new worker and tools.
+
+
+### Submitting prompts to terminal applications
+
+`terminal_input` with `submit=true` waits briefly for the text/paste to settle before sending one separate Enter. If rendering does not settle, or a permission/password prompt appears, it leaves the text in place and does not submit it. Cancellation also prevents a delayed Enter.
+
+Long terminal waits check for input prompts at intervals of at most two seconds. If a current pasted draft is still visible, the result reports `inputStatus=pending`; if Enter was withheld, it reports `inputStatus=not_submitted`. These are not completion signals. The agent must inspect the prompt before continuing and must not paste the task again or blindly resend Enter. The application does not automatically retry submission. Detection is based on the visible terminal screen and is not a universal acknowledgment protocol for every TUI.
