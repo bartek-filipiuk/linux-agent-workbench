@@ -368,6 +368,10 @@ function previewOf(call: ToolCall): string {
       const act = (a.action ?? {}) as Record<string, unknown>;
       return clip([act.kind, act.ref, act.url, act.text, act.key, act.pageId].filter((v) => v !== undefined).join(" "));
     }
+    case "browser_read":
+      return a.snapshotId ? `continue capture at ${String(a.offset ?? 0)}` : `read ${String(a.scope ?? "main")} content`;
+    case "browser_save":
+      return a.name ? `save source: ${clip(a.name)}` : "save captured source to workspace";
     case "browser_wait":
       return a.text ? `text /${clip(a.text, 40)}/` : a.selector ? `selector ${clip(a.selector, 40)}` : String(a.state ?? "load");
     default:

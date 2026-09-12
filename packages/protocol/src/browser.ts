@@ -146,3 +146,13 @@ export type BrowserWaitResult = z.infer<typeof BrowserWaitResult>;
 
 export const BrowserDownload = z.object({ name: z.string(), bytes: z.number().int().nonnegative(), pageUrl: z.string() });
 export type BrowserDownload = z.infer<typeof BrowserDownload>;
+
+// Rendered document capture: bounded worker result, paginated separately by the run's tool executor.
+export const BrowserReadInput = z.object({ scope: z.enum(["main", "page"]).optional() }).strict();
+export type BrowserReadInput = z.infer<typeof BrowserReadInput>;
+export const BrowserReadResult = z.object({
+  pageId: z.string(), url: z.string().max(4096), title: z.string().max(1000),
+  capturedAt: z.string().datetime(), content: z.string().max(200_000),
+  truncated: z.boolean(), warnings: z.array(z.string().max(500)).max(32),
+});
+export type BrowserReadResult = z.infer<typeof BrowserReadResult>;

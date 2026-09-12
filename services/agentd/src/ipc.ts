@@ -560,7 +560,7 @@ export class Daemon {
       const approvals = this.approvals;
       policies.push(new LeasePolicy(this.browserLease, "browser"));
       policies.push(new BrowserActionPolicy({ lastObservation: () => browser.lastObservation, approvals, domainMode: () => this.domainMode, hosts: () => this.allowlist }));
-      executors.push(browserExecutor(browser));
+      executors.push(browserExecutor(browser, status.workspacePath));
     }
     const profile: RunProfileName = opts.profile ?? "quick";
     const profileModel = this.profileModels[profile];

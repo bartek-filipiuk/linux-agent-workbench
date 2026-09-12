@@ -10,6 +10,7 @@ This is an early source-build project. It is not affiliated with or endorsed by 
 
 - A real terminal with PTY/tmux, interactive applications, and a persistent workspace.
 - A separate Chromium browser with tabs, screenshots, DOM observations, downloads, and manual sign-in.
+- Browser research: read rendered page content and save source captures as Markdown for terminal or coding-agent work.
 - Codex subscription authentication, account-specific model choices, and reasoning effort selection.
 - Human takeover, approval cards, activity history, output inspection, and tracked-file restoration for Git workspaces.
 - A growing task editor, saved preferences, explained working styles, and separate step/time limits.

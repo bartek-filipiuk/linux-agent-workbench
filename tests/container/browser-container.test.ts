@@ -48,6 +48,9 @@ describe.skipIf(!enabled || !imageId)("browser container", { timeout: 120_000 },
     // about:blank never repaints, so frames only start flowing once a page renders.
     const info = await m.navigate("https://example.com");
     expect(info.title).toMatch(/Example Domain/);
+    const source = await m.read();
+    expect(source.content).toMatch(/Example Domain/);
+    expect(source.truncated).toBe(false);
     m.input({ kind: "mousemove", x: 5, y: 5 });
     await expect.poll(() => frames.length, { timeout: 15_000 }).toBeGreaterThan(0);
     m.setFramesEnabled(false);
@@ -66,6 +69,7 @@ describe.skipIf(!enabled || !imageId)("browser container", { timeout: 120_000 },
     m.on("frame", f => frames.push(f.jpeg.length)); m.setFramesEnabled(true);
     expect((await m.control({ kind: "manual", enabled: true })).manual).toBe(true);
     await expect(m.observe({ screenshot: true })).rejects.toThrow(/Manual login/);
+    await expect(m.read()).rejects.toThrow(/Manual login/);
     await expect.poll(() => frames.length, { timeout: 15000 }).toBeGreaterThan(2);
     expect((await m.control({ kind: "manual", enabled: false })).manual).toBe(false);
     expect((await m.observe()).title).toMatch(/Example Domain/);

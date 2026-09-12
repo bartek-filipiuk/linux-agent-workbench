@@ -1,5 +1,6 @@
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
+import { readPage } from "./read-page.js";
 import os from "node:os";
 import { ManualBrowser, type ManualBrowserOptions } from "./manual-browser.js";
 import path from "node:path";
@@ -9,6 +10,7 @@ import { chromium, type BrowserContext, type ElementHandle, type Frame, type Pag
 import {
   ProtocolError,
   normaliseNavigableUrl,
+  type BrowserReadInput,
   type BrowserAction,
   type BrowserControl,
   type BrowserActResult,
@@ -479,6 +481,15 @@ export class BrowserSession {
       case "insert":
         return page.keyboard.insertText(e.text);
     }
+  }
+
+  async read(input: BrowserReadInput = {}) {
+    const page = this.requirePage();
+    const pageId = this.active!.id;
+    const generation = this.generation;
+    const result = await readPage(page, pageId, input);
+    if (generation !== this.generation || this.active?.page !== page) throw new ProtocolError("STALE_OBSERVATION", "Active page changed while reading; read again");
+    return result;
   }
 
   async observe(input: BrowserObserveInput = {}): Promise<BrowserObservation> {

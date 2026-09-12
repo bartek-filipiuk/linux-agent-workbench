@@ -18,8 +18,8 @@ function fakeBrowser(state: "ready" | "stopped" = "ready") {
 const sig = new AbortController().signal;
 
 describe("browser tools", () => {
-  it("lists four tools with schemas mentioning the action kinds", () => {
-    expect(BROWSER_TOOLS.map((t) => t.name)).toEqual(["browser_observe", "browser_act", "browser_wait", "browser_downloads"]);
+  it("lists browser tools with schemas mentioning the action kinds", () => {
+    expect(BROWSER_TOOLS.map((t) => t.name)).toEqual(["browser_observe", "browser_act", "browser_wait", "browser_read", "browser_save", "browser_downloads"]);
     expect(JSON.stringify(BROWSER_TOOLS[1]!.parameters)).toContain("switchPage");
   });
   it("keeps the screenshot out of the text and returns it as an image", async () => {
