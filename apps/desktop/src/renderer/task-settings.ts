@@ -2,7 +2,7 @@ import { RunLimits, type RunLimits as Limits } from "@law/protocol";
 
 export const STYLES = {
   quick: { name: "General", description: "Chooses an approach for your task, using the browser and terminal as needed." },
-  research: { name: "Research & data", description: "Collects information in batches and saves results along the way. Prefers scripts for repetitive fetching." },
+  research: { name: "Research & data", description: "Reads sources in the browser and saves captured text with source links for comparison or a coding agent." },
   project: { name: "Build with a coding agent", description: "Coordinates another coding agent in the terminal and checks its work. That agent needs its own setup and sign-in." },
 } as const;
 export type TaskPreferences = { profile: keyof typeof STYLES; stepMode: "unlimited" | "custom"; steps: string; timeMode: "none" | "30" | "60" | "custom"; minutes: string };

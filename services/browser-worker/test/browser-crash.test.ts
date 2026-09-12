@@ -30,6 +30,7 @@ it("reports a real renderer crash, rejects tools and recovers only on explicit r
     await expect.poll(() => states.some(s => s.crashed), { timeout: 5000 }).toBe(true);
     expect((await session.info()).frameError).toMatch(/Page crashed/);
     await expect(session.observe()).rejects.toThrow(/crashed/);
+    await expect(session.read()).rejects.toThrow(/crashed/);
     await expect(session.wait({ timeoutMs: 100 })).rejects.toThrow(/crashed/);
     await expect(session.act({ kind: "navigate", url: before.url })).rejects.toThrow(/crashed/);
     await expect(session.control({ kind: "refresh" })).rejects.toThrow(/crashed/);

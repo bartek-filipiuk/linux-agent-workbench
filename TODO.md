@@ -17,6 +17,7 @@ Product direction and future features live in [ROADMAP.md](ROADMAP.md). This fil
 - [x] Publication review fixes: IPv6/local-address filtering, proxy input handling, renderer IPC/navigation validation, diagnostic redaction and ownership-scoped image pruning.
 - [x] English source/example/test cleanup while retaining Unicode coverage through escaped fixtures.
 - [x] GitHub repository setup with issue/PR templates, private vulnerability reporting, secret scanning and push protection.
+- [x] Browser text capture, bounded snapshot pagination and safe Markdown export to the workspace; browser-first Research instructions.
 - [x] Browser crash detection and explicit tab recovery, a bounded 4 GiB browser memory budget, terminal display-stall detection/resync and batched TUI delivery.
 
 ## Before public release

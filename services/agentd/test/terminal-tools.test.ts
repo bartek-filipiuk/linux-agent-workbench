@@ -49,7 +49,7 @@ describe("terminal tools", () => {
     expect(out.screen).toContain("pwd");
     expect(out).toHaveProperty("timedOut");
     const kinds = fw.received.map((r) => (r as { type?: string }).type);
-    expect(kinds.slice(-3)).toEqual(["terminal.input", "terminal.input", "terminal.wait"]);
+    expect(kinds).toEqual(["terminal.input", "terminal.wait", "terminal.input", "terminal.wait"]);
   });
 
   it("slims observations: trailing blanks go, scrollback only on request", () => {

@@ -1,0 +1,48 @@
+import { afterEach, expect, it, vi } from "vitest";
+import fs from "node:fs";
+import path from "node:path";
+import { BrowserResearch, ReadArgs, SaveArgs } from "../src/tools/browser-research.js";
+const dirs: string[] = [];
+const temp = () => { const p = fs.mkdtempSync("/tmp/law-research-test-"); dirs.push(p); return p; };
+afterEach(() => { for (const p of dirs.splice(0)) fs.rmSync(p, { recursive: true, force: true }); });
+const sig = new AbortController().signal;
+const capture = () => ({ pageId: "p1", url: "https://example.com/article", title: "Article", capturedAt: new Date().toISOString(), content: "First paragraph.\n".repeat(1000), truncated: false, warnings: [] });
+it("paginates an immutable capture and saves its complete content with provenance, without overwrites", async () => {
+  const workspace = temp(), research = new BrowserResearch(workspace);
+  const read = vi.fn(async () => capture());
+  const first = await research.read({ maxChars: 100 }, read, sig);
+  expect(first.content).toHaveLength(100); expect(first.nextOffset).toBe(100);
+  const second = await research.read({ snapshotId: first.snapshotId, offset: 100, maxChars: 200 }, read, sig);
+  expect(second.content).toBe(capture().content.slice(100, 300)); expect(read).toHaveBeenCalledTimes(1);
+  const saved = research.save({ snapshotId: first.snapshotId, name: "biography" }, sig);
+  const file = path.join(workspace, path.basename(saved.path));
+  expect(saved.path).toMatch(/^\/workspace\/research-biography-.*\.md$/);
+  expect(fs.readFileSync(file, "utf8")).toContain(capture().content);
+  expect(fs.readFileSync(file, "utf8")).toContain(first.capturedAt);
+  expect(fs.readFileSync(file, "utf8")).toContain("Source: https://example.com/article");
+  expect(fs.statSync(file).mode & 0o777).toBe(0o600);
+  const next = research.save({ snapshotId: first.snapshotId, name: "biography" }, sig);
+  expect(next.path).not.toBe(saved.path); expect(fs.readdirSync(workspace)).toHaveLength(2);
+});
+it("rejects expired or foreign captures, bad offsets, arbitrary code and path traversal", async () => {
+  const research = new BrowserResearch(temp());
+  const first = await research.read({}, async () => capture(), sig);
+  for (let i = 0; i < 8; i++) await research.read({}, async () => capture(), sig);
+  expect(() => research.save({ snapshotId: first.snapshotId }, sig)).toThrow(/expired/);
+  await expect(research.read({ snapshotId: first.snapshotId }, async () => capture(), sig)).rejects.toThrow(/expired/);
+  await expect(research.read({ offset: 1 }, async () => capture(), sig)).rejects.toThrow(/requires/);
+  expect(SaveArgs.safeParse({ snapshotId: first.snapshotId, name: "../../outside" }).success).toBe(false);
+  expect(SaveArgs.safeParse({ snapshotId: first.snapshotId, path: "/tmp/outside" }).success).toBe(false);
+  expect(ReadArgs.safeParse({ script: "fetch('/private')" }).success).toBe(false);
+  expect(ReadArgs.safeParse({ url: "https://example.com" }).success).toBe(false);
+});
+it("refuses a symlink workspace, empty content and cancelled writes", async () => {
+  const target = temp(), parent = temp(), link = path.join(parent, "link"); fs.symlinkSync(target, link);
+  const research = new BrowserResearch(link), first = await research.read({}, async () => capture(), sig);
+  expect(() => research.save({ snapshotId: first.snapshotId }, sig)).toThrow();
+  expect(fs.readdirSync(target)).toEqual([]);
+  const real = new BrowserResearch(target), empty = await real.read({}, async () => ({ ...capture(), content: "" }), sig);
+  expect(() => real.save({ snapshotId: empty.snapshotId }, sig)).toThrow(/no readable text/);
+  const controller = new AbortController(); controller.abort();
+  expect(() => research.save({ snapshotId: first.snapshotId }, controller.signal)).toThrow();
+});

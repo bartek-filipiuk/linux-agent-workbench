@@ -1,11 +1,13 @@
 import { z } from "zod";
+import { setTimeout as sleep } from "node:timers/promises";
+import { waitForTerminal } from "./terminal-wait.js";
 import { ProtocolError, TerminalInput, TerminalObserveInput, TerminalWaitInput } from "@law/protocol";
 import type { ToolCall, ToolExecutor, ToolSpec } from "../provider/types.js";
 import type { TerminalWorker } from "../worker/types.js";
 
 export const RequestHumanArgs = z.object({ reason: z.string().min(1).max(500) });
 const NoArgs = z.object({}).strict();
-// submit=true runs the line: ENTER is sent after the text or paste; wait={...} then waits for the result in
+// submit=true runs the line: ENTER is sent after the text or paste has settled; wait={...} then waits for the result in
 // the same call, so one command costs one model turn instead of two.
 export const TerminalInputArgs = z.intersection(TerminalInput, z.object({ submit: z.boolean().optional(), wait: TerminalWaitInput.optional() }));
 // scrollback=true adds the history tail (the worker only captures it when asked); by default only the visible screen travels.
@@ -44,13 +46,13 @@ export const TERMINAL_TOOLS: ToolSpec[] = [
   {
     name: "terminal_input",
     description:
-      "Send input to the terminal. kind=text types characters (no control characters); kind=key sends one named key (ENTER, TAB, ESC, CTRL_C, CTRL_D, arrows); kind=paste pastes a block. Set submit=true to press ENTER right after the text or paste, and wait={idleMs?, until?, timeoutMs?} to get the settled screen back in the same call (one call = type, run, read).",
+      "Send input to the terminal. kind=text types characters (no control characters); kind=key sends one named key (ENTER, TAB, ESC, CTRL_C, CTRL_D, arrows); kind=paste pastes a block. Set submit=true to let the text settle and press one separate ENTER, and wait={idleMs?, until?, timeoutMs?} to get the settled screen back in the same call (one call = type, run, read).",
     parameters: schema(TerminalInputArgs),
   },
   {
     name: "terminal_wait",
     description:
-      "Wait for the terminal to settle, then return the observation. Returns when the screen has been quiet for idleMs (default 1500), when the regex `until` matches the screen, or after timeoutMs (default 60000, then timedOut=true). Use this after sending input instead of repeated observes. The result's hint.state tells you what the screen is: busy, idle_shell, nested_agent_idle, question_menu (answer with UP/DOWN/ENTER), permission_prompt or password_prompt (the human answers these).",
+      "Wait for the terminal to settle, then return the observation. Returns when the screen has been quiet for idleMs (default 1500), when the regex `until` matches the screen, or after timeoutMs (default 60000, then timedOut=true). Use this after sending input instead of repeated observes. A long wait returns early for a pending pasted draft or an input/permission prompt; it never resends ENTER. The result's hint.state tells you what the screen is: busy, idle_shell, nested_agent_idle, question_menu (answer with UP/DOWN/ENTER), permission_prompt or password_prompt (the human answers these).",
     parameters: schema(TerminalWaitArgs),
   },
   {
@@ -73,6 +75,7 @@ function parseArgs<T>(s: z.ZodType<T>, args: unknown, tool: string): T {
 }
 
 export async function executeTerminalTool(call: ToolCall, worker: TerminalWorker, signal: AbortSignal): Promise<string> {
+  signal.throwIfAborted();
   switch (call.name) {
     case "terminal_observe": {
       const input = parseArgs(TerminalObserveArgs, call.args, call.name);
@@ -81,13 +84,25 @@ export async function executeTerminalTool(call: ToolCall, worker: TerminalWorker
     case "terminal_input": {
       const { submit, wait, ...input } = parseArgs(TerminalInputArgs, call.args, call.name);
       let result = await worker.input(input, signal);
-      if (submit && input.kind !== "key") result = await worker.input({ kind: "key", key: "ENTER" }, signal);
-      if (wait) return JSON.stringify(slimTerminal(await worker.wait(wait, signal), wait.scrollback === true));
+      if (submit && input.kind !== "key") {
+        // A socket acknowledgement only means PTY bytes were queued. Tmux/TUIs may still
+        // merge an immediate CR into the paste. Keep ENTER in a later input burst and
+        // wait for rendering, with a bound so animations cannot hold submission forever.
+        await sleep(250, undefined, { signal });
+        const settled = await worker.wait({ idleMs: 150, timeoutMs: 1500 }, signal);
+        signal.throwIfAborted();
+        if (settled.hint?.state === "permission_prompt" || settled.hint?.state === "password_prompt") {
+          throw new HandoffRequested("The terminal needs human input before submission. Text was delivered, but ENTER was not sent.");
+        }
+        if (settled.exited || settled.timedOut) return JSON.stringify({ ...slimTerminal(settled, false), inputStatus: "not_submitted", note: "Text was delivered, but the terminal did not settle. ENTER was not sent. Observe before continuing; do not paste the task again." });
+        result = await worker.input({ kind: "key", key: "ENTER" }, signal);
+      }
+      if (wait) return JSON.stringify(slimTerminal(await waitForTerminal(worker, wait, signal), wait.scrollback === true));
       return JSON.stringify(result);
     }
     case "terminal_wait": {
       const input = parseArgs(TerminalWaitArgs, call.args, call.name);
-      return JSON.stringify(slimTerminal(await worker.wait(input, signal), input.scrollback === true));
+      return JSON.stringify(slimTerminal(await waitForTerminal(worker, input, signal), input.scrollback === true));
     }
     case "terminal_interrupt":
       parseArgs(NoArgs, call.args, call.name);

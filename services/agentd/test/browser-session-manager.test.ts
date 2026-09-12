@@ -3,6 +3,7 @@ import fs from "node:fs";
 import type { PodmanRuntime } from "../src/runtime/podman.js";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { browserExecutor } from "../src/tools/browser-tools.js";
 import { BrowserSessionManager, hostLauncher, podmanLauncher } from "../src/session/browser-session-manager.js";
 import { tmpDir } from "./helpers/tmp.js";
 import { startFixtureServer } from "../../browser-worker/test/helpers/fixture-server.js";
@@ -46,6 +47,15 @@ describe.skipIf(!built)("BrowserSessionManager (host worker)", { timeout: 60_000
       expect((await m.wait({ text: "QUERY=socket", timeoutMs: 5000 })).matched).toBe(true);
       await expect(m.act({ kind: "click", ref: q.ref, revision: obs.revision })).rejects.toMatchObject({ code: "STALE_OBSERVATION" });
       expect(await m.downloads()).toEqual([]);
+      const tools = browserExecutor(m, root);
+      const signal = new AbortController().signal;
+      const read = JSON.parse((await tools.execute({ callId: "read", name: "browser_read", args: { scope: "page" } }, signal)).output);
+      expect(read.content).toContain("QUERY=socket");
+      expect(read.url).toContain(site.url);
+      await m.stop(); // Stored captures remain saveable without restarting a browser.
+      const saved = JSON.parse((await tools.execute({ callId: "save", name: "browser_save", args: { snapshotId: read.snapshotId } }, signal)).output);
+      expect(fs.readFileSync(path.join(root, path.basename(saved.path)), "utf8")).toContain("QUERY=socket");
+      expect(m.status.state).toBe("stopped");
     } finally {
       await site.close();
     }

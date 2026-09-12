@@ -7,6 +7,8 @@ import { setTimeout as sleep } from "node:timers/promises";
 import { FramedConnection } from "@law/protocol/node";
 import {
   BrowserActResult,
+  BrowserReadResult,
+  type BrowserReadInput,
   BrowserDownload,
   BrowserInfo,
   BrowserObservation,
@@ -168,6 +170,10 @@ export class BrowserSessionManager extends EventEmitter {
 
   input(event: BrowserInputEvent): void {
     this.conn?.notify("browser.input", event);
+  }
+
+  async read(input: BrowserReadInput = {}, signal?: AbortSignal): Promise<BrowserReadResult> {
+    return BrowserReadResult.parse(await this.requireConn().request("browser.read", input, { timeoutMs: 30_000, ...(signal ? { signal } : {}) }));
   }
 
   async observe(input: BrowserObserveInput = {}, signal?: AbortSignal): Promise<BrowserObservation> {

@@ -39,7 +39,7 @@ The goal supports up to 4,000 characters. It grows as you type; **Expand editor*
 | Style | What it changes | Good fit |
 | --- | --- | --- |
 | General | Lets the operator choose browser and terminal actions as needed | Mixed tasks and ordinary browsing |
-| Research & data | Encourages batching, scripts for repetitive retrieval, and intermediate saved results | Collecting and comparing information |
+| Research & data | Reads sources in the browser, saves captured material with provenance, and works in batches | Collecting and comparing information |
 | Build with a coding agent | Asks the operator to coordinate another coding agent in the terminal and inspect its work | Work requiring a separately configured terminal coding agent |
 
 **Compare working styles** displays the legend. These are prompt instructions, not guaranteed outcomes or fixed numbers of steps. They do not select the Codex model or reasoning effort. The third style requires the nested coding agent's own installation, login, quota and permissions; it is not another selectable operator provider.
@@ -152,3 +152,25 @@ Containers can survive window closure and reconnect to the existing terminal ses
 When reporting a non-sensitive bug, include distribution, Node/Podman/Codex versions, provider mode, steps to reproduce, expected/actual behavior and sanitized diagnostics. Use the private reporting guidance in [SECURITY.md](../SECURITY.md) for security issues.
 
 Browser containers have a **4 GiB memory limit** and a separate 1 GB shared-memory mount (shared memory still counts toward the container's total). Heavy sites can still exhaust this budget. Rebuild the browser image and reconnect to replace an older container using the former 2 GiB limit. A completed agent response does not certify that every external action succeeded or that the browser is healthy; a crashed tab remains visibly flagged until recovered.
+
+
+## Research from browser pages
+
+The agent can read the currently open page using `browser_read`, including paragraphs, lists, readable table rows, links, dynamically rendered text, open shadow DOM and visible embedded frames. It uses the existing browser session; it does not fetch the page URL through a separate HTTP client. `browser_observe` still describes controls for navigation and interaction.
+
+`browser_save` writes a captured source to a unique `research-<label>-<id>.md` file at the workspace root, with source URL, capture time and any truncation warnings. It returns a `/workspace/...` path that terminal tools and interactive coding agents can read. Saving does not require a clipboard or Save Page dialog. The browser container itself still has no workspace mount. Existing files are never overwritten.
+
+For example: “Search Google in the browser for information about this topic. Open the original sources, read them with browser_read, and save them with browser_save. Then start interactive Claude Code in the terminal and ask it to build a page from those saved files. Do not fetch source URLs through scripts.” The Research working style follows this flow by default; browser-only instructions also apply in other styles.
+
+Reading defaults to the first visible main/article region; the agent can request `scope=page` when content is missing. A capture is capped at 200,000 characters, 16 frames, 20,000 visited nodes per frame and depth 100. Content beyond a limit is marked incomplete. Responses default to 10,000 characters (maximum 20,000) and provide a snapshot ID and continuation offset. Continuing a snapshot reads the same captured text even after navigation. Saving writes the full capture, including portions not returned in the first response; it does not imply the model has reviewed every portion. Only the latest eight captures are held in memory during a run; they do not survive a new run or app restart unless saved.
+
+The reader excludes hidden content, editable fields and password values; it does not export cookies or storage. Known credential-like URL parameters are removed. Visible account information on a page can still be included, so select sources appropriate for your task. Source text remains untrusted data, including when passed to a nested coding agent.
+
+Infinite feeds and collapsed sections require scrolling/expansion and a new capture. Canvas-only content and text inside images require visual inspection. Reading is not a login, CAPTCHA or access-control bypass. To update an existing installation, rebuild the app and browser image (`pnpm build`, `pnpm images:build:browser`) and restart the application so it uses the new worker and tools.
+
+
+### Submitting prompts to terminal applications
+
+`terminal_input` with `submit=true` waits briefly for the text/paste to settle before sending one separate Enter. If rendering does not settle, or a permission/password prompt appears, it leaves the text in place and does not submit it. Cancellation also prevents a delayed Enter.
+
+Long terminal waits check for input prompts at intervals of at most two seconds. If a current pasted draft is still visible, the result reports `inputStatus=pending`; if Enter was withheld, it reports `inputStatus=not_submitted`. These are not completion signals. The agent must inspect the prompt before continuing and must not paste the task again or blindly resend Enter. The application does not automatically retry submission. Detection is based on the visible terminal screen and is not a universal acknowledgment protocol for every TUI.
