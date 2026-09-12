@@ -13,6 +13,7 @@ This is an early source-build project. It is not affiliated with or endorsed by 
 - Browser research: read rendered page content and save source captures as Markdown for terminal or coding-agent work.
 - Codex subscription authentication, account-specific model choices, and reasoning effort selection.
 - Human takeover, approval cards, activity history, output inspection, and tracked-file restoration for Git workspaces.
+- Durable current conversations with follow-ups, pause/interrupt controls and continuation after app restart. Independent browser restart preserves the saved profile and workspace.
 - A growing task editor, saved preferences, explained working styles, and separate step/time limits.
 - Pausing at a limit and continuing the same live task, with explicit Stop throughout.
 

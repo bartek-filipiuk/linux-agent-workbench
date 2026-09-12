@@ -103,6 +103,15 @@ export function podmanLauncher(opts: {
 }
 
 export class BrowserSessionManager extends EventEmitter {
+  private restarting = false;
+  private epoch = 0;
+  private actions = new Set<Promise<unknown>>();
+  private uncertainAction = false;
+
+  async settleActions(): Promise<void> {
+    await Promise.allSettled([...this.actions]);
+    if (this.uncertainAction) throw new Error("A browser action did not finish. Restart browser before continuing; its outcome is unknown");
+  }
   private _status: BrowserStatus = { state: "idle" };
   lastObservation: BrowserObservation | undefined;
   private handle: LaunchHandle | undefined;
@@ -134,12 +143,14 @@ export class BrowserSessionManager extends EventEmitter {
       const conn = await this.waitForSocket(socketPath);
       this.conn = conn;
       conn.on("message", env => {
+        if (this.conn !== conn) return;
         if (env.type === "browser.state") {
           const result = BrowserInfo.safeParse(env.payload);
           if (result.success) this.setStatus({ state: "ready", ...result.data });
         }
       });
       conn.on("browser-frame", (bytes: Uint8Array) => {
+        if (this.conn !== conn) return;
         const frame = decodeBrowserFrame(bytes);
         if (frame.generation !== this._status.generation) this.setStatus({ ...this._status, generation: frame.generation });
         this.emit("frame", frame);
@@ -164,12 +175,34 @@ export class BrowserSessionManager extends EventEmitter {
   }
 
   async control(command: BrowserControl): Promise<BrowserInfo> {
+    const epoch = this.epoch;
     const info = BrowserInfo.parse(await this.requireConn().request("browser.control", command, { timeoutMs: 60000 }));
+    if (epoch !== this.epoch) throw new ProtocolError("CANCELLED", "Browser restarted; the previous operation was discarded");
     this.setStatus({ state: "ready", ...info }); return info;
   }
 
   input(event: BrowserInputEvent): void {
+    if (this.restarting) return;
     this.conn?.notify("browser.input", event);
+  }
+
+  /** Out-of-band recovery: never ask a stuck browser RPC/input queue to shut itself down. */
+  async restart(): Promise<BrowserStatus> {
+    if (this.restarting) throw new Error("Browser restart is already in progress");
+    if (this._status.state === "starting") throw new Error("Browser is still starting. Wait for startup to finish before restarting");
+    this.restarting = true; this.epoch++;
+    this.setStatus({ state: "starting", message: "Restarting browser…" });
+    const conn = this.conn; this.conn = undefined; conn?.close();
+    this.lastObservation = undefined;
+    this.uncertainAction = false;
+    try {
+      await this.handle?.destroy();
+      this.handle = undefined;
+      this.setStatus({ state: "stopped" });
+      return await this.start();
+    } catch (error) {
+      return this.setStatus({ state: "error", message: `Browser restart failed: ${error instanceof Error ? error.message : String(error)}` });
+    } finally { this.restarting = false; }
   }
 
   async read(input: BrowserReadInput = {}, signal?: AbortSignal): Promise<BrowserReadResult> {
@@ -183,7 +216,29 @@ export class BrowserSessionManager extends EventEmitter {
   }
 
   async act(action: BrowserAction, signal?: AbortSignal): Promise<BrowserActResult> {
-    const r = BrowserActResult.parse(await this.requireConn().request("browser.act", action, { timeoutMs: 45_000, ...(signal ? { signal } : {}) }));
+    signal?.throwIfAborted();
+    if (this.uncertainAction) throw new ProtocolError("WORKER_UNAVAILABLE", "Restart browser before continuing an uncertain action");
+    const epoch = this.epoch;
+    // Keep tracking the worker reply after the caller stops waiting. Aborting an RPC does not cancel a click.
+    const request = this.requireConn().request("browser.act", action, { timeoutMs: 45_000 });
+    this.actions.add(request);
+    void request.catch(error => {
+      if (epoch === this.epoch && ProtocolError.is(error) && error.code === "TIMEOUT") {
+        this.uncertainAction = true;
+        this.setStatus({ ...this._status, message: "Browser action timed out. Restart browser before continuing." });
+      }
+    }).finally(() => this.actions.delete(request));
+    let abort: (() => void) | undefined;
+    let payload;
+    try {
+      payload = await Promise.race([request, new Promise<never>((_, reject) => {
+        abort = () => reject(new ProtocolError("CANCELLED", "Browser action interrupted; check its outcome before continuing"));
+        signal?.addEventListener("abort", abort, { once: true });
+        if (signal?.aborted) abort();
+      })]);
+    } finally { if (abort) signal?.removeEventListener("abort", abort); }
+    if (epoch !== this.epoch) throw new ProtocolError("CANCELLED", "Browser restarted");
+    const r = BrowserActResult.parse(payload);
     this.setStatus({ ...this._status, state: "ready", url: r.url, title: r.title, activePageId: r.activePageId });
     return r;
   }

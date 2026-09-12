@@ -67,6 +67,22 @@ describe.skipIf(!built)("BrowserSessionManager (host worker)", { timeout: 60_000
     const status = await m.start();
     expect(status.state).toBe("error");
   });
+
+  it("restarts only the browser worker, retains the profile and reconnects frames", async () => {
+    const root = tmpDir("law-br-reset-");
+    const profile = path.join(root, "profile");
+    m = new BrowserSessionManager({ socketDir: path.join(root, "rt"), launcher: hostLauncher({ workerEntry, profileDir: profile }) });
+    m.setFramesEnabled(true);
+    expect((await m.start()).state).toBe("ready");
+    fs.writeFileSync(path.join(profile, "retained-profile-marker"), "keep");
+    const frames: unknown[] = []; m.on("frame", f => frames.push(f));
+    const restart = m.restart();
+    await expect(m.restart()).rejects.toThrow(/already in progress/);
+    expect((await restart).state).toBe("ready");
+    expect(fs.readFileSync(path.join(profile, "retained-profile-marker"), "utf8")).toBe("keep");
+    await expect.poll(() => frames.length).toBeGreaterThan(0);
+    expect((await m.observe({})).url).toBe("about:blank");
+  });
 });
 
 it("refuses to launch a browser without a container image instead of falling back to the host", async () => {

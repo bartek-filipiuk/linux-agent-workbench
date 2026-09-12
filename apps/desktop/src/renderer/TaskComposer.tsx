@@ -3,7 +3,7 @@ import { ModelPicker, useModelPicker } from "./ModelPicker";
 import { DEFAULT_TASK_PREFERENCES, readTaskPreferences, STYLES, TASK_PREFERENCES_KEY, taskLimits, type TaskPreferences } from "./task-settings";
 
 /** Keep typing off synchronous disk APIs; flush on blur, start, page exit and unmount. */
-function useDraftStorage(key: string, value: string) {
+export function useDraftStorage(key: string, value: string) {
   const pending = useRef({ key, value });
   const [error, setError] = useState("");
   const write = useCallback(() => {

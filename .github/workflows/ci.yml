@@ -26,4 +26,5 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm build
       - run: pnpm exec vitest run --maxWorkers=1
+      - run: node tests/ui/followups.mjs
       - run: pnpm audit --audit-level=high

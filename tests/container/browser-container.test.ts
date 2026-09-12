@@ -79,6 +79,18 @@ describe.skipIf(!enabled || !imageId)("browser container", { timeout: 120_000 },
     fs.copyFileSync(path.join(downloads, "manual-window.jpg"), "/tmp/law-manual-window.jpg");
   });
 
+  it("hard-restarts the browser container without deleting its saved profile", async () => {
+    const name = browserContainerName(sessionId);
+    execFileSync("podman", ["exec", name, "touch", "/profile/user-data/reset-profile-sentinel"]);
+    const before = execFileSync("podman", ["inspect", name, "--format", "{{.Id}}"], { encoding: "utf8" }).trim();
+    expect((await m.restart()).state).toBe("ready");
+    const after = execFileSync("podman", ["inspect", name, "--format", "{{.Id}}"], { encoding: "utf8" }).trim();
+    expect(after).not.toBe(before);
+    execFileSync("podman", ["exec", name, "test", "-f", "/profile/user-data/reset-profile-sentinel"]);
+    expect(m.lastObservation).toBeUndefined();
+    expect((await m.navigate("https://example.com")).title).toMatch(/Example Domain/);
+  });
+
   it("keeps the profile across stop and start (container reused), and across destroy (volume)", async () => {
     await m.stop();
     expect(m.status.state).toBe("stopped");

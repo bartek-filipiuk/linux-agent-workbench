@@ -20,7 +20,7 @@ type PolicySettings = { nestedAutonomy: boolean; domainMode: "open" | "ask" };
 type Leases = Record<"terminal" | "browser", LeaseState>;
 
 declare global {
-  interface Window {
+    interface Window {
     workbench: {
       checkSetup(): Promise<SetupState>;
       loginCodex(): Promise<AccountState>;
@@ -29,6 +29,10 @@ declare global {
       onAccount(cb: (s: AccountState) => void): () => void;
       getModels(refresh?: boolean): Promise<ModelCatalog>;
       getRun(): Promise<{ run: RunView; goal: string; handoff: string | null; sequence: number }>;
+      getConversation(): Promise<import("./FollowupComposer").Conversation | null>;
+      sendFollowup(runId: string, message: string): Promise<{ runId: string }>;
+      pauseRun(runId: string): Promise<void>;
+      restartBrowser(): Promise<void>;
       getHistory(): Promise<HistoryRow[]>;
       getRunDetail(id: string): Promise<HistoryDetail>;
       getChanges(): Promise<string>;

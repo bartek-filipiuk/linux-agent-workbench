@@ -24,6 +24,11 @@ export class BudgetTracker {
   private pausedAt: number | undefined;
   private pausedMs = 0;
   private pauseDepth = 0;
+  private carriedMs = 0;
+
+  restore(usage: { turns: number; toolCalls: number; costUsd: number; elapsedMs: number }): void {
+    this.turns = usage.turns; this.toolCalls = usage.toolCalls; this.costUsd = usage.costUsd; this.carriedMs = usage.elapsedMs;
+  }
 
   constructor(
     private budgets: Budgets,
@@ -36,7 +41,7 @@ export class BudgetTracker {
   addToolCall() { this.toolCalls++; }
   addCost(usd: number) { this.costUsd += usd; }
 
-  elapsedMs() { return (this.pausedAt ?? this.now()) - this.startedAt - this.pausedMs; }
+  elapsedMs() { return this.carriedMs + (this.pausedAt ?? this.now()) - this.startedAt - this.pausedMs; }
   get limits(): Budgets { return { ...this.budgets }; }
   pauseClock() { if (this.pauseDepth++ === 0) this.pausedAt = this.now(); }
   resumeClock() {

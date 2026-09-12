@@ -6,6 +6,10 @@ import { TERMINAL_STATES, type ErrorCode, type NetworkMode, type RunEvent, type 
 import { migrate } from "./migrate.js";
 
 export type RunRow = {
+  parent_run_id: string | null;
+  conversation_id: string;
+  continuation_json: string | null;
+  settings_json: string | null;
   id: string;
   workspace_id: string;
   goal: string;
@@ -89,10 +93,10 @@ export class Store {
     const now = Date.now();
     this.db
       .prepare(
-        `INSERT INTO runs (id, workspace_id, goal, model, state, network_mode, started_at, snapshot_json)
-         VALUES (?, ?, ?, ?, 'running', ?, ?, ?)`,
+        `INSERT INTO runs (id, workspace_id, goal, model, state, network_mode, started_at, snapshot_json, conversation_id)
+         VALUES (?, ?, ?, ?, 'running', ?, ?, ?, ?)`,
       )
-      .run(id, input.workspaceId, input.goal, input.model, input.networkMode, now, input.snapshot === undefined ? null : JSON.stringify(input.snapshot));
+      .run(id, input.workspaceId, input.goal, input.model, input.networkMode, now, input.snapshot === undefined ? null : JSON.stringify(input.snapshot), id);
     this.appendEvent(id, "run.created", { goal: input.goal, model: input.model, networkMode: input.networkMode });
     return id;
   }
@@ -109,8 +113,25 @@ export class Store {
     return this.db.prepare(`SELECT * FROM runs WHERE id = ?`).get(runId) as RunRow | undefined;
   }
 
+  linkRun(runId: string, parentId: string | undefined, settings: unknown): void {
+    const parent = parentId ? this.getRun(parentId) : undefined;
+    if (parentId && (!parent || parent.workspace_id !== this.getRun(runId)?.workspace_id)) throw new Error("Conversation parent must belong to the same workspace");
+    this.db.prepare(`UPDATE runs SET parent_run_id = ?, conversation_id = ?, settings_json = ? WHERE id = ?`)
+      .run(parentId ?? null, parent?.conversation_id ?? runId, JSON.stringify(settings), runId);
+  }
+
+  saveContinuation(runId: string, checkpoint: unknown): void {
+    this.db.prepare(`UPDATE runs SET continuation_json = ? WHERE id = ?`).run(JSON.stringify(checkpoint), runId);
+  }
+
+  conversationRuns(runId: string, workspacePath: string, limit = 30): RunRow[] {
+    return this.db.prepare(`SELECT r.* FROM runs r JOIN workspaces w ON w.id = r.workspace_id
+      WHERE r.conversation_id = (SELECT conversation_id FROM runs WHERE id = ?) AND w.path = ?
+      ORDER BY r.started_at DESC, r.rowid DESC LIMIT ?`).all(runId, workspacePath, limit) as RunRow[];
+  }
+
   listRecentRuns(workspacePath: string, limit = 30): RunRow[] {
-    return this.db.prepare(`SELECT r.* FROM runs r JOIN workspaces w ON w.id = r.workspace_id WHERE w.path = ? ORDER BY r.started_at DESC LIMIT ?`).all(workspacePath, limit) as RunRow[];
+    return this.db.prepare(`SELECT r.* FROM runs r JOIN workspaces w ON w.id = r.workspace_id WHERE w.path = ? ORDER BY r.started_at DESC, r.rowid DESC LIMIT ?`).all(workspacePath, limit) as RunRow[];
   }
 
   listRecentEvents(runId: string, limit = 500): RunEvent[] {
@@ -154,6 +175,19 @@ export class Store {
 
   listToolCalls(runId: string): ToolCallRow[] {
     return this.db.prepare(`SELECT * FROM tool_calls WHERE run_id = ? ORDER BY started_at, rowid`).all(runId) as ToolCallRow[];
+  }
+
+  listRecentToolCalls(runId: string, limit = 12): ToolCallRow[] {
+    return (this.db.prepare(`SELECT * FROM tool_calls WHERE run_id = ? ORDER BY started_at DESC, rowid DESC LIMIT ?`).all(runId, limit) as ToolCallRow[]).reverse();
+  }
+
+  conversationText(runId: string): { user?: string; answer?: string } {
+    const read = (type: string) => {
+      const row = this.db.prepare(`SELECT payload_json FROM run_events WHERE run_id = ? AND type = ? ORDER BY seq DESC LIMIT 1`).get(runId, type) as { payload_json: string } | undefined;
+      return row ? String(JSON.parse(row.payload_json).text ?? "") : undefined;
+    };
+    const user = read("user.message"), answer = read("run.result");
+    return { ...(user !== undefined ? { user } : {}), ...(answer !== undefined ? { answer } : {}) };
   }
 
   recordUsage(runId: string, u: { responseId: string; inputTokens: number; outputTokens: number; cachedInputTokens?: number; costUsd: number }): void {

@@ -70,7 +70,17 @@ At a step/tool limit, use **Add 100 steps** or **Continue without a step limit**
 
 **Stop task** aborts the operator and asks the worker to cancel current work. It does not undo external actions or guarantee termination of every detached process previously started in the sandbox. Inspect the terminal if a nested process remains running. **Destroy sandbox** stops/removes the workspace containers and disconnects the session; it does not erase the workspace or all persistent volumes.
 
-Reloading only the renderer recovers the current UI snapshot. Closing/restarting the entire app interrupts the active run; history remains, but the live provider thread is not reconstructed.
+Reloading only the renderer recovers the current UI snapshot. Closing/restarting the entire app interrupts active work. The latest conversation in the reopened workspace is restored without automatically running the agent; send a follow-up to continue it.
+
+### Follow-ups and interruption
+
+The message field below the activity log stays available while the agent works and after it finishes. **Interrupt & send** stops the current run, waits for its cleanup and outstanding browser actions, then sends your message in the same conversation. **Pause** stops work without sending anything; use **Continue** when ready. Enter inserts a line break; Ctrl+Enter (Cmd+Enter on macOS) sends. A draft is retained until the service accepts it.
+
+Continuation preserves the workspace, provider context, model/effort and accumulated limits. Reaching an existing limit still pauses for an explicit extension. **New task** starts an independent conversation with fresh limits. Each continuation remains a separate audited run and has its own pre-run Git snapshot.
+
+New Codex conversations use durable threads in LAW's isolated Codex home. API continuations use the preceding stored Response and supply outstanding tool results. Older tasks created before durable continuation are reconstructed from bounded saved task/result/tool records; their full original provider context cannot be recovered. If a provider no longer has a stored conversation, the error is shown; LAW does not silently switch provider or replay the task.
+
+The agent is instructed to inspect the current browser/terminal and reread relevant workspace files after interruption. A stopped RPC does not undo a click or stop a program already launched in the terminal. An action with an uncertain outcome must be checked before repeating it. Previous browser element references and in-memory research capture IDs expire between runs; saved Markdown files remain available at their workspace paths.
 
 ## Browser and account sign-in
 
@@ -112,11 +122,17 @@ The shell gate classifies commands typed into its instrumented interactive Bash 
 
 ## History and output
 
-**History & results** opens the task view; **Recent tasks** shows up to 30 tasks for this workspace. Select an entry to see saved information. **Continue…** prepares a new goal with the previous result; this is a new task, unlike budget continuation.
+**History & results** opens the task view; **Recent tasks** shows up to 30 tasks for this workspace. Select an entry to see saved information. **Draft new task from result** prepares an independent goal from that entry. To preserve the current conversation, use the message field below the activity log. A dedicated browser for earlier conversations is planned separately.
 
 A completed result offers **Copy result**, **Show output…**, and **Workspace changes**. Output paths must resolve inside the workspace. Workspace changes shows the current Git working tree, including changes made by you. **Restore pre-run state** is available when a Git snapshot exists and asks for confirmation; it restores tracked state and leaves untracked files alone. It cannot undo website activity, sent messages or remote pushes.
 
-Run data older than 30 days is pruned at startup. Persistent browser/nested-agent profiles, workspace files and preferences have separate lifecycles and are not automatically erased by history pruning.
+Run data older than 30 days is pruned at startup. Persistent browser/nested-agent profiles, workspace files, Codex conversation files and preferences have separate lifecycles and are not automatically erased by history pruning.
+
+### Recovering an unresponsive browser
+
+Use **Refresh preview** when the page image stops updating. **Restart browser** is an independent recovery control that also works while a mode switch is stuck. It stops the agent and replaces only the browser container; the app, terminal processes, workspace and saved browser profile remain. Unsaved forms and recent login changes may be lost, so the UI asks before restarting. Resume explicitly afterward.
+
+Human input operations have a five-second deadline and a bounded queue. Timed-out input quarantines the browser until restart, preventing queued actions from running late. Mode switches have a 45-second deadline. A browser action whose outcome cannot be confirmed also requires recovery before continuation. A static page image alone never triggers an automatic hard restart.
 
 ## Maintenance and diagnostics
 

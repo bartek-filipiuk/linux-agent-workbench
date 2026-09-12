@@ -50,16 +50,17 @@ let handoffReason: string | null = null;
 let runSequence = 0;
 let querySequence = 0;
 const queries = new Map<string, { resolve: (value: unknown) => void; reject: (e: Error) => void; timer: NodeJS.Timeout }>();
-function queryDaemon(kind: "history" | "detail" | "browser", runId?: string, command?: BrowserControl): Promise<unknown> {
+function queryDaemon(kind: "history" | "detail" | "browser" | "browser_restart" | "conversation" | "followup" | "pause", runId?: string, command?: BrowserControl, message?: string): Promise<unknown> {
   if (!port) return Promise.reject(new Error("Agent service is unavailable. Recheck setup first."));
   const requestId = String(++querySequence);
   return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => { queries.delete(requestId); reject(new Error("History request timed out")); }, kind === "browser" ? 90000 : 10000);
+    const timer = setTimeout(() => { queries.delete(requestId); reject(new Error(`${kind.replaceAll("_", " ")} request timed out. Check the current state before retrying.`)); }, ["browser", "browser_restart", "followup", "pause"].includes(kind) ? 90000 : 10000);
     queries.set(requestId, { resolve, reject, timer });
-    toAgentd({ type: "ui.query", requestId, kind, ...(runId ? { runId } : {}), ...(command ? { command } : {}) });
+    toAgentd({ type: "ui.query", requestId, kind, ...(runId ? { runId } : {}), ...(command ? { command } : {}), ...(message ? { message } : {}) });
   });
 }
 function publishRun(event: RunEvent) {
+  if (event.type === "run.state" && event.goal !== undefined) currentGoal = event.goal;
   currentRun = reduceRun(currentRun, event);
   if (event.type === "run.handoff") handoffReason = event.reason;
   if (event.type === "run.state" && event.state !== "handoff") handoffReason = null;
@@ -397,6 +398,16 @@ handleTrusted("run:start", async (_e, goal: unknown, opts: unknown) => {
 });
 handleTrusted("run:get", () => ({ run: currentRun, goal: currentGoal, handoff: handoffReason, sequence: runSequence }));
 handleTrusted("run:history", () => queryDaemon("history"));
+handleTrusted("conversation:get", () => queryDaemon("conversation"));
+handleTrusted("conversation:send", (_e, runId: unknown, message: unknown) => {
+  if (typeof runId !== "string" || typeof message !== "string" || !message.trim() || message.length > 4000) throw new Error("Write a message of 1–4,000 characters");
+  return queryDaemon("followup", runId, undefined, message.trim());
+});
+handleTrusted("conversation:pause", (_e, runId: unknown) => {
+  if (typeof runId !== "string") throw new Error("Invalid run id");
+  return queryDaemon("pause", runId);
+});
+handleTrusted("browser:restart", () => queryDaemon("browser_restart"));
 handleTrusted("run:detail", (_e, id: unknown) => { if (typeof id !== "string") throw new Error("Invalid run id"); return queryDaemon("detail", id); });
 handleTrusted("workspace:changes", async () => {
   if (!session.workspacePath) throw new Error("Open a workspace first");

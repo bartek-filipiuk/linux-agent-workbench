@@ -1,6 +1,7 @@
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import { readPage } from "./read-page.js";
+import { deadline } from "./deadline.js";
 import os from "node:os";
 import { ManualBrowser, type ManualBrowserOptions } from "./manual-browser.js";
 import path from "node:path";
@@ -136,6 +137,18 @@ export class BrowserSession {
   private diagnostics: Array<{ ts: number; message: string }> = [];
   private stateTimer: ReturnType<typeof setTimeout> | undefined;
   private inputQueue: Promise<void> = Promise.resolve();
+  private inputCount = 0;
+  private unresponsive = false;
+
+  private async bounded<T>(work: Promise<T>, ms = 5000): Promise<T> {
+    try { return await deadline(work, ms); }
+    catch (error) {
+      if (error instanceof Error && error.message.includes("operation timed out")) {
+        this.unresponsive = true; this.generation++; this.frameError = error.message; this.publishState();
+      }
+      throw error;
+    }
+  }
   private closing = false;
   private manual: ManualBrowser | undefined;
   private manualMode = false;
@@ -163,9 +176,10 @@ export class BrowserSession {
     void this.attachScreencast(this.active?.page, true);
   }
   async control(command: BrowserControl): Promise<BrowserInfo> {
+    if (this.unresponsive) throw new ProtocolError("WORKER_UNAVAILABLE", "Browser is unresponsive. Restart browser to recover.");
     if (this.transitioning) throw new ProtocolError("INVALID_INPUT", "Browser mode is changing; please wait");
-    if (command.kind === "recover") return this.recoverPage();
-    if (command.kind === "manual") { await this.setManual(command.enabled); return this.info(); }
+    if (command.kind === "recover") return this.bounded(this.recoverPage(), 45000);
+    if (command.kind === "manual") { await this.bounded(this.setManual(command.enabled), 45000); return this.info(); }
     if (command.kind === "refresh" && this.manualMode) {
       this.generation = (this.generation + 1) >>> 0; this.frameError = null; this.publishState();
       await this.manual?.setFramesEnabled(this.framesEnabled); return this.info();
@@ -267,7 +281,7 @@ export class BrowserSession {
     this.transitioning = true; this.generation = (this.generation + 1) >>> 0;
     this.frameError = null; this.refFrames.clear(); this.revision++; this.publishState();
     try {
-      await this.inputQueue;
+      await this.bounded(this.inputQueue);
       if (enabled) {
         // Only a regular return URL is persisted, never the OAuth query/fragment or credentials.
         const target = normaliseNavigableUrl(this.active?.page.url() ?? "");
@@ -275,8 +289,8 @@ export class BrowserSession {
         fs.writeFileSync(this.markerPath, JSON.stringify({ url: this.returnUrl }), { mode: 0o600 });
         this.closing = true;
         if (this.pendingDialog) { await this.pendingDialog.dismiss().catch(() => {}); this.pendingDialog = undefined; }
-        await this.castTransition;
-        await this.context?.close(); this.context = undefined; this.active = undefined; this.pages.length = 0;
+        await this.bounded(this.castTransition);
+        await this.bounded(this.context?.close() ?? Promise.resolve()); this.context = undefined; this.active = undefined; this.pages.length = 0;
         this.manualMode = true;
         await this.waitForProfile(); await this.openManual();
       } else {
@@ -287,10 +301,10 @@ export class BrowserSession {
       }
     } catch (e) {
       this.closing = true;
-      await this.context?.close().catch(() => {}); this.context = undefined; this.active = undefined; this.pages.length = 0;
+      await this.bounded(this.context?.close() ?? Promise.resolve()).catch(() => {}); this.context = undefined; this.active = undefined; this.pages.length = 0;
       // Keep manual mode/marker on a failed transition: the agent must not resume into a login.
       this.manualMode = true;
-      this.frameError = "Browser mode could not switch. Choose Finish manual login to recover.";
+      this.frameError = this.unresponsive ? "Browser is unresponsive. Restart browser to recover." : "Browser mode could not switch. Choose Finish manual login to recover.";
       throw e;
     } finally { this.transitioning = false; this.generation = (this.generation + 1) >>> 0; this.publishState(); }
     if (!enabled) {
@@ -449,15 +463,21 @@ export class BrowserSession {
   }
 
   input(e: BrowserInputEvent): Promise<void> {
-    if (this.transitioning || this.active?.crashed) return Promise.resolve();
+    if (this.transitioning || this.active?.crashed || this.unresponsive) return Promise.resolve();
+    if (this.inputCount >= 64) {
+      // Never drop a key/button release and carry on with an ambiguous input state.
+      this.unresponsive = true; this.generation++; this.frameError = "Browser input queue overflowed. Restart browser to recover."; this.publishState();
+      return Promise.resolve();
+    }
+    this.inputCount++;
     const generation = this.generation;
     const next = this.inputQueue.then(() => {
-      if (generation !== this.generation || this.transitioning || this.active?.crashed) return;
-      return this.manualMode ? this.manual?.input(e) : this.applyInput(e);
+      if (generation !== this.generation || this.transitioning || this.active?.crashed || this.unresponsive) return;
+      return this.bounded(this.manualMode ? this.manual?.input(e) ?? Promise.resolve() : this.applyInput(e));
     }).catch(() => {
       this.diagnostic("Browser input could not be delivered. Refresh the preview and try again.");
     });
-    this.inputQueue = next.catch(() => {}); return next;
+    this.inputQueue = next.finally(() => { this.inputCount--; }); return this.inputQueue;
   }
   private async applyInput(e: BrowserInputEvent): Promise<void> {
     const page = this.requirePage();
@@ -467,12 +487,15 @@ export class BrowserSession {
         return page.mouse.move(e.x, e.y);
       case "mousedown":
         await page.mouse.move(e.x, e.y);
+        this.requirePage();
         return page.mouse.down({ button: e.button ?? "left" });
       case "mouseup":
         await page.mouse.move(e.x, e.y);
+        this.requirePage();
         return page.mouse.up({ button: e.button ?? "left" });
       case "wheel":
         await page.mouse.move(e.x, e.y);
+        this.requirePage();
         return page.mouse.wheel(e.deltaX ?? 0, e.deltaY ?? 0);
       case "keydown":
         return page.keyboard.down(e.key);
@@ -651,6 +674,7 @@ export class BrowserSession {
   }
 
   private requirePage(allowCrashed = false): Page {
+    if (this.unresponsive && !allowCrashed) throw new ProtocolError("WORKER_UNAVAILABLE", "Browser is unresponsive. Restart browser to recover.");
     if (this.manualMode || this.transitioning) throw new ProtocolError("INVALID_INPUT", "Manual login active; wait for the human to finish and resume the agent");
     if (!this.active) throw new ProtocolError("WORKER_UNAVAILABLE", "browser not started");
     if (!allowCrashed && this.active.crashed) throw new ProtocolError("WORKER_UNAVAILABLE", "Browser tab crashed. Ask the human to recover the tab; no action was replayed.");

@@ -37,6 +37,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md#before-publishing) for the publication che
 - [ ] Per-workspace/account isolation of browser and nested-agent profiles.
 - [ ] Stronger remote-approval authentication and hostile-input resource testing.
 - [ ] Accurate model-specific cached-input pricing estimates.
-- [ ] Explicit durable continuation after full restart, only after safe provider/state recovery is implemented.
+- [x] Durable current-conversation follow-ups, interruption, budget preservation and explicit continuation after app restart.
+- [x] Independent browser restart and quarantine of stalled human input.
+- [ ] Separate task: earlier-conversation navigation and reopening. Resolve grouping, search and branch/continue behavior first; see `docs/SESSION_HISTORY_TASK.md`.
 
 No new provider or Settings feature is part of this publication-preparation change.

@@ -24,6 +24,7 @@ export type ModelTurn = {
 };
 
 export type TurnContext = {
+  onCheckpoint?: (checkpoint: { threadId: string; usage?: ModelUsage }) => void;
   previousResponseId?: string;
   tools: ToolSpec[];
   system: string;
@@ -31,6 +32,8 @@ export type TurnContext = {
 };
 
 export interface ModelAdapter {
+  restore?(checkpoint: { threadId: string; usage?: ModelUsage }): void;
+  interrupt?(): Promise<void>;
   readonly model: string;
   readonly managesContext?: boolean;
   close?(): void;

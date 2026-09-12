@@ -7,8 +7,11 @@ import { allowAllPolicy, type Policy } from "../policy/types.js";
 import { HandoffRequested, terminalExecutor } from "../tools/terminal-tools.js";
 import { BudgetExceededError, BudgetTracker, costOf, type PriceTable } from "./budgets.js";
 import { SYSTEM_PROMPT } from "./system-prompt.js";
+import { pendingResults, type Continuation } from "./continuation.js";
 
 export type RunControllerDeps = {
+  provider?: "codex" | "openai";
+  continuation?: Continuation;
   store: Store;
   adapter: ModelAdapter;
   worker: TerminalWorker;
@@ -31,7 +34,7 @@ export type RunControllerDeps = {
 const COMPACT_PROMPT =
   "Pause. Write a compact state summary for yourself (plain text, no tool calls, at most 15 lines): what the goal is, what is done and verified (with file paths), what is in progress, what remains, and any facts you must not lose (ids, revisions, URLs, decisions). Your next message will start a fresh context with only the goal and this summary.";
 
-export type RunInput = { workspaceId: string; goal: string; networkMode: NetworkMode; snapshot?: unknown };
+export type RunInput = { workspaceId: string; goal: string; prompt?: string; networkMode: NetworkMode; snapshot?: unknown };
 
 export type RunOutcome = { runId: string; state: RunState; endReason?: string; finalText?: string };
 
@@ -52,6 +55,16 @@ export class RunController extends EventEmitter {
   private reobserveAfterBudget = false;
   private controlRevision = 0;
   private humanPause: { reason: string; promise: Promise<void>; resolve: () => void } | undefined;
+  private stopReason = "user_stop";
+  private resolveSettled!: () => void;
+  readonly settled = new Promise<void>(resolve => { this.resolveSettled = resolve; });
+  private checkpoint: Continuation;
+
+  private saveCheckpoint(): void {
+    this.checkpoint.usage = { turns: this.budget.turns, toolCalls: this.budget.toolCalls, costUsd: this.budget.costUsd, elapsedMs: this.budget.elapsedMs() };
+    this.checkpoint.limits = this.budget.limits;
+    this.deps.store.saveContinuation(this.runId, { ...this.checkpoint, results: this.checkpoint.results.map(({ callId, output }) => ({ callId, output })) });
+  }
 
   /** Resolve only after all in-flight work is finished and the run is parked (or has ended). */
   pauseForHuman(reason: string): Promise<void> {
@@ -76,6 +89,9 @@ export class RunController extends EventEmitter {
     this.system = deps.systemPrompt ?? SYSTEM_PROMPT;
     this.tools = deps.tools ?? terminalExecutor(deps.worker);
     this.budget = new BudgetTracker({ ...(deps.budgets ?? DEFAULT_BUDGETS) }, deps.now);
+    this.checkpoint = { provider: deps.provider ?? "openai", pending: [], results: [], ...deps.continuation };
+    if (deps.continuation?.usage) this.budget.restore(deps.continuation.usage);
+    if (deps.continuation?.threadId) deps.adapter.restore?.({ threadId: deps.continuation.threadId, ...(deps.continuation.providerUsage ? { usage: deps.continuation.providerUsage } : {}) });
     this.runId = deps.store.createRun({
       workspaceId: input.workspaceId,
       goal: input.goal,
@@ -109,8 +125,10 @@ export class RunController extends EventEmitter {
     resume();
   }
 
-  stop(): void {
-    if (this.abort.signal.aborted) return;
+  stop(reason = "user_stop"): void {
+    if (this.abort.signal.aborted || ["completed", "failed", "stopped", "interrupted"].includes(this.state)) return;
+    this.stopReason = reason;
+    this.budget.pauseClock();
     this.abort.abort();
     this.deps.worker.cancel();
     this.handoffResume?.();
@@ -125,8 +143,10 @@ export class RunController extends EventEmitter {
     this.setState("running");
     const { store, adapter, worker } = this.deps;
     const signal = this.abort.signal;
-    let previousResponseId: string | undefined;
-    let next: ModelTurnInput = { goal: this.input.goal };
+    let previousResponseId: string | undefined = adapter.managesContext ? undefined : this.checkpoint.responseId;
+    let next: ModelTurnInput = previousResponseId
+      ? { toolResults: pendingResults(this.checkpoint), message: this.input.prompt ?? this.input.goal }
+      : { goal: this.input.prompt ?? this.input.goal };
     const compactEvery = adapter.managesContext ? 0 : this.deps.compactEvery ?? 0;
     let turnsInChain = 0;
 
@@ -136,8 +156,12 @@ export class RunController extends EventEmitter {
         tools: this.tools.specs,
         system: this.system,
         signal,
+        onCheckpoint: checkpoint => { this.checkpoint.threadId = checkpoint.threadId; if (checkpoint.usage) this.checkpoint.providerUsage = checkpoint.usage; this.saveCheckpoint(); },
       });
       previousResponseId = turn.responseId;
+      this.checkpoint.responseId = turn.responseId;
+      this.checkpoint.pending = turn.toolCalls;
+      this.checkpoint.results = [];
       turnsInChain++;
       this.budget.addTurn();
       const usd = costOf(adapter.model, turn.usage, this.prices);
@@ -148,6 +172,7 @@ export class RunController extends EventEmitter {
       } else this.budget.addCost(usd);
       store.recordUsage(this.runId, { responseId: turn.responseId, ...turn.usage, costUsd: usd ?? 0 });
       store.addRunTotals(this.runId, { turns: 1, costUsd: usd ?? 0 });
+      this.saveCheckpoint();
       return turn;
     };
 
@@ -198,18 +223,26 @@ export class RunController extends EventEmitter {
             continue;
           }
           results.push(await this.runTool(call, worker, signal));
+          this.checkpoint.results = [...results];
           this.budget.addToolCall();
           store.addRunTotals(this.runId, { toolCalls: 1 });
+          this.saveCheckpoint();
         }
+        this.checkpoint.results = results;
+        this.saveCheckpoint();
         next = { toolResults: results };
       }
     } catch (e) {
-      if (signal.aborted) return this.finish("stopped", "user_stop");
+      if (signal.aborted) return this.finish("stopped", this.stopReason);
       return this.finish("failed", e instanceof Error ? e.message : String(e));
     } finally {
       this.humanPause?.resolve(); this.humanPause = undefined;
       this.budgetResume = undefined;
-      adapter.close?.();
+      try {
+        if (signal.aborted) await adapter.interrupt?.();
+        this.saveCheckpoint();
+        adapter.close?.();
+      } finally { this.resolveSettled(); }
     }
   }
 

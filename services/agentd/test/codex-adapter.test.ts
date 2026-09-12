@@ -22,6 +22,18 @@ function setup(mode = "normal", timeoutMs = 2000, selection: { model?: string; e
 }
 
 describe("Codex App Server adapter", () => {
+  it("resumes a durable thread without opening a new one and checkpoints its identity", async () => {
+    const { adapter, home, ctx } = setup();
+    adapter.restore({ threadId: "thread-1", usage: { inputTokens: 90, outputTokens: 5, cachedInputTokens: 30 } });
+    const checkpoint = vi.fn();
+    const result = await adapter.turn({ goal: "Update /workspace/research.md" }, { ...ctx, onCheckpoint: checkpoint });
+    expect(fs.existsSync(path.join(home, "thread.json"))).toBe(false);
+    expect(JSON.parse(fs.readFileSync(path.join(home, "resume.json"), "utf8"))).toMatchObject({ threadId: "thread-1", sandbox: "read-only", approvalPolicy: "untrusted" });
+    expect(result.usage).toMatchObject({ inputTokens: 10, outputTokens: 5, cachedInputTokens: 10 });
+    expect(checkpoint).toHaveBeenCalledWith(expect.objectContaining({ threadId: "thread-1" }));
+    await adapter.interrupt();
+    expect(JSON.parse(fs.readFileSync(path.join(home, "interrupt.json"), "utf8"))).toMatchObject({ threadId: "thread-1", turnId: "turn-1" });
+  });
   it("sends an explicit model and reasoning effort to the App Server", async () => {
     const { adapter, home, ctx } = setup("normal", 2000, { model: "gpt-6-astra", effort: "medium" });
     await adapter.turn({ goal: "Observe" }, ctx);
@@ -41,7 +53,7 @@ describe("Codex App Server adapter", () => {
   it("round trips tools, text, screenshots and usage while isolating credentials and host tools", async () => {
     const { adapter, home, ctx } = setup();
     const first = await adapter.turn({ goal: "Observe" }, ctx);
-    expect(first).toMatchObject({ text: "Sprawdzam ekran.", toolCalls: [{ callId: "tool-1", name: "browser_observe" }], usage: { inputTokens: 100, outputTokens: 10, cachedInputTokens: 40 } });
+    expect(first).toMatchObject({ text: "Inspecting the screen.", toolCalls: [{ callId: "tool-1", name: "browser_observe" }], usage: { inputTokens: 100, outputTokens: 10, cachedInputTokens: 40 } });
     const launch = JSON.parse(fs.readFileSync(path.join(home, "process.json"), "utf8"));
     expect(launch.apiKeyPresent).toBe(false);
     expect(launch.cwd).toBe(path.join(home, "operator"));
@@ -51,7 +63,7 @@ describe("Codex App Server adapter", () => {
     expect(launch.args).toContain("features.code_mode_host=true");
     expect(launch.args).not.toContain("features.code_mode_host=false");
     const thread = JSON.parse(fs.readFileSync(path.join(home, "thread.json"), "utf8"));
-    expect(thread).toMatchObject({ sandbox: "read-only", ephemeral: true, dynamicTools: [{ type: "function", name: "browser_observe" }, { type: "function", name: "terminal_observe" }] });
+    expect(thread).toMatchObject({ sandbox: "read-only", ephemeral: false, dynamicTools: [{ type: "function", name: "browser_observe" }, { type: "function", name: "terminal_observe" }] });
     expect(thread).not.toHaveProperty("model");
     expect(JSON.parse(fs.readFileSync(path.join(home, "turn.json"), "utf8"))).not.toHaveProperty("effort");
     const last = await adapter.turn({ toolResults: [{ callId: "tool-1", output: '{"ok":true}', imageJpegBase64: "jpeg-data" }] }, { ...ctx, previousResponseId: first.responseId });

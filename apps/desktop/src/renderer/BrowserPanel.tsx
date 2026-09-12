@@ -21,6 +21,15 @@ export function BrowserPanel({ status, owner, runActive }: { status: BrowserStat
   const [previewError, setPreviewError] = useState("");
   const [actionError, setActionError] = useState("");
   const [pending, setPending] = useState(false);
+  const [restarting, setRestarting] = useState(false);
+  const restartLock = useRef(false);
+  const restart = async () => {
+    if (restartLock.current || !window.confirm("Restart only the browser? The agent will stop. Saved browser profile and workspace files are kept; unsaved page input and recent login changes may be lost.")) return;
+    restartLock.current = true; setRestarting(true); setActionError("");
+    try { await window.workbench.restartBrowser(); }
+    catch (e) { setActionError(String(e)); }
+    finally { restartLock.current = false; setRestarting(false); }
+  };
   const control = async (command: BrowserControl) => {
     setPending(true); setActionError("");
     try { await window.workbench.browserControl(command); }
@@ -29,10 +38,11 @@ export function BrowserPanel({ status, owner, runActive }: { status: BrowserStat
   };
   useEffect(() => {
     setPreviewError("");
+    if (status.state !== "ready" && status.state !== "crashed") { newestFrame.current = -1; setDisplayedGeneration(null); }
     if (status.state !== "ready" || displayedGeneration === status.generation) return;
-    const timer = setTimeout(() => setPreviewError("No image received. Refresh the preview to reconnect."), 8000);
+    const timer = setTimeout(() => setPreviewError(status.transitioning ? "Browser mode is still switching. If it does not finish, restart the browser using the button above." : "No image received. Refresh the preview, or restart the browser if it remains unresponsive."), 8000);
     return () => clearTimeout(timer);
-  }, [status.state, status.generation, displayedGeneration]);
+  }, [status.state, status.generation, status.transitioning, displayedGeneration]);
 
   useEffect(() => {
     // Mirror real navigations into the bar; a fresh profile starts on about:blank, which is not worth showing.
@@ -134,7 +144,7 @@ export function BrowserPanel({ status, owner, runActive }: { status: BrowserStat
   };
 
   const live = status.state === "ready" || status.state === "crashed";
-  const human = owner === "human" && !pending && !status.transitioning;
+  const human = owner === "human" && !pending && !restarting && !status.transitioning;
   const previewReady = !status.crashed && (status.generation === undefined || displayedGeneration === status.generation);
   return (
     <section ref={panelRef} className="browser" aria-label="Sandbox browser">
@@ -159,6 +169,7 @@ export function BrowserPanel({ status, owner, runActive }: { status: BrowserStat
         ) : (
           <button className="btn" type="button" onClick={() => void window.workbench.takeControl("browser")}>Take the browser</button>
         ))}
+        {status.state !== "idle" && <button className="btn danger" type="button" disabled={restarting || status.state === "starting"} onClick={() => void restart()}>{restarting ? "Restarting…" : "Restart browser"}</button>}
         <span className="hint">{live ? `${status.title ?? ""} · ${fps} fps` : status.state === "error" ? status.message : "sandbox browser is closed"}</span>
       </form>
       {live && <div className="browser-tabs">
