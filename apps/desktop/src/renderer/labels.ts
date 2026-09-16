@@ -15,6 +15,9 @@ export const CATEGORY_LABEL: Record<string, string> = {
 export const END_REASON_LABEL: Record<string, string> = {
   final_answer: "finished",
   user_stop: "stopped by you",
+  user_pause: "paused by you — continue below",
+  followup: "interrupted for your follow-up",
+  browser_restart: "paused for browser recovery",
   maxTurns: "turn budget reached",
   maxToolCalls: "tool budget reached",
   maxDurationMs: "time budget reached",

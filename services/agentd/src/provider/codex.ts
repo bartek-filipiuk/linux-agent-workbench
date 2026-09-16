@@ -21,6 +21,20 @@ export class CodexAppServerAdapter implements ModelAdapter {
   private reported = zero();
   private sequence = 0;
   private removeAbort: (() => void) | undefined;
+  private resumeThread = false;
+  private interrupting: Promise<void> | undefined;
+
+  restore(checkpoint: { threadId: string; usage?: ModelUsage }): void {
+    this.threadId = checkpoint.threadId;
+    this.resumeThread = true;
+    if (checkpoint.usage) { this.total = { ...checkpoint.usage, cachedInputTokens: checkpoint.usage.cachedInputTokens ?? 0 }; this.reported = { ...this.total }; }
+  }
+
+  interrupt(): Promise<void> {
+    if (!this.rpc || !this.threadId || !this.turnId) return Promise.resolve();
+    return this.interrupting ??= this.rpc.request("turn/interrupt", { threadId: this.threadId, turnId: this.turnId }, AbortSignal.timeout(5000))
+      .then(() => {}, () => {}).finally(() => { this.interrupting = undefined; });
+  }
 
   constructor(private readonly options: CodexAdapterOptions = {}) { this.model = options.model ?? "codex-default"; }
 
@@ -30,7 +44,7 @@ export class CodexAppServerAdapter implements ModelAdapter {
       signal.throwIfAborted();
       if (!this.rpc) {
         this.rpc = new CodexProcess(this.options);
-        const stop = () => this.close();
+        const stop = () => { void this.interrupt().finally(() => this.close()); };
         ctx.signal.addEventListener("abort", stop, { once: true });
         this.removeAbort = () => ctx.signal.removeEventListener("abort", stop);
         await this.rpc.request("initialize", { clientInfo: { name: "linux_agent_workbench", version: "0.0.1" }, capabilities: { experimentalApi: true } }, signal);
@@ -40,14 +54,24 @@ export class CodexAppServerAdapter implements ModelAdapter {
       }
       const rpc = this.rpc;
       if ("goal" in input) {
+        if (this.resumeThread && this.threadId) {
+          await rpc.request("thread/resume", {
+            threadId: this.threadId, modelProvider: "openai", ...(this.model !== "codex-default" ? { model: this.model } : {}),
+            cwd: path.join(codexHome(this.options), "operator"), approvalPolicy: "untrusted", sandbox: "read-only",
+            baseInstructions: `${ctx.system}\nUse only LAW tools. The host is not the workspace. Re-observe after interruption; never replay an uncertain action.`,
+          }, signal);
+          this.resumeThread = false;
+        } else {
         if (this.threadId) throw new Error("Codex manages its own context; start a new adapter for a new goal");
         const started = await rpc.request("thread/start", {
           ...(this.model !== "codex-default" ? { model: this.model } : {}), modelProvider: "openai",
-          cwd: path.join(codexHome(this.options), "operator"), approvalPolicy: "untrusted", sandbox: "read-only", ephemeral: true,
+          cwd: path.join(codexHome(this.options), "operator"), approvalPolicy: "untrusted", sandbox: "read-only", ephemeral: false,
           baseInstructions: `${ctx.system}\nUse only the provided LAW tools for terminal, files, browser and human handoff. The host is not the workspace. Never use built-in tools to perform work.`,
           dynamicTools: ctx.tools.map((tool) => ({ type: "function", name: tool.name, description: tool.description, inputSchema: tool.parameters })),
         }, signal);
         this.threadId = z.string().parse(started?.thread?.id);
+        }
+        ctx.onCheckpoint?.({ threadId: this.threadId! });
         const startedTurn = await rpc.request("turn/start", { threadId: this.threadId, ...(this.options.effort ? { effort: this.options.effort } : {}), input: [{ type: "text", text: input.goal, text_elements: [] }] }, signal);
         this.turnId = z.string().parse(startedTurn?.turn?.id);
       } else {
@@ -79,7 +103,10 @@ export class CodexAppServerAdapter implements ModelAdapter {
         }
         const params = msg.params;
         if (params?.threadId !== this.threadId) continue;
-        if (msg.method === "thread/tokenUsage/updated") this.total = Usage.parse(params.tokenUsage.total);
+        if (msg.method === "thread/tokenUsage/updated") {
+          this.total = Usage.parse(params.tokenUsage.total);
+          ctx.onCheckpoint?.({ threadId: this.threadId!, usage: this.total });
+        }
         if (msg.method === "item/completed" && params.item?.type === "agentMessage") texts.push(z.string().parse(params.item.text));
         if (msg.method === "turn/completed") {
           if (params.turn?.status !== "completed") throw new Error(`Codex turn ${params.turn?.status}: ${params.turn?.error?.message ?? "interrupted or failed"}`);
@@ -87,6 +114,7 @@ export class CodexAppServerAdapter implements ModelAdapter {
         }
       }
     } catch (error) {
+      await this.interrupt();
       this.close();
       if (!ctx.signal.aborted && signal.aborted) throw new Error("Codex timed out waiting for a model response. Retry the run; no API fallback was used.");
       throw error;

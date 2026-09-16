@@ -39,7 +39,7 @@ The goal supports up to 4,000 characters. It grows as you type; **Expand editor*
 | Style | What it changes | Good fit |
 | --- | --- | --- |
 | General | Lets the operator choose browser and terminal actions as needed | Mixed tasks and ordinary browsing |
-| Research & data | Encourages batching, scripts for repetitive retrieval, and intermediate saved results | Collecting and comparing information |
+| Research & data | Reads sources in the browser, saves captured material with provenance, and works in batches | Collecting and comparing information |
 | Build with a coding agent | Asks the operator to coordinate another coding agent in the terminal and inspect its work | Work requiring a separately configured terminal coding agent |
 
 **Compare working styles** displays the legend. These are prompt instructions, not guaranteed outcomes or fixed numbers of steps. They do not select the Codex model or reasoning effort. The third style requires the nested coding agent's own installation, login, quota and permissions; it is not another selectable operator provider.
@@ -70,7 +70,17 @@ At a step/tool limit, use **Add 100 steps** or **Continue without a step limit**
 
 **Stop task** aborts the operator and asks the worker to cancel current work. It does not undo external actions or guarantee termination of every detached process previously started in the sandbox. Inspect the terminal if a nested process remains running. **Destroy sandbox** stops/removes the workspace containers and disconnects the session; it does not erase the workspace or all persistent volumes.
 
-Reloading only the renderer recovers the current UI snapshot. Closing/restarting the entire app interrupts the active run; history remains, but the live provider thread is not reconstructed.
+Reloading only the renderer recovers the current UI snapshot. Closing/restarting the entire app interrupts active work. The latest conversation in the reopened workspace is restored without automatically running the agent; send a follow-up to continue it.
+
+### Follow-ups and interruption
+
+The message field below the activity log stays available while the agent works and after it finishes. **Interrupt & send** stops the current run, waits for its cleanup and outstanding browser actions, then sends your message in the same conversation. **Pause** stops work without sending anything; use **Continue** when ready. Enter inserts a line break; Ctrl+Enter (Cmd+Enter on macOS) sends. A draft is retained until the service accepts it.
+
+Continuation preserves the workspace, provider context, model/effort and accumulated limits. Reaching an existing limit still pauses for an explicit extension. **New task** starts an independent conversation with fresh limits. Each continuation remains a separate audited run and has its own pre-run Git snapshot.
+
+New Codex conversations use durable threads in LAW's isolated Codex home. API continuations use the preceding stored Response and supply outstanding tool results. Older tasks created before durable continuation are reconstructed from bounded saved task/result/tool records; their full original provider context cannot be recovered. If a provider no longer has a stored conversation, the error is shown; LAW does not silently switch provider or replay the task.
+
+The agent is instructed to inspect the current browser/terminal and reread relevant workspace files after interruption. A stopped RPC does not undo a click or stop a program already launched in the terminal. An action with an uncertain outcome must be checked before repeating it. Previous browser element references and in-memory research capture IDs expire between runs; saved Markdown files remain available at their workspace paths.
 
 ## Browser and account sign-in
 
@@ -112,11 +122,19 @@ The shell gate classifies commands typed into its instrumented interactive Bash 
 
 ## History and output
 
-**History & results** opens the task view; **Recent tasks** shows up to 30 tasks for this workspace. Select an entry to see saved information. **Continue…** prepares a new goal with the previous result; this is a new task, unlike budget continuation.
+**History & results** opens the task view; **Recent tasks** shows up to 30 tasks for this workspace. Select an entry to see saved information. **Draft new task from result** prepares an independent goal from that entry. To preserve the current conversation, use the message field below the activity log. A dedicated browser for earlier conversations is planned separately.
 
 A completed result offers **Copy result**, **Show output…**, and **Workspace changes**. Output paths must resolve inside the workspace. Workspace changes shows the current Git working tree, including changes made by you. **Restore pre-run state** is available when a Git snapshot exists and asks for confirmation; it restores tracked state and leaves untracked files alone. It cannot undo website activity, sent messages or remote pushes.
 
-Run data older than 30 days is pruned at startup. Persistent browser/nested-agent profiles, workspace files and preferences have separate lifecycles and are not automatically erased by history pruning.
+Run data older than 30 days is pruned at startup. Persistent browser/nested-agent profiles, workspace files, Codex conversation files and preferences have separate lifecycles and are not automatically erased by history pruning.
+
+### Recovering an unresponsive browser
+
+Use **Refresh preview** when the page image stops updating. **Restart browser** is an independent recovery control that also works while a mode switch is stuck. It stops the agent and replaces only the browser container; the app, terminal processes, workspace and saved browser profile remain. Unsaved forms and recent login changes may be lost, so the UI asks before restarting. Resume explicitly afterward.
+
+Human input is best effort. A page that is busy delays it; consecutive pointer moves collapse into the latest one, wheel ticks add up, and key or button releases are never dropped. Input that waits more than 15 seconds is noted under Connection details but does not quarantine the browser. Mode switches have a 45-second deadline; a switch or recovery that hangs marks the browser unresponsive, and **Refresh preview** probes it again and clears that mark once the page answers. A browser action whose outcome cannot be confirmed requires **Restart browser** before continuation. A static page image alone never triggers an automatic hard restart.
+
+The sandbox browser presents the host's locale and time zone (for example `pl-PL` and `Europe/Warsaw`). Sites behind bot protection such as DataDome (allegro.pl) serve a captcha to a browser whose language and clock do not match its IP address.
 
 ## Maintenance and diagnostics
 
@@ -152,3 +170,25 @@ Containers can survive window closure and reconnect to the existing terminal ses
 When reporting a non-sensitive bug, include distribution, Node/Podman/Codex versions, provider mode, steps to reproduce, expected/actual behavior and sanitized diagnostics. Use the private reporting guidance in [SECURITY.md](../SECURITY.md) for security issues.
 
 Browser containers have a **4 GiB memory limit** and a separate 1 GB shared-memory mount (shared memory still counts toward the container's total). Heavy sites can still exhaust this budget. Rebuild the browser image and reconnect to replace an older container using the former 2 GiB limit. A completed agent response does not certify that every external action succeeded or that the browser is healthy; a crashed tab remains visibly flagged until recovered.
+
+
+## Research from browser pages
+
+The agent can read the currently open page using `browser_read`, including paragraphs, lists, readable table rows, links, dynamically rendered text, open shadow DOM and visible embedded frames. It uses the existing browser session; it does not fetch the page URL through a separate HTTP client. `browser_observe` still describes controls for navigation and interaction.
+
+`browser_save` writes a captured source to a unique `research-<label>-<id>.md` file at the workspace root, with source URL, capture time and any truncation warnings. It returns a `/workspace/...` path that terminal tools and interactive coding agents can read. Saving does not require a clipboard or Save Page dialog. The browser container itself still has no workspace mount. Existing files are never overwritten.
+
+For example: “Search Google in the browser for information about this topic. Open the original sources, read them with browser_read, and save them with browser_save. Then start interactive Claude Code in the terminal and ask it to build a page from those saved files. Do not fetch source URLs through scripts.” The Research working style follows this flow by default; browser-only instructions also apply in other styles.
+
+Reading defaults to the first visible main/article region; the agent can request `scope=page` when content is missing. A capture is capped at 200,000 characters, 16 frames, 20,000 visited nodes per frame and depth 100. Content beyond a limit is marked incomplete. Responses default to 10,000 characters (maximum 20,000) and provide a snapshot ID and continuation offset. Continuing a snapshot reads the same captured text even after navigation. Saving writes the full capture, including portions not returned in the first response; it does not imply the model has reviewed every portion. Only the latest eight captures are held in memory during a run; they do not survive a new run or app restart unless saved.
+
+The reader excludes hidden content, editable fields and password values; it does not export cookies or storage. Known credential-like URL parameters are removed. Visible account information on a page can still be included, so select sources appropriate for your task. Source text remains untrusted data, including when passed to a nested coding agent.
+
+Infinite feeds and collapsed sections require scrolling/expansion and a new capture. Canvas-only content and text inside images require visual inspection. Reading is not a login, CAPTCHA or access-control bypass. To update an existing installation, rebuild the app and browser image (`pnpm build`, `pnpm images:build:browser`) and restart the application so it uses the new worker and tools.
+
+
+### Submitting prompts to terminal applications
+
+`terminal_input` with `submit=true` waits briefly for the text/paste to settle before sending one separate Enter. If rendering does not settle, or a permission/password prompt appears, it leaves the text in place and does not submit it. Cancellation also prevents a delayed Enter.
+
+Long terminal waits check for input prompts at intervals of at most two seconds. If a current pasted draft is still visible, the result reports `inputStatus=pending`; if Enter was withheld, it reports `inputStatus=not_submitted`. These are not completion signals. The agent must inspect the prompt before continuing and must not paste the task again or blindly resend Enter. The application does not automatically retry submission. Detection is based on the visible terminal screen and is not a universal acknowledgment protocol for every TUI.

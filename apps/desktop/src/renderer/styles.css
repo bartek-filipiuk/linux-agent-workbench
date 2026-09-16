@@ -255,6 +255,13 @@ button, select, summary { -webkit-tap-highlight-color: transparent; }
 .composer-submit { flex: none; margin-top: 12px; padding: 12px 0 2px; border-top: 1px solid var(--border); }
 .composer-submit .primary { width: 100%; }
 .composer-submit .composer-help { text-align: center; }
+.followup-composer { flex: none; border-top: 1px solid var(--border); margin-top: 12px; padding-top: 12px; }
+.followup-composer label { display: block; font-weight: 600; margin-bottom: 8px; }
+.followup-composer textarea { display: block; width: 100%; min-height: 84px; max-height: 220px; resize: vertical; padding: 10px; line-height: 1.5; background: var(--bg); color: var(--fg); border: 1px solid var(--border); border-radius: 4px; font: inherit; }
+.followup-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+.conversation-history article { margin: 16px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.conversation-history article strong { display: block; margin-bottom: 6px; }
+.conversation-history summary { cursor: pointer; }
 .active-task { font-size: 12px; }
 .active-task > p { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 220px; overflow: auto; }
 .budget-pause { flex: 0 1 auto; overflow: auto; min-height: 100px; max-height: 280px; padding: 12px; border: 1px solid var(--warn); border-radius: 6px; background: #26231f; }

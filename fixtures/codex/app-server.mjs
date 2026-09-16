@@ -23,11 +23,18 @@ for await (const line of readline.createInterface({ input: process.stdin })) {
     fs.writeFileSync(path.join(process.env.CODEX_HOME, "thread.json"), JSON.stringify(msg.params));
     if (mode === "rpc-error") send({ id: msg.id, error: { code: -32602, message: "unsupported model" } });
     else reply(msg.id, { thread: { id: "thread-1" } });
+  } else if (msg.method === "thread/resume") {
+    fs.writeFileSync(path.join(process.env.CODEX_HOME, "resume.json"), JSON.stringify(msg.params));
+    reply(msg.id, { thread: { id: msg.params.threadId } });
+  } else if (msg.method === "turn/interrupt") {
+    fs.writeFileSync(path.join(process.env.CODEX_HOME, "interrupt.json"), JSON.stringify(msg.params));
+    reply(msg.id, {});
+    event("turn/completed", { turn: { id: "turn-1", status: "interrupted" } });
   } else if (msg.method === "turn/start") {
     fs.writeFileSync(path.join(process.env.CODEX_HOME, "turn.json"), JSON.stringify(msg.params));
     // Intentionally emit notifications before the RPC response, like a busy real server.
     usage(100, 10, 40);
-    event("item/completed", { item: { type: "agentMessage", text: "Sprawdzam ekran." } });
+    event("item/completed", { item: { type: "agentMessage", text: "Inspecting the screen." } });
     reply(msg.id, { turn: { id: "turn-1" } });
     if (mode === "hang") continue;
     if (mode === "host-request") { send({ id: "host", method: "item/commandExecution/requestApproval", params: { threadId: "thread-1" } }); continue; }

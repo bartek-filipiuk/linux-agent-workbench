@@ -19,6 +19,8 @@ The agent can modify its mounted workspace and act through any website account a
 - Tool arguments are validated. Surface control leases, browser policy, nested-prompt detection and interactive-shell rules mediate normal agent actions. Pending approvals expire to denial.
 - API keys remain in the host-side provider path. Strong OS-backed encryption is used when available; plaintext fallback is visibly reported. Codex credentials are managed by its dedicated runtime, not copied from the user's ordinary session.
 - Budget continuation validates run identity/state, retains other limits and is blocked during manual login. Actions planned before a pause are invalidated rather than blindly replayed.
+- Follow-ups validate the latest run against the open workspace, serialize interruption and preserve accumulated limits. Outstanding browser actions are tracked after cancellation; an unconfirmed timeout blocks continuation until browser recovery. Restored Codex threads retain LAW-only tooling and the read-only host sandbox.
+- Browser restart replaces only the session's browser container and preserves its named profile volume. No agent actions are automatically replayed. Human input is best effort: consecutive moves and wheel ticks coalesce, releases are never dropped, and input meant for a page that has since navigated is discarded. A hung mode switch or recovery marks the worker unresponsive until a refresh probe succeeds or the browser is restarted.
 - Diagnostics redact common credentials and OAuth parameters. Image cleanup is restricted to owned LAW-tagged images and preserves foreign/shared tags and unidentified cache.
 
 These are specific controls, not a claim that all interactions or data are confidential.
@@ -38,6 +40,8 @@ Nested-agent permissions default to **autonomous**, domain policy to **open** an
 Browser cookies and nested-agent credentials are accessible to their container environment. The default browser profile and named authentication volumes are shared across workspaces. Switching workspace or destroying a container does not necessarily sign out or delete those volumes. A mounted host `.gitconfig` can contain more than name/email; inspect it first.
 
 Task goals, tool output, commands, URLs and approvals can be stored locally without field-level encryption. Screenshots are not stored in the SQLite tool log, but may be sent to the selected model provider and exist in provider/runtime state. The API adapter uses stored Responses (`store: true`). Codex/provider retention and account data policies are outside LAW's control.
+
+Durable Codex conversations are stored in LAW's private Codex home, separately from the user's normal Codex configuration. LAW's 30-day SQLite pruning does not erase those Codex conversation files. Continuation checkpoints omit screenshot bytes; they retain provider identifiers, textual tool results and accumulated limits. Follow-up drafts are saved locally, like initial task drafts.
 
 Manual login parks the operator, but the preview still shows login UI to the local human. After resumption, the agent can use the saved account and observe page content. Use narrowly privileged test accounts where possible.
 

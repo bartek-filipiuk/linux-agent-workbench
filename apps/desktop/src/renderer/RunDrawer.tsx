@@ -1,9 +1,10 @@
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { ApprovalCard } from "./ApprovalCard";
 import { useActivityLog } from "./useActivityLog";
 import { RunHistory } from "./RunHistory";
 import { RunProgress } from "./RunProgress";
 import { TaskComposer } from "./TaskComposer";
+import { FollowupComposer, type Conversation } from "./FollowupComposer";
 import { BudgetPause } from "./BudgetPause";
 import { STYLES } from "./task-settings";
 import { RUNNING, TERMINAL, type LogRow, type RunView } from "./run-view";
@@ -48,6 +49,20 @@ export function RunDrawer({ run, sandboxReady, activeGoal, workspace, surfaceWar
   const [composing, setComposing] = useState(!run.state);
   const [expanded, setExpanded] = useState(false);
   const [continuation, setContinuation] = useState<{ text: string; revision: number } | null>(null);
+  const [conversation, setConversation] = useState<Conversation | null>(null);
+  const [conversationRevision, setConversationRevision] = useState(0);
+  const restored = useRef(false);
+  const refreshConversation = useCallback(() => setConversationRevision(v => v + 1), []);
+  useEffect(() => {
+    if (!workspace) return;
+    let cancelled = false;
+    void window.workbench.getConversation().then(value => {
+      if (cancelled) return;
+      setConversation(value);
+      if (!restored.current) { restored.current = true; if (value && !run.state) setComposing(false); }
+    }).catch(e => { if (!cancelled) setActionError(String(e)); });
+    return () => { cancelled = true; };
+  }, [workspace, sandboxReady, run.runId, run.state, conversationRevision]);
   const toggleExpanded = useCallback(() => setExpanded(v => !v), []);
   const started = useCallback(() => { setComposing(false); setExpanded(false); setContinuation(null); }, []);
   useEffect(() => { if (run.runId) { setComposing(false); setExpanded(false); } }, [run.runId]);
@@ -113,6 +128,7 @@ export function RunDrawer({ run, sandboxReady, activeGoal, workspace, surfaceWar
       {run.restored && <div className="notice">{run.restored}</div>}
       </div>
       <ol className="log" aria-label="Run activity" tabIndex={0} ref={logRef} onScroll={onScroll}>
+        {conversation && conversation.messages.filter(m => !run.runId || !m.id.startsWith(`${run.runId}:`)).length > 0 && <li className="conversation-history"><details open={!run.runId}><summary>Earlier in this conversation</summary>{conversation.messages.filter(m => !run.runId || !m.id.startsWith(`${run.runId}:`)).map(m => <article key={m.id}><strong>{m.role === "user" ? "You" : "Agent"}</strong><div><Inline text={m.text} /></div></article>)}</details></li>}
         {run.log.map((l) => (
           <Row key={l.id} row={l} />
         ))}
@@ -128,7 +144,6 @@ export function RunDrawer({ run, sandboxReady, activeGoal, workspace, surfaceWar
             <Inline text={run.finalText} />
             <div className="row result-actions">
               <button className="btn" onClick={() => void navigator.clipboard.writeText(run.finalText ?? "").catch(e => setActionError(String(e)))}>Copy result</button>
-              <button className="btn" onClick={() => continueGoal(activeGoal, run.finalText ?? "")}>Continue…</button>
               <button className="btn" onClick={() => void showOutput()}>Show output…</button>
               <button className="btn" onClick={() => void window.workbench.getChanges().then(setChanges).catch(e => setActionError(String(e)))}>Workspace changes</button>
             </div>
@@ -137,6 +152,7 @@ export function RunDrawer({ run, sandboxReady, activeGoal, workspace, surfaceWar
       </ol>
       {changes !== null && <details className="workspace-changes" open><summary>Workspace changes</summary><pre>{changes}</pre><button className="btn" onClick={() => setChanges(null)}>Close</button></details>}
       </>}
+      {!composing && conversation && <FollowupComposer key={conversation.conversationId} conversation={run.runId ? { ...conversation, runId: run.runId } : conversation} busy={busy} ready={sandboxReady} refresh={refreshConversation} />}
       {actionError && <p className="error" role="alert">{actionError}</p>}
       {!composing && !following && <button className="btn log-follow" onClick={showLatest}>
         {unread > 0 ? `${unread} new ${unread === 1 ? "update" : "updates"} · ` : ""}{run.finalText && run.state === "completed" ? "Show result" : "Follow latest"}

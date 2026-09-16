@@ -1,7 +1,7 @@
 // Entry point for Electron utilityProcess. Receives a MessagePort from main, then routes messages through Daemon.
 import { Store } from "./storage/store.js";
 import { Daemon } from "./ipc.js";
-import { PodmanRuntime } from "./runtime/podman.js";
+import { PodmanRuntime, hostLocale } from "./runtime/podman.js";
 import { TerminalSessionManager } from "./session/terminal-session-manager.js";
 import { OpenAIResponsesAdapter } from "./provider/openai.js";
 import { CodexAppServerAdapter } from "./provider/codex.js";
@@ -44,7 +44,10 @@ parentPort.once("message", (e) => {
     makeBrowser: ({ runtimeRoot, sessionId, networkMode, browserImageId }) =>
       new BrowserSessionManager({
         socketDir: path.join(runtimeRoot, sessionId, "browser"),
-        launcher: podmanLauncher({ runtime: new PodmanRuntime(), sessionId, imageId: browserImageId, networkMode, downloadsDir: path.join(dataDir(), "downloads", sessionId) }),
+        launcher: podmanLauncher({
+          runtime: new PodmanRuntime(), sessionId, imageId: browserImageId, networkMode, downloadsDir: path.join(dataDir(), "downloads", sessionId),
+          locale: hostLocale(process.env) ?? Intl.DateTimeFormat().resolvedOptions().locale, timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        }),
       }),
     post: (m) => port.postMessage(m),
     podman: new PodmanRuntime(),

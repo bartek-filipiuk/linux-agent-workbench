@@ -25,7 +25,7 @@ export function RunHistory({ workspace, revision, onContinue }: { workspace?: st
   return <details className="run-history"><summary>Recent tasks ({rows.length})</summary>
     {rows.length === 0 && <p className="hint">No recent tasks in this workspace.</p>}
     <ol>{rows.map(r => <li key={r.id}><button className="history-choice" disabled={loading} onClick={() => void inspect(r.id)}>{r.goal}<span>{r.state} · {new Date(r.startedAt).toLocaleString()}</span></button></li>)}</ol>
-    {detail && <div className="history-detail"><h3>{detail.state}</h3><p>{detail.goal}</p><pre>{detail.finalText || detail.endReason || "No final answer recorded."}</pre><div className="row"><button className="btn" onClick={() => onContinue(detail.goal, detail.finalText)}>Draft continuation</button><button className="btn" onClick={() => void navigator.clipboard.writeText(detail.finalText || detail.goal).catch(e => setError(String(e)))}>Copy result</button></div><details><summary>Recorded activity</summary><ol>{detail.events.map((e,i)=><li key={i}>{e.text}</li>)}</ol></details></div>}
+    {detail && <div className="history-detail"><h3>{detail.state}</h3><p>{detail.goal}</p><pre>{detail.finalText || detail.endReason || "No final answer recorded."}</pre><div className="row"><button className="btn" onClick={() => onContinue(detail.goal, detail.finalText)}>Draft new task from result</button><button className="btn" onClick={() => void navigator.clipboard.writeText(detail.finalText || detail.goal).catch(e => setError(String(e)))}>Copy result</button></div><details><summary>Recorded activity</summary><ol>{detail.events.map((e,i)=><li key={i}>{e.text}</li>)}</ol></details></div>}
     {error && <p className="error" role="alert">{error}</p>}
   </details>;
 }

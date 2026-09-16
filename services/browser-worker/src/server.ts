@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import net from "node:net";
 import { FramedConnection } from "@law/protocol/node";
-import { BrowserAction, BrowserControl, BrowserInputEvent, BrowserNavigate, BrowserObserveInput, BrowserWaitInput, ProtocolError, encodeBrowserFrame, type Envelope } from "@law/protocol";
+import { BrowserAction, BrowserReadInput, BrowserControl, BrowserInputEvent, BrowserNavigate, BrowserObserveInput, BrowserWaitInput, ProtocolError, encodeBrowserFrame, type Envelope } from "@law/protocol";
 import type { BrowserSession } from "./browser-session.js";
 
 export class BrowserWorkerServer {
@@ -68,6 +68,8 @@ export class BrowserWorkerServer {
           return conn.reply(id, { ok: true, payload: await this.session.navigate(BrowserNavigate.parse(env.payload).url) });
         case "browser.info":
           return conn.reply(id, { ok: true, payload: await this.session.info() });
+        case "browser.read":
+          return conn.reply(id, { ok: true, payload: await this.session.read(BrowserReadInput.parse(env.payload)) });
         case "browser.observe":
           return conn.reply(id, { ok: true, payload: await this.session.observe(BrowserObserveInput.parse(env.payload)) });
         case "browser.act":

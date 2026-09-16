@@ -35,6 +35,8 @@
 - reCAPTCHA and similar widgets live in cross-origin iframes; observation walks frames, bounds are page coordinates.
 - Containers run with `--network none`; a tool that ignores `HTTPS_PROXY` has no network at all. ssh works only through the shipped `ProxyCommand`.
 - Never type into the user's live Claude Code session in the sandbox terminal.
+- Human browser input is best-effort (`BrowserSession.input`): a slow page delays it and coalesces moves/wheel, it never quarantines the browser. `unresponsive` is set only by hung control operations (`bounded`) and cleared by a "refresh" probe.
+- The browser container gets the host locale and time zone (`LAW_BROWSER_LOCALE`, `LAW_BROWSER_TZ`, `TZ` from `hostLocale` + `Intl`); an en-US/UTC browser on a Polish IP gets a DataDome captcha on allegro.pl. `--pids-limit` counts threads: Chromium idles at ~160, ad-heavy tabs pass 400.
 - With a strong keyring, the API key moves from `.env` to encrypted settings. Without it, the key stays in `.env`. Codex uses a separate dedicated authentication home.
 
 ### Extending the application

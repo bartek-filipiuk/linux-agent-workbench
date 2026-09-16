@@ -28,13 +28,13 @@ describe("Store", () => {
   });
   it("migrates to the current schema version and is idempotent", () => {
     const s = mkStore();
-    expect(s.schemaVersion).toBe(4);
+    expect(s.schemaVersion).toBe(5);
     s.close();
     const file = path.join(tmpDir(), "state.sqlite");
     const a = new Store(file);
     a.close();
     const b = new Store(file);
-    expect(b.schemaVersion).toBe(4);
+    expect(b.schemaVersion).toBe(5);
     b.close();
   });
 

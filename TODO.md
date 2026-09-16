@@ -17,6 +17,7 @@ Product direction and future features live in [ROADMAP.md](ROADMAP.md). This fil
 - [x] Publication review fixes: IPv6/local-address filtering, proxy input handling, renderer IPC/navigation validation, diagnostic redaction and ownership-scoped image pruning.
 - [x] English source/example/test cleanup while retaining Unicode coverage through escaped fixtures.
 - [x] GitHub repository setup with issue/PR templates, private vulnerability reporting, secret scanning and push protection.
+- [x] Browser text capture, bounded snapshot pagination and safe Markdown export to the workspace; browser-first Research instructions.
 - [x] Browser crash detection and explicit tab recovery, a bounded 4 GiB browser memory budget, terminal display-stall detection/resync and batched TUI delivery.
 
 ## Before public release
@@ -36,6 +37,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md#before-publishing) for the publication che
 - [ ] Per-workspace/account isolation of browser and nested-agent profiles.
 - [ ] Stronger remote-approval authentication and hostile-input resource testing.
 - [ ] Accurate model-specific cached-input pricing estimates.
-- [ ] Explicit durable continuation after full restart, only after safe provider/state recovery is implemented.
+- [x] Durable current-conversation follow-ups, interruption, budget preservation and explicit continuation after app restart.
+- [x] Independent browser restart; human input coalesces on slow pages instead of quarantining the browser.
+- [ ] Separate task: earlier-conversation navigation and reopening. Resolve grouping, search and branch/continue behavior first; see `docs/SESSION_HISTORY_TASK.md`.
 
 No new provider or Settings feature is part of this publication-preparation change.

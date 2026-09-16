@@ -30,6 +30,39 @@ const input = (workspaceId: string) => ({ workspaceId, goal: "list files", netwo
 const toolResultsOf = (i: unknown) => (i as { toolResults: { callId: string; output: string }[] }).toolResults;
 
 describe("RunController", () => {
+  it("continues an API response with completed and uncertain tool results, without replay or budget reset", async () => {
+    const { ws, store, worker, fw } = await setup();
+    const adapter = new FakeModelAdapter([{ text: "Updated the existing file" }]);
+    const rc = new RunController({ store, adapter, worker, continuation: {
+      provider: "openai", responseId: "response-parent", pending: [
+        { callId: "saved", name: "browser_save", args: {} }, { callId: "uncertain", name: "terminal_input", args: { text: "DO_NOT_REPLAY" } },
+      ], results: [{ callId: "saved", output: '{"path":"/workspace/research.md"}' }],
+      usage: { turns: 10, toolCalls: 12, costUsd: 0.5, elapsedMs: 1234 },
+    } }, { ...input(ws), goal: "Make it shorter" });
+    expect((await rc.start()).state).toBe("completed");
+    expect(adapter.contexts[0]?.previousResponseId).toBe("response-parent");
+    expect(adapter.inputs[0]).toMatchObject({ message: "Make it shorter", toolResults: [
+      { callId: "saved", output: expect.stringContaining("/workspace/research.md") },
+      { callId: "uncertain", output: expect.stringContaining('"outcome":"unknown"') },
+    ] });
+    expect(fw.screen).not.toContain("DO_NOT_REPLAY");
+    expect(rc.stats).toMatchObject({ turns: 11, toolCalls: 12 });
+    const checkpoint = JSON.parse(store.getRun(rc.runId)!.continuation_json!);
+    expect(checkpoint.usage.elapsedMs).toBeGreaterThanOrEqual(1234);
+  });
+
+  it("settles after interruption cleanup and saves the checkpoint without images", async () => {
+    const { ws, store, worker } = await setup();
+    const adapter = Object.assign(new FakeModelAdapter([{ delayMs: 5000 }]), { interrupt: vi.fn(async () => {}), close: vi.fn() });
+    const rc = new RunController({ store, adapter, worker }, input(ws));
+    const result = rc.start();
+    rc.stop("user_pause");
+    await rc.settled;
+    expect((await result).endReason).toBe("user_pause");
+    expect(adapter.interrupt).toHaveBeenCalledOnce();
+    expect(adapter.close).toHaveBeenCalledOnce();
+    expect(store.getRun(rc.runId)!.continuation_json).toBeTruthy();
+  });
   it("parks for manual login, skips actions from an in-flight model turn and waits for explicit resume", async () => {
     const { ws, store, worker, fw } = await setup();
     const adapter = new FakeModelAdapter([
