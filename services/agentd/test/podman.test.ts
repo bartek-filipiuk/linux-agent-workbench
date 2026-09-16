@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { PodmanRuntime, buildBrowserRunArgs, buildRunArgs, sessionIdFor, validateWorkspacePath } from "../src/runtime/podman.js";
+import { PodmanRuntime, buildBrowserRunArgs, buildRunArgs, hostLocale, sessionIdFor, validateWorkspacePath } from "../src/runtime/podman.js";
 import { ProtocolError } from "@law/protocol";
 
 const spec = {
@@ -123,7 +123,9 @@ describe("buildBrowserRunArgs", () => {
   it("isolates the browser: profile volume, downloads, socket dir, no workspace, no keys", () => {
     const args = buildBrowserRunArgs(bspec);
     expect(args[args.indexOf("--name") + 1]).toBe("law-browser-0123456789abcdef");
-    for (const flag of ["--userns=keep-id", "--cap-drop=ALL", "--security-opt=no-new-privileges", "--read-only", "--shm-size=1g", "--memory=4g"]) expect(args).toContain(flag);
+    // Chromium spends one task per thread: a few ad-heavy tabs pass 400, so the browser gets more room than the terminal.
+    for (const flag of ["--userns=keep-id", "--cap-drop=ALL", "--security-opt=no-new-privileges", "--read-only", "--shm-size=1g", "--memory=4g", "--pids-limit=2048"]) expect(args).toContain(flag);
+    expect(args.join(" ")).not.toMatch(/LAW_BROWSER_LOCALE|LAW_BROWSER_TZ|TZ=/);
     expect(args).toContain("law-browser-profile-default:/profile");
     expect(args).toContain(`${bspec.downloadsDir}:/downloads:rw`);
     expect(args).toContain(`${bspec.runtimeDir}:/run/law:rw`);
@@ -131,5 +133,21 @@ describe("buildBrowserRunArgs", () => {
     expect(args.at(-1)).toBe("sha256:beef");
     expect(buildBrowserRunArgs({ ...bspec, networkMode: "none" })).toContain("none");
     expect(() => buildBrowserRunArgs({ ...bspec, sessionId: "x" })).toThrow();
+  });
+  it("hands the host locale and time zone to the worker so sites see a local visitor", () => {
+    const args = buildBrowserRunArgs({ ...bspec, locale: "pl-PL", timeZone: "Europe/Warsaw" });
+    for (const env of ["LAW_BROWSER_LOCALE=pl-PL", "LAW_BROWSER_TZ=Europe/Warsaw", "TZ=Europe/Warsaw"]) expect(args[args.indexOf(env) - 1]).toBe("--env");
+    expect(() => buildBrowserRunArgs({ ...bspec, locale: "pl PL" })).toThrow();
+    expect(() => buildBrowserRunArgs({ ...bspec, timeZone: "Europe/Warsaw;rm" })).toThrow();
+  });
+});
+
+describe("hostLocale", () => {
+  it("derives a BCP 47 tag from the POSIX locale variables and ignores the C locales", () => {
+    expect(hostLocale({ LANG: "pl_PL.UTF-8" })).toBe("pl-PL");
+    expect(hostLocale({ LC_ALL: "de_DE", LANG: "pl_PL.UTF-8" })).toBe("de-DE");
+    expect(hostLocale({ LANG: "C.UTF-8" })).toBeUndefined();
+    expect(hostLocale({ LANG: "POSIX" })).toBeUndefined();
+    expect(hostLocale({})).toBeUndefined();
   });
 });

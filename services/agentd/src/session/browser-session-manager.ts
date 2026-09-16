@@ -74,6 +74,8 @@ export function podmanLauncher(opts: {
   networkMode: NetworkMode;
   downloadsDir: string;
   profileVolume?: string;
+  locale?: string;
+  timeZone?: string;
 }): BrowserLauncher {
   return async ({ socketDir }) => {
     if (!opts.imageId) throw new Error("Browser image missing; run pnpm images:build:browser. Host browser fallback is disabled.");
@@ -82,7 +84,7 @@ export function podmanLauncher(opts: {
     // The browser container holds no state outside its profile volume: an outdated image is simply replaced.
     const result = await opts.runtime.ensureRunningWith(
       name,
-      buildBrowserRunArgs({ sessionId: opts.sessionId, runtimeDir: socketDir, downloadsDir: opts.downloadsDir, imageId: opts.imageId, networkMode: opts.networkMode, ...(opts.profileVolume ? { profileVolume: opts.profileVolume } : {}) }),
+      buildBrowserRunArgs({ sessionId: opts.sessionId, runtimeDir: socketDir, downloadsDir: opts.downloadsDir, imageId: opts.imageId, networkMode: opts.networkMode, ...(opts.profileVolume ? { profileVolume: opts.profileVolume } : {}), ...(opts.locale ? { locale: opts.locale } : {}), ...(opts.timeZone ? { timeZone: opts.timeZone } : {}) }),
       { imageId: opts.imageId, recreateOnImageMismatch: true },
     );
     console.error(`[agentd] browser container ${name}: ${result}`);

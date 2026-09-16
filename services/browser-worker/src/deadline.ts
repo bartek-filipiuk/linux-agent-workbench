@@ -1,4 +1,4 @@
-/** Bounds waiting, not the underlying operation: callers must quarantine timed-out sessions. */
+/** Bounds waiting, not the underlying operation: the caller decides whether a timeout is a hung browser (control paths) or a slow page (human input). */
 export async function deadline<T>(work: Promise<T>, ms: number): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {

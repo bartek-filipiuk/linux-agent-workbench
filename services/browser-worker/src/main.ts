@@ -21,6 +21,8 @@ const session = new BrowserSession({
   profileDir,
   ...(process.env.LAW_BROWSER_DOWNLOADS ? { downloadsDir: process.env.LAW_BROWSER_DOWNLOADS } : {}),
   ...(egressSocket ? { proxyServer: `http://127.0.0.1:${egressPort}` } : {}),
+  ...(process.env.LAW_BROWSER_LOCALE ? { locale: process.env.LAW_BROWSER_LOCALE } : {}),
+  ...(process.env.LAW_BROWSER_TZ ? { timeZone: process.env.LAW_BROWSER_TZ } : {}),
 });
 const server = new BrowserWorkerServer(socketPath, session);
 await session.start();

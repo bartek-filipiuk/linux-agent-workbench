@@ -63,7 +63,19 @@ export type BrowserRunSpec = {
   downloadsDir: string;
   imageId: string;
   networkMode: NetworkMode;
+  /** Host locale and time zone (see hostLocale); Polish sites behind DataDome challenge an en-US/UTC browser on a Polish IP. */
+  locale?: string;
+  timeZone?: string;
 };
+
+const LOCALE_TAG = /^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$/;
+const TIME_ZONE = /^[A-Za-z0-9_+\-]+(\/[A-Za-z0-9_+\-]+)*$/;
+
+/** BCP 47 tag from the POSIX locale variables ("pl_PL.UTF-8" -> "pl-PL"); undefined for the C/POSIX locales. */
+export function hostLocale(env: NodeJS.ProcessEnv): string | undefined {
+  const m = /^([a-z]{2,3})(?:_([A-Za-z]{2}))?(?:[.@]|$)/.exec(env.LC_ALL || env.LC_MESSAGES || env.LANG || "");
+  return m ? (m[2] ? `${m[1]}-${m[2]}` : m[1]) : undefined;
+}
 
 const PROXY_URL = "http://127.0.0.1:3128";
 export const EGRESS_ENV = [
@@ -80,6 +92,8 @@ export function buildBrowserRunArgs(spec: BrowserRunSpec): string[] {
   if (!path.isAbsolute(spec.runtimeDir) || !path.isAbsolute(spec.downloadsDir)) {
     throw new ProtocolError("INVALID_INPUT", "runtime and downloads dirs must be absolute");
   }
+  if (spec.locale !== undefined && !LOCALE_TAG.test(spec.locale)) throw new ProtocolError("INVALID_INPUT", "locale must be a BCP 47 tag");
+  if (spec.timeZone !== undefined && !TIME_ZONE.test(spec.timeZone)) throw new ProtocolError("INVALID_INPUT", "time zone must be an IANA zone name");
   return [
     "run", "-d", "--rm",
     "--name", name,
@@ -89,7 +103,8 @@ export function buildBrowserRunArgs(spec: BrowserRunSpec): string[] {
     "--cap-drop=ALL",
     "--security-opt=no-new-privileges",
     "--read-only",
-    "--pids-limit=512",
+    // The limit counts threads: Chromium idles at ~160 and a few ad-heavy tabs pass 400, after which renderers die as "Page crashed".
+    "--pids-limit=2048",
     "--memory=4g",
     "--shm-size=1g",
     "--tmpfs", "/tmp:rw,nosuid,nodev,size=1g",
@@ -102,6 +117,8 @@ export function buildBrowserRunArgs(spec: BrowserRunSpec): string[] {
     "--network", "none",
     ...EGRESS_ENV,
     "--env", "HOME=/home/agent",
+    ...(spec.locale ? ["--env", `LAW_BROWSER_LOCALE=${spec.locale}`] : []),
+    ...(spec.timeZone ? ["--env", `LAW_BROWSER_TZ=${spec.timeZone}`, "--env", `TZ=${spec.timeZone}`] : []),
     spec.imageId,
   ];
 }

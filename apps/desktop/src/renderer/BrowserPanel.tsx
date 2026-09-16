@@ -88,7 +88,7 @@ export function BrowserPanel({ status, owner, runActive }: { status: BrowserStat
       off(); newestFrame.current = -1;
       clearInterval(t);
       if (moveFrame.current !== null) cancelAnimationFrame(moveFrame.current);
-      pendingMove.current = null;
+      pendingMove.current = null; pendingWheel.current = null;
       for (const key of pressedKeys.current) window.workbench.browserInput({ kind: "keyup", key });
       pressedKeys.current.clear();
     };
@@ -101,17 +101,22 @@ export function BrowserPanel({ status, owner, runActive }: { status: BrowserStat
   };
   const button = (e: React.MouseEvent) => (e.button === 1 ? "middle" : e.button === 2 ? "right" : "left");
   const send = (event: unknown) => window.workbench.browserInput(event);
-  // Pointer moves arrive faster than frames can show them; keep only the latest per animation frame and
-  // flush it before any button event so the order stays right.
+  // Pointer moves and wheel ticks arrive faster than frames can show them; keep the latest move and the summed
+  // wheel delta per animation frame and flush them before any button event so the order stays right.
   const pendingMove = useRef<{ x: number; y: number } | null>(null);
+  const pendingWheel = useRef<{ x: number; y: number; deltaX: number; deltaY: number } | null>(null);
   const moveFrame = useRef<number | null>(null);
-  const flushMove = () => {
+  const flushPointer = () => {
     if (moveFrame.current !== null) { cancelAnimationFrame(moveFrame.current); moveFrame.current = null; }
     if (pendingMove.current) { send({ kind: "mousemove", ...pendingMove.current }); pendingMove.current = null; }
+    if (pendingWheel.current) { send({ kind: "wheel", ...pendingWheel.current }); pendingWheel.current = null; }
   };
-  const queueMove = (p: { x: number; y: number }) => {
-    pendingMove.current = p;
-    moveFrame.current ??= requestAnimationFrame(() => { moveFrame.current = null; flushMove(); });
+  const schedulePointer = () => { moveFrame.current ??= requestAnimationFrame(() => { moveFrame.current = null; flushPointer(); }); };
+  const queueMove = (p: { x: number; y: number }) => { pendingMove.current = p; schedulePointer(); };
+  const queueWheel = (p: { x: number; y: number }, deltaX: number, deltaY: number) => {
+    const w = pendingWheel.current;
+    pendingWheel.current = { ...p, deltaX: (w?.deltaX ?? 0) + deltaX, deltaY: (w?.deltaY ?? 0) + deltaY };
+    schedulePointer();
   };
 
   const isPaste = (e: React.KeyboardEvent) => ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "v") || (e.shiftKey && e.key === "Insert");
@@ -199,11 +204,11 @@ export function BrowserPanel({ status, owner, runActive }: { status: BrowserStat
           onMouseMove={(e) => live && human && previewReady && queueMove(toViewport(e))}
           onMouseDown={(e) => {
             e.currentTarget.focus();
-            if (live && human && previewReady) { flushMove(); send({ kind: "mousedown", ...toViewport(e), button: button(e) }); }
+            if (live && human && previewReady) { flushPointer(); send({ kind: "mousedown", ...toViewport(e), button: button(e) }); }
           }}
-          onMouseUp={(e) => { if (live && human && previewReady) { flushMove(); send({ kind: "mouseup", ...toViewport(e), button: button(e) }); } }}
+          onMouseUp={(e) => { if (live && human && previewReady) { flushPointer(); send({ kind: "mouseup", ...toViewport(e), button: button(e) }); } }}
           onContextMenu={(e) => e.preventDefault()}
-          onWheel={(e) => live && human && previewReady && send({ kind: "wheel", ...toViewport(e), deltaX: Math.round(e.deltaX), deltaY: Math.round(e.deltaY) })}
+          onWheel={(e) => live && human && previewReady && queueWheel(toViewport(e), Math.round(e.deltaX), Math.round(e.deltaY))}
           onKeyDown={onKey("keydown")}
           onKeyUp={onKey("keyup")}
           onPaste={(e) => {

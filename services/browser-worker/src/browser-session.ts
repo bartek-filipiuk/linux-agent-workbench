@@ -41,6 +41,11 @@ export type BrowserSessionOptions = {
   idleFps?: number;
   manualAvailable?: boolean;
   manualFactory?: (opts: ManualBrowserOptions) => ManualBrowser;
+  /** BCP 47 tag and IANA zone of the human at the keyboard; a mismatch with the IP is an anti-bot signal (DataDome on allegro.pl). */
+  locale?: string;
+  timeZone?: string;
+  /** How long one human input event may wait for the page before the next one is sent. */
+  inputTimeoutMs?: number;
 };
 
 type PageEntry = { id: string; page: Page; opener?: Page | null; crashed?: boolean };
@@ -136,11 +141,13 @@ export class BrowserSession {
   private readonly stateListeners = new Set<(info: BrowserInfo) => void>();
   private diagnostics: Array<{ ts: number; message: string }> = [];
   private stateTimer: ReturnType<typeof setTimeout> | undefined;
-  private inputQueue: Promise<void> = Promise.resolve();
-  private inputCount = 0;
+  private inputQueue: Array<{ event: BrowserInputEvent; generation: number }> = [];
+  private draining: Promise<void> | undefined;
+  private readonly inputTimeoutMs: number;
   private unresponsive = false;
 
-  private async bounded<T>(work: Promise<T>, ms = 5000): Promise<T> {
+  /** Control operations that hang mark the browser unresponsive; "Refresh preview" re-probes it (see control). */
+  private async bounded<T>(work: Promise<T>, ms = 15_000): Promise<T> {
     try { return await deadline(work, ms); }
     catch (error) {
       if (error instanceof Error && error.message.includes("operation timed out")) {
@@ -176,7 +183,10 @@ export class BrowserSession {
     void this.attachScreencast(this.active?.page, true);
   }
   async control(command: BrowserControl): Promise<BrowserInfo> {
-    if (this.unresponsive) throw new ProtocolError("WORKER_UNAVAILABLE", "Browser is unresponsive. Restart browser to recover.");
+    if (this.unresponsive) {
+      if (command.kind !== "refresh" || !(await this.probe())) throw new ProtocolError("WORKER_UNAVAILABLE", "Browser is unresponsive. Restart browser to recover.");
+      this.unresponsive = false; this.frameError = null; this.diagnostic("The browser answers again.");
+    }
     if (this.transitioning) throw new ProtocolError("INVALID_INPUT", "Browser mode is changing; please wait");
     if (command.kind === "recover") return this.bounded(this.recoverPage(), 45000);
     if (command.kind === "manual") { await this.bounded(this.setManual(command.enabled), 45000); return this.info(); }
@@ -193,6 +203,14 @@ export class BrowserSession {
       this.publishState();
     } else throw new ProtocolError("INVALID_INPUT", "Manual login is not available in this worker yet");
     return this.info();
+  }
+
+  /** A page that evaluates a constant within the input deadline is alive, whatever the screencast says. */
+  private async probe(): Promise<boolean> {
+    if (this.manualMode) return this.manual !== undefined;
+    const page = this.active?.page;
+    if (!page || page.isClosed()) return false;
+    try { await deadline(page.evaluate("1"), Math.min(this.inputTimeoutMs, 5000)); return true; } catch { return false; }
   }
 
   /** Explicit human recovery creates a fresh GET navigation, never replays a tool or form submission. */
@@ -229,6 +247,7 @@ export class BrowserSession {
     this.viewport = opts.viewport ?? { width: 1280, height: 800 };
     this.activeFps = opts.activeFps ?? 12;
     this.idleFps = opts.idleFps ?? 2;
+    this.inputTimeoutMs = opts.inputTimeoutMs ?? 15_000;
     // Container: LAW_BROWSER_DOWNLOADS=/downloads (a per-session host dir). Host: next to the profile.
     this.downloadsDir = opts.downloadsDir ?? process.env.LAW_BROWSER_DOWNLOADS ?? path.join(opts.profileDir, "..", "downloads");
   }
@@ -264,6 +283,7 @@ export class BrowserSession {
     const options: ManualBrowserOptions = {
       executablePath: chromium.executablePath(), profileDir: this.opts.profileDir, url: this.returnUrl,
       viewport: this.viewport, ...(this.opts.proxyServer ? { proxyServer: this.opts.proxyServer } : {}),
+      ...(this.opts.locale ? { locale: this.opts.locale } : {}),
       onFrame: jpeg => {
         if (!this.framesEnabled || !this.manualMode || this.transitioning) return;
         for (const l of this.listeners) l({ ...this.viewport, jpeg, generation: this.generation, sequence: ++this.frameSequence });
@@ -281,7 +301,7 @@ export class BrowserSession {
     this.transitioning = true; this.generation = (this.generation + 1) >>> 0;
     this.frameError = null; this.refFrames.clear(); this.revision++; this.publishState();
     try {
-      await this.bounded(this.inputQueue);
+      await this.bounded(this.draining ?? Promise.resolve());
       if (enabled) {
         // Only a regular return URL is persisted, never the OAuth query/fragment or credentials.
         const target = normaliseNavigableUrl(this.active?.page.url() ?? "");
@@ -327,6 +347,8 @@ export class BrowserSession {
       acceptDownloads: true,
       ...(channel ? { channel } : {}),
       ...(this.opts.proxyServer ? { proxy: { server: this.opts.proxyServer } } : {}),
+      ...(this.opts.locale ? { locale: this.opts.locale } : {}),
+      ...(this.opts.timeZone ? { timezoneId: this.opts.timeZone } : {}),
       // Sites such as x.com answer 403 to the headless signature; present as a regular Chrome.
       userAgent: chromeUserAgent(chromium.executablePath()),
       ignoreDefaultArgs: ["--enable-automation"],
@@ -462,22 +484,35 @@ export class BrowserSession {
     };
   }
 
-  input(e: BrowserInputEvent): Promise<void> {
+  /**
+   * Human input is best effort: a busy page delays it, consecutive moves keep only the latest and wheel deltas add up,
+   * and a key or button release is never dropped. A slow page is not a hung browser, so nothing here quarantines it.
+   */
+  input(event: BrowserInputEvent): Promise<void> {
     if (this.transitioning || this.active?.crashed || this.unresponsive) return Promise.resolve();
-    if (this.inputCount >= 64) {
-      // Never drop a key/button release and carry on with an ambiguous input state.
-      this.unresponsive = true; this.generation++; this.frameError = "Browser input queue overflowed. Restart browser to recover."; this.publishState();
-      return Promise.resolve();
-    }
-    this.inputCount++;
     const generation = this.generation;
-    const next = this.inputQueue.then(() => {
-      if (generation !== this.generation || this.transitioning || this.active?.crashed || this.unresponsive) return;
-      return this.bounded(this.manualMode ? this.manual?.input(e) ?? Promise.resolve() : this.applyInput(e));
-    }).catch(() => {
-      this.diagnostic("Browser input could not be delivered. Refresh the preview and try again.");
-    });
-    this.inputQueue = next.finally(() => { this.inputCount--; }); return this.inputQueue;
+    const last = this.inputQueue.at(-1);
+    if (last?.generation === generation && last.event.kind === "mousemove" && event.kind === "mousemove") last.event = event;
+    else if (last?.generation === generation && last.event.kind === "wheel" && event.kind === "wheel") {
+      last.event = { ...event, deltaX: (last.event.deltaX ?? 0) + (event.deltaX ?? 0), deltaY: (last.event.deltaY ?? 0) + (event.deltaY ?? 0) };
+    } else this.inputQueue.push({ event, generation });
+    return this.kickDrain();
+  }
+  private kickDrain(): Promise<void> {
+    this.draining ??= this.drainInput().finally(() => { this.draining = undefined; if (this.inputQueue.length) void this.kickDrain(); });
+    return this.draining;
+  }
+  private async drainInput(): Promise<void> {
+    for (let next = this.inputQueue.shift(); next; next = this.inputQueue.shift()) {
+      if (this.transitioning || this.active?.crashed || this.unresponsive) { this.inputQueue.length = 0; return; }
+      if (next.generation !== this.generation) continue; // meant for a page that is gone
+      try {
+        await deadline(this.manualMode ? this.manual?.input(next.event) ?? Promise.resolve() : this.applyInput(next.event), this.inputTimeoutMs);
+      } catch (error) {
+        const timedOut = error instanceof Error && error.message.includes("timed out");
+        this.diagnostic(timedOut ? `The page was slow to accept input (over ${Math.round(this.inputTimeoutMs / 1000)} s); later input may arrive late.` : "Browser input could not be delivered. Refresh the preview and try again.");
+      }
+    }
   }
   private async applyInput(e: BrowserInputEvent): Promise<void> {
     const page = this.requirePage();

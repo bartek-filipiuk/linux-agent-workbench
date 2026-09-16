@@ -23,7 +23,7 @@ os.killpg(os.getpgrp(), signal.SIGKILL)
 `;
 
 export type ManualBrowserOptions = {
-  executablePath: string; profileDir: string; url: string; proxyServer?: string;
+  executablePath: string; profileDir: string; url: string; proxyServer?: string; locale?: string;
   viewport: { width: number; height: number };
   onFrame: (jpeg: Uint8Array) => void;
   onError: (message: string) => void;
@@ -67,6 +67,7 @@ export class ManualBrowser {
       "--no-first-run", "--no-default-browser-check", "--password-store=basic", "--disable-background-mode",
       `--window-size=${width},${height}`, "--start-maximized", "--restore-last-session",
       ...(this.opts.proxyServer ? [`--proxy-server=${this.opts.proxyServer}`, "--proxy-bypass-list=<-loopback>"] : []),
+      ...(this.opts.locale ? [`--lang=${this.opts.locale}`] : []),
       this.opts.url,
     ]);
     this.browser = browser;

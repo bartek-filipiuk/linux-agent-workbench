@@ -132,7 +132,9 @@ Run data older than 30 days is pruned at startup. Persistent browser/nested-agen
 
 Use **Refresh preview** when the page image stops updating. **Restart browser** is an independent recovery control that also works while a mode switch is stuck. It stops the agent and replaces only the browser container; the app, terminal processes, workspace and saved browser profile remain. Unsaved forms and recent login changes may be lost, so the UI asks before restarting. Resume explicitly afterward.
 
-Human input operations have a five-second deadline and a bounded queue. Timed-out input quarantines the browser until restart, preventing queued actions from running late. Mode switches have a 45-second deadline. A browser action whose outcome cannot be confirmed also requires recovery before continuation. A static page image alone never triggers an automatic hard restart.
+Human input is best effort. A page that is busy delays it; consecutive pointer moves collapse into the latest one, wheel ticks add up, and key or button releases are never dropped. Input that waits more than 15 seconds is noted under Connection details but does not quarantine the browser. Mode switches have a 45-second deadline; a switch or recovery that hangs marks the browser unresponsive, and **Refresh preview** probes it again and clears that mark once the page answers. A browser action whose outcome cannot be confirmed requires **Restart browser** before continuation. A static page image alone never triggers an automatic hard restart.
+
+The sandbox browser presents the host's locale and time zone (for example `pl-PL` and `Europe/Warsaw`). Sites behind bot protection such as DataDome (allegro.pl) serve a captcha to a browser whose language and clock do not match its IP address.
 
 ## Maintenance and diagnostics
 
