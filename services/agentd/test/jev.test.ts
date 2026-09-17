@@ -171,26 +171,26 @@ describe("hybrid controller", () => {
     const run = rc.start(); await started; rc.stop(); expect((await run).state).toBe("stopped");
     expect(execute.mock.calls.some(([c]) => c.name === "browser_act")).toBe(false);
   });
-  it("manual takeover invalidates the decision and resumes the same primary conversation", async () => {
+  it.each([false, true])("manual takeover invalidates the decision and resumes the same primary conversation (first=%s)", async first => {
     let entered!: () => void; let finish!: (r: JevReply) => void;
     const started = new Promise<void>(r => { entered = r; });
-    const { rc, execute, adapter } = setup({ evaluate: async () => { entered(); return new Promise(r => { finish = r; }); } });
+    const { rc, execute, adapter } = setup({ first, evaluate: async () => { entered(); return new Promise(r => { finish = r; }); } });
     const run = rc.start(); await started; const paused = rc.pauseForHuman("manual"); finish(reply()); await paused;
     expect(rc.state).toBe("handoff"); rc.resumeFromHandoff(); await run;
     expect(execute.mock.calls.some(([c]) => c.name === "browser_act")).toBe(false);
     expect(adapter.inputs).toHaveLength(2);
   });
-  it("budget pause invalidates pending work and continues with the planner", async () => {
-    const { rc, execute } = setup({ maxTurns: 1 });
+  it.each([false, true])("budget pause invalidates pending work and continues with the planner (first=%s)", async first => {
+    const { rc, execute } = setup({ first, maxTurns: 1 });
     const parked = new Promise<void>(resolve => rc.on("state", state => { if (state === "budget_paused") resolve(); }));
     const run = rc.start(); await parked; rc.resumeBudget("add_steps"); await run;
     expect(execute.mock.calls.some(([c]) => c.name === "browser_act")).toBe(false);
   });
-  it("does not let a late approval execute after Stop", async () => {
+  it.each([false, true])("does not let a late approval execute after Stop (first=%s)", async first => {
     let entered!: () => void; let approve!: (r: "once") => void;
     const waiting = new Promise<void>(r => { entered = r; }); const obs = observation(); obs.elements[0]!.name = "Publish";
     const policy = new BrowserActionPolicy({ lastObservation: () => obs, approvals: { isSessionAllowed: () => false, request: async () => { entered(); return new Promise(r => { approve = r; }); } } });
-    const { rc, execute } = setup({ policy }); const run = rc.start(); await waiting; rc.stop(); approve("once"); await run;
+    const { rc, execute } = setup({ first, policy }); const run = rc.start(); await waiting; rc.stop(); approve("once"); await run;
     expect(execute.mock.calls.some(([c]) => c.name === "browser_act")).toBe(false);
   });
 });

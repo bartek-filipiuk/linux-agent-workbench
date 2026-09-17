@@ -87,7 +87,7 @@ export async function runBrowserTask(args: unknown, evaluator: JevEvaluator, ctx
   const finish = async (status: "needs_help" | "completion_candidate", reason: string) => {
     let evidence: { observation: string; page: string } | undefined;
     if (first && ctx.current()) {
-      const observed = await ctx.execute({ callId: `jev-${randomUUID()}`, name: "browser_observe", args: { screenshot: false, pageText: true } });
+      const observed = await ctx.execute({ callId: `jev-${randomUUID()}`, name: "browser_observe", args: { screenshot: false } });
       const read = ctx.current() ? await ctx.execute({ callId: `jev-${randomUUID()}`, name: "browser_read", args: { scope: "page", maxChars: 12000 } }) : undefined;
       if (ctx.current() && read) evidence = { observation: observed.output, page: read.output };
     }
@@ -127,7 +127,9 @@ export async function runBrowserTask(args: unknown, evaluator: JevEvaluator, ctx
     if (!ctx.current()) return finish("needs_help", "control_changed");
     const op = reply.answers.operation;
     if (!op || op.confidence < minConfidence || !Object.hasOwn(space.questions.operation!.criteria, op.choice)) return finish("needs_help", "uncertain_operation");
-    if (op.choice === "DONE") return finish("completion_candidate", "Independently verify all requirements with browser_read/observe before claiming success.");
+    if (op.choice === "DONE") return finish("completion_candidate", first
+      ? "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof."
+      : "Independently verify all requirements with browser_read/observe before claiming success.");
     if (op.choice === "BLOCKED") return finish("needs_help", "blocked");
     let action: BrowserAction; let target: string | undefined; let label: string | undefined;
     if (op.choice === "WAIT") action = { kind: "wait", ms: 300 };

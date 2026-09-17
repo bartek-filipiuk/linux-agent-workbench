@@ -129,3 +129,16 @@ node scripts/check-jev-driver.mjs /tmp/jev-driver-check.json
 The desktop check repeated a live Hybrid task through Electron, daemon and browser container; it reached the expected IANA page with two Jev decisions. Stopping a subsequent task reached `stopped` in 227 ms. Starting a new Classic task afterwards completed successfully with no Jev statistics and no renderer errors. The test waits for a new run ID before inspecting its outcome; reading the previous run's terminal state is insufficient. [Desktop results](benchmarks/jev-desktop-2026-09-17.json).
 
 Additional regression cases cover cancelling oversized response streams, rejecting oversized context before any provider call, and returning to the planner after repeated actions make no progress. The final regression suite passed **407 tests** (12 skipped). The UI smoke check again passed engine selection, preference persistence, missing-key blocking and compact layouts.
+
+### Jev First verification
+
+The initial diagnostic comparison exposed a redundant-read instruction in the DONE result; First mode now asks the planner to evaluate the evidence already attached and request more only when it is insufficient. The final observation omits duplicate page text because the independent read supplies it. [Pilot metrics](benchmarks/jev-first-pilot-2026-09-17.json) and [interrupted diagnostic metrics](benchmarks/jev-first-diagnostic-2026-09-17.json) retain all attempts and link their full compressed traces. The intentionally interrupted attempt is identified separately from model failures.
+
+The live desktop test covers Jev First with Luna/low, the independent destination URL/title check, Stop, Classic after Stop and 1400/1024 px layouts. It requires the experimental app to be closed and already configured with a workspace, Codex access and a TypeSafe key:
+
+```sh
+pnpm build
+LAW_INSTANCE=jev node tests/ui/jev-desktop.mjs
+```
+
+It uses the isolated browser profile and real model quota. The first test assertion expected an older IANA URL; Chromium correctly reached the current `/help/example-domains` page. After correcting the assertion, all live checks passed, including Stop in 22 ms and a completed Classic task without Jev statistics. [Desktop results](benchmarks/jev-first-desktop-2026-09-17.json). The stop measurement is one desktop sample; cancellation during a pending Jev decision, takeover, budget pause and delayed approval are also covered by controlled regression tests for First mode.
