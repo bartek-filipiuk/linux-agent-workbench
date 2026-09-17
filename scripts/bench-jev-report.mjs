@@ -21,7 +21,8 @@ for (const scenario of [...new Set(report.results.map(r => r.scenario))]) for (c
 console.log(`\nBaseline: ${baseline}. Medians use successful attempts; ratios require both paired attempts to succeed. All failures are retained.`);
 for (const variant of variants) {
   const rows = report.results.filter(r => key(r) === variant);
-  console.log(`${variant}: ${rows.filter(r => r.success).length}/${rows.length} success; ${rows.filter(r => !r.jevCalls).length} with zero Jev decisions; primary ${secs(rows.reduce((n, r) => n + (r.primaryMs ?? 0), 0))}s; Jev ${secs(rows.reduce((n, r) => n + (r.jevMs ?? 0), 0))}s.`);
+  const errors = rows.flatMap(r => r.jevErrors ?? []).reduce((counts, e) => { const code = e.httpStatus ?? e.reason; counts[code] = (counts[code] ?? 0) + 1; return counts; }, {});
+  console.log(`${variant}: ${rows.filter(r => r.success).length}/${rows.length} success; ${rows.filter(r => !r.jevCalls).length} with zero Jev decisions; primary ${secs(rows.reduce((n, r) => n + (r.primaryMs ?? 0), 0))}s; Jev ${secs(rows.reduce((n, r) => n + (r.jevMs ?? 0), 0))}s; Jev errors ${JSON.stringify(errors)}.`);
 }
 console.log(`Estimated Jev cost: $${report.results.reduce((n, r) => n + (r.jevCostUsd ?? 0), 0).toFixed(6)}. Failed provider requests may also be billed.`);
 for (const r of report.results.filter(r => !r.success)) console.log(`Failure: ${r.scenario} #${r.repeat} ${key(r)}: ${r.error ?? r.verificationError ?? r.endReason ?? "independent check failed"}`);

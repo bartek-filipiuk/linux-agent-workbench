@@ -27,9 +27,30 @@ describe("TypeSafe host boundary", () => {
     expect(fetcher.mock.calls[0]).toMatchObject(["https://api.typesafe.ai/v1/systemone", { redirect: "error", method: "POST" }]);
     expect(result.costUsd).toBeCloseTo(0.0000042);
   });
-  it.each([401, 429, 529])("does not leak provider bodies or retry HTTP %s", async status => {
+  it.each([401, 429])("does not leak provider bodies or retry HTTP %s", async status => {
     const fetcher = vi.fn(async () => new Response("apikey_secret-test-only", { status }));
     await expect(new JevClient(config, fetcher).evaluate(request, new AbortController().signal)).rejects.toThrow(`Jev HTTP ${status}`);
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  });
+  it.each([503, 529])("recovers from transient HTTP %s with one inference retry", async status => {
+    const fetcher = vi.fn().mockResolvedValueOnce(new Response("private provider error", { status })).mockResolvedValueOnce(new Response(JSON.stringify(valid())));
+    const result = await new JevClient(config, fetcher).evaluate(request, new AbortController().signal);
+    expect(result.attempts).toBe(2); expect(fetcher).toHaveBeenCalledTimes(2);
+  });
+  it("bounds persistent overload to two attempts and exposes only the safe HTTP status", async () => {
+    const fetcher = vi.fn(async () => new Response("apikey_private_error", { status: 503 }));
+    await expect(new JevClient(config, fetcher).evaluate(request, new AbortController().signal)).rejects.toMatchObject({ code: "http_error", status: 503, message: "Jev HTTP 503" });
+    expect(fetcher).toHaveBeenCalledTimes(2);
+  });
+  it("includes retry backoff in the original deadline", async () => {
+    const fetcher = vi.fn(async () => new Response("overload", { status: 503 }));
+    await expect(new JevClient({ ...config, timeoutMs: 100 }, fetcher).evaluate(request, new AbortController().signal)).rejects.toMatchObject({ code: "timeout_or_transport" });
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  });
+  it("Stop cancels retry backoff without a second provider request", async () => {
+    const stop = new AbortController();
+    const fetcher = vi.fn(async () => { queueMicrotask(() => stop.abort(new Error("stopped"))); return new Response("overload", { status: 503 }); });
+    await expect(new JevClient(config, fetcher).evaluate(request, stop.signal)).rejects.toThrow("stopped");
     expect(fetcher).toHaveBeenCalledTimes(1);
   });
   it.each(["outside", "missing", "sum", "winner", "nan"])("rejects malformed distributions: %s", async kind => {

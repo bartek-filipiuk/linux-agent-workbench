@@ -407,6 +407,7 @@ export class RunController extends EventEmitter {
     this.deps.store.addRunTotals(this.runId, { turns: 1, costUsd: reply.costUsd });
     this.deps.store.appendEvent(this.runId, "jev.decision", {
       model: reply.model, elapsedMs: reply.elapsedMs, inputTokens: reply.usage.input_tokens,
+      attempts: reply.attempts ?? 1,
       outputTokens: reply.usage.output_tokens, costUsd: reply.costUsd,
       operation: reply.answers.operation?.choice, confidence: reply.answers.operation?.confidence,
     });

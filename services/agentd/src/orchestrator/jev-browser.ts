@@ -3,6 +3,7 @@ import { z } from "zod";
 import { BrowserObservation, type BrowserAction } from "@law/protocol";
 import type { ToolCall, ToolResult, ToolSpec } from "../provider/types.js";
 import type { JevEvaluator, JevQuestion, JevReply } from "../provider/jev.js";
+import { JevError } from "../provider/jev.js";
 
 export const BrowserTask = z.object({
   goal: z.string().trim().min(1).max(4000),
@@ -112,6 +113,7 @@ export async function runBrowserTask(args: unknown, evaluator: JevEvaluator, ctx
     const space = actionSpace(obs, task, first);
     if (!await ctx.beforeDecision()) return finish("needs_help", "control_changed");
     let reply: JevReply;
+    const decisionAt = performance.now();
     try {
       reply = await evaluator.evaluate({ questions: space.questions, state: {
         page: { url: obs.url, title: obs.title, text: obs.pageText ?? "", scroll: obs.scroll },
@@ -120,7 +122,7 @@ export async function runBrowserTask(args: unknown, evaluator: JevEvaluator, ctx
       } }, ctx.signal);
     } catch (e) {
       if (ctx.signal.aborted) throw e;
-      ctx.event("jev.error", { reason: "request_failed" });
+      ctx.event("jev.error", { reason: e instanceof JevError ? e.code : "request_failed", elapsedMs: performance.now() - decisionAt, ...(e instanceof JevError && e.status !== undefined ? { httpStatus: e.status } : {}) });
       return finish("needs_help", "jev_unavailable_or_invalid_response");
     }
     ctx.record(reply);

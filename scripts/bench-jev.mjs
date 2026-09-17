@@ -41,7 +41,7 @@ let activeRun; let stopping = false;
 process.on("SIGINT", () => { stopping = true; activeRun?.stop("benchmark_interrupted"); });
 process.on("SIGTERM", () => { stopping = true; activeRun?.stop("benchmark_interrupted"); });
 const report = { commit: execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(), sourceDiffSha256: createHash("sha256").update(execFileSync("git", ["diff", "HEAD"])).digest("hex"), dirty: !!execFileSync("git", ["status", "--porcelain"], { encoding: "utf8" }).trim(), model, effort, jevModel: config.model,
-  variants, environment: "host Chromium, isolated fresh profile per attempt; no Podman or desktop startup in task time", clock: "taskMs includes primary model, Jev, actions and independent final verification; setupMs contains browser startup and initial navigation", results };
+  variants, jevPolicy: { maxRetries: config.maxRetries, timeoutMs: config.timeoutMs, minConfidence: config.minConfidence }, environment: "host Chromium, isolated fresh profile per attempt; no Podman or desktop startup in task time", clock: "taskMs includes primary model, Jev, actions and independent final verification; setupMs contains browser startup and initial navigation", results };
 const save = () => fs.writeFileSync(output, JSON.stringify(report, null, 2), { mode: 0o600 });
 try {
   attempts: for (const [taskIndex, task] of tasks.entries()) for (let repeat = 0; repeat < repeats; repeat++) for (const { engine, model } of Array.from({ length: variants.length }, (_, i) => variants[(i + repeat + taskIndex) % variants.length])) {
@@ -78,11 +78,12 @@ try {
       const events = store.listEvents(rc.runId);
       const modelEvents = events.filter(e => e.type === "model.timing").map(e => e.payload);
       const decisions = events.filter(e => e.type === "jev.decision").map(e => e.payload);
+      const jevErrors = events.filter(e => e.type === "jev.error").map(e => e.payload);
       const fallbacks = events.filter(e => e.type === "browser.task" && e.payload.status === "needs_help").map(e => e.payload.reason);
       const tools = store.listToolCalls(rc.runId);
       record = { ...record, success: outcome.state === "completed" && content.content.includes(task.expected), taskMs: performance.now() - started, state: outcome.state, endReason: outcome.endReason, verificationError, approvals,
-        primaryCalls: modelEvents.length, primaryMs: modelEvents.reduce((n, e) => n + e.elapsedMs, 0), jevCalls: decisions.length, jevMs: decisions.reduce((n, e) => n + e.elapsedMs, 0), jevCostUsd: decisions.reduce((n, e) => n + e.costUsd, 0),
-        actions: tools.filter(t => t.name === "browser_act").length, fallbacks, verification: { expected: task.expected, matched: content.content.includes(task.expected) },
+        primaryCalls: modelEvents.length, primaryMs: modelEvents.reduce((n, e) => n + e.elapsedMs, 0), jevCalls: decisions.length, jevMs: [...decisions, ...jevErrors].reduce((n, e) => n + (e.elapsedMs ?? 0), 0), jevCostUsd: decisions.reduce((n, e) => n + e.costUsd, 0),
+        actions: tools.filter(t => t.name === "browser_act").length, fallbacks, jevErrors, verification: { expected: task.expected, matched: content.content.includes(task.expected) },
         trace: tools.map(t => ({ name: t.name, status: t.status, input: JSON.parse(t.input_json), output: t.output_json?.slice(0, 15000), durationMs: (t.ended_at ?? t.started_at) - t.started_at })), decisions };
     } catch (error) { record.error = error instanceof Error ? error.message.replace(/apikey_[A-Za-z0-9_-]+/g, "[redacted]") : "benchmark error"; }
     finally { clearTimeout(timer); rc?.stop(); await browser.close().catch(() => {}); store.close(); fs.rmSync(profileDir, { recursive: true, force: true }); }

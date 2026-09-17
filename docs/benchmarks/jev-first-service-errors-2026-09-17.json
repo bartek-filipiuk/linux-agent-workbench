@@ -1,0 +1,412 @@
+{
+  "commit": "66d3a257f0ab2eb300adf69233e5a6e017f5df7e",
+  "sourceDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "dirty": false,
+  "model": "gpt-5.6-sol",
+  "effort": "low",
+  "jevModel": "jev-1.13.0",
+  "variants": [
+    {
+      "engine": "classic",
+      "model": "gpt-5.6-sol"
+    },
+    {
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol"
+    },
+    {
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna"
+    }
+  ],
+  "environment": "host Chromium, isolated fresh profile per attempt; no Podman or desktop startup in task time",
+  "clock": "taskMs includes primary model, Jev, actions and independent final verification; setupMs contains browser startup and initial navigation",
+  "results": [
+    {
+      "scenario": "search",
+      "repeat": 1,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 199.45555999999988,
+      "taskMs": 19227.310189,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 6,
+      "primaryMs": 19128.199524999996,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 2,
+      "fallbacks": [],
+      "verification": {
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "search",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 186.82044300000052,
+      "taskMs": 9247.833926,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 7789.065687999999,
+      "jevCalls": 3,
+      "jevMs": 1348.9744460000002,
+      "jevCostUsd": 0.000169764,
+      "actions": 3,
+      "fallbacks": [],
+      "verification": {
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "search",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 189.40359199999875,
+      "taskMs": 7950.274762000001,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 6622.146382999999,
+      "jevCalls": 3,
+      "jevMs": 1234.824665,
+      "jevCostUsd": 0.000161616,
+      "actions": 3,
+      "fallbacks": [],
+      "verification": {
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "search",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 185.04808399999456,
+      "taskMs": 9119.105846999999,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 7704.596483000001,
+      "jevCalls": 3,
+      "jevMs": 1312.3694749999995,
+      "jevCostUsd": 0.00017203200000000002,
+      "actions": 3,
+      "fallbacks": [],
+      "verification": {
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "search",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 186.92129700000078,
+      "taskMs": 21563.095011999998,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 7,
+      "primaryMs": 20623.044538000002,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 3,
+      "fallbacks": [
+        "jev_unavailable_or_invalid_response"
+      ],
+      "verification": {
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "search",
+      "repeat": 2,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 185.7110900000116,
+      "taskMs": 16229.389882000003,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 6,
+      "primaryMs": 16159.987654999975,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 2,
+      "fallbacks": [],
+      "verification": {
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "search",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 188.80526900000405,
+      "taskMs": 20635.051083,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 7,
+      "primaryMs": 19719.580027999997,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 3,
+      "fallbacks": [
+        "jev_unavailable_or_invalid_response"
+      ],
+      "verification": {
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "search",
+      "repeat": 3,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 184.46044699999038,
+      "taskMs": 17889.272671999992,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 6,
+      "primaryMs": 17820.818331999995,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 2,
+      "fallbacks": [],
+      "verification": {
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "search",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 189.46750700000848,
+      "taskMs": 23251.776499999993,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 6,
+      "primaryMs": 22494.110823999974,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 3,
+      "fallbacks": [
+        "jev_unavailable_or_invalid_response"
+      ],
+      "verification": {
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "filters",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 184.50410099999863,
+      "taskMs": 24872.361552999995,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 8,
+      "primaryMs": 24041.799484000047,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 4,
+      "fallbacks": [
+        "jev_unavailable_or_invalid_response"
+      ],
+      "verification": {
+        "expected": "Applied: Books, in stock: yes",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "filters",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 194.69282399999793,
+      "taskMs": 23323.21700200002,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 8,
+      "primaryMs": 22558.56529800003,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 4,
+      "fallbacks": [
+        "jev_unavailable_or_invalid_response"
+      ],
+      "verification": {
+        "expected": "Applied: Books, in stock: yes",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "filters",
+      "repeat": 1,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 187.68537400002242,
+      "taskMs": 18519.37601899999,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 8,
+      "primaryMs": 18406.96540600006,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 3,
+      "fallbacks": [],
+      "verification": {
+        "expected": "Applied: Books, in stock: yes",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "filters",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 183.18613299998106,
+      "taskMs": 14370.112143000006,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 3,
+      "primaryMs": 12111.038926999987,
+      "jevCalls": 4,
+      "jevMs": 2133.8465939999733,
+      "jevCostUsd": 0.00027308400000000004,
+      "actions": 4,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "verification": {
+        "expected": "Applied: Books, in stock: yes",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "filters",
+      "repeat": 2,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 186.96866600000067,
+      "taskMs": 21571.555188999977,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 8,
+      "primaryMs": 21479.056105999916,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 3,
+      "fallbacks": [],
+      "verification": {
+        "expected": "Applied: Books, in stock: yes",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "filters",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 186.72198800000479,
+      "taskMs": 26088.239415999997,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 5,
+      "primaryMs": 22638.001160999906,
+      "jevCalls": 7,
+      "jevMs": 3222.825286000094,
+      "jevCostUsd": 0.0004803120000000001,
+      "actions": 7,
+      "fallbacks": [
+        "uncertain_target",
+        "uncertain_operation"
+      ],
+      "verification": {
+        "expected": "Applied: Books, in stock: yes",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "filters",
+      "repeat": 3,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": false,
+      "setupMs": 193.17462299996987,
+      "taskMs": 5374.641051999992,
+      "state": "stopped",
+      "endReason": "benchmark_interrupted",
+      "verificationError": "Browser is unresponsive. Restart browser to recover.",
+      "approvals": 0,
+      "primaryCalls": 1,
+      "primaryMs": 3784.000549999997,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 0,
+      "fallbacks": [],
+      "verification": {
+        "expected": "Applied: Books, in stock: yes",
+        "matched": false
+      }
+    }
+  ],
+  "traceFile": "jev-first-service-errors-2026-09-17-traces.json.gz",
+  "note": "Intentionally interrupted to diagnose provider errors. An independent minimal Jev request returned HTTP 503 at 20:08 Europe/Warsaw; a subsequent probe at 20:11 succeeded. Per-run errors were still generic in this revision; not every fallback can be attributed to HTTP 503. All attempts including the interrupted one are retained."
+}
