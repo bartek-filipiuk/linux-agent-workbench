@@ -24,7 +24,7 @@ if (!tasks.length) throw new Error("Unknown --scenario");
 const model = flag("--model", "gpt-5.6-sol");
 const effort = flag("--effort", "low");
 const configFile = flag("--config", path.join(os.homedir(), ".config/linux-agent-workbench-jev/.env"));
-const env = Object.fromEntries(fs.readFileSync(configFile, "utf8").split(/\r?\n/).filter(l => /^[A-Z_]+=/.test(l)).map(l => l.split(/=(.*)/s).slice(0, 2)));
+const env = Object.fromEntries((fs.existsSync(configFile) ? fs.readFileSync(configFile, "utf8") : "").split(/\r?\n/).filter(l => /^[A-Z_]+=/.test(l)).map(l => l.split(/=(.*)/s).slice(0, 2)));
 const config = JevConfig.parse({ apiKey: await readJevKey(configFile, env), model: env.TYPESAFE_MODEL ?? "jev-1.13.0" });
 const codexHome = flag("--codex-home", path.join(os.homedir(), ".local/share/linux-agent-workbench-jev/codex"));
 const output = path.resolve(flag("--output", path.join(os.tmpdir(), `law-jev-bench-${Date.now()}.json`)));

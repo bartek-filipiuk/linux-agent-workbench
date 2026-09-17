@@ -32,12 +32,15 @@ Interrupted parent tool calls are retained in the existing continuation checkpoi
 From the experimental worktree, with Node 24 and pnpm 10:
 
 ```sh
+nvm use
 pnpm install --frozen-lockfile
 pnpm images:build:jev
 pnpm dev:jev
 ```
 
 Keep the existing main checkout for the original version. `dev:jev` sets `LAW_INSTANCE=jev`; it does not change XDG roots or Podman storage. In New task choose **Jev Hybrid** under **Browser engine**, and use your existing primary model selection. Classic remains selectable for comparison. The task log shows each child action; progress shows Jev decisions, model time, estimated cost and returns to the planner. Each Jev request counts as a step, and each child tool counts toward the tool limit. Hybrid tasks have a $10 API spending limit, including Jev; subscription usage remains unpriced. Limits are checked between operations, so one request may cross a limit.
+
+On the development machine the worktree is `/home/bartek/linux-agent-jev`, the key and subscription login are configured, and the browser image is already built. Run `nvm use && pnpm dev:jev` there. The original checkout is `/home/bartek/linux-agent`.
 
 Private configuration: `~/.config/linux-agent-workbench-jev/.env` (0600), outside every agent workspace:
 
@@ -65,6 +68,8 @@ Named builds do not prune original LAW images. A branch/worktree alone does not 
 
 ## Comparison
 
+[Measured results, 2026-09-17](benchmarks/jev-2026-09-17.md): 80/80 successful fixture attempts, but no general speed advantage (median paired ratio 1.01×). Hybrid had zero Jev decisions in 28/40 attempts. Full metrics and traces are included; this remains an experiment.
+
 ```sh
 pnpm build
 node scripts/check-jev-fixtures.mjs
@@ -74,7 +79,7 @@ node scripts/bench-jev-report.mjs /tmp/jev-comparison.json
 
 Options: `--scenario search|filters|autocomplete|form|navigation|tabs|scroll|disclosure`, `--model`, `--effort`, `--codex-home`, `--config`. The benchmark uses the same primary subscription model in both modes. It reads the TypeSafe key from the environment/private config, or uses an anonymous pipe from Electron to read the OS keyring; keys never appear in reports. Headless environments without a desktop keyring can supply `TYPESAFE_API_KEY`.
 
-The harness verifies all eight fixtures deterministically before spending model quota. Each attempt uses a fresh Chromium profile and a fixed viewport. Order alternates across repeats. Timings start after browser startup and initial navigation (reported as `setupMs`) and end after an independent rendered-content check. Every attempt is retained, including timeouts, denied actions and fallbacks. SIGINT/TERM stops the current run and saves partial results. This is a comparison of Classic and Hybrid on the experimental code; it is not a measurement against unmodified main. Host Chromium measurements exclude Podman and Electron startup. Container and desktop integration are checked separately. Tiny fixture samples do not establish general web reliability or calibrated confidence.
+The harness verifies all eight fixtures deterministically before spending model quota. Each attempt uses a fresh Chromium profile and a fixed viewport. The task names the exact starting URL, and browser requests are restricted to the fixture server in both modes. Order alternates across repeats. Timings start after browser startup and initial navigation (reported as `setupMs`) and end after an independent rendered-content check. Every attempt is retained, including timeouts, denied actions and fallbacks. SIGINT/TERM stops the current run and saves partial results. This is a comparison of Classic and Hybrid on the experimental code; it is not a measurement against unmodified main. Host Chromium measurements exclude Podman and Electron startup. Container and desktop integration are checked separately. Tiny fixture samples do not establish general web reliability or calibrated confidence.
 
 The planner can choose ordinary tools and receives control again when Jev is uncertain, unavailable or unsupported. A Hybrid run with zero Jev decisions is counted as such, not presented as Jev acceleration. Full desktop automation, screenshot-only interfaces, arbitrary generated text inside Jev, and recursive shadow-root traversal are outside this initial browser driver; existing model tools remain available for these cases.
 
@@ -88,3 +93,7 @@ LAW_INSTANCE=jev LAW_CONTAINER_TESTS=1 pnpm exec vitest run tests/container/brow
 ```
 
 The storage guard measures the entire host Podman store. If its 14 GB ceiling is exceeded after a successful image build, the image may still have been created and pinned; inspect the reported image and existing storage before rebuilding. Do not prune the baseline merely to make an experiment's storage check pass.
+
+Verified on 2026-09-17: typecheck and build passed; the normal suite passed 404 tests (12 skipped), and all four browser-container integration tests passed against the pinned experimental image. UI checks covered engine selection, persistence, missing-key blocking, live metrics and 1400/1024 px layouts. A real Electron → daemon → container → Codex/TypeSafe task completed and reached the expected IANA page. Stop, takeover, delayed approval, failed mutation, stale targets and invalid provider replies have regression coverage.
+
+The image build completed and its container tests passed, but the build command returned exit 3 at its final global storage check. After removing the superseded experimental image, the host store measured 22.34 GB, including retained remapped layers and existing images. The original images were preserved. This does not prevent launching the already built app.

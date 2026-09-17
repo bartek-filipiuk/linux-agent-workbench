@@ -19,4 +19,10 @@ for (const scenario of [...new Set(report.results.map(r => r.scenario))]) {
 const errors = report.results.filter(r => !r.success);
 console.log(`\nAll attempts: ${report.results.length}; failed: ${errors.length}. Time medians above use successful attempts; ratios use pairs where both succeeded. Failures are retained, not converted into fast completions.`);
 console.log(`Estimated Jev cost: $${report.results.reduce((n, r) => n + (r.jevCostUsd ?? 0), 0).toFixed(6)}. Failed provider requests may also be billed.`);
+const hybrid = report.results.filter(r => r.engine === "jev-hybrid");
+console.log(`Hybrid attempts with zero Jev decisions: ${hybrid.filter(r => !r.jevCalls).length}/${hybrid.length}. These remain in the comparison.`);
+for (const engine of ["classic", "jev-hybrid"]) {
+  const rows = report.results.filter(r => r.engine === engine);
+  console.log(`${engine}: ${rows.reduce((n, r) => n + (r.primaryCalls ?? 0), 0)} primary calls, ${rows.reduce((n, r) => n + (r.jevCalls ?? 0), 0)} Jev decisions, ${rows.reduce((n, r) => n + (r.approvals ?? 0), 0)} denied approval requests.`);
+}
 for (const r of errors) console.log(`Failure: ${r.scenario} #${r.repeat} ${r.engine}: ${r.error ?? r.verificationError ?? r.endReason ?? "independent check failed"}`);
