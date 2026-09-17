@@ -97,3 +97,18 @@ The storage guard measures the entire host Podman store. If its 14 GB ceiling is
 Verified on 2026-09-17: typecheck and build passed; the normal suite passed 404 tests (12 skipped), and all four browser-container integration tests passed against the pinned experimental image. UI checks covered engine selection, persistence, missing-key blocking, live metrics and 1400/1024 px layouts. A real Electron → daemon → container → Codex/TypeSafe task completed and reached the expected IANA page. Stop, takeover, delayed approval, failed mutation, stale targets and invalid provider replies have regression coverage.
 
 The image build completed and its container tests passed, but the build command returned exit 3 at its final global storage check. After removing the superseded experimental image, the host store measured 22.34 GB, including retained remapped layers and existing images. The original images were preserved. This does not prevent launching the already built app.
+
+### Additional verification, 2026-09-17
+
+An explicit driver check dispatched each fixture goal directly to `browser_task`, using the real TypeSafe API, real browser and RunController policies, with no primary-model fallback. Jev reached the independently checked result in **7/8** scenarios. Navigation stopped after the first link with `uncertain_operation`; the Installation guide was not opened. Tabs reached the expected article but also returned low confidence to the planner. These are recorded limitations, not successful self-verification by Jev. One attempt per case does not establish a reliability rate. [Full driver results](benchmarks/jev-driver-2026-09-17.json).
+
+To reproduce this additional check (uses the configured TypeSafe key and incurs API usage):
+
+```sh
+pnpm build
+node scripts/check-jev-driver.mjs /tmp/jev-driver-check.json
+```
+
+The desktop check repeated a live Hybrid task through Electron, daemon and browser container; it reached the expected IANA page with two Jev decisions. Stopping a subsequent task reached `stopped` in 227 ms. Starting a new Classic task afterwards completed successfully with no Jev statistics and no renderer errors. The test waits for a new run ID before inspecting its outcome; reading the previous run's terminal state is insufficient. [Desktop results](benchmarks/jev-desktop-2026-09-17.json).
+
+Additional regression cases cover cancelling oversized response streams, rejecting oversized context before any provider call, and returning to the planner after repeated actions make no progress. The final regression suite passed **407 tests** (12 skipped). The UI smoke check again passed engine selection, preference persistence, missing-key blocking and compact layouts.

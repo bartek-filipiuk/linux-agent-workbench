@@ -1,0 +1,32 @@
+[
+  {
+    "provider": "codex",
+    "accountState": "ready",
+    "podman": true,
+    "image": true
+  },
+  {
+    "state": "completed",
+    "engine": "jev-hybrid",
+    "jev": {
+      "decisions": 2,
+      "elapsedMs": 1260.1876629999988,
+      "costUsd": 0.00024717,
+      "fallbacks": 1
+    },
+    "final": "Page title: **Example Domains**  \nURL: **https://www.iana.org/help/example-domains**",
+    "errors": []
+  },
+  {
+    "check": "stop",
+    "state": "stopped",
+    "elapsedMs": 227
+  },
+  {
+    "check": "classic_after_stop",
+    "state": "completed",
+    "engine": "classic",
+    "final": "The page title is **\u201cExample Domain.\u201d**",
+    "errors": []
+  }
+]

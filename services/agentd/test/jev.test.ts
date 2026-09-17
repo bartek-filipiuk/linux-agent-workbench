@@ -49,6 +49,17 @@ describe("TypeSafe host boundary", () => {
     vi.stubEnv("TYPESAFE_API_KEY", "secret"); vi.stubEnv("JEV_API_KEY", "secret");
     expect(codexEnvironment().TYPESAFE_API_KEY).toBeUndefined(); expect(codexEnvironment().JEV_API_KEY).toBeUndefined();
   });
+  it("rejects oversized response streams and cancels the reader", async () => {
+    const cancel = vi.fn();
+    const body = new ReadableStream({ start(controller) { controller.enqueue(new Uint8Array(256001)); }, cancel });
+    await expect(new JevClient(config, async () => new Response(body)).evaluate(request, new AbortController().signal)).rejects.toThrow("Jev response exceeds the size limit");
+    expect(cancel).toHaveBeenCalledOnce();
+  });
+  it("rejects oversized context before contacting the provider", async () => {
+    const fetcher = vi.fn();
+    await expect(new JevClient(config, fetcher).evaluate({ ...request, state: "x".repeat(160001) }, new AbortController().signal)).rejects.toThrow("context exceeds");
+    expect(fetcher).not.toHaveBeenCalled();
+  });
 });
 
 const observation = (): BrowserObservation => ({ revision: 1, activePageId: "p1", url: "https://example.com", title: "Test", viewport: { width: 1000, height: 700 }, scroll: { x: 0, y: 0, maxY: 0 }, pages: [], pageText: "Form", elements: [
@@ -93,6 +104,14 @@ describe("hybrid controller", () => {
     const { rc, execute, evaluator } = setup({ act: () => JSON.stringify({ error: { code: "TIMEOUT" } }) }); await rc.start();
     expect(execute.mock.calls.filter(([c]) => c.name === "browser_act")).toHaveLength(1);
     expect(evaluator.evaluate).toHaveBeenCalledOnce();
+  });
+  it("returns control when repeated clicks make no observable progress", async () => {
+    const { rc, execute, evaluator, adapter } = setup({ evaluate: async () => reply() });
+    await rc.start();
+    expect(execute.mock.calls.filter(([c]) => c.name === "browser_act")).toHaveLength(2);
+    expect(evaluator.evaluate).toHaveBeenCalledTimes(3);
+    expect(JSON.stringify(adapter.inputs[1])).toContain("no_progress");
+    expect(rc.stats.jev?.fallbacks).toBe(1);
   });
   it("falls back without action on low confidence or provider failure", async () => {
     for (const evaluate of [async () => reply("CLICK", 0.1), async () => { throw new Error("Jev unavailable"); }]) {
