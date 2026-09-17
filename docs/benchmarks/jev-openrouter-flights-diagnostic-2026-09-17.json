@@ -1,0 +1,637 @@
+{
+  "commit": "f9f8ecdc007f135cffc4632ce75329b357964b23",
+  "sourceDiffSha256": "71f86446d66fa644f6d04c62b7b898dc4aefe0e9dfbd68b650e502b6099610b9",
+  "dirty": true,
+  "model": "gpt-5.6-sol",
+  "effort": "low",
+  "jevModel": "jev-1.13.0",
+  "variants": [
+    {
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter"
+    },
+    {
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter"
+    }
+  ],
+  "upstream": "google-ai-studio",
+  "live": true,
+  "jevPolicy": {
+    "maxRetries": 1,
+    "timeoutMs": 5000,
+    "minConfidence": 0.55
+  },
+  "environment": "host Chromium, isolated fresh profile per attempt; no Podman or desktop startup in task time",
+  "clock": "taskMs includes primary model, Jev, actions and independent final verification; setupMs contains browser startup and initial navigation",
+  "results": [
+    {
+      "scenario": "google-flights",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": false,
+      "setupMs": 3133.746383,
+      "taskMs": 66076.82847400001,
+      "agentMs": 66063.556455,
+      "verificationMs": 13.272019000010914,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 35,
+      "primaryMs": 60407.74243999999,
+      "jevCalls": 1,
+      "jevMs": 887.5265939999999,
+      "jevCostUsd": 0.00047350800000000003,
+      "actions": 29,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "passed": false,
+        "checks": {
+          "searchPage": false,
+          "origin": true,
+          "destination": false,
+          "oneWay": false,
+          "departure": false,
+          "year": false,
+          "passenger": true,
+          "economy": true,
+          "results": false
+        },
+        "url": "https://www.google.com/travel/flights?tfs=CBwQARoOagwIAxIIL20vMDg5NjYaDnIMCAMSCC9tLzA4OTY2QAFIAXABggELCP___________wGYAQE&tfu=KgIIAw&hl=en",
+        "controls": [
+          {
+            "role": "button",
+            "label": "Main menu",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "link",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "link",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "link",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "link",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Change appearance",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Google apps",
+            "value": ""
+          },
+          {
+            "role": "combobox",
+            "label": "Round trip",
+            "value": "Round trip"
+          },
+          {
+            "role": "button",
+            "label": "1 passenger",
+            "value": ""
+          },
+          {
+            "role": "combobox",
+            "label": "Economy",
+            "value": "Economy"
+          },
+          {
+            "role": "combobox",
+            "label": "Where from?",
+            "value": "Z\u00fcrich"
+          },
+          {
+            "role": "button",
+            "label": "Swap origin and destination.",
+            "value": ""
+          },
+          {
+            "role": "combobox",
+            "label": "Where to?",
+            "value": ""
+          },
+          {
+            "role": "input",
+            "label": "Departure",
+            "value": ""
+          },
+          {
+            "role": "input",
+            "label": "Return",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Explore destinations",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Learn more about this section",
+            "value": ""
+          },
+          {
+            "role": "tab",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "tab",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "tab",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "tab",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Previous",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Next",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Find flights from Wroc\u0142aw (WRO) to London (LTN) from PLN\u00a0130.  Operated by Ryanair. Oct 22 to Oct 30. Nonstop",
+            "value": "Wroc\u0142awLondonOct 22 \u2014 Oct 30Nonstopfrom PLN\u00a0130"
+          },
+          {
+            "role": "button",
+            "label": "Find flights from Wroc\u0142aw (WRO) to Paris (BVA) from PLN\u00a0188.  Operated by Ryanair. Nov 22 to Nov 30. Nonstop",
+            "value": "Wroc\u0142awParisNov 22 \u2014 Nov 30Nonstopfrom PLN\u00a0188"
+          },
+          {
+            "role": "button",
+            "label": "Find flights from Wroc\u0142aw (WRO) to Milan (BGY) from PLN\u00a0130.  Operated by Ryanair. Oct 31 to Nov 7. Nonstop",
+            "value": "Wroc\u0142awMilanOct 31 \u2014 Nov 7Nonstopfrom PLN\u00a0130"
+          },
+          {
+            "role": "button",
+            "label": "Explore more destinations from Wroc\u0142aw",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Previous",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Next",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "What are some good flight destinations from Poland?",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "How can I find last-minute flight deals?",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "How can I find cheap flights for a weekend getaway?",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "How can I find flight deals if my travel plans are flexible?",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "How can I find cheap flights to anywhere?",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "How can I get flight alerts for my trip?",
+            "value": ""
+          },
+          {
+            "role": "tab",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "tab",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Currency PLN",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "Report Illegal Content"
+          },
+          {
+            "role": "button",
+            "label": "International sites",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Explore flights",
+            "value": ""
+          }
+        ],
+        "visibleFlights": [],
+        "text": "Skip to main content\nAccessibility feedback\nExplore\nFlights\nHotels\nVacation rentals\nChange appearance\nSign in\nFlights\nRound trip\n1\nEconomy\nZ\u00fcrich\nExplore\nFlexible? Discover the best flight deals with AI\nDescribe your ideal trip, and let Google Flights find the best deals for you\nExplore deals with AI\nFind and book cheap flights worldwide and track prices\nFind cheap flights from Poland to anywhere\nWroc\u0142aw\nWarsaw\nKrak\u00f3w\nGda\u0144sk\nWroc\u0142aw\nLondon\nOct 22 \u2014 Oct 30\nNonstop\nfrom PLN\u00a0130\nWroc\u0142aw\nParis\nNov 22 \u2014 Nov 30\nNonstop\nfrom PLN\u00a0188\nWroc\u0142aw\nMilan\nOct 31 \u2014 Nov 7\nNonstop\nfrom PLN\u00a0130\nExplore destinations\nUseful tools to help you find the best airline tickets\nFind the cheapest days to fly\nThe Date grid and Price graph make it easy to find the best flight deals\nKnow when to book with price insights\nPrice history and trend data show you the best time to book your airline ticket to get the cheapest price for your flight\nTrack flight prices for a trip\nNot ready to book yet? Observe price changes for a route or flight and get notified when prices drop.\nExplore the best flight deals with AI\nDescribe your ideal trip and let Google Flights find you the best deals\nInsightful tools help you choose your trip dates\nIf your travel plans are flexible, use the form above to start searching for a specific trip. Then, play around with the Date grid and Price graph options on the Search page to find the cheapest days to fly and book your tickets.\nPopular flight destinations from Poland\nLondon\nMilan\nParis\nTokyo\nOslo\nBarcelona\nFrankfurt am Main\nCopenhagen\nRome\nMunich\nFrequently asked questions\nWhat are some good flight destinations from Poland?\nHow can I find last-minute flight deals?\nHow can I find cheap flights for a weekend getaway?\nHow can I find flight deals if my travel plans are flexible?\nHow can I find cheap flights to anywhere?\nHow can I get flight alerts for my trip?\nSearch more flights\nFind cheap flights on popular routes\nFlights from cities in Poland\nInternational flights from Poland\nFlights from Warsaw\nFlights from Krak\u00f3w\nFlights from Gda\u0144sk\nFlights from Wroc\u0142aw\nFlights from Pozna\u0144\nFlights from Rzesz\u00f3w\nLanguage\u200bEnglish (United States)\nLocation\u200bPoland\nCurrencyPLN\n\nCurrent language and currency options applied: English (United States) - Poland - PLN\n\nDisplayed currencies may differ from the currencies used to purchase flights. Learn more\n\nPrices are final prices and include all taxes and fees, including payment fees for the cheapest common payment method (which may differ depending on the provider). Additional charges may apply for other types of payment, luggage, meals, WLAN or other additional services. Prices, availability and travel details are provided based on the latest information received from our partners. This information is reflected in the results within a period of less than 24 hours. Additional conditions may also be applied by our partners. You should then check prices and conditions with the services providers before booking.\n\nAbout\nPrivacy\nTerms\nJoin user studies\nReport Illegal Content\nFeedback\nHelp Center and Consumer Information\nInternational sites\nExplore flights"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1524.6176980000005,
+          "attempts": 1,
+          "headersMs": 1505.9173980000005,
+          "responseMs": 1523.3039120000003,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 2744.329482,
+          "attempts": 1,
+          "headersMs": 2730.1465210000006,
+          "responseMs": 2744.064642999999,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1200.2169090000007,
+          "attempts": 1,
+          "headersMs": 1187.1813709999988,
+          "responseMs": 1199.9692509999986,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1092.2024440000005,
+          "attempts": 1,
+          "headersMs": 1071.0669150000012,
+          "responseMs": 1091.961351,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1442.489966000001,
+          "attempts": 1,
+          "headersMs": 1432.6025260000006,
+          "responseMs": 1442.2834449999991,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1130.1593199999988,
+          "attempts": 1,
+          "headersMs": 1112.1230720000003,
+          "responseMs": 1129.9322659999998,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1264.8467459999993,
+          "attempts": 1,
+          "headersMs": 1247.1783520000008,
+          "responseMs": 1264.6027200000008,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1057.5818630000012,
+          "attempts": 1,
+          "headersMs": 1039.4546119999995,
+          "responseMs": 1057.2994940000008,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1763.9202049999985,
+          "attempts": 1,
+          "headersMs": 1746.8306559999983,
+          "responseMs": 1763.682675,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 6854.330512,
+          "attempts": 1,
+          "headersMs": 6829.260543,
+          "responseMs": 6854.1281119999985,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1213.438725,
+          "attempts": 1,
+          "headersMs": 1195.0698919999995,
+          "responseMs": 1213.1757719999987,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1637.323013000001,
+          "attempts": 1,
+          "headersMs": 1612.830700999999,
+          "responseMs": 1637.1433099999995,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 2755.0630109999984,
+          "attempts": 1,
+          "headersMs": 2738.420029000001,
+          "responseMs": 2754.9162739999992,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1095.8417399999998,
+          "attempts": 1,
+          "headersMs": 1073.6702560000012,
+          "responseMs": 1095.6662279999982,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 3386.9817120000007,
+          "attempts": 1,
+          "headersMs": 3361.580277000001,
+          "responseMs": 3386.8045249999996,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1148.1606419999953,
+          "attempts": 1,
+          "headersMs": 1126.3901880000049,
+          "responseMs": 1147.9914169999975,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1202.9462819999972,
+          "attempts": 1,
+          "headersMs": 1184.4539010000008,
+          "responseMs": 1202.7857169999988,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1002.9582519999967,
+          "attempts": 1,
+          "headersMs": 975.256104,
+          "responseMs": 1002.8014590000021,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1140.2530549999938,
+          "attempts": 1,
+          "headersMs": 1121.063936999999,
+          "responseMs": 1140.090185000001,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 2527.0053130000015,
+          "attempts": 1,
+          "headersMs": 2493.777317,
+          "responseMs": 2526.848589000001,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 2261.2082940000037,
+          "attempts": 1,
+          "headersMs": 2229.297786000003,
+          "responseMs": 2260.9683890000015,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1140.0452580000056,
+          "attempts": 1,
+          "headersMs": 1108.0098750000034,
+          "responseMs": 1139.8464900000035,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1377.506297,
+          "attempts": 1,
+          "headersMs": 1355.4749169999996,
+          "responseMs": 1377.346359999996,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1418.9775179999997,
+          "attempts": 1,
+          "headersMs": 1389.7792990000016,
+          "responseMs": 1418.7890160000024,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1258.973589000001,
+          "attempts": 1,
+          "headersMs": 1232.5512149999995,
+          "responseMs": 1258.7861360000024,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1187.4049300000042,
+          "attempts": 1,
+          "headersMs": 1161.0688789999986,
+          "responseMs": 1187.2325629999978,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 2664.379160999997,
+          "attempts": 1,
+          "headersMs": 2634.0627810000005,
+          "responseMs": 2664.205114999997,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1156.7214529999983,
+          "attempts": 1,
+          "headersMs": 1126.026324999999,
+          "responseMs": 1156.4273519999988,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1473.087621999999,
+          "attempts": 1,
+          "headersMs": 1436.1343609999967,
+          "responseMs": 1472.8375900000028,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1120.1426720000018,
+          "attempts": 1,
+          "headersMs": 1108.142952000002,
+          "responseMs": 1119.8917320000037,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1644.5441800000044,
+          "attempts": 1,
+          "headersMs": 1613.6430889999974,
+          "responseMs": 1644.2169730000023,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1563.2478090000004,
+          "attempts": 1,
+          "headersMs": 1520.8117950000014,
+          "responseMs": 1562.8656370000026,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1868.5384599999961,
+          "attempts": 1,
+          "headersMs": 1841.947279,
+          "responseMs": 1868.2322750000021,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1251.4996079999983,
+          "attempts": 1,
+          "headersMs": 1222.5568000000058,
+          "responseMs": 1251.3106869999901,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1836.7986989999918,
+          "attempts": 1,
+          "headersMs": 1118.565631000005,
+          "responseMs": 1836.6443509999954,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.38628959999999996
+    },
+    {
+      "scenario": "google-flights",
+      "repeat": 1,
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": false,
+      "error": "page.waitForURL: net::ERR_ABORTED; maybe frame was detached?\n=========================== logs ===========================\nwaiting for navigation to \"https://www.google.com/travel/flights**\" until \"load\"\n============================================================"
+    }
+  ]
+}

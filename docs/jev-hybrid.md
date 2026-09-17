@@ -150,3 +150,7 @@ The final correction path also captures separate fresh observation/read evidence
 Benchmark traces retain every tool call; individual tool outputs are clipped to 15,000 characters by the reporting harness. Full metrics retain failures and provider errors. The final candidate is measured in a separate later series against Classic/Luna, with both variants interleaved. Do not interpret comparisons across the earlier Sol series and the later Luna series as simultaneous measurements.
 
 [Final measured results](benchmarks/jev-first-2026-09-17.md): the completed 72-attempt engine/model comparison and the later 48-attempt same-Luna comparison retain all attempts. The final First/Luna candidate passed 24/24 checks with a 15.12-second median; Classic/Luna passed 23/24 with a 24.93-second median among successful attempts.
+
+## OpenRouter comparison
+
+Gemini 3.8 Flash/low is available through the explicit OpenRouter provider. See [setup and reproduction](openrouter.md) and the [local + Google Flights comparison](benchmarks/jev-openrouter-2026-09-17.md).

@@ -1,0 +1,49 @@
+{
+  "passed": true,
+  "artifacts": "/tmp/law-jev-first-desktop-khvbs7",
+  "checks": [
+    {
+      "check": "first_navigation",
+      "passed": true,
+      "elapsedMs": 7658,
+      "state": "completed",
+      "engine": "jev-first",
+      "jev": {
+        "decisions": 3,
+        "elapsedMs": 1436.4734590000003,
+        "costUsd": 0.00029038800000000004,
+        "fallbacks": 2
+      },
+      "browser": {
+        "url": "https://www.iana.org/help/example-domains",
+        "title": "Example Domains"
+      },
+      "final": "The resulting page details from following the link on https://example.com are:\n\n- **Page Title:** Example Domains\n- **URL:** https://www.iana.org/help/example-domains"
+    },
+    {
+      "check": "stop",
+      "passed": true,
+      "elapsedMs": 173
+    },
+    {
+      "check": "classic_after_stop",
+      "passed": true,
+      "state": "completed",
+      "browser": {
+        "url": "https://example.com/",
+        "title": "Example Domain"
+      }
+    },
+    {
+      "check": "followup_context",
+      "passed": true,
+      "state": "completed",
+      "browser": {
+        "url": "https://www.iana.org/help/example-domains",
+        "title": "Example Domains"
+      }
+    }
+  ],
+  "provider": "openrouter",
+  "model": "google/gemini-3.8-flash"
+}
