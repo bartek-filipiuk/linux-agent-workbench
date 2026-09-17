@@ -11,6 +11,8 @@ export type Continuation = {
   results: ToolResult[];
   usage?: { turns: number; toolCalls: number; costUsd: number; elapsedMs: number };
   limits?: Budgets;
+  /** Mutating fallback opens only after a completed Jev exception. */
+  browserFallback?: boolean;
   jev?: import("@law/protocol").JevStats;
 };
 

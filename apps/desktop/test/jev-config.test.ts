@@ -17,5 +17,6 @@ it("preserves engine preference and defaults legacy/invalid preferences to Class
   const legacy = { profile: "quick", stepMode: "unlimited", steps: "100", timeMode: "30", minutes: "30" };
   expect(readTaskPreferences(JSON.stringify(legacy)).browserEngine).toBe("classic");
   expect(readTaskPreferences(JSON.stringify({ ...legacy, browserEngine: "jev-hybrid" })).browserEngine).toBe("jev-hybrid");
+  expect(readTaskPreferences(JSON.stringify({ ...legacy, browserEngine: "jev-first" })).browserEngine).toBe("jev-first");
   expect(readTaskPreferences(JSON.stringify({ ...legacy, browserEngine: "unexpected" })).browserEngine).toBe("classic");
 });

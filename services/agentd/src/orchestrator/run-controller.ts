@@ -1,4 +1,5 @@
-import { BROWSER_TASK, HYBRID_INSTRUCTIONS, runBrowserTask } from "./jev-browser.js";
+import { BROWSER_TASK, BROWSER_FIRST_TASK, BrowserFallback, FIRST_INSTRUCTIONS, HYBRID_INSTRUCTIONS, runBrowserTask } from "./jev-browser.js";
+import { z } from "zod";
 import type { JevEvaluator, JevReply } from "../provider/jev.js";
 import type { BrowserObservation } from "@law/protocol";
 import { EventEmitter } from "node:events";
@@ -13,7 +14,7 @@ import { SYSTEM_PROMPT } from "./system-prompt.js";
 import { pendingResults, type Continuation } from "./continuation.js";
 
 export type RunControllerDeps = {
-  hybrid?: { evaluator: JevEvaluator; observation: () => BrowserObservation | undefined; minConfidence: number };
+  hybrid?: { evaluator: JevEvaluator; observation: () => BrowserObservation | undefined; minConfidence: number; strategy?: "first" };
   provider?: "codex" | "openai";
   continuation?: Continuation;
   store: Store;
@@ -93,7 +94,7 @@ export class RunController extends EventEmitter {
     this.policy = deps.policy ?? allowAllPolicy;
     this.prices = deps.prices ?? {};
     this.costKnown = deps.adapter.model in this.prices;
-    this.system = (deps.systemPrompt ?? SYSTEM_PROMPT) + (deps.hybrid ? HYBRID_INSTRUCTIONS : "");
+    this.system = (deps.systemPrompt ?? SYSTEM_PROMPT) + (deps.hybrid ? deps.hybrid.strategy === "first" ? FIRST_INSTRUCTIONS : HYBRID_INSTRUCTIONS : "");
     this.tools = deps.tools ?? terminalExecutor(deps.worker);
     this.budget = new BudgetTracker({ ...(deps.budgets ?? DEFAULT_BUDGETS) }, deps.now);
     this.checkpoint = { provider: deps.provider ?? "openai", pending: [], results: [], ...deps.continuation };
@@ -177,7 +178,7 @@ export class RunController extends EventEmitter {
       const started = performance.now();
       const turn = await adapter.turn(input, {
         ...(previousResponseId ? { previousResponseId } : {}),
-        tools: [...this.tools.specs, ...(this.deps.hybrid ? [BROWSER_TASK] : [])],
+        tools: this.modelTools(),
         system: this.system,
         signal,
         onCheckpoint: checkpoint => { this.checkpoint.threadId = checkpoint.threadId; if (checkpoint.usage) this.checkpoint.providerUsage = checkpoint.usage; this.saveCheckpoint(); },
@@ -301,7 +302,17 @@ export class RunController extends EventEmitter {
     }
   }
 
-  private async runTool(call: ToolCall, worker: TerminalWorker, signal: AbortSignal): Promise<ToolResult> {
+  private modelTools() {
+    if (this.deps.hybrid?.strategy !== "first") return [...this.tools.specs, ...(this.deps.hybrid ? [BROWSER_TASK] : [])];
+    const fallbackNames = ["browser_observe", "browser_act", "browser_wait"];
+    return [...this.tools.specs.filter(s => !fallbackNames.includes(s.name)), BROWSER_FIRST_TASK, {
+      name: "browser_fallback",
+      description: "Use only to inspect or recover from a browser_task exception; give a reason. browser_act and browser_wait are enabled only after needs_help. Re-observe before repairing uncertain actions. Child actions retain all policy checks. Tool argument reference: " + this.tools.specs.filter(s => fallbackNames.includes(s.name)).map(s => `${s.name}: ${s.description}`).join("\n"),
+      parameters: z.toJSONSchema(BrowserFallback, { target: "draft-7" }) as Record<string, unknown>,
+    }];
+  }
+
+  private async runTool(call: ToolCall, worker: TerminalWorker, signal: AbortSignal, child = false): Promise<ToolResult> {
     const { store } = this.deps;
     const revision = this.controlRevision;
     const decision = await this.policy.authorize(call, { runId: this.runId, networkMode: this.input.networkMode });
@@ -326,9 +337,12 @@ export class RunController extends EventEmitter {
       await this.waitForApprovals(signal);
       this.throwIfStopped();
       if (this.humanPause || revision !== this.controlRevision) throw new ProtocolError("INVALID_INPUT", "Human took control; re-observe after resuming");
+      if (this.deps.hybrid?.strategy === "first" && !child && ["browser_observe", "browser_act", "browser_wait"].includes(call.name)) throw new ProtocolError("INVALID_INPUT", "Use browser_task for browser work, or browser_fallback after an exception");
       const result = call.name === "browser_task" && this.deps.hybrid
         ? { output: JSON.stringify(await this.runHybrid(call, worker, signal)) }
-        : await this.tools.execute(call, signal);
+        : call.name === "browser_fallback" && this.deps.hybrid?.strategy === "first"
+          ? await this.runFallback(call, worker, signal)
+          : await this.tools.execute(call, signal);
       store.finishToolCall(rowId, "done", safeJson(result.output));
       store.appendEvent(this.runId, "tool.done", { name: call.name, bytes: result.output.length, image: result.imageJpegBase64 !== undefined });
       tool("done");
@@ -353,27 +367,38 @@ export class RunController extends EventEmitter {
     }
   }
 
+  private async runFallback(parent: ToolCall, worker: TerminalWorker, signal: AbortSignal): Promise<ToolResult> {
+    const args = BrowserFallback.parse(parent.args);
+    if (args.tool !== "browser_observe" && !this.checkpoint.browserFallback) throw new ProtocolError("INVALID_INPUT", "Delegate to browser_task first; direct actions require needs_help");
+    const result = await this.runBrowserChild(parent, { callId: `${parent.callId}-child`, name: args.tool, args: args.args }, worker, signal, this.controlRevision);
+    return { ...result, callId: parent.callId };
+  }
+
+  private async runBrowserChild(parent: ToolCall, call: ToolCall, worker: TerminalWorker, signal: AbortSignal, revision: number): Promise<ToolResult> {
+    await this.checkBudget("tool");
+    if (signal.aborted || this.humanPause || revision !== this.controlRevision) return { callId: call.callId, output: JSON.stringify({ skipped: "control_changed" }) };
+    this.deps.store.appendEvent(this.runId, "jev.child", { parentCallId: parent.callId, callId: call.callId });
+    const result = await this.runTool(call, worker, signal, true);
+    this.budget.addToolCall(); this.deps.store.addRunTotals(this.runId, { toolCalls: 1 }); this.saveCheckpoint();
+    return result;
+  }
+
   private async runHybrid(parent: ToolCall, worker: TerminalWorker, signal: AbortSignal) {
     const hybrid = this.deps.hybrid!;
     const revision = this.controlRevision;
     const current = () => !signal.aborted && !this.humanPause && revision === this.controlRevision;
+    this.checkpoint.browserFallback = false;
+    this.saveCheckpoint();
     return runBrowserTask(parent.args, hybrid.evaluator, {
       signal, current, observation: hybrid.observation,
       beforeDecision: async () => { await this.checkBudget("model"); return current(); },
-      execute: async call => {
-        await this.checkBudget("tool");
-        if (!current()) return { callId: call.callId, output: JSON.stringify({ skipped: "control_changed" }) };
-        this.deps.store.appendEvent(this.runId, "jev.child", { parentCallId: parent.callId, callId: call.callId });
-        const result = await this.runTool(call, worker, signal);
-        this.budget.addToolCall(); this.deps.store.addRunTotals(this.runId, { toolCalls: 1 }); this.saveCheckpoint();
-        return result;
-      },
+      execute: call => this.runBrowserChild(parent, call, worker, signal, revision),
       record: reply => this.recordJev(reply),
       event: (type, payload) => {
-        if (type === "browser.task" && payload.status === "needs_help") this.jevStats.fallbacks++;
+        if (type === "browser.task" && payload.status === "needs_help") { this.jevStats.fallbacks++; this.checkpoint.browserFallback = true; this.saveCheckpoint(); }
         this.deps.store.appendEvent(this.runId, type, { ...payload, parentCallId: parent.callId });
       },
-    }, hybrid.minConfidence);
+    }, hybrid.minConfidence, hybrid.strategy === "first");
   }
 
   private recordJev(reply: JevReply): void {

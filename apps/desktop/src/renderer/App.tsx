@@ -53,7 +53,7 @@ declare global {
       getTerminalStalled(): Promise<boolean>;
       onTerminalStalled(cb: (stalled: boolean) => void): () => void;
       onTerminalReset(cb: () => void): () => void;
-      startRun(goal: string, opts?: { browserEngine?: "classic" | "jev-hybrid"; profile?: "quick" | "research" | "project"; maxTurns?: number; modelSelection?: ModelSelection; limits?: RunLimits }): Promise<void>;
+      startRun(goal: string, opts?: { browserEngine?: "classic" | "jev-hybrid" | "jev-first"; profile?: "quick" | "research" | "project"; maxTurns?: number; modelSelection?: ModelSelection; limits?: RunLimits }): Promise<void>;
       stopRun(): Promise<void>;
       continueBudget(runId: string, action: BudgetAction): Promise<void>;
       resumeRun(): Promise<void>;

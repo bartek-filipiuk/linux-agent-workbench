@@ -34,7 +34,7 @@ await page.addInitScript(() => {
 });
 try {
   const url = `http://127.0.0.1:${server.address().port}`;
-  await page.goto(url); await page.getByLabel("Browser engine", { exact: true }).selectOption("jev-hybrid");
+  await page.goto(url); await page.getByLabel("Browser engine", { exact: true }).selectOption("jev-first");
   await page.getByLabel("What should the agent do?", { exact: true }).fill("Find a notebook and compare its options.");
   await page.getByRole("button", { name: "Expand editor" }).click();
   for (const [width, height, name] of [[1400, 900, "desktop"], [1024, 768, "compact"]]) {
@@ -45,7 +45,7 @@ try {
   await page.getByRole("button", { name: "Start task", exact: true }).click();
   await page.getByText(/Jev: 3 decisions/).waitFor();
   const calls = await page.evaluate(() => window.fixture.calls);
-  if (calls.length !== 1 || calls[0].options.browserEngine !== "jev-hybrid") throw new Error("Engine was not sent exactly once");
+  if (calls.length !== 1 || calls[0].options.browserEngine !== "jev-first") throw new Error("Engine was not sent exactly once");
   await page.goto(`${url}/?missing`);
   await page.getByText(/Jev is not configured/).waitFor();
   if (await page.getByRole("button", { name: "Start task", exact: true }).isEnabled()) throw new Error("Missing key allowed start");

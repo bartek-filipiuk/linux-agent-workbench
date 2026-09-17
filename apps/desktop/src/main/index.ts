@@ -408,8 +408,8 @@ handleTrusted("run:start", async (_e, goal: unknown, opts: unknown) => {
   if (typeof goal !== "string" || !goal.trim()) return;
   const o = (opts ?? {}) as { profile?: unknown; maxTurns?: unknown; modelSelection?: unknown; limits?: unknown; browserEngine?: unknown };
   const browserEngine = o.browserEngine ?? "classic";
-  if (browserEngine !== "classic" && browserEngine !== "jev-hybrid") throw new Error("Choose Classic or Jev Hybrid");
-  if (browserEngine === "jev-hybrid" && !loadJevKey(loadEnv().env, loadEnv().file)) throw new Error("Configure TYPESAFE_API_KEY on the host or choose Classic");
+  if (browserEngine !== "classic" && browserEngine !== "jev-hybrid" && browserEngine !== "jev-first") throw new Error("Choose Classic, Jev Hybrid or Jev First");
+  if (browserEngine !== "classic" && !loadJevKey(loadEnv().env, loadEnv().file)) throw new Error("Configure TYPESAFE_API_KEY on the host or choose Classic");
   const modelSelection = ModelSelection.parse(o.modelSelection ?? {});
   const limits = o.limits === undefined ? undefined : RunLimits.parse(o.limits);
   if (modelSelection.model) {

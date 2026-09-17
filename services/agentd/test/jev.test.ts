@@ -4,7 +4,7 @@ import { JevClient, JevConfig, type JevReply, type JevRequest } from "../src/pro
 import { actionSpace, BrowserTask } from "../src/orchestrator/jev-browser.js";
 import { RunController } from "../src/orchestrator/run-controller.js";
 import { Store } from "../src/storage/store.js";
-import { FakeModelAdapter } from "../src/provider/fake.js";
+import { FakeModelAdapter, type ScriptedTurn } from "../src/provider/fake.js";
 import type { TerminalWorker } from "../src/worker/types.js";
 import { ApprovalManager } from "../src/policy/approvals.js";
 import { BrowserActionPolicy } from "../src/policy/browser-policy.js";
@@ -68,21 +68,67 @@ const observation = (): BrowserObservation => ({ revision: 1, activePageId: "p1"
 let stores: Store[] = [];
 afterEach(() => { stores.forEach(s => s.close()); stores = []; vi.unstubAllEnvs(); });
 
-function setup(options: { evaluate?: (r: JevRequest, signal: AbortSignal) => Promise<JevReply>; policy?: BrowserActionPolicy; maxTurns?: number; act?: () => string } = {}) {
+function setup(options: { evaluate?: (r: JevRequest, signal: AbortSignal) => Promise<JevReply>; policy?: BrowserActionPolicy; maxTurns?: number; act?: () => string; first?: boolean; script?: ScriptedTurn[] } = {}) {
   const store = new Store(":memory:"); stores.push(store); const obs = observation();
-  const adapter = new FakeModelAdapter([{ toolCalls: [{ name: "browser_task", args: { goal: "Search" } }] }, { text: "Planner received result" }]);
+  const adapter = new FakeModelAdapter(options.script ?? [{ toolCalls: [{ name: "browser_task", args: { goal: "Search" } }] }, { text: "Planner received result" }]);
   let calls = 0;
   const execute = vi.fn(async (call: { name: string }) => ({ output: call.name === "browser_act" ? options.act?.() ?? "{}" : "page observation" }));
   const evaluator = { evaluate: vi.fn(options.evaluate ?? (async () => reply(calls++ ? "DONE" : "CLICK"))) };
   const rc = new RunController({ store, adapter, worker: { cancel: vi.fn(), observe: vi.fn(async () => ({})) } as unknown as TerminalWorker,
-    tools: { specs: [], execute }, ...(options.policy ? { policy: options.policy } : {}),
+    tools: { specs: [{ name: "browser_act", description: "act", parameters: {} }, { name: "browser_read", description: "read", parameters: {} }], execute }, ...(options.policy ? { policy: options.policy } : {}),
     budgets: { ...DEFAULT_BUDGETS, maxTurns: options.maxTurns ?? 30 },
-    hybrid: { evaluator, observation: () => obs, minConfidence: 0.55 },
+    hybrid: { evaluator, observation: () => obs, minConfidence: 0.55, ...(options.first ? { strategy: "first" as const } : {}) },
   }, { workspaceId: store.createWorkspace("/tmp/jev-test"), goal: "Search", networkMode: "open" });
   return { rc, store, adapter, execute, evaluator, obs };
 }
 
 describe("hybrid controller", () => {
+  it("Jev First delegates navigation and supplies separate fresh evidence in two primary turns", async () => {
+    const { rc, store, adapter } = setup({ first: true, script: [
+      { toolCalls: [{ name: "browser_task", args: { goal: "Search", url: "https://example.com" } }] }, { text: "Checked evidence" },
+    ] });
+    await rc.start();
+    const names = store.listToolCalls(rc.runId).map(c => c.name);
+    expect(names).toEqual(["browser_task", "browser_act", "browser_observe", "browser_act", "browser_observe", "browser_observe", "browser_read"]);
+    expect(adapter.inputs).toHaveLength(2);
+    const offered = adapter.contexts[0]!.tools.map(t => t.name);
+    expect(offered).toContain("browser_task"); expect(offered).toContain("browser_fallback"); expect(offered).not.toContain("browser_act");
+    const result = JSON.parse((adapter.inputs[1] as { toolResults: { output: string }[] }).toolResults[0]!.output);
+    expect(result).toMatchObject({ status: "completion_candidate", verified: false, evidence: { page: "page observation", observation: "page observation" } });
+  });
+  it("Jev First refuses direct actions and mutating fallback before delegation", async () => {
+    const { rc, execute, adapter } = setup({ first: true, script: [
+      { toolCalls: [{ name: "browser_act", args: { action: { kind: "navigate", url: "https://example.com" } } },
+        { name: "browser_fallback", args: { tool: "browser_act", args: { action: { kind: "navigate", url: "https://example.com" } }, reason: "skip Jev" } }] }, { text: "Blocked" },
+    ] });
+    await rc.start(); expect(execute).not.toHaveBeenCalled();
+    expect(JSON.stringify(adapter.inputs[1])).toContain("require needs_help");
+  });
+  it("Jev First exceptions enable fallback without bypassing child approval", async () => {
+    const obs = observation(); obs.elements[0]!.name = "Purchase";
+    const approvals = { isSessionAllowed: () => false, request: vi.fn(async () => "deny" as const) };
+    const { rc, execute, store } = setup({ first: true, evaluate: async () => reply("BLOCKED"), policy: new BrowserActionPolicy({ lastObservation: () => obs, approvals }), script: [
+      { toolCalls: [{ name: "browser_task", args: { goal: "Purchase" } }] },
+      { toolCalls: [{ name: "browser_fallback", args: { tool: "browser_act", args: { action: { kind: "click", ref: "e1", revision: 1 } }, reason: "unsupported action" } }] }, { text: "Denied" },
+    ] });
+    await rc.start(); expect(approvals.request).toHaveBeenCalledOnce();
+    expect(execute.mock.calls.some(([c]) => c.name === "browser_act")).toBe(false);
+    expect(JSON.parse(store.getRun(rc.runId)!.continuation_json!).browserFallback).toBe(true);
+  });
+  it("Jev First never executes a denied initial navigation", async () => {
+    const policy = new BrowserActionPolicy({ lastObservation: () => observation(), approvals: { isSessionAllowed: () => false, request: async () => "deny" } });
+    const { rc, execute, evaluator, adapter } = setup({ first: true, policy, script: [
+      { toolCalls: [{ name: "browser_task", args: { goal: "Inspect", url: "http://127.0.0.1/admin" } }] }, { text: "Denied" },
+    ] });
+    await rc.start(); expect(execute.mock.calls.some(([c]) => c.name === "browser_act")).toBe(false); expect(evaluator.evaluate).not.toHaveBeenCalled();
+    expect(JSON.stringify(adapter.inputs[1])).toContain("navigation_failed_or_denied");
+  });
+  it("Jev First Stop interrupts a pending decision and prevents evidence capture", async () => {
+    let entered!: () => void; const started = new Promise<void>(r => { entered = r; });
+    const { rc, execute } = setup({ first: true, evaluate: async (_r, signal) => { entered(); return new Promise((_resolve, reject) => signal.addEventListener("abort", () => reject(new Error("aborted")))); } });
+    const run = rc.start(); await started; rc.stop(); expect((await run).state).toBe("stopped");
+    expect(execute.mock.calls.map(([c]) => c.name)).toEqual(["browser_observe"]);
+  });
   it("journals child actions, counts decisions/tools and returns unverified completion to the planner", async () => {
     const { rc, store, adapter } = setup(); await rc.start();
     expect(store.listToolCalls(rc.runId).map(c => c.name)).toEqual(["browser_task", "browser_observe", "browser_act", "browser_observe"]);

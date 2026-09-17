@@ -1,4 +1,4 @@
-# Jev Hybrid experiment
+# Jev browser experiments
 
 Baseline: `72eaed2` on main. Development: `experiment/jev-browser`, separate worktree.
 
@@ -65,6 +65,23 @@ Instance data:
 | Browser image tags | `localhost/law-browser-jev:*` |
 
 Named builds do not prune original LAW images. A branch/worktree alone does not isolate application state. Avoid opening the same writable project in two agents at once: isolated containers can still edit the same host workspace if you select it in both.
+
+## Jev First
+
+The **Jev First** engine delegates the complete browser outcome before offering ordinary action tools to the primary model. `browser_task` accepts an optional starting HTTP(S) URL, the outcome and exact non-secret field values. Navigation and every subsequent action still pass through the existing policy, journal, budgets, lease and cancellation checks. Classic and the original optional Hybrid remain selectable.
+
+After the loop, the host obtains fresh `browser_observe` and `browser_read` evidence and returns it in the same tool result. The primary model compares that evidence with the user goal; `verified: false` explicitly prevents treating Jev's DONE as proof. Evidence may be incomplete or contain an error; the planner must inspect further when necessary. Research paging, saving and downloads remain available.
+
+Direct primary `browser_act`/`browser_wait` calls are replaced by `browser_fallback`. Mutations through that wrapper require a preceding `needs_help`; observation remains available for diagnosis. The fallback gate is persisted in continuation state and closes on every new delegation. All fallback children go through the same authorization as ordinary browser tools. No automatic replay is introduced. First mode supplies semantic action history (labels, URL and entered text), explains submit/completed-field behavior and permits completion decisions on pages without controls.
+
+Use the existing **Model & reasoning** picker to compare `gpt-5.6-sol / low` and `gpt-5.6-luna / low`. The selected primary model handles exceptions; there is no silent switch to Astra or a separate API billing path. Difficult work can use Astra through the same picker. This version retains the isolated Playwright browser, without stacking another Browser Use agent or LLM loop.
+
+```sh
+node scripts/bench-jev.mjs --runs 3 --variants classic:gpt-5.6-sol,jev-first:gpt-5.6-sol,jev-first:gpt-5.6-luna --output /tmp/jev-first.json
+node scripts/bench-jev-report.mjs /tmp/jev-first.json
+```
+
+Variant order rotates across tasks and repetitions. Every attempt records its model, full tool trace and independent verification, including failures. This isolates the execution change (Classic/Sol versus First/Sol) from the planner change (First/Sol versus First/Luna).
 
 ## Comparison
 

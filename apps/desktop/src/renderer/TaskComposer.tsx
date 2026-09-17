@@ -39,7 +39,7 @@ export const TaskComposer = memo(function TaskComposer({ workspace, ready, expan
   const savedPreferences = useDraftStorage(TASK_PREFERENCES_KEY, JSON.stringify(preferences));
   const picker = useModelPicker();
   const validation = taskLimits(preferences);
-  const engineReady = preferences.browserEngine !== "jev-hybrid" || picker.catalog?.jevAvailable === true;
+  const engineReady = preferences.browserEngine === "classic" || picker.catalog?.jevAvailable === true;
   const change = (patch: Partial<TaskPreferences>) => setPreferences(p => ({ ...p, ...patch }));
 
   useEffect(() => {
@@ -84,9 +84,9 @@ export const TaskComposer = memo(function TaskComposer({ workspace, ready, expan
     <details className="style-legend"><summary>Compare working styles</summary><dl>{Object.entries(STYLES).map(([id, style]) => <div key={id}><dt>{style.name}</dt><dd>{style.description}</dd></div>)}</dl><p className="composer-help">Styles guide the approach. Model and reasoning effort are selected separately.</p></details>
     <label className="composer-label" htmlFor="browser-engine">Browser engine</label>
     <select id="browser-engine" value={preferences.browserEngine} disabled={starting} onChange={e => change({ browserEngine: e.target.value as TaskPreferences["browserEngine"] })} aria-describedby="browser-engine-help">
-      <option value="classic">Classic</option><option value="jev-hybrid">Jev Hybrid · experimental</option>
+      <option value="classic">Classic</option><option value="jev-hybrid">Jev Hybrid · experimental</option><option value="jev-first">Jev First · experimental</option>
     </select>
-    <p className="composer-help" id="browser-engine-help">{preferences.browserEngine === "classic" ? "The selected model controls the browser and terminal." : "Jev handles browser steps; your selected model plans, writes and handles exceptions. Page text is sent to TypeSafe. Jev API usage is billed separately, with a $10 task limit."}</p>
+    <p className="composer-help" id="browser-engine-help">{preferences.browserEngine === "classic" ? "The selected model controls the browser and terminal." : "Jev handles browser steps; your selected model plans, checks the result and handles exceptions. Page text is sent to TypeSafe. Jev API usage is billed separately, with a $10 task limit."}</p>
     {!engineReady && !picker.loading && <p className="error" role="alert">Jev is not configured. Add TYPESAFE_API_KEY to the app’s private configuration and restart, or choose Classic.</p>}
     <div className="task-limit-fields">
       <div><label className="composer-label" htmlFor="step-mode">Steps</label><select id="step-mode" value={preferences.stepMode} disabled={starting} onChange={e => change({ stepMode: e.target.value as TaskPreferences["stepMode"] })}><option value="unlimited">No step limit</option><option value="custom">Custom limit</option></select>

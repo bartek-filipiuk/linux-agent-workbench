@@ -8,7 +8,7 @@ This is an early source-build project. It is not affiliated with or endorsed by 
 
 ## Jev Hybrid experiment
 
-This branch adds an optional Jev browser driver while retaining the existing UI and primary model. Run `pnpm dev:jev` for isolated settings, history, containers and browser profile, then choose **Jev Hybrid** under **Browser engine**. Setup, security boundaries and the repeatable Classic/Hybrid benchmark are in [the experiment guide](docs/jev-hybrid.md).
+This branch adds an optional Jev browser driver while retaining the existing UI and primary model. Run `pnpm dev:jev` for isolated settings, history, containers and browser profile, then choose **Jev First** under **Browser engine** (or the original optional **Jev Hybrid**). Setup, security boundaries and the repeatable Classic/Hybrid benchmark are in [the experiment guide](docs/jev-hybrid.md).
 
 ## What works today
 
