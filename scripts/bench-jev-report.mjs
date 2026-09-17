@@ -7,7 +7,7 @@ const median = values => { const a = [...values].sort((x, y) => x - y); return a
 const secs = n => n === null ? "—" : (n / 1000).toFixed(2);
 const key = r => `${r.engine}/${r.model ?? report.model}`;
 const variants = [...new Set(report.results.map(key))];
-const baseline = variants.find(v => v.startsWith("classic/")) ?? variants[0];
+const baseline = variants[0];
 console.log(`Effort: ${report.effort}; Jev: ${report.jevModel}. Commit: ${report.commit}${report.dirty ? " + recorded working changes" : ""}.`);
 console.log("Times include independent final verification; browser setup is separate. Success is checked outside the agent. Subscription usage is not priced as API usage.\n");
 console.log("| Scenario | Engine / model | Success | Median, s | Paired speed vs baseline | Primary calls | Jev decisions | Fallbacks |");
@@ -26,3 +26,13 @@ for (const variant of variants) {
 }
 console.log(`Estimated Jev cost: $${report.results.reduce((n, r) => n + (r.jevCostUsd ?? 0), 0).toFixed(6)}. Failed provider requests may also be billed.`);
 for (const r of report.results.filter(r => !r.success)) console.log(`Failure: ${r.scenario} #${r.repeat} ${key(r)}: ${r.error ?? r.verificationError ?? r.endReason ?? "independent check failed"}`);
+
+console.log("\n| Variant | Success | Median task, s | Mean primary, s | Mean Jev, s | Mean other, s | API cost, USD |");
+console.log("|---|---:|---:|---:|---:|---:|---:|");
+for (const variant of variants) {
+  const rows = report.results.filter(r => key(r) === variant);
+  const good = rows.filter(r => r.success);
+  const measured = rows.filter(r => Number.isFinite(r.taskMs));
+  const mean = fn => measured.length ? measured.reduce((n, r) => n + fn(r), 0) / measured.length : null;
+  console.log(`| ${variant} | ${good.length}/${rows.length} | ${secs(median(good.map(r => r.taskMs)))} | ${secs(mean(r => r.primaryMs ?? 0))} | ${secs(mean(r => r.jevMs ?? 0))} | ${secs(mean(r => r.taskMs - (r.primaryMs ?? 0) - (r.jevMs ?? 0)))} | ${rows.some(r => r.primaryCostUsd != null) ? rows.reduce((n, r) => n + (r.primaryCostUsd ?? 0), 0).toFixed(6) : "unpriced subscription"} |`);
+}

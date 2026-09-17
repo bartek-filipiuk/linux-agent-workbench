@@ -55,7 +55,7 @@ export const BROWSER_TOOLS: ToolSpec[] = [
   {
     name: "browser_act",
     description:
-      "Act on the page. action.kind: navigate {url} (http/https only), click {ref, revision}, type {ref, revision, text, submit?} (replaces the field content; submit presses Enter), press {key}, select {ref, revision, values}, mouse {x, y, action: move|down|up|wheel, deltaY}, switchPage {pageId}, closePage {pageId}, wait {ms}. A stale revision is refused: observe again first. Passwords, 2FA codes and CAPTCHA image challenges are for the human: call request_human.",
+      "Act on the page. Pass action as a JSON object, e.g. {\"action\":{\"kind\":\"click\",\"ref\":\"e1\",\"revision\":3}}. action.kind: navigate {url} (http/https only), click {ref, revision}, type {ref, revision, text, submit?} (replaces the field content; submit presses Enter), press {key}, select {ref, revision, values}, mouse {x, y, action: move|down|up|wheel, deltaY}, switchPage {pageId}, closePage {pageId}, wait {ms}. A stale revision is refused: observe again first. Passwords, 2FA codes and CAPTCHA image challenges are for the human: call request_human.",
     parameters: schema(ActArgs),
   },
   {

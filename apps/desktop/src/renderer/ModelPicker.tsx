@@ -22,7 +22,7 @@ export function useModelPicker() {
     try { localStorage.setItem(preferenceKey, JSON.stringify(next)); setSaveError(""); }
     catch { setSaveError("Selection applies now, but could not be saved for next time."); }
   };
-  const isCodex = catalog?.provider !== "openai";
+  const isCodex = catalog?.provider === "codex";
   let invalid = "";
   if (isCodex && selection.model && !loading) {
     try { validateModelSelection(selection, catalog?.models ?? []); }

@@ -128,6 +128,20 @@ function loadApiKey(env: Record<string, string>, envFile: string | undefined): s
   return r.apiKey;
 }
 
+function loadOpenRouterKey(env: Record<string, string>, envFile: string | undefined): string {
+  const available = safeStorage.isEncryptionAvailable();
+  const backend = process.platform === "linux" && available ? safeStorage.getSelectedStorageBackend() : available ? process.platform : "unknown";
+  const result = resolveApiKey({ encryptedKey: settings.openrouterKeyEncrypted, envKey: env.OPENROUTER_API_KEY,
+    keys: { backend, available, encrypt: p => safeStorage.encryptString(p), decrypt: b => safeStorage.decryptString(b) } });
+  keyInfo = { keyStore: result.keyStore, keyBackend: result.backend };
+  if (result.encryptedKey && envFile) {
+    settings = { ...settings, openrouterKeyEncrypted: result.encryptedKey };
+    writeSettings(settingsFile(), settings);
+    fs.writeFileSync(envFile, fs.readFileSync(envFile, "utf8").split(/\r?\n/).map(line => /^\s*(export\s+)?OPENROUTER_API_KEY\s*=/.test(line) ? "# OPENROUTER_API_KEY moved to the OS keyring" : line).join("\n"), { mode: 0o600 });
+  }
+  return result.apiKey;
+}
+
 function loadJevKey(env: Record<string, string>, envFile: string | undefined): string {
   const available = safeStorage.isEncryptionAvailable();
   const backend = process.platform === "linux" && available ? safeStorage.getSelectedStorageBackend() : available ? process.platform : "unknown";
@@ -264,7 +278,7 @@ function onAgentdExit(code: number | undefined): void {
 }
 
 let accountState: AccountState = { state: "signed_out" };
-const account = new CodexAccount(() => providerConfig(loadEnv().env).codex ?? {}, (state) => { accountState = state; send("setup:account", state); });
+const account = new CodexAccount(() => { const config = providerConfig(loadEnv().env); return config.provider === "codex" ? config.codex ?? {} : {}; }, (state) => { accountState = state; send("setup:account", state); });
 async function checkSetup() {
   const config = providerConfig(loadEnv().env);
   const podman = await command("podman", ["info", "--format", "{{.Host.Arch}}"], { timeout: 10000 });
@@ -274,7 +288,7 @@ async function checkSetup() {
     try { accountState = await account.read(); }
     catch (e) { accountState = { state: "error", message: e instanceof Error ? e.message : String(e) }; }
   }
-  const providerReady = config.provider === "codex" ? accountState.state === "ready" : !!loadApiKey(loadEnv().env, loadEnv().file);
+  const providerReady = config.provider === "codex" ? accountState.state === "ready" : !!(config.provider === "openrouter" ? loadOpenRouterKey(loadEnv().env, loadEnv().file) : loadApiKey(loadEnv().env, loadEnv().file));
   return { provider: config.provider, account: accountState, podman: podman.ok, image: image.ok, providerReady, workspace: session.workspacePath ?? settings.lastWorkspace ?? null };
 }
 
@@ -286,9 +300,9 @@ function startAgentd() {
   let jev: ReturnType<typeof jevConfig>;
   try { jev = jevConfig(env, loadJevKey(env, envFile)); }
   catch (e) { return onAgentd({ type: "agentd.error", message: e instanceof Error ? e.message : "Invalid Jev configuration" }); }
-  const apiKey = provider.provider === "openai" ? loadApiKey(env, envFile) : "";
+  const apiKey = provider.provider === "openrouter" ? loadOpenRouterKey(env, envFile) : provider.provider === "openai" ? loadApiKey(env, envFile) : "";
   const imageId = readImageId();
-  if (provider.provider === "openai" && !apiKey) return onAgentd({ type: "agentd.error", message: "OPENAI_API_KEY missing: put it in .env once; it is moved to the OS keyring on the next start" });
+  if (provider.provider !== "codex" && !apiKey) return onAgentd({ type: "agentd.error", message: `${provider.provider === "openrouter" ? "OPENROUTER_API_KEY" : "OPENAI_API_KEY"} missing: put it in the private .env once; it is moved to the OS keyring on the next start` });
   if (!imageId) return onAgentd({ type: "agentd.error", message: "images/terminal/image.json missing; run pnpm images:build" });
   const entry = path.join(repoRoot(), "services", "agentd", "dist", "main.js");
   const child = utilityProcess.fork(entry, [], { serviceName: "agentd", stdio: "pipe" });
@@ -396,7 +410,7 @@ function getModels(refresh = false): Promise<ModelCatalog> {
   if (!modelCatalog || refresh || Date.now() - modelCatalogAt > 60_000) {
     const config = providerConfig(loadEnv().env);
     modelCatalogAt = Date.now();
-    const request = (async (): Promise<ModelCatalog> => ({ provider: config.provider, configuredModel: config.model, jevAvailable: !!loadJevKey(loadEnv().env, loadEnv().file), models: config.provider === "codex" ? await account.models() : [] }))();
+    const request = (async (): Promise<ModelCatalog> => ({ provider: config.provider, configuredModel: config.model, ...(config.provider === "openrouter" ? { configuredEffort: config.openrouter.effort } : {}), jevAvailable: !!loadJevKey(loadEnv().env, loadEnv().file), models: config.provider === "codex" ? await account.models() : [] }))();
     modelCatalog = request;
     void request.catch(() => { if (modelCatalog === request) modelCatalog = undefined; });
   }

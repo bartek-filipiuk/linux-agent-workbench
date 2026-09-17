@@ -3,6 +3,7 @@ import { Store } from "./storage/store.js";
 import { Daemon } from "./ipc.js";
 import { PodmanRuntime, hostLocale } from "./runtime/podman.js";
 import { TerminalSessionManager } from "./session/terminal-session-manager.js";
+import { OpenRouterAdapter } from "./provider/openrouter.js";
 import { OpenAIResponsesAdapter } from "./provider/openai.js";
 import { CodexAppServerAdapter } from "./provider/codex.js";
 import { BrowserSessionManager, podmanLauncher } from "./session/browser-session-manager.js";
@@ -40,7 +41,9 @@ parentPort.once("message", (e) => {
     makeManager: (imageId, runtimeRoot) => new TerminalSessionManager({ runtime: new PodmanRuntime(), runtimeRoot, imageId }),
     makeAdapter: (model, apiKey, config) => config.provider === "codex"
       ? new CodexAppServerAdapter({ model, ...config.codex, ...(config.effort ? { effort: config.effort } : {}) })
-      : new OpenAIResponsesAdapter({ model, apiKey }),
+      : config.provider === "openrouter"
+        ? new OpenRouterAdapter({ model, apiKey, ...config.openrouter, ...(config.effort ? { effort: config.effort } : {}) })
+        : new OpenAIResponsesAdapter({ model, apiKey }),
     makeBrowser: ({ runtimeRoot, sessionId, networkMode, browserImageId }) =>
       new BrowserSessionManager({
         socketDir: path.join(runtimeRoot, sessionId, "browser"),

@@ -41,8 +41,9 @@ const ProfileModel = z.object({ model: z.string().min(1), prices: Prices.optiona
 
 export const ConfigInit = z.object({
   type: z.literal("config.init"),
-  provider: z.enum(["openai", "codex"]).optional(),
+  provider: z.enum(["openai", "codex", "openrouter"]).optional(),
   codex: z.object({ binary: z.string().min(1).optional(), home: z.string().min(1).optional() }).optional(),
+  openrouter: z.object({ effort: z.enum(["low", "medium", "high"]).default("low"), provider: z.string().min(1).max(200).optional() }).optional(),
   apiKey: z.string().default(""),
   jev: JevConfig.optional(),
   model: z.string().min(1),
@@ -57,7 +58,7 @@ export const ConfigInit = z.object({
   profileModels: z
     .object({ quick: ProfileModel.optional(), research: ProfileModel.optional(), project: ProfileModel.optional() })
     .optional(),
-}).refine((c) => c.provider === "codex" || c.apiKey.length > 0, { message: "OpenAI provider requires an API key", path: ["apiKey"] });
+}).refine((c) => c.provider === "codex" || c.apiKey.length > 0, { message: "API provider requires an API key", path: ["apiKey"] });
 export type ConfigInit = z.infer<typeof ConfigInit>;
 
 export const SessionStart = z.object({ type: z.literal("session.start"), workspacePath: z.string().min(1), networkMode: NetworkMode });
@@ -126,17 +127,17 @@ export type AgentdToMain =
   | AgentdReady | AgentdError | SessionStateMsg | TerminalData | RunStateMsg | RunCommentary | RunTool | RunHandoff | LeaseStateMsg
   | ApprovalRequestMsg | ApprovalResolved | GateEventMsg | RunRestored | BrowserStateMsg | BrowserFrameMsg;
 
-export type ProviderConfig = Pick<ConfigInit, "provider" | "codex"> & { effort?: string };
+export type ProviderConfig = Pick<ConfigInit, "provider" | "codex" | "openrouter"> & { effort?: string };
 export type AgentdRuntime = ProviderConfig & { store: Store; model: string; apiKey: string; prices: PriceTable };
 
 export function handleConfigInit(msg: unknown, openStore: (dbPath: string) => Store): { reply: AgentdReady | AgentdError; runtime?: AgentdRuntime } {
   const parsed = ConfigInit.safeParse(msg);
   if (!parsed.success) return { reply: { type: "agentd.error", message: "invalid config.init" } };
-  const { apiKey, model, dbPath, prices, provider, codex } = parsed.data;
+  const { apiKey, model, dbPath, prices, provider, codex, openrouter } = parsed.data;
   try {
     const store = openStore(dbPath);
     const interruptedRuns = store.markInterruptedRuns("agentd_restart");
-    const runtime: AgentdRuntime = { store, model, apiKey: provider === "codex" ? "" : apiKey, provider, codex, prices: provider !== "codex" && prices ? { [model]: prices } : {} };
+    const runtime: AgentdRuntime = { store, model, apiKey: provider === "codex" ? "" : apiKey, provider, codex, openrouter, prices: provider !== "codex" && prices ? { [model]: prices } : {} };
     return { reply: { type: "agentd.ready", schemaVersion: store.schemaVersion, dbPath, model: provider === "codex" ? `Codex subscription · ${model === "codex-default" ? "default model" : model}` : model, interruptedRuns }, runtime };
   } catch (e) {
     return { reply: { type: "agentd.error", message: e instanceof Error ? e.message : String(e) } };

@@ -3,10 +3,11 @@ import type { ToolCall, ToolResult } from "../provider/types.js";
 
 /** Durable pointers and pending results, separate from the renderer's bounded activity log. */
 export type Continuation = {
-  provider: "codex" | "openai";
+  provider: "codex" | "openai" | "openrouter";
   threadId?: string;
   providerUsage?: import("../provider/types.js").ModelUsage;
   responseId?: string;
+  modelContext?: unknown;
   pending: ToolCall[];
   results: ToolResult[];
   usage?: { turns: number; toolCalls: number; costUsd: number; elapsedMs: number };

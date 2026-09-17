@@ -7,7 +7,7 @@ const PATTERNS: RegExp[] = [
   /sk-[A-Za-z0-9_-]{8,}/g, // OpenAI-style keys
   /(Bearer\s+)[A-Za-z0-9._~+/-]{8,}=*/gi,
   /((?:api[_-]?key|token|secret|password|authorization)\s*[=:]\s*)["']?(?!Bearer\b|\[redacted\])[^\s"',;[]{6,}/gi,
-  /((?:openai|jev)KeyEncrypted"?\s*:\s*")[^"]+/g,
+  /((?:openai|jev|openrouter)KeyEncrypted"?\s*:\s*")[^"]+/g,
 ];
 
 export function redact(text: string): string {

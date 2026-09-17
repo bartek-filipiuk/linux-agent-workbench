@@ -96,7 +96,7 @@ export const TaskComposer = memo(function TaskComposer({ workspace, ready, expan
     </div>
     <p className="composer-help">A step is one model response or Jev decision. Each browser action also counts toward the tool limit. Limits pause between actions; waiting for you does not use active time.</p>
     {touched && validation.error && <p className="error" role="alert">{validation.error}</p>}
-    <details className="composer-model"><summary>Model & reasoning <span>{picker.selection.model ?? "Configured"} · {picker.selection.effort ?? "configured effort"}</span></summary><ModelPicker picker={picker} disabled={starting} />{!picker.isCodex && <p className="composer-help">API model: {picker.catalog?.configuredModel}. Spending limit: $10; the task pauses before further actions when reached.</p>}</details>
+    <details className="composer-model"><summary>Model & reasoning <span>{(picker.isCodex ? picker.selection.model : picker.catalog?.configuredModel) ?? "Configured"} · {(picker.isCodex ? picker.selection.effort : picker.catalog?.configuredEffort) ?? "configured effort"}</span></summary><ModelPicker picker={picker} disabled={starting} />{!picker.isCodex && <p className="composer-help">API model: {picker.catalog?.configuredModel}. Spending limit: $10; the task pauses before further actions when reached.</p>}</details>
     {(picker.invalid || picker.error) && <p className="error" role="alert">{picker.invalid || picker.error} Open Model & reasoning to refresh or change the selection.</p>}
     </div>
     <div className="composer-submit"><button className="btn primary" disabled={starting || !ready || !goal.trim() || !picker.canStart || !engineReady || !limits} onClick={() => void start()}>{starting ? "Starting…" : "Start task"}</button>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 export type AccountState = { state: "signed_out" | "ready" | "waiting" | "error"; email?: string; plan?: string; message?: string };
-export type SetupState = { provider: "codex" | "openai"; account: AccountState; podman: boolean; image: boolean; providerReady: boolean; workspace: string | null };
+export type SetupState = { provider: "codex" | "openai" | "openrouter"; account: AccountState; podman: boolean; image: boolean; providerReady: boolean; workspace: string | null };
 
 export function SetupPanel({ onReady, workspaceReady }: { onReady: (ready: boolean) => void; workspaceReady: boolean }) {
   const [setup, setSetup] = useState<SetupState | null>(null);
@@ -29,10 +29,10 @@ export function SetupPanel({ onReady, workspaceReady }: { onReady: (ready: boole
     finally { setSigningIn(false); }
   };
   return <details className="setup-panel" open={!ready}>
-    <summary>{ready ? `${setup.provider === "codex" ? "Codex" : "OpenAI API"} ready${setup.account.email ? ` · ${setup.account.email}` : ""}` : "Set up your workspace"}</summary>
+    <summary>{ready ? `${setup.provider === "codex" ? "Codex" : setup.provider === "openrouter" ? "OpenRouter API" : "OpenAI API"} ready${setup.account.email ? ` · ${setup.account.email}` : ""}` : "Set up your workspace"}</summary>
     <div className="setup-content">
       {setup && <>
-        <div className="setup-row"><span>Account</span><span>{setup.provider === "openai" ? (setup.providerReady ? "API key configured" : "Add OPENAI_API_KEY to .env") : setup.account.state === "ready" ? `${setup.account.email ?? "Signed in"} · ${setup.account.plan ?? "ChatGPT"}` : setup.account.message ?? "Sign in with the ChatGPT account you use for Codex."}</span>
+        <div className="setup-row"><span>Account</span><span>{setup.provider !== "codex" ? (setup.providerReady ? "API key configured" : `Add ${setup.provider === "openrouter" ? "OPENROUTER_API_KEY" : "OPENAI_API_KEY"} to .env`) : setup.account.state === "ready" ? `${setup.account.email ?? "Signed in"} · ${setup.account.plan ?? "ChatGPT"}` : setup.account.message ?? "Sign in with the ChatGPT account you use for Codex."}</span>
           {setup.provider === "codex" && setup.account.state !== "ready" && (setup.account.state === "waiting" ? <button className="btn" onClick={() => void window.workbench.cancelLogin().catch(e => setError(String(e)))}>Cancel sign-in</button> : <button className="btn primary" disabled={signingIn} onClick={() => void signIn()}>{signingIn ? "Opening sign-in…" : "Sign in to Codex"}</button>)}
         </div>
         <div className="setup-row"><span>Environment</span><span>{setup.podman && setup.image ? "Podman and terminal image ready" : !setup.podman ? "Podman is unavailable. Install/start Podman, then recheck." : <>Build the terminal image from the project folder: <code>pnpm images:build</code></>}</span></div>

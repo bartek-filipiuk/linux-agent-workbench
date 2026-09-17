@@ -13,3 +13,9 @@ describe("provider selection", () => {
     expect(() => providerConfig({ LAW_PROVIDER: "typo" })).toThrow("LAW_PROVIDER");
   });
 });
+
+it("isolates OpenRouter model and reasoning from subscription settings", () => {
+  expect(providerConfig({ LAW_PROVIDER: "openrouter", LAW_CODEX_MODEL: "ignore", OPENAI_MODEL: "ignore" })).toEqual({ provider: "openrouter", model: "google/gemini-3.8-flash", openrouter: { effort: "low" } });
+  expect(providerConfig({ LAW_PROVIDER: "openrouter", OPENROUTER_EFFORT: "high", OPENROUTER_PROVIDER: "google-ai-studio" })).toMatchObject({ openrouter: { effort: "high", provider: "google-ai-studio" } });
+  expect(() => providerConfig({ LAW_PROVIDER: "openrouter", OPENROUTER_EFFORT: "minimal" })).toThrow("OPENROUTER_EFFORT");
+});

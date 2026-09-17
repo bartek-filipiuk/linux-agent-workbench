@@ -20,6 +20,7 @@ export { TerminalSessionManager } from "./session/terminal-session-manager.js";
 export type { SessionState, SessionStatus, ManagerDeps } from "./session/terminal-session-manager.js";
 export { Daemon, MainToAgentd, ConfigInit, SessionStart, SessionStop, TerminalWrite, TerminalResizeMsg, RunStart, RunStop, RunResume, LeaseTake, ApprovalDecide, RunRestore, AgentdReady, AgentdError } from "./ipc.js";
 export type { AgentdToMain, SessionStateMsg, TerminalData, RunStateMsg, RunCommentary, RunTool, RunHandoff, LeaseStateMsg, ApprovalRequestMsg, ApprovalResolved, GateEventMsg, RunRestored, DaemonDeps } from "./ipc.js";
+export { OpenRouterAdapter } from "./provider/openrouter.js";
 export { OpenAIResponsesAdapter } from "./provider/openai.js";
 export { CodexAppServerAdapter } from "./provider/codex.js";
 export type { CodexAdapterOptions } from "./provider/codex.js";

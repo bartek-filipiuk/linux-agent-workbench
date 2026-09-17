@@ -8,9 +8,10 @@ app.whenReady().then(() => {
   try {
     const settingsFile = process.argv[2];
     if (!settingsFile || !path.isAbsolute(settingsFile)) throw new Error('Invalid settings path');
+    const field = process.argv[3] === 'openrouter' ? 'openrouterKeyEncrypted' : 'jevKeyEncrypted';
     const settings = JSON.parse(fs.readFileSync(settingsFile, 'utf8'));
-    if (!safeStorage.isEncryptionAvailable() || !settings.jevKeyEncrypted) throw new Error('Key unavailable');
-    const key = safeStorage.decryptString(Buffer.from(settings.jevKeyEncrypted, 'base64'));
+    if (!safeStorage.isEncryptionAvailable() || !settings[field]) throw new Error('Key unavailable');
+    const key = safeStorage.decryptString(Buffer.from(settings[field], 'base64'));
     if (!key || key.length > 512) throw new Error('Invalid key');
     fs.writeSync(3, key);
     app.exit(0);

@@ -15,7 +15,7 @@ import { pendingResults, type Continuation } from "./continuation.js";
 
 export type RunControllerDeps = {
   hybrid?: { evaluator: JevEvaluator; observation: () => BrowserObservation | undefined; minConfidence: number; strategy?: "first" };
-  provider?: "codex" | "openai";
+  provider?: "codex" | "openai" | "openrouter";
   continuation?: Continuation;
   store: Store;
   adapter: ModelAdapter;
@@ -100,6 +100,7 @@ export class RunController extends EventEmitter {
     this.checkpoint = { provider: deps.provider ?? "openai", pending: [], results: [], ...deps.continuation };
     if (deps.continuation?.jev) this.jevStats = { ...deps.continuation.jev };
     if (deps.continuation?.usage) this.budget.restore(deps.continuation.usage);
+    if (deps.continuation?.modelContext) deps.adapter.restoreContext?.(deps.continuation.modelContext);
     if (deps.continuation?.threadId) deps.adapter.restore?.({ threadId: deps.continuation.threadId, ...(deps.continuation.providerUsage ? { usage: deps.continuation.providerUsage } : {}) });
     this.runId = deps.store.createRun({
       workspaceId: input.workspaceId,
@@ -182,15 +183,20 @@ export class RunController extends EventEmitter {
         system: this.system,
         signal,
         onCheckpoint: checkpoint => { this.checkpoint.threadId = checkpoint.threadId; if (checkpoint.usage) this.checkpoint.providerUsage = checkpoint.usage; this.saveCheckpoint(); },
+      }).catch(error => {
+        store.appendEvent(this.runId, "model.timing", { provider: this.deps.provider ?? "openai", model: adapter.model, elapsedMs: performance.now() - started, failed: true });
+        throw error;
       });
-      store.appendEvent(this.runId, "model.timing", { provider: this.deps.provider ?? "openai", model: adapter.model, elapsedMs: performance.now() - started });
+      store.appendEvent(this.runId, "model.timing", { provider: this.deps.provider ?? "openai", model: adapter.model, elapsedMs: performance.now() - started, ...turn.timing });
       previousResponseId = turn.responseId;
       this.checkpoint.responseId = turn.responseId;
+      if (adapter.exportContext) this.checkpoint.modelContext = adapter.exportContext();
       this.checkpoint.pending = turn.toolCalls;
       this.checkpoint.results = [];
       turnsInChain++;
       this.budget.addTurn();
-      const usd = costOf(adapter.model, turn.usage, this.prices);
+      const usd = turn.usage.costUsd ?? costOf(adapter.model, turn.usage, this.prices);
+      if (usd !== undefined && !this.unknownCostLogged) this.costKnown = true;
       if (usd === undefined) {
         this.costKnown = false;
         if (!this.unknownCostLogged) store.appendEvent(this.runId, "cost.unknown_model", { model: adapter.model });
@@ -307,8 +313,15 @@ export class RunController extends EventEmitter {
     const fallbackNames = ["browser_observe", "browser_act", "browser_wait"];
     return [...this.tools.specs.filter(s => !fallbackNames.includes(s.name)), BROWSER_FIRST_TASK, {
       name: "browser_fallback",
-      description: "Use only to inspect or recover from a browser_task exception; give a reason. browser_act and browser_wait are enabled only after needs_help. Re-observe before repairing uncertain actions. Each browser_act returns separate fresh observation and page evidence: compare it with the goal and answer directly when sufficient, without another observation call. Never replay a denied or uncertain action blindly. Child actions retain all policy checks. Tool argument reference: " + this.tools.specs.filter(s => fallbackNames.includes(s.name)).map(s => `${s.name}: ${s.description}`).join("\n"),
-      parameters: z.toJSONSchema(BrowserFallback, { target: "draft-7" }) as Record<string, unknown>,
+      description: "Use only to inspect or recover from a browser_task exception; give a reason. Example: {\"tool\":\"browser_act\",\"args\":{\"action\":{\"kind\":\"click\",\"ref\":\"e1\",\"revision\":3}},\"reason\":\"Recover after needs_help\"}. browser_act and browser_wait are enabled only after needs_help. Re-observe before repairing uncertain actions. Each browser_act returns separate fresh observation and page evidence: compare it with the goal and answer directly when sufficient, without another observation call. Never replay a denied or uncertain action blindly. Child actions retain all policy checks. Tool argument reference: " + this.tools.specs.filter(s => fallbackNames.includes(s.name)).map(s => `${s.name}: ${s.description}`).join("\n"),
+      parameters: {
+        type: "object", additionalProperties: false, required: ["tool", "args", "reason"],
+        properties: {
+          tool: { type: "string", enum: ["browser_observe", "browser_act", "browser_wait"] },
+          args: { type: "object", anyOf: this.tools.specs.filter(t => ["browser_observe", "browser_act", "browser_wait"].includes(t.name)).map(t => t.parameters) },
+          reason: { type: "string", minLength: 1, maxLength: 1000 },
+        },
+      },
     }];
   }
 

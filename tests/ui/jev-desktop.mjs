@@ -37,13 +37,16 @@ try {
     await page.getByRole("button", { name: "Start task", exact: true }).click();
     await waitUntil(() => page.evaluate(async id => { const r = (await window.workbench.getRun()).run; return !!r.runId && r.runId !== id; }, previousId), 30000);
   }
+  const catalog = await page.evaluate(() => window.workbench.getModels());
+  const testModel = catalog.provider === "codex" ? "gpt-5.6-luna" : undefined;
+  report.provider = catalog.provider; report.model = testModel ?? catalog.configuredModel;
   const started = Date.now();
-  await newTask("jev-first", "Open https://example.com, open its More information link, then report the resulting page title and URL. Use only the browser.", "gpt-5.6-luna");
+  await newTask("jev-first", "Open https://example.com, open its More information link, then report the resulting page title and URL. Use only the browser.", testModel);
   await waitUntil(() => page.evaluate(async () => ["completed", "failed", "stopped", "handoff"].includes((await window.workbench.getRun()).run.state)), 120000);
   const run = (await page.evaluate(() => window.workbench.getRun())).run;
   const browser = await page.evaluate(() => window.workbench.getBrowser());
   const passed = run.state === "completed" && run.browserEngine === "jev-first" && run.jev?.decisions > 0 && new URL(browser.url).hostname === "www.iana.org" && new URL(browser.url).pathname === "/help/example-domains" && browser.title === "Example Domains";
-  report.checks.push({ check: "first_luna_navigation", passed, elapsedMs: Date.now() - started, state: run.state, engine: run.browserEngine, jev: run.jev, browser: { url: browser.url, title: browser.title }, final: run.finalText });
+  report.checks.push({ check: "first_navigation", passed, elapsedMs: Date.now() - started, state: run.state, engine: run.browserEngine, jev: run.jev, browser: { url: browser.url, title: browser.title }, final: run.finalText });
   if (!passed) throw new Error("Jev First live navigation failed independent URL check");
   for (const [width, height, name] of [[1400, 900, "desktop"], [1024, 768, "compact"]]) {
     await app.evaluate(({ BrowserWindow }, size) => BrowserWindow.getAllWindows()[0].setSize(...size), [width, height]);
@@ -63,6 +66,14 @@ try {
   const classicPassed = classic.state === "completed" && classic.browserEngine === "classic" && !classic.jev && new URL(classicBrowser.url).hostname === "example.com" && classicBrowser.title === "Example Domain";
   report.checks.push({ check: "classic_after_stop", passed: classicPassed, state: classic.state, browser: { url: classicBrowser.url, title: classicBrowser.title } });
   if (!classicPassed) throw new Error("Classic after Stop failed independent page check");
+  // Follow-up creates a new adapter from the durable checkpoint, including opaque API tool state.
+  await page.evaluate(({ id }) => window.workbench.sendFollowup(id, "Now open the More information link on this page and report the title. Use only the browser."), { id: classic.runId });
+  await waitUntil(() => page.evaluate(async id => { const r = (await window.workbench.getRun()).run; return r.runId !== id && ["completed", "failed", "stopped", "handoff"].includes(r.state); }, classic.runId), 120000);
+  const followup = (await page.evaluate(() => window.workbench.getRun())).run;
+  const followupBrowser = await page.evaluate(() => window.workbench.getBrowser());
+  const followupPassed = followup.state === "completed" && new URL(followupBrowser.url).hostname === "www.iana.org" && new URL(followupBrowser.url).pathname === "/help/example-domains";
+  report.checks.push({ check: "followup_context", passed: followupPassed, state: followup.state, browser: { url: followupBrowser.url, title: followupBrowser.title } });
+  if (!followupPassed) throw new Error("Follow-up failed independent page check");
   if (errors.length) throw new Error(errors.join("\n"));
   // Leave the new task form ready with the measured candidate, without starting another run.
   await page.getByRole("button", { name: "New task", exact: true }).click();

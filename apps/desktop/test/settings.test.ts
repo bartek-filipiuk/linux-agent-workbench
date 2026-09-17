@@ -20,3 +20,13 @@ describe("settings", () => {
     expect(readSettings(file)).toEqual({ ...DEFAULT_SETTINGS, lastWorkspace: "/y" });
   });
 });
+
+it("retains separate encrypted OpenRouter and Jev keys across settings updates", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "law-set-or-"));
+  try {
+    const file = path.join(dir, "settings.json");
+    writeSettings(file, { ...DEFAULT_SETTINGS, openrouterKeyEncrypted: "encrypted-router", jevKeyEncrypted: "encrypted-jev" });
+    writeSettings(file, { ...readSettings(file), networkMode: "none" });
+    expect(readSettings(file)).toMatchObject({ openrouterKeyEncrypted: "encrypted-router", jevKeyEncrypted: "encrypted-jev", networkMode: "none" });
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
