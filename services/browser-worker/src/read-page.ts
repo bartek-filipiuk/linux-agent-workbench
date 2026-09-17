@@ -73,14 +73,14 @@ export function sourceUrl(value: string): string {
   } catch { return ""; }
 }
 
-export async function readPage(page: Page, pageId: string, input: BrowserReadInput): Promise<BrowserReadResult> {
+export async function readPage(page: Page, pageId: string, input: BrowserReadInput, maxChars = 200_000): Promise<BrowserReadResult> {
   const url = page.url();
   if (!sourceUrl(url)) throw new ProtocolError("INVALID_INPUT", "Open an HTTP or HTTPS page before reading");
   const warnings = ["Loaded rendered content only; scroll or expand the page and read again for lazy-loaded content. Form fields and hidden content are excluded."];
   const capturedAt = new Date().toISOString();
   const title = (await page.title()).slice(0, 1000);
   const sections: string[] = [];
-  let remaining = 200_000, truncated = false;
+  let remaining = Math.min(200_000, Math.max(1000, maxChars)), truncated = false;
   const frames = page.frames();
   if (frames.length > 16) { truncated = true; warnings.push("Frame limit reached (16)."); }
   for (const frame of frames.slice(0, 16)) {

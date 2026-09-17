@@ -1,3 +1,6 @@
+import { BROWSER_TASK, HYBRID_INSTRUCTIONS, runBrowserTask } from "./jev-browser.js";
+import type { JevEvaluator, JevReply } from "../provider/jev.js";
+import type { BrowserObservation } from "@law/protocol";
 import { EventEmitter } from "node:events";
 import { DEFAULT_BUDGETS, ProtocolError, type Budgets, type BudgetAction, type RunBudgetStatus, type NetworkMode, type RunState } from "@law/protocol";
 import type { Store } from "../storage/store.js";
@@ -10,6 +13,7 @@ import { SYSTEM_PROMPT } from "./system-prompt.js";
 import { pendingResults, type Continuation } from "./continuation.js";
 
 export type RunControllerDeps = {
+  hybrid?: { evaluator: JevEvaluator; observation: () => BrowserObservation | undefined; minConfidence: number };
   provider?: "codex" | "openai";
   continuation?: Continuation;
   store: Store;
@@ -22,7 +26,7 @@ export type RunControllerDeps = {
   systemPrompt?: string;
   now?: () => number;
   /** When given, a pending approval card parks the run in awaiting_approval instead of letting the model poll. */
-  approvals?: { hasPending(runId: string): boolean; once(event: "resolved", cb: () => void): unknown; off(event: "resolved", cb: () => void): unknown };
+  approvals?: { denyPending?(runId: string): void; hasPending(runId: string): boolean; once(event: "resolved", cb: () => void): unknown; on?(event: "request" | "resolved", cb: () => void): unknown; off(event: "request" | "resolved", cb: () => void): unknown };
   /**
    * Context compaction: every N turns the model writes a short state summary and the conversation chain is
    * restarted from the goal plus that summary. Long runs then cost a few thousand tokens per turn instead
@@ -59,10 +63,12 @@ export class RunController extends EventEmitter {
   private resolveSettled!: () => void;
   readonly settled = new Promise<void>(resolve => { this.resolveSettled = resolve; });
   private checkpoint: Continuation;
+  private jevStats = { decisions: 0, elapsedMs: 0, costUsd: 0, fallbacks: 0 };
 
   private saveCheckpoint(): void {
     this.checkpoint.usage = { turns: this.budget.turns, toolCalls: this.budget.toolCalls, costUsd: this.budget.costUsd, elapsedMs: this.budget.elapsedMs() };
     this.checkpoint.limits = this.budget.limits;
+    if (this.deps.hybrid) this.checkpoint.jev = { ...this.jevStats };
     this.deps.store.saveContinuation(this.runId, { ...this.checkpoint, results: this.checkpoint.results.map(({ callId, output }) => ({ callId, output })) });
   }
 
@@ -74,6 +80,7 @@ export class RunController extends EventEmitter {
     const promise = new Promise<void>(r => { resolve = r; });
     this.controlRevision++;
     this.humanPause = { reason, promise, resolve };
+    this.deps.approvals?.denyPending?.(this.runId);
     return promise;
   }
 
@@ -86,10 +93,11 @@ export class RunController extends EventEmitter {
     this.policy = deps.policy ?? allowAllPolicy;
     this.prices = deps.prices ?? {};
     this.costKnown = deps.adapter.model in this.prices;
-    this.system = deps.systemPrompt ?? SYSTEM_PROMPT;
+    this.system = (deps.systemPrompt ?? SYSTEM_PROMPT) + (deps.hybrid ? HYBRID_INSTRUCTIONS : "");
     this.tools = deps.tools ?? terminalExecutor(deps.worker);
     this.budget = new BudgetTracker({ ...(deps.budgets ?? DEFAULT_BUDGETS) }, deps.now);
     this.checkpoint = { provider: deps.provider ?? "openai", pending: [], results: [], ...deps.continuation };
+    if (deps.continuation?.jev) this.jevStats = { ...deps.continuation.jev };
     if (deps.continuation?.usage) this.budget.restore(deps.continuation.usage);
     if (deps.continuation?.threadId) deps.adapter.restore?.({ threadId: deps.continuation.threadId, ...(deps.continuation.providerUsage ? { usage: deps.continuation.providerUsage } : {}) });
     this.runId = deps.store.createRun({
@@ -105,8 +113,8 @@ export class RunController extends EventEmitter {
     return this._state;
   }
 
-  get stats(): { turns: number; toolCalls: number; costUsd: number | null } {
-    return { turns: this.budget.turns, toolCalls: this.budget.toolCalls, costUsd: this.costKnown ? this.budget.costUsd : null };
+  get stats(): { turns: number; toolCalls: number; costUsd: number | null; jev?: import("@law/protocol").JevStats } {
+    return { turns: this.budget.turns, toolCalls: this.budget.toolCalls, costUsd: this.costKnown ? this.budget.costUsd : null, ...(this.deps.hybrid ? { jev: { ...this.jevStats } } : {}) };
   }
 
   get budgetStatus(): RunBudgetStatus {
@@ -130,6 +138,7 @@ export class RunController extends EventEmitter {
     this.stopReason = reason;
     this.budget.pauseClock();
     this.abort.abort();
+    this.deps.approvals?.denyPending?.(this.runId);
     this.deps.worker.cancel();
     this.handoffResume?.();
     this.budgetResume?.();
@@ -143,6 +152,20 @@ export class RunController extends EventEmitter {
     this.setState("running");
     const { store, adapter, worker } = this.deps;
     const signal = this.abort.signal;
+    const approvals = this.deps.approvals;
+    let approvalClockPaused = false;
+    const approvalRequested = () => {
+      if (!approvalClockPaused && approvals?.hasPending(this.runId) && !signal.aborted) {
+        approvalClockPaused = true; this.budget.pauseClock(); this.setState("awaiting_approval");
+      }
+    };
+    const approvalResolved = () => {
+      if (approvalClockPaused && !approvals?.hasPending(this.runId)) {
+        approvalClockPaused = false; this.budget.resumeClock();
+        if (!signal.aborted && this.state === "awaiting_approval") this.setState("running");
+      }
+    };
+    approvals?.on?.("request", approvalRequested); approvals?.on?.("resolved", approvalResolved);
     let previousResponseId: string | undefined = adapter.managesContext ? undefined : this.checkpoint.responseId;
     let next: ModelTurnInput = previousResponseId
       ? { toolResults: pendingResults(this.checkpoint), message: this.input.prompt ?? this.input.goal }
@@ -151,13 +174,15 @@ export class RunController extends EventEmitter {
     let turnsInChain = 0;
 
     const callModel = async (input: ModelTurnInput) => {
+      const started = performance.now();
       const turn = await adapter.turn(input, {
         ...(previousResponseId ? { previousResponseId } : {}),
-        tools: this.tools.specs,
+        tools: [...this.tools.specs, ...(this.deps.hybrid ? [BROWSER_TASK] : [])],
         system: this.system,
         signal,
         onCheckpoint: checkpoint => { this.checkpoint.threadId = checkpoint.threadId; if (checkpoint.usage) this.checkpoint.providerUsage = checkpoint.usage; this.saveCheckpoint(); },
       });
+      store.appendEvent(this.runId, "model.timing", { provider: this.deps.provider ?? "openai", model: adapter.model, elapsedMs: performance.now() - started });
       previousResponseId = turn.responseId;
       this.checkpoint.responseId = turn.responseId;
       this.checkpoint.pending = turn.toolCalls;
@@ -236,6 +261,8 @@ export class RunController extends EventEmitter {
       if (signal.aborted) return this.finish("stopped", this.stopReason);
       return this.finish("failed", e instanceof Error ? e.message : String(e));
     } finally {
+      approvals?.off("request", approvalRequested); approvals?.off("resolved", approvalResolved);
+      if (approvalClockPaused) this.budget.resumeClock();
       this.humanPause?.resolve(); this.humanPause = undefined;
       this.budgetResume = undefined;
       try {
@@ -276,6 +303,7 @@ export class RunController extends EventEmitter {
 
   private async runTool(call: ToolCall, worker: TerminalWorker, signal: AbortSignal): Promise<ToolResult> {
     const { store } = this.deps;
+    const revision = this.controlRevision;
     const decision = await this.policy.authorize(call, { runId: this.runId, networkMode: this.input.networkMode });
     const rowId = store.beginToolCall(this.runId, call);
     const preview = previewOf(call);
@@ -296,8 +324,11 @@ export class RunController extends EventEmitter {
 
     try {
       await this.waitForApprovals(signal);
-      if (this.humanPause) throw new ProtocolError("INVALID_INPUT", "Human took control; re-observe after resuming");
-      const result = await this.tools.execute(call, signal);
+      this.throwIfStopped();
+      if (this.humanPause || revision !== this.controlRevision) throw new ProtocolError("INVALID_INPUT", "Human took control; re-observe after resuming");
+      const result = call.name === "browser_task" && this.deps.hybrid
+        ? { output: JSON.stringify(await this.runHybrid(call, worker, signal)) }
+        : await this.tools.execute(call, signal);
       store.finishToolCall(rowId, "done", safeJson(result.output));
       store.appendEvent(this.runId, "tool.done", { name: call.name, bytes: result.output.length, image: result.imageJpegBase64 !== undefined });
       tool("done");
@@ -320,6 +351,41 @@ export class RunController extends EventEmitter {
       if (error.code === "WORKER_UNAVAILABLE") throw new Error(`sandbox worker unavailable: ${error.message}`);
       return { callId: call.callId, output: JSON.stringify({ error }) };
     }
+  }
+
+  private async runHybrid(parent: ToolCall, worker: TerminalWorker, signal: AbortSignal) {
+    const hybrid = this.deps.hybrid!;
+    const revision = this.controlRevision;
+    const current = () => !signal.aborted && !this.humanPause && revision === this.controlRevision;
+    return runBrowserTask(parent.args, hybrid.evaluator, {
+      signal, current, observation: hybrid.observation,
+      beforeDecision: async () => { await this.checkBudget("model"); return current(); },
+      execute: async call => {
+        await this.checkBudget("tool");
+        if (!current()) return { callId: call.callId, output: JSON.stringify({ skipped: "control_changed" }) };
+        this.deps.store.appendEvent(this.runId, "jev.child", { parentCallId: parent.callId, callId: call.callId });
+        const result = await this.runTool(call, worker, signal);
+        this.budget.addToolCall(); this.deps.store.addRunTotals(this.runId, { toolCalls: 1 }); this.saveCheckpoint();
+        return result;
+      },
+      record: reply => this.recordJev(reply),
+      event: (type, payload) => {
+        if (type === "browser.task" && payload.status === "needs_help") this.jevStats.fallbacks++;
+        this.deps.store.appendEvent(this.runId, type, { ...payload, parentCallId: parent.callId });
+      },
+    }, hybrid.minConfidence);
+  }
+
+  private recordJev(reply: JevReply): void {
+    this.jevStats.decisions++; this.jevStats.elapsedMs += reply.elapsedMs; this.jevStats.costUsd += reply.costUsd;
+    this.budget.addTurn(); this.budget.addCost(reply.costUsd);
+    this.deps.store.addRunTotals(this.runId, { turns: 1, costUsd: reply.costUsd });
+    this.deps.store.appendEvent(this.runId, "jev.decision", {
+      model: reply.model, elapsedMs: reply.elapsedMs, inputTokens: reply.usage.input_tokens,
+      outputTokens: reply.usage.output_tokens, costUsd: reply.costUsd,
+      operation: reply.answers.operation?.choice, confidence: reply.answers.operation?.confidence,
+    });
+    this.saveCheckpoint();
   }
 
   /** While a card is open for this run, hold the tool instead of letting the model poll the terminal. */
@@ -401,6 +467,8 @@ function previewOf(call: ToolCall): string {
       const act = (a.action ?? {}) as Record<string, unknown>;
       return clip([act.kind, act.ref, act.url, act.text, act.key, act.pageId].filter((v) => v !== undefined).join(" "));
     }
+    case "browser_task":
+      return clip(a.goal);
     case "browser_read":
       return a.snapshotId ? `continue capture at ${String(a.offset ?? 0)}` : `read ${String(a.scope ?? "main")} content`;
     case "browser_save":

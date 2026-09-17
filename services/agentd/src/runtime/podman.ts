@@ -1,3 +1,4 @@
+import { instanceName, containerLabel, profileVolume } from "../paths.js";
 import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
 import fs from "node:fs";
@@ -18,7 +19,7 @@ export const defaultExec: Exec = (args) =>
 const SESSION_ID = /^[a-f0-9]{16}$/;
 
 export function sessionIdFor(workspacePath: string): string {
-  return createHash("sha256").update(workspacePath).digest("hex").slice(0, 16);
+  return createHash("sha256").update(instanceName() ? `${instanceName()}\0${workspacePath}` : workspacePath).digest("hex").slice(0, 16);
 }
 
 export function validateWorkspacePath(p: string): string {
@@ -97,7 +98,7 @@ export function buildBrowserRunArgs(spec: BrowserRunSpec): string[] {
   return [
     "run", "-d", "--rm",
     "--name", name,
-    "--label", "law.app=1",
+    "--label", containerLabel(),
     "--label", `law.session=${spec.sessionId}`,
     "--userns=keep-id",
     "--cap-drop=ALL",
@@ -110,7 +111,7 @@ export function buildBrowserRunArgs(spec: BrowserRunSpec): string[] {
     "--tmpfs", "/tmp:rw,nosuid,nodev,size=1g",
     "--tmpfs", "/run:rw,nosuid,nodev,size=64m",
     "--tmpfs", "/home/agent:rw,nosuid,nodev,size=256m",
-    "--volume", `${spec.profileVolume ?? "law-browser-profile-default"}:/profile`,
+    "--volume", `${spec.profileVolume ?? profileVolume()}:/profile`,
     "--volume", `${spec.downloadsDir}:/downloads:rw`,
     "--volume", `${spec.runtimeDir}:/run/law:rw`,
     // No network namespace of its own: everything leaves through the egress proxy socket in /run/law (B6 H1).
@@ -134,7 +135,7 @@ export function buildRunArgs(spec: RunSpec): string[] {
   return [
     "run", "-d", "--rm",
     "--name", name,
-    "--label", "law.app=1",
+    "--label", containerLabel(),
     "--label", `law.session=${spec.sessionId}`,
     "--userns=keep-id",
     "--cap-drop=ALL",
@@ -236,7 +237,7 @@ export class PodmanRuntime {
 
   /** Running containers started by this app, with the session id from their label. */
   async listApp(): Promise<{ name: string; sessionId: string }[]> {
-    const { stdout } = await this.exec(["ps", "--filter", "label=law.app=1", "--format", '{{.Names}} {{index .Labels "law.session"}}']);
+    const { stdout } = await this.exec(["ps", "--filter", `label=${containerLabel()}`, "--format", '{{.Names}} {{index .Labels "law.session"}}']);
     return stdout
       .split("\n")
       .map((l) => l.trim().split(/\s+/))

@@ -5,6 +5,8 @@ import { isRendererUrl, isTrustedRenderer } from "./renderer-security";
 import os from "node:os";
 import path from "node:path";
 import { RunLimits, BudgetAction, ModelSelection, validateModelSelection, type ModelCatalog, type BrowserControl, type BrowserInfo } from "@law/protocol";
+import { appDirectoryName, instanceName } from "@law/agentd";
+import { jevConfig } from "./jev-config";
 import type { AgentdToMain, MainToAgentd, SessionStatus } from "@law/agentd";
 import { TerminalDelivery } from "./terminal-delivery";
 import { CodexAccount, type AccountState } from "./codex-account";
@@ -21,6 +23,8 @@ type AgentdStatus =
   | { type: "agentd.starting" }
   | { type: "agentd.ready"; schemaVersion: number; dbPath: string; model: string; interruptedRuns: number; keyStore: KeyStore; keyBackend: string }
   | { type: "agentd.error"; message: string };
+
+if (instanceName()) app.setPath("userData", path.join(app.getPath("appData"), appDirectoryName()));
 
 let status: AgentdStatus = { type: "agentd.starting" };
 let session: SessionStatus = { state: "idle" };
@@ -76,7 +80,7 @@ async function writeDiagnostics(): Promise<string> {
   diagnosticsAbort = new AbortController();
   const dir = path.join(path.dirname(dbPath()), "diagnostics");
 
-  const { openaiKeyEncrypted: _k, ...settingsNoKey } = settings;
+  const { openaiKeyEncrypted: _k, jevKeyEncrypted: _j, ...settingsNoKey } = settings;
   const sections: [string, string][] = [
     ["versions", `app ${app.getVersion()}\nelectron ${process.versions.electron}\nnode ${process.versions.node}`],
     ["images", `terminal ${readImageId("terminal") ?? "missing"}\nbrowser ${readImageId("browser") ?? "missing"}`],
@@ -124,11 +128,24 @@ function loadApiKey(env: Record<string, string>, envFile: string | undefined): s
   return r.apiKey;
 }
 
+function loadJevKey(env: Record<string, string>, envFile: string | undefined): string {
+  const available = safeStorage.isEncryptionAvailable();
+  const backend = process.platform === "linux" && available ? safeStorage.getSelectedStorageBackend() : available ? process.platform : "unknown";
+  const result = resolveApiKey({ encryptedKey: settings.jevKeyEncrypted, envKey: env.TYPESAFE_API_KEY,
+    keys: { backend, available, encrypt: p => safeStorage.encryptString(p), decrypt: b => safeStorage.decryptString(b) } });
+  if (result.encryptedKey && envFile) {
+    settings = { ...settings, jevKeyEncrypted: result.encryptedKey };
+    writeSettings(settingsFile(), settings);
+    fs.writeFileSync(envFile, fs.readFileSync(envFile, "utf8").split(/\r?\n/).map(line => /^\s*(export\s+)?TYPESAFE_API_KEY\s*=/.test(line) ? "# TYPESAFE_API_KEY moved to the OS keyring" : line).join("\n"), { mode: 0o600 });
+  }
+  return result.apiKey;
+}
+
 function xdg(name: "XDG_DATA_HOME" | "XDG_RUNTIME_DIR", fallback: string): string {
   return process.env[name] || fallback;
 }
-const dbPath = () => path.join(xdg("XDG_DATA_HOME", path.join(os.homedir(), ".local", "share")), "linux-agent-workbench", "state.sqlite");
-const runtimeRoot = () => path.join(xdg("XDG_RUNTIME_DIR", path.join(os.tmpdir(), `law-${os.userInfo().uid}`)), "linux-agent-workbench");
+const dbPath = () => path.join(xdg("XDG_DATA_HOME", path.join(os.homedir(), ".local", "share")), appDirectoryName(), "state.sqlite");
+const runtimeRoot = () => path.join(xdg("XDG_RUNTIME_DIR", path.join(os.tmpdir(), `law-${os.userInfo().uid}`)), appDirectoryName());
 
 function readImageId(name: "terminal" | "browser" = "terminal"): string | undefined {
   try {
@@ -266,6 +283,9 @@ function startAgentd() {
   let provider: ReturnType<typeof providerConfig>;
   try { provider = providerConfig(env); }
   catch (e) { return onAgentd({ type: "agentd.error", message: e instanceof Error ? e.message : String(e) }); }
+  let jev: ReturnType<typeof jevConfig>;
+  try { jev = jevConfig(env, loadJevKey(env, envFile)); }
+  catch (e) { return onAgentd({ type: "agentd.error", message: e instanceof Error ? e.message : "Invalid Jev configuration" }); }
   const apiKey = provider.provider === "openai" ? loadApiKey(env, envFile) : "";
   const imageId = readImageId();
   if (provider.provider === "openai" && !apiKey) return onAgentd({ type: "agentd.error", message: "OPENAI_API_KEY missing: put it in .env once; it is moved to the OS keyring on the next start" });
@@ -295,7 +315,7 @@ function startAgentd() {
   const profileModels = provider.provider === "openai" && env.LAW_RESEARCH_MODEL
     ? { research: { model: env.LAW_RESEARCH_MODEL, ...(Number.isFinite(rin) && Number.isFinite(rout) && env.LAW_RESEARCH_PRICE_INPUT_PER_MTOK ? { prices: { inputUsdPerMTok: rin, outputUsdPerMTok: rout } } : {}) } }
     : undefined;
-  toAgentd({ type: "config.init", apiKey, ...provider, dbPath: dbPath(), imageId, runtimeRoot: runtimeRoot(), ...(provider.provider === "openai" && prices ? { prices } : {}), ...(browserImageId ? { browserImageId } : {}), ...(notify ? { notify } : {}), ...(profileModels ? { profileModels } : {}) });
+  toAgentd({ type: "config.init", ...(jev ? { jev } : {}), apiKey, ...provider, dbPath: dbPath(), imageId, runtimeRoot: runtimeRoot(), ...(provider.provider === "openai" && prices ? { prices } : {}), ...(browserImageId ? { browserImageId } : {}), ...(notify ? { notify } : {}), ...(profileModels ? { profileModels } : {}) });
   child.on("exit", (code) => onAgentdExit(code));
 }
 
@@ -314,6 +334,10 @@ function createWindow() {
       backgroundThrottling: false,
     },
   });
+  if (instanceName()) {
+    win.setTitle(`Linux Agent Workbench · ${instanceName()}`);
+    win.on("page-title-updated", event => event.preventDefault());
+  }
   win.on("minimize", syncFrameVisibility);
   win.on("restore", syncFrameVisibility);
   win.on("hide", syncFrameVisibility);
@@ -372,7 +396,7 @@ function getModels(refresh = false): Promise<ModelCatalog> {
   if (!modelCatalog || refresh || Date.now() - modelCatalogAt > 60_000) {
     const config = providerConfig(loadEnv().env);
     modelCatalogAt = Date.now();
-    const request = (async (): Promise<ModelCatalog> => ({ provider: config.provider, configuredModel: config.model, models: config.provider === "codex" ? await account.models() : [] }))();
+    const request = (async (): Promise<ModelCatalog> => ({ provider: config.provider, configuredModel: config.model, jevAvailable: !!loadJevKey(loadEnv().env, loadEnv().file), models: config.provider === "codex" ? await account.models() : [] }))();
     modelCatalog = request;
     void request.catch(() => { if (modelCatalog === request) modelCatalog = undefined; });
   }
@@ -382,7 +406,10 @@ handleTrusted("models:list", (_e, refresh: unknown) => getModels(refresh === tru
 handleTrusted("run:start", async (_e, goal: unknown, opts: unknown) => {
   if (activeRun) throw new Error("A run is already active");
   if (typeof goal !== "string" || !goal.trim()) return;
-  const o = (opts ?? {}) as { profile?: unknown; maxTurns?: unknown; modelSelection?: unknown; limits?: unknown };
+  const o = (opts ?? {}) as { profile?: unknown; maxTurns?: unknown; modelSelection?: unknown; limits?: unknown; browserEngine?: unknown };
+  const browserEngine = o.browserEngine ?? "classic";
+  if (browserEngine !== "classic" && browserEngine !== "jev-hybrid") throw new Error("Choose Classic or Jev Hybrid");
+  if (browserEngine === "jev-hybrid" && !loadJevKey(loadEnv().env, loadEnv().file)) throw new Error("Configure TYPESAFE_API_KEY on the host or choose Classic");
   const modelSelection = ModelSelection.parse(o.modelSelection ?? {});
   const limits = o.limits === undefined ? undefined : RunLimits.parse(o.limits);
   if (modelSelection.model) {
@@ -394,7 +421,7 @@ handleTrusted("run:start", async (_e, goal: unknown, opts: unknown) => {
   const profile = o.profile === "research" || o.profile === "project" || o.profile === "quick" ? o.profile : undefined;
   const maxTurns = Number.isInteger(o.maxTurns) && (o.maxTurns as number) >= 5 && (o.maxTurns as number) <= 400 ? (o.maxTurns as number) : undefined;
   currentGoal = goal.trim().slice(0, 4000);
-  toAgentd({ type: "run.start", goal: goal.trim().slice(0, 4000), ...(profile ? { profile } : {}), ...(maxTurns ? { maxTurns } : {}), modelSelection, ...(limits ? { limits } : {}) });
+  toAgentd({ type: "run.start", browserEngine, goal: goal.trim().slice(0, 4000), ...(profile ? { profile } : {}), ...(maxTurns ? { maxTurns } : {}), modelSelection, ...(limits ? { limits } : {}) });
 });
 handleTrusted("run:get", () => ({ run: currentRun, goal: currentGoal, handoff: handoffReason, sequence: runSequence }));
 handleTrusted("run:history", () => queryDaemon("history"));

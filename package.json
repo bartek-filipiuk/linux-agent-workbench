@@ -18,7 +18,10 @@
     "images:build": "bash scripts/build-image.sh",
     "test:container": "LAW_CONTAINER_TESTS=1 vitest run tests/container",
     "images:prune": "bash scripts/prune-images.sh",
-    "images:build:browser": "bash scripts/build-image.sh browser"
+    "images:build:browser": "bash scripts/build-image.sh browser",
+    "dev:jev": "LAW_INSTANCE=jev pnpm dev",
+    "images:build:jev": "LAW_INSTANCE=jev bash scripts/build-image.sh browser",
+    "bench:jev": "pnpm build && node scripts/bench-jev.mjs"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

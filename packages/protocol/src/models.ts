@@ -16,7 +16,7 @@ export const CodexModel = z.object({
   inputModalities: z.array(z.string()).optional(),
 });
 export type CodexModel = z.infer<typeof CodexModel>;
-export type ModelCatalog = { provider: "codex" | "openai"; configuredModel: string; models: CodexModel[] };
+export type ModelCatalog = { provider: "codex" | "openai"; configuredModel: string; jevAvailable?: boolean; models: CodexModel[] };
 
 export function validateModelSelection(selection: ModelSelection, models: CodexModel[]): void {
   ModelSelection.parse(selection);

@@ -3,9 +3,9 @@ import type { ApprovalView } from "./ApprovalCard";
 import { label, STATE_LABEL } from "./labels";
 
 export type RunEvent = (
-  | { type: "run.state"; runId: string; state: string; goal?: string; endReason?: string; finalText?: string; turns: number; toolCalls: number; costUsd: number | null; snapshot: boolean; budget?: RunBudgetStatus; model?: string; effort?: string; profile?: string }
+  | { type: "run.state"; runId: string; state: string; goal?: string; endReason?: string; finalText?: string; turns: number; toolCalls: number; costUsd: number | null; jev?: import("@law/protocol").JevStats; snapshot: boolean; browserEngine?: "classic" | "jev-hybrid"; budget?: RunBudgetStatus; model?: string; effort?: string; profile?: string }
   | { type: "run.commentary"; runId: string; text: string }
-  | { type: "run.tool"; runId: string; name: string; status: "executing" | "done" | "denied" | "error"; callId: string; preview?: string; turns: number; toolCalls: number; costUsd: number | null }
+  | { type: "run.tool"; runId: string; name: string; status: "executing" | "done" | "denied" | "error"; callId: string; preview?: string; turns: number; toolCalls: number; costUsd: number | null; jev?: import("@law/protocol").JevStats }
   | { type: "run.handoff"; runId: string; reason: string }
   | { type: "approval.request"; id: string; runId: string; command: string; category: string; ruleId: string; summary: string; expiresAt: number }
   | { type: "approval.resolved"; id: string; decision: "once" | "session" | "deny" }
@@ -27,11 +27,13 @@ export type RunView = {
   turns: number;
   toolCalls: number;
   costUsd: number | null;
+  jev?: import("@law/protocol").JevStats;
   snapshot: boolean;
   budget?: RunBudgetStatus;
   model?: string;
   effort?: string;
   profile?: string;
+  browserEngine?: "classic" | "jev-hybrid";
   restored?: string;
   approvals: ApprovalView[];
   log: LogRow[];
@@ -63,10 +65,12 @@ function applyEvent(prev: RunView, e: RunEvent): RunView {
         turns: e.turns,
         toolCalls: e.toolCalls,
         costUsd: e.costUsd,
+        ...(e.jev ? { jev: e.jev } : {}),
         snapshot: e.snapshot,
         ...(e.budget ? { budget: e.budget } : {}),
         ...(e.model ? { model: e.model } : {}),
         ...(e.effort ? { effort: e.effort } : {}),
+        ...(e.browserEngine ? { browserEngine: e.browserEngine } : {}),
         ...(e.profile ? { profile: e.profile } : {}),
         ...(e.endReason ? { endReason: e.endReason } : {}),
         ...(e.finalText !== undefined ? { finalText: e.finalText } : {}),
@@ -82,9 +86,9 @@ function applyEvent(prev: RunView, e: RunEvent): RunView {
       if (i >= 0) {
         const log = [...view.log];
         log[i] = { ...log[i]!, status: e.status, ...(e.preview ? { preview: e.preview } : {}) };
-        return { ...view, log, turns: e.turns, toolCalls: e.toolCalls, costUsd: e.costUsd };
+        return { ...view, log, turns: e.turns, toolCalls: e.toolCalls, costUsd: e.costUsd, ...(e.jev ? { jev: e.jev } : {}) };
       }
-      return { ...view, log: appendLog(view.log, { kind: "tool", text: key, status: e.status, ...(e.preview ? { preview: e.preview } : {}) }), turns: e.turns, toolCalls: e.toolCalls, costUsd: e.costUsd };
+      return { ...view, log: appendLog(view.log, { kind: "tool", text: key, status: e.status, ...(e.preview ? { preview: e.preview } : {}) }), turns: e.turns, toolCalls: e.toolCalls, costUsd: e.costUsd, ...(e.jev ? { jev: e.jev } : {}) };
     }
     case "run.handoff":
       return { ...view, log: appendLog(view.log, { kind: "commentary", text: `Agent asks for help: ${e.reason}` }) };

@@ -82,6 +82,7 @@ const OBSERVE_SCRIPT = `
     if (t === "img") return el.getAttribute("alt") || "";
     return el.innerText || el.getAttribute("title") || el.getAttribute("value") || "";
   };
+  const signature = el => JSON.stringify([el.tagName, roleOf(el), nameOf(el), el.getAttribute("href"), el.getAttribute("type"), el.getAttribute("autocomplete"), el.disabled, el.getAttribute("aria-disabled"), el.checked, el.value, el.getAttribute("aria-expanded"), el.getAttribute("aria-checked"), el.tagName === "SELECT" ? Array.from(el.options).map(o => [o.value, o.label, o.disabled]) : null]);
   const vw = window.innerWidth, vh = window.innerHeight;
   const out = [];
   for (const el of document.querySelectorAll(SEL)) {
@@ -95,13 +96,20 @@ const OBSERVE_SCRIPT = `
     if (t === "a") item.href = clip(el.getAttribute("href") || "", 400);
     if (editable && t !== "select" && el.type !== "password" && el.autocomplete !== "one-time-code") item.value = clip(el.value || "");
     if (t === "select") item.value = clip(el.options[el.selectedIndex]?.text || "");
+    item.sensitive = el.type === "password" || el.type === "file" || /one-time-code|cc-number|cc-csc/.test(el.autocomplete || "") || /verification code|one.?time|2fa|authenticator|passcode/i.test(item.name);
+    const fillable = (t === "textarea" || el.isContentEditable || (t === "input" && /^(text|search|email|url|tel|number|date|time|datetime-local|month|week)$/.test(el.type))) && !el.readOnly;
+    item.operations = item.sensitive || !item.enabled ? [] : t === "select" ? ["select"] : fillable ? ["click", "type"] : item.role === "heading" ? [] : ["click"];
+    if (item.sensitive) delete item.value;
+    if (el.type === "checkbox" || el.type === "radio" || el.hasAttribute("aria-checked")) item.checked = el.checked === true || el.getAttribute("aria-checked") === "true";
+    if (el.hasAttribute("aria-expanded")) item.expanded = el.getAttribute("aria-expanded") === "true";
+    if (t === "select") item.options = Array.from(el.options).slice(0, 100).map(o => ({ label: clip(o.label), value: o.value.slice(0, 200), disabled: o.disabled || o.parentElement?.disabled === true }));
     out.push(item);
   }
   out.sort((a, b) => (a.inViewport === b.inViewport ? 0 : a.inViewport ? -1 : 1));
   const kept = out.slice(0, max);
   const els = new Map();
-  const elements = kept.map((it, i) => { const ref = "e" + (start + i + 1); els.set(ref, it.el); const { el, ...rest } = it; return { ref, ...rest }; });
-  window[key] = { els };
+  const elements = kept.map((it, i) => { const ref = "e" + (start + i + 1); els.set(ref, { el: it.el, signature: signature(it.el) }); const { el, ...rest } = it; return { ref, ...rest }; });
+  window[key] = { els, signature };
   const doc = document.documentElement;
   return { elements, scroll: { x: Math.round(window.scrollX), y: Math.round(window.scrollY), maxY: Math.max(0, doc.scrollHeight - vh) } };
 })
@@ -356,7 +364,7 @@ export class BrowserSession {
     });
     for (const p of this.context.pages()) await this.registerPage(p);
     if (!this.active) await this.registerPage(await this.context.newPage());
-    this.context.on("page", (p) => void this.registerPage(p));
+    this.context.on("page", (p) => void this.registerPage(p).catch(() => { if (!this.closing) { this.unresponsive = true; this.diagnostic("Could not register the new tab. Restart browser to recover."); } }));
   }
 
   private async registerPage(page: Page): Promise<void> {
@@ -401,7 +409,7 @@ export class BrowserSession {
       if (this.active?.page === page) {
         this.active = this.pages.find(e => e.page === entry.opener) ?? this.pages.at(-1);
         if (this.active) this.changedPage();
-        else if (!this.closing) void this.context?.newPage();
+        else if (!this.closing) void this.context?.newPage().catch(() => { if (!this.closing) { this.unresponsive = true; this.diagnostic("Browser connection closed. Restart browser to recover."); } });
       }
       this.publishState();
     });
@@ -555,6 +563,7 @@ export class BrowserSession {
     this.revision++;
     const max = input.maxElements ?? 200;
     const { elements, scroll } = await this.walkFrames(page, max);
+    const pageText = input.pageText && /^https?:/.test(page.url()) ? (await readPage(page, this.active!.id, { scope: "page" }, 12000)).content : undefined;
     this.requirePage(); // A crash during observation must not become an empty successful result.
     // Opt-in, as the tool contract says: a screenshot costs 100-300 ms here and an image in the model's context.
     const screenshot = input.screenshot === true ? (await page.screenshot({ type: "jpeg", quality: 50 })).toString("base64") : undefined;
@@ -569,6 +578,7 @@ export class BrowserSession {
       viewport: page.viewportSize() ?? this.viewport,
       scroll,
       elements,
+      ...(pageText !== undefined ? { pageText } : {}),
       pages,
       ...(screenshot ? { screenshotJpegBase64: screenshot } : {}),
       ...(dialog ? { lastDialog: dialog } : {}),
@@ -607,7 +617,7 @@ export class BrowserSession {
       throw new ProtocolError("STALE_OBSERVATION", `revision ${revision} is stale (current ${this.revision}); observe again before acting`);
     }
     const frame = this.refFrames.get(ref);
-    const h = frame && !frame.isDetached() ? await frame.evaluateHandle(`(window[${JSON.stringify(this.registryKey)}]?.els.get(${JSON.stringify(ref)}) ?? null)`) : undefined;
+    const h = frame && !frame.isDetached() ? await frame.evaluateHandle(`(() => { const registry = window[${JSON.stringify(this.registryKey)}]; const item = registry?.els.get(${JSON.stringify(ref)}); if (!item || !item.el.isConnected || item.signature !== registry.signature(item.el)) return null; return item.el; })()`) : undefined;
     const el = h?.asElement();
     if (!el) throw new ProtocolError("STALE_OBSERVATION", `unknown element ref ${ref}; observe again`);
     return el;

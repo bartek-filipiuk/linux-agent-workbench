@@ -90,6 +90,11 @@ export const BrowserElement = z.object({
   href: z.string().max(400).optional(),
   enabled: z.boolean(),
   editable: z.boolean(),
+  sensitive: z.boolean().optional(),
+  operations: z.array(z.enum(["click", "type", "select"])).optional(),
+  checked: z.boolean().optional(),
+  expanded: z.boolean().optional(),
+  options: z.array(z.object({ label: z.string().max(120), value: z.string().max(200), disabled: z.boolean() })).max(100).optional(),
   inViewport: z.boolean(),
   bounds: z.object({ x: z.number(), y: z.number(), width: z.number(), height: z.number() }),
 });
@@ -105,13 +110,14 @@ export const BrowserObservation = z.object({
   viewport: z.object({ width: z.number().int().positive(), height: z.number().int().positive() }),
   scroll: z.object({ x: z.number(), y: z.number(), maxY: z.number() }),
   elements: z.array(BrowserElement).max(200),
+  pageText: z.string().max(12000).optional(),
   pages: z.array(BrowserPageInfo),
   screenshotJpegBase64: z.string().optional(),
   lastDialog: z.object({ type: z.string(), message: z.string() }).optional(),
 });
 export type BrowserObservation = z.infer<typeof BrowserObservation>;
 
-export const BrowserObserveInput = z.object({ screenshot: z.boolean().optional(), maxElements: z.number().int().min(1).max(200).optional() });
+export const BrowserObserveInput = z.object({ screenshot: z.boolean().optional(), pageText: z.boolean().optional(), maxElements: z.number().int().min(1).max(200).optional() });
 export type BrowserObserveInput = z.infer<typeof BrowserObserveInput>;
 
 const ref = z.string().regex(/^e\d+$/);

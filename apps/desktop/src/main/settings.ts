@@ -8,6 +8,7 @@ export type Settings = {
   /** "ask" = a card before the sandbox or the browser first talks to a new host. */
   domainMode: "open" | "ask";
   openaiKeyEncrypted?: string;
+  jevKeyEncrypted?: string;
 };
 
 export const DEFAULT_SETTINGS: Settings = { networkMode: "open", nestedAutonomy: true, domainMode: "open" };
@@ -20,7 +21,8 @@ export function readSettings(file: string): Settings {
     const domainMode = raw.domainMode === "ask" ? "ask" : "open";
     const lastWorkspace = typeof raw.lastWorkspace === "string" && raw.lastWorkspace ? raw.lastWorkspace : undefined;
     const openaiKeyEncrypted = typeof raw.openaiKeyEncrypted === "string" && raw.openaiKeyEncrypted ? raw.openaiKeyEncrypted : undefined;
-    return { networkMode, nestedAutonomy, domainMode, ...(lastWorkspace ? { lastWorkspace } : {}), ...(openaiKeyEncrypted ? { openaiKeyEncrypted } : {}) };
+    const jevKeyEncrypted = typeof raw.jevKeyEncrypted === "string" && raw.jevKeyEncrypted ? raw.jevKeyEncrypted : undefined;
+    return { networkMode, nestedAutonomy, domainMode, ...(jevKeyEncrypted ? { jevKeyEncrypted } : {}), ...(lastWorkspace ? { lastWorkspace } : {}), ...(openaiKeyEncrypted ? { openaiKeyEncrypted } : {}) };
   } catch {
     return { ...DEFAULT_SETTINGS };
   }

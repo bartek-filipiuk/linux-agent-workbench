@@ -37,6 +37,8 @@ export const RunLimits = z.object({
 export type RunLimits = z.infer<typeof RunLimits>;
 export const BudgetAction = z.enum(["add_steps", "unlimited_steps", "add_time", "unlimited_time", "add_cost"]);
 export type BudgetAction = z.infer<typeof BudgetAction>;
+export type JevStats = { decisions: number; elapsedMs: number; costUsd: number; fallbacks: number };
+
 export type RunBudgetStatus = { limits: Budgets; elapsedMs: number; reason: keyof Budgets | null };
 
 export const DEFAULT_BUDGETS: Budgets = {

@@ -6,6 +6,10 @@ A Linux desktop workspace where an AI agent operates a containerized terminal an
 
 This is an early source-build project. It is not affiliated with or endorsed by OpenAI. Read the [security model](SECURITY.md) before connecting accounts or opening a workspace containing sensitive data. Release packaging and license selection are tracked in the [publication checklist](CONTRIBUTING.md#before-publishing).
 
+## Jev Hybrid experiment
+
+This branch adds an optional Jev browser driver while retaining the existing UI and primary model. Run `pnpm dev:jev` for isolated settings, history, containers and browser profile, then choose **Jev Hybrid** under **Browser engine**. Setup, security boundaries and the repeatable Classic/Hybrid benchmark are in [the experiment guide](docs/jev-hybrid.md).
+
 ## What works today
 
 - A real terminal with PTY/tmux, interactive applications, and a persistent workspace.

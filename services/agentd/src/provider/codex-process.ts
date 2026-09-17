@@ -32,7 +32,7 @@ export function codexBinary(options: CodexOptions = {}): string {
 /** Separate login/config from the user's coding agent; never forward API credentials. */
 export function codexEnvironment(options: CodexOptions = {}): NodeJS.ProcessEnv {
   const env: NodeJS.ProcessEnv = { ...process.env, CODEX_HOME: codexHome(options) };
-  for (const key of ["OPENAI_API_KEY", "OPENAI_BASE_URL", "CODEX_API_KEY", "CODEX_ACCESS_TOKEN", "CODEX_THREAD_ID", "CODEX_INTERNAL_ORIGINATOR_OVERRIDE"]) delete env[key];
+  for (const key of ["TYPESAFE_API_KEY", "JEV_API_KEY", "OPENAI_API_KEY", "OPENAI_BASE_URL", "CODEX_API_KEY", "CODEX_ACCESS_TOKEN", "CODEX_THREAD_ID", "CODEX_INTERNAL_ORIGINATOR_OVERRIDE"]) delete env[key];
   return env;
 }
 

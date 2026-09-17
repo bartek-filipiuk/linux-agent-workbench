@@ -11,6 +11,7 @@ export type Continuation = {
   results: ToolResult[];
   usage?: { turns: number; toolCalls: number; costUsd: number; elapsedMs: number };
   limits?: Budgets;
+  jev?: import("@law/protocol").JevStats;
 };
 
 export function pendingResults(checkpoint: Continuation): ToolResult[] {
