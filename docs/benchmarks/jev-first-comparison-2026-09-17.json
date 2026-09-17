@@ -1,0 +1,1837 @@
+{
+  "commit": "df45d2c2e995b9e1004afcb69cff05634474d6c5",
+  "sourceDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "dirty": false,
+  "model": "gpt-5.6-sol",
+  "effort": "low",
+  "jevModel": "jev-1.13.0",
+  "variants": [
+    {
+      "engine": "classic",
+      "model": "gpt-5.6-sol"
+    },
+    {
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol"
+    },
+    {
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna"
+    }
+  ],
+  "jevPolicy": {
+    "maxRetries": 1,
+    "timeoutMs": 5000,
+    "minConfidence": 0.55
+  },
+  "environment": "host Chromium, isolated fresh profile per attempt; no Podman or desktop startup in task time",
+  "clock": "taskMs includes primary model, Jev, actions and independent final verification; setupMs contains browser startup and initial navigation",
+  "results": [
+    {
+      "scenario": "search",
+      "repeat": 1,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 194.816468,
+      "taskMs": 18731.154734,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 6,
+      "primaryMs": 18638.545932,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "search",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 188.7163150000015,
+      "taskMs": 23491.885283,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 6,
+      "primaryMs": 22227.044111,
+      "jevCalls": 0,
+      "jevMs": 1145.0158440000014,
+      "jevCostUsd": 0,
+      "actions": 3,
+      "fallbacks": [
+        "jev_unavailable_or_invalid_response"
+      ],
+      "jevErrors": [
+        {
+          "reason": "http_error",
+          "elapsedMs": 1145.0158440000014,
+          "httpStatus": 503,
+          "parentCallId": "exec-13de019f-d617-4ade-80df-8b3e256e8522"
+        }
+      ],
+      "verification": {
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "search",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 184.70149899999524,
+      "taskMs": 20512.144065,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 6,
+      "primaryMs": 18274.85721400001,
+      "jevCalls": 0,
+      "jevMs": 2125.9177710000004,
+      "jevCostUsd": 0,
+      "actions": 3,
+      "fallbacks": [
+        "jev_unavailable_or_invalid_response"
+      ],
+      "jevErrors": [
+        {
+          "reason": "http_error",
+          "elapsedMs": 2125.9177710000004,
+          "httpStatus": 503,
+          "parentCallId": "exec-0ea465f6-7384-4db0-afc7-29a670c2e99f"
+        }
+      ],
+      "verification": {
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "search",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 194.7739850000071,
+      "taskMs": 22387.554252,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 6,
+      "primaryMs": 19952.959764000014,
+      "jevCalls": 0,
+      "jevMs": 2326.337962999998,
+      "jevCostUsd": 0,
+      "actions": 3,
+      "fallbacks": [
+        "jev_unavailable_or_invalid_response"
+      ],
+      "jevErrors": [
+        {
+          "reason": "http_error",
+          "elapsedMs": 2326.337962999998,
+          "httpStatus": 503,
+          "parentCallId": "exec-b3478eff-05b5-4595-97a1-6a56f1a31b78"
+        }
+      ],
+      "verification": {
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "search",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 196.17773399999714,
+      "taskMs": 9470.685404000003,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 7445.586544999998,
+      "jevCalls": 3,
+      "jevMs": 1929.2278730000107,
+      "jevCostUsd": 0.000166152,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "search",
+      "repeat": 2,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 188.86929200000304,
+      "taskMs": 16561.166757,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 6,
+      "primaryMs": 16484.487681000013,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "search",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 184.47170899999037,
+      "taskMs": 8840.18245600001,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 7206.6734720000095,
+      "jevCalls": 3,
+      "jevMs": 1533.2324729999964,
+      "jevCostUsd": 0.000161616,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "search",
+      "repeat": 3,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 179.2034999999887,
+      "taskMs": 16412.143477000005,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 6,
+      "primaryMs": 16327.54476600005,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "search",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 182.84885599999689,
+      "taskMs": 9113.383013999992,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 7375.317945999996,
+      "jevCalls": 3,
+      "jevMs": 1630.3738920000033,
+      "jevCostUsd": 0.00017203200000000002,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "filters",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 186.13245299999835,
+      "taskMs": 17649.147585,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 4,
+      "primaryMs": 16057.86471699999,
+      "jevCalls": 3,
+      "jevMs": 1472.7050939999754,
+      "jevCostUsd": 0.000201054,
+      "actions": 4,
+      "fallbacks": [
+        "uncertain_target"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Applied: Books, in stock: yes",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "filters",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 192.74629799998365,
+      "taskMs": 11829.792128000001,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 3,
+      "primaryMs": 9447.860925999994,
+      "jevCalls": 4,
+      "jevMs": 2259.3851720000384,
+      "jevCostUsd": 0.00026300400000000006,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Applied: Books, in stock: yes",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "filters",
+      "repeat": 1,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 192.81778299997677,
+      "taskMs": 22719.545268999995,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 8,
+      "primaryMs": 22608.203247999976,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Applied: Books, in stock: yes",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "filters",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 189.52502500000992,
+      "taskMs": 8341.729116000002,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 6449.8974449999805,
+      "jevCalls": 4,
+      "jevMs": 1774.6209949999757,
+      "jevCostUsd": 0.00026250000000000004,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Applied: Books, in stock: yes",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "filters",
+      "repeat": 2,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 193.70371500001056,
+      "taskMs": 20130.766632999992,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 8,
+      "primaryMs": 20031.36566400001,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Applied: Books, in stock: yes",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "filters",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 181.38913900000625,
+      "taskMs": 12550.096198999992,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 10650.706026,
+      "jevCalls": 4,
+      "jevMs": 1764.3156629999867,
+      "jevCostUsd": 0.000266532,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Applied: Books, in stock: yes",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "filters",
+      "repeat": 3,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 187.7177640000009,
+      "taskMs": 20149.718296000006,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 8,
+      "primaryMs": 20016.616634999984,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Applied: Books, in stock: yes",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "filters",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 176.99775799998315,
+      "taskMs": 18560.779359000036,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 4,
+      "primaryMs": 16867.675415000005,
+      "jevCalls": 4,
+      "jevMs": 1571.0373239999171,
+      "jevCostUsd": 0.00027913199999999997,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Applied: Books, in stock: yes",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "filters",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 188.7606950000045,
+      "taskMs": 12496.208488999982,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 3,
+      "primaryMs": 10804.432597000035,
+      "jevCalls": 4,
+      "jevMs": 1545.450354999979,
+      "jevCostUsd": 0.00026300400000000006,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Applied: Books, in stock: yes",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "autocomplete",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 182.92768500000238,
+      "taskMs": 12578.467003000027,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 4,
+      "primaryMs": 11493.915075999976,
+      "jevCalls": 2,
+      "jevMs": 992.2235179999843,
+      "jevCostUsd": 9.269400000000002e-05,
+      "actions": 3,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Selected destination: Paris, France",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "autocomplete",
+      "repeat": 1,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 190.09008200000972,
+      "taskMs": 14469.958165999968,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 6,
+      "primaryMs": 14391.205489000073,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Selected destination: Paris, France",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "autocomplete",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 186.63644299999578,
+      "taskMs": 23439.102683999983,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 6,
+      "primaryMs": 21657.264389000076,
+      "jevCalls": 3,
+      "jevMs": 1670.0576419999707,
+      "jevCostUsd": 0.000155694,
+      "actions": 3,
+      "fallbacks": [
+        "uncertain_operation",
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Selected destination: Paris, France",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "autocomplete",
+      "repeat": 2,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 188.05174099997384,
+      "taskMs": 16211.860553999955,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 6,
+      "primaryMs": 16092.037782000029,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Selected destination: Paris, France",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "autocomplete",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 183.99264499999117,
+      "taskMs": 24514.34743600001,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 7,
+      "primaryMs": 23699.497789999994,
+      "jevCalls": 1,
+      "jevMs": 710.4996479999973,
+      "jevCostUsd": 4.851000000000001e-05,
+      "actions": 3,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Selected destination: Paris, France",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "autocomplete",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 188.879431999987,
+      "taskMs": 13853.999132999976,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 4,
+      "primaryMs": 12404.485092999996,
+      "jevCalls": 2,
+      "jevMs": 1359.0156430000206,
+      "jevCostUsd": 9.3702e-05,
+      "actions": 3,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Selected destination: Paris, France",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "autocomplete",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 181.1557449999964,
+      "taskMs": 22985.612994999974,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 5,
+      "primaryMs": 21762.362059999956,
+      "jevCalls": 2,
+      "jevMs": 1124.1082350000506,
+      "jevCostUsd": 0.000101766,
+      "actions": 3,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Selected destination: Paris, France",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "autocomplete",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 190.62471499998355,
+      "taskMs": 13454.295019000012,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 4,
+      "primaryMs": 12383.920176999993,
+      "jevCalls": 2,
+      "jevMs": 968.7248369999579,
+      "jevCostUsd": 9.319800000000001e-05,
+      "actions": 3,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Selected destination: Paris, France",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "autocomplete",
+      "repeat": 3,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 186.16725100000622,
+      "taskMs": 17758.773525999975,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 6,
+      "primaryMs": 17688.047858000093,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Selected destination: Paris, France",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "form",
+      "repeat": 1,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 191.57458099996438,
+      "taskMs": 17886.694663000002,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 8,
+      "primaryMs": 17755.89470199996,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Preview: Ada \u2014 Research",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "form",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 187.19854999997187,
+      "taskMs": 24226.908836000017,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 5,
+      "primaryMs": 21646.685944999976,
+      "jevCalls": 5,
+      "jevMs": 2437.3425690000295,
+      "jevCostUsd": 0.000372708,
+      "actions": 4,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Preview: Ada \u2014 Research",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "form",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 191.39174299995648,
+      "taskMs": 21222.997827000043,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 8,
+      "primaryMs": 20038.767365000036,
+      "jevCalls": 2,
+      "jevMs": 1023.8978349999525,
+      "jevCostUsd": 0.00012755400000000002,
+      "actions": 5,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Preview: Ada \u2014 Research",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "form",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 201.5511670000269,
+      "taskMs": 21766.724638999964,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 3,
+      "primaryMs": 20015.758026000112,
+      "jevCalls": 4,
+      "jevMs": 1637.8050330000697,
+      "jevCostUsd": 0.00033373200000000005,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Preview: Ada \u2014 Research",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "form",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 181.87777600006666,
+      "taskMs": 25130.525515999994,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 8,
+      "primaryMs": 24201.026469000033,
+      "jevCalls": 1,
+      "jevMs": 810.8174739999231,
+      "jevCostUsd": 6.400800000000001e-05,
+      "actions": 4,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Preview: Ada \u2014 Research",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "form",
+      "repeat": 2,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 200.46499400003813,
+      "taskMs": 24707.056663000025,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 8,
+      "primaryMs": 24589.235490999767,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Preview: Ada \u2014 Research",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "form",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 186.65879799996037,
+      "taskMs": 37848.12234400003,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 3,
+      "primaryMs": 34720.69958399993,
+      "jevCalls": 6,
+      "jevMs": 2964.502955000149,
+      "jevCostUsd": 0.000440412,
+      "actions": 5,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Preview: Ada \u2014 Research",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "form",
+      "repeat": 3,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 194.29817700001877,
+      "taskMs": 25795.590933000087,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 9,
+      "primaryMs": 25671.186039999942,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Preview: Ada \u2014 Research",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "form",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 185.4386649999069,
+      "taskMs": 20309.638777000015,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 4,
+      "primaryMs": 17766.870065999916,
+      "jevCalls": 5,
+      "jevMs": 2418.7057800000766,
+      "jevCostUsd": 0.00039921000000000005,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Preview: Ada \u2014 Research",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "navigation",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 187.05715400003828,
+      "taskMs": 8443.74728599994,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 7085.845022000023,
+      "jevCalls": 3,
+      "jevMs": 1171.7702389999758,
+      "jevCostUsd": 0.00012054000000000001,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Installation guide: install the package and start the service.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "navigation",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 183.86503400001675,
+      "taskMs": 13404.800494999974,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 4,
+      "primaryMs": 12292.608506000019,
+      "jevCalls": 2,
+      "jevMs": 933.5638259999687,
+      "jevCostUsd": 8.677200000000002e-05,
+      "actions": 3,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Installation guide: install the package and start the service.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "navigation",
+      "repeat": 1,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 187.8141459999606,
+      "taskMs": 13894.1675199999,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 6,
+      "primaryMs": 13762.020795000019,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Installation guide: install the package and start the service.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "navigation",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 184.2654110000003,
+      "taskMs": 8630.119097999996,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 7185.445424000034,
+      "jevCalls": 3,
+      "jevMs": 1276.3821679998655,
+      "jevCostUsd": 0.00011991000000000001,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Installation guide: install the package and start the service.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "navigation",
+      "repeat": 2,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 190.9610489999177,
+      "taskMs": 13173.078862000024,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 8,
+      "primaryMs": 13027.296622000169,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Installation guide: install the package and start the service.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "navigation",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 189.13125700003002,
+      "taskMs": 10007.780954000074,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 8493.065157999983,
+      "jevCalls": 3,
+      "jevMs": 1345.0370450000046,
+      "jevCostUsd": 0.00012012000000000001,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Installation guide: install the package and start the service.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "navigation",
+      "repeat": 3,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 192.9502569999313,
+      "taskMs": 15104.927304000012,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 6,
+      "primaryMs": 14960.57061699999,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Installation guide: install the package and start the service.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "navigation",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 189.42882999998983,
+      "taskMs": 9277.359659000067,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 7533.116004000069,
+      "jevCalls": 3,
+      "jevMs": 1587.028089000145,
+      "jevCostUsd": 0.00012075000000000001,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Installation guide: install the package and start the service.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "navigation",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 193.07413500000257,
+      "taskMs": 14767.077410000027,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 4,
+      "primaryMs": 13518.843564999872,
+      "jevCalls": 2,
+      "jevMs": 1085.0140720001655,
+      "jevCostUsd": 8.6436e-05,
+      "actions": 3,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Installation guide: install the package and start the service.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "tabs",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 189.5125489999773,
+      "taskMs": 7782.134901999962,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 6674.586851000087,
+      "jevCalls": 2,
+      "jevMs": 1001.562156999833,
+      "jevCostUsd": 8.173200000000001e-05,
+      "actions": 2,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Reference article: the orbit period is 42 days.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "tabs",
+      "repeat": 1,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 190.6991520000156,
+      "taskMs": 9776.48947999999,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 4,
+      "primaryMs": 9710.791368999984,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 1,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Reference article: the orbit period is 42 days.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "tabs",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 184.62823300005402,
+      "taskMs": 9301.396412999951,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 7913.696049999911,
+      "jevCalls": 2,
+      "jevMs": 1285.6529149999842,
+      "jevCostUsd": 8.7444e-05,
+      "actions": 2,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Reference article: the orbit period is 42 days.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "tabs",
+      "repeat": 2,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 191.5106960000703,
+      "taskMs": 12319.42508299998,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 4,
+      "primaryMs": 12235.620054000057,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 1,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Reference article: the orbit period is 42 days.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "tabs",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 190.46920799999498,
+      "taskMs": 19700.09758599999,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 3,
+      "primaryMs": 17617.901924999896,
+      "jevCalls": 4,
+      "jevMs": 1906.6226250000764,
+      "jevCostUsd": 0.000186564,
+      "actions": 4,
+      "fallbacks": [
+        "uncertain_operation",
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Reference article: the orbit period is 42 days.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "tabs",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 185.59522899996955,
+      "taskMs": 9054.053202999989,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 8067.219414999941,
+      "jevCalls": 2,
+      "jevMs": 876.6289989999495,
+      "jevCostUsd": 8.2572e-05,
+      "actions": 2,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Reference article: the orbit period is 42 days.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "tabs",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 174.3059569998877,
+      "taskMs": 13009.126648000092,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 11892.10636799992,
+      "jevCalls": 2,
+      "jevMs": 1028.4587739999406,
+      "jevCostUsd": 8.677200000000002e-05,
+      "actions": 2,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Reference article: the orbit period is 42 days.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "tabs",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 184.58495399996173,
+      "taskMs": 8349.834256000002,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 7268.205891999998,
+      "jevCalls": 2,
+      "jevMs": 993.0618350000586,
+      "jevCostUsd": 8.475600000000001e-05,
+      "actions": 2,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Reference article: the orbit period is 42 days.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "tabs",
+      "repeat": 3,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 189.78437500004657,
+      "taskMs": 12066.010563999997,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 4,
+      "primaryMs": 11990.507065000013,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 1,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Reference article: the orbit period is 42 days.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "scroll",
+      "repeat": 1,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 193.8478190000169,
+      "taskMs": 29861.95003800001,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 6,
+      "primaryMs": 29776.23472999991,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Expanded details: warranty lasts two years.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "scroll",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 183.27713800000492,
+      "taskMs": 19727.54915899993,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 4,
+      "primaryMs": 18013.287525999825,
+      "jevCalls": 4,
+      "jevMs": 1567.1933780000545,
+      "jevCostUsd": 0.00013402200000000003,
+      "actions": 5,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Expanded details: warranty lasts two years.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "scroll",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 186.08538599999156,
+      "taskMs": 14911.156143,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 4,
+      "primaryMs": 12896.5648259999,
+      "jevCalls": 4,
+      "jevMs": 1861.3947479999624,
+      "jevCostUsd": 0.00013486200000000002,
+      "actions": 5,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Expanded details: warranty lasts two years.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "scroll",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 183.5074550000718,
+      "taskMs": 14119.221699999995,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 4,
+      "primaryMs": 12440.164088999969,
+      "jevCalls": 4,
+      "jevMs": 1543.8347060000524,
+      "jevCostUsd": 0.000134358,
+      "actions": 5,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Expanded details: warranty lasts two years.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "scroll",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 196.92205599998124,
+      "taskMs": 15364.171260999981,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 4,
+      "primaryMs": 13424.820018000086,
+      "jevCalls": 4,
+      "jevMs": 1800.7079219999723,
+      "jevCostUsd": 0.000133686,
+      "actions": 5,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Expanded details: warranty lasts two years.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "scroll",
+      "repeat": 2,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 190.20929500006605,
+      "taskMs": 16709.985148999956,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 6,
+      "primaryMs": 16622.747178999824,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Expanded details: warranty lasts two years.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "scroll",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 190.61744000006001,
+      "taskMs": 15725.56271800003,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 4,
+      "primaryMs": 13800.796039999928,
+      "jevCalls": 4,
+      "jevMs": 1779.8323940000264,
+      "jevCostUsd": 0.000133518,
+      "actions": 5,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Expanded details: warranty lasts two years.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "scroll",
+      "repeat": 3,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 190.811520999996,
+      "taskMs": 22314.31270400004,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 6,
+      "primaryMs": 22214.554385000025,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Expanded details: warranty lasts two years.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "scroll",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 199.42548700002953,
+      "taskMs": 16995.672565999907,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 4,
+      "primaryMs": 15172.66710600024,
+      "jevCalls": 4,
+      "jevMs": 1674.4283250001026,
+      "jevCostUsd": 0.00013503,
+      "actions": 5,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Expanded details: warranty lasts two years.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "disclosure",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 189.1482959999703,
+      "taskMs": 13141.489489000058,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 3,
+      "primaryMs": 11934.755068999948,
+      "jevCalls": 2,
+      "jevMs": 1119.8701170000713,
+      "jevCostUsd": 8.7612e-05,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Shipping time: three business days.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "disclosure",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 191.15057600010186,
+      "taskMs": 7246.180561000016,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 6056.103382999776,
+      "jevCalls": 2,
+      "jevMs": 1109.721339999931,
+      "jevCostUsd": 8.744400000000001e-05,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Shipping time: three business days.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "disclosure",
+      "repeat": 1,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 192.87342400010675,
+      "taskMs": 14751.065389999887,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 4,
+      "primaryMs": 14686.523424999788,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 1,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Shipping time: three business days.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "disclosure",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 188.06126500014216,
+      "taskMs": 10546.441607999848,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 9528.787052999949,
+      "jevCalls": 2,
+      "jevMs": 935.7553640000988,
+      "jevCostUsd": 8.677200000000002e-05,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Shipping time: three business days.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "disclosure",
+      "repeat": 2,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 196.43665800010785,
+      "taskMs": 10813.096261000028,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 4,
+      "primaryMs": 10748.817464999855,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 1,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Shipping time: three business days.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "disclosure",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 192.46609200001694,
+      "taskMs": 8479.783156000078,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 7297.822386000073,
+      "jevCalls": 2,
+      "jevMs": 1080.0049099999014,
+      "jevCostUsd": 8.8788e-05,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Shipping time: three business days.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "disclosure",
+      "repeat": 3,
+      "engine": "classic",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 179.17761799995787,
+      "taskMs": 12653.987423000159,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 4,
+      "primaryMs": 12584.770761999767,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 1,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Shipping time: three business days.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "disclosure",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 182.9333420000039,
+      "taskMs": 10952.03089500009,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 9899.724281999748,
+      "jevCalls": 2,
+      "jevMs": 972.4285729997791,
+      "jevCostUsd": 8.727600000000001e-05,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Shipping time: three business days.",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "disclosure",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 193.62181500019506,
+      "taskMs": 7248.1628729999065,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 6226.068328999914,
+      "jevCalls": 2,
+      "jevMs": 930.993880999973,
+      "jevCostUsd": 8.626800000000001e-05,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "expected": "Shipping time: three business days.",
+        "matched": true
+      }
+    }
+  ],
+  "traceFile": "jev-first-comparison-2026-09-17-traces.json.gz"
+}

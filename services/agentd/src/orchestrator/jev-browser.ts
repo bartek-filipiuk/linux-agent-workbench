@@ -79,6 +79,15 @@ export type BrowserDriverContext = {
   signal: AbortSignal;
 };
 
+/** Evidence is captured by ordinary controlled tools, independently of the decision model. */
+export async function captureBrowserEvidence(ctx: Pick<BrowserDriverContext, "execute" | "current">) {
+  if (!ctx.current()) return undefined;
+  const observed = await ctx.execute({ callId: `jev-${randomUUID()}`, name: "browser_observe", args: { screenshot: false } });
+  if (!ctx.current()) return undefined;
+  const read = await ctx.execute({ callId: `jev-${randomUUID()}`, name: "browser_read", args: { scope: "page", maxChars: 12000 } });
+  return ctx.current() ? { observation: observed.output, page: read.output } : undefined;
+}
+
 /** This loop has no direct browser access: every observation/action is a controlled child tool. */
 export async function runBrowserTask(args: unknown, evaluator: JevEvaluator, ctx: BrowserDriverContext, minConfidence: number, first = false) {
   const task = first ? BrowserFirstTask.parse(args) : BrowserTask.parse(args);
@@ -86,12 +95,7 @@ export async function runBrowserTask(args: unknown, evaluator: JevEvaluator, ctx
   const seen = new Map<string, number>();
   const started = performance.now();
   const finish = async (status: "needs_help" | "completion_candidate", reason: string) => {
-    let evidence: { observation: string; page: string } | undefined;
-    if (first && ctx.current()) {
-      const observed = await ctx.execute({ callId: `jev-${randomUUID()}`, name: "browser_observe", args: { screenshot: false } });
-      const read = ctx.current() ? await ctx.execute({ callId: `jev-${randomUUID()}`, name: "browser_read", args: { scope: "page", maxChars: 12000 } }) : undefined;
-      if (ctx.current() && read) evidence = { observation: observed.output, page: read.output };
-    }
+    let evidence = first ? await captureBrowserEvidence(ctx) : undefined;
     if (!ctx.current()) { status = "needs_help"; reason = "control_changed"; evidence = undefined; }
     const result = { status, reason, actions: recent.length, elapsedMs: performance.now() - started, verified: false, ...(evidence ? { evidence } : {}) };
     const { evidence: _evidence, ...summary } = result;
@@ -123,7 +127,9 @@ export async function runBrowserTask(args: unknown, evaluator: JevEvaluator, ctx
     } catch (e) {
       if (ctx.signal.aborted) throw e;
       ctx.event("jev.error", { reason: e instanceof JevError ? e.code : "request_failed", elapsedMs: performance.now() - decisionAt, ...(e instanceof JevError && e.status !== undefined ? { httpStatus: e.status } : {}) });
-      return finish("needs_help", "jev_unavailable_or_invalid_response");
+      return finish("needs_help", e instanceof JevError
+        ? `jev_${e.code}${e.status !== undefined ? `_${e.status}` : ""}; inspect attached evidence and use fallback instead of immediately repeating the same delegation`
+        : "jev_unavailable_or_invalid_response");
     }
     ctx.record(reply);
     if (!ctx.current()) return finish("needs_help", "control_changed");

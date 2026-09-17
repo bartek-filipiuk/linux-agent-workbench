@@ -81,7 +81,7 @@ node scripts/bench-jev.mjs --runs 3 --variants classic:gpt-5.6-sol,jev-first:gpt
 node scripts/bench-jev-report.mjs /tmp/jev-first.json
 ```
 
-Variant order rotates across tasks and repetitions. Every attempt records its model, full tool trace and independent verification, including failures. This isolates the execution change (Classic/Sol versus First/Sol) from the planner change (First/Sol versus First/Luna).
+Variant order rotates across tasks and repetitions. Every attempt records its model, tool sequence and independent verification, including failures. This isolates the execution change (Classic/Sol versus First/Sol) from the planner change (First/Sol versus First/Luna).
 
 ## Comparison
 
@@ -144,3 +144,7 @@ LAW_INSTANCE=jev node tests/ui/jev-desktop.mjs
 It uses the isolated browser profile and real model quota. The first test assertion expected an older IANA URL; Chromium correctly reached the current `/help/example-domains` page. After correcting the assertion, all live checks passed, including Stop in 22 ms and a completed Classic task without Jev statistics. [Desktop results](benchmarks/jev-first-desktop-2026-09-17.json). The stop measurement is one desktop sample; cancellation during a pending Jev decision, takeover, budget pause and delayed approval are also covered by controlled regression tests for First mode.
 
 The next comparison encountered provider failures: a separate minimal request returned **HTTP 503**, and a later probe recovered. [All service-error diagnostic attempts](benchmarks/jev-first-service-errors-2026-09-17.json) are retained; the old generic error event cannot identify the HTTP status of each individual fallback. The client now retries only 503/529 once after 200 ms, within the same total 5-second deadline. It does not retry 429, authentication errors, malformed responses or browser actions. Stop cancels backoff. Events record a fixed error category and optional HTTP status, never provider bodies, credentials or arbitrary exception text. Benchmark Jev time includes failed requests; failed requests may also be billed, beyond the reported estimate.
+
+The final correction path also captures separate fresh observation/read evidence immediately after each `browser_fallback` action. The primary model can evaluate the result in its next response, while incomplete or failed evidence still requires further inspection. Child authorization, journaling, Stop, takeover and budget checks apply to these reads too. Provider error categories are included in the task result so the planner can distinguish a service failure from an ambiguous browser decision without receiving raw exception text.
+
+Benchmark traces retain every tool call; individual tool outputs are clipped to 15,000 characters by the reporting harness. Full metrics retain failures and provider errors. The final candidate is measured in a separate later series against Classic/Luna, with both variants interleaved. Do not interpret comparisons across the earlier Sol series and the later Luna series as simultaneous measurements.

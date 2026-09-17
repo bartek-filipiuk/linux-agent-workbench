@@ -1,4 +1,4 @@
-import { BROWSER_TASK, BROWSER_FIRST_TASK, BrowserFallback, FIRST_INSTRUCTIONS, HYBRID_INSTRUCTIONS, runBrowserTask } from "./jev-browser.js";
+import { BROWSER_TASK, BROWSER_FIRST_TASK, BrowserFallback, FIRST_INSTRUCTIONS, HYBRID_INSTRUCTIONS, captureBrowserEvidence, runBrowserTask } from "./jev-browser.js";
 import { z } from "zod";
 import type { JevEvaluator, JevReply } from "../provider/jev.js";
 import type { BrowserObservation } from "@law/protocol";
@@ -307,7 +307,7 @@ export class RunController extends EventEmitter {
     const fallbackNames = ["browser_observe", "browser_act", "browser_wait"];
     return [...this.tools.specs.filter(s => !fallbackNames.includes(s.name)), BROWSER_FIRST_TASK, {
       name: "browser_fallback",
-      description: "Use only to inspect or recover from a browser_task exception; give a reason. browser_act and browser_wait are enabled only after needs_help. Re-observe before repairing uncertain actions. Child actions retain all policy checks. Tool argument reference: " + this.tools.specs.filter(s => fallbackNames.includes(s.name)).map(s => `${s.name}: ${s.description}`).join("\n"),
+      description: "Use only to inspect or recover from a browser_task exception; give a reason. browser_act and browser_wait are enabled only after needs_help. Re-observe before repairing uncertain actions. Each browser_act returns separate fresh observation and page evidence: compare it with the goal and answer directly when sufficient, without another observation call. Never replay a denied or uncertain action blindly. Child actions retain all policy checks. Tool argument reference: " + this.tools.specs.filter(s => fallbackNames.includes(s.name)).map(s => `${s.name}: ${s.description}`).join("\n"),
       parameters: z.toJSONSchema(BrowserFallback, { target: "draft-7" }) as Record<string, unknown>,
     }];
   }
@@ -370,7 +370,13 @@ export class RunController extends EventEmitter {
   private async runFallback(parent: ToolCall, worker: TerminalWorker, signal: AbortSignal): Promise<ToolResult> {
     const args = BrowserFallback.parse(parent.args);
     if (args.tool !== "browser_observe" && !this.checkpoint.browserFallback) throw new ProtocolError("INVALID_INPUT", "Delegate to browser_task first; direct actions require needs_help");
-    const result = await this.runBrowserChild(parent, { callId: `${parent.callId}-child`, name: args.tool, args: args.args }, worker, signal, this.controlRevision);
+    const revision = this.controlRevision;
+    const execute = (call: ToolCall) => this.runBrowserChild(parent, call, worker, signal, revision);
+    const result = await execute({ callId: `${parent.callId}-child`, name: args.tool, args: args.args });
+    if (args.tool === "browser_act") {
+      const evidence = await captureBrowserEvidence({ execute, current: () => !signal.aborted && !this.humanPause && revision === this.controlRevision });
+      return { callId: parent.callId, output: JSON.stringify({ action: safeJson(result.output), verified: false, ...(evidence ? { evidence } : {}), note: "Compare fresh evidence against every requirement; read more only when it is missing or incomplete. An action response alone is not proof. Never replay a denied or uncertain action blindly." }) };
+    }
     return { ...result, callId: parent.callId };
   }
 

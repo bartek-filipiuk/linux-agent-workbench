@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_BUDGETS, type BrowserObservation } from "@law/protocol";
-import { JevClient, JevConfig, type JevReply, type JevRequest } from "../src/provider/jev.js";
+import { JevClient, JevConfig, JevError, type JevReply, type JevRequest } from "../src/provider/jev.js";
 import { actionSpace, BrowserTask } from "../src/orchestrator/jev-browser.js";
 import { RunController } from "../src/orchestrator/run-controller.js";
 import { Store } from "../src/storage/store.js";
@@ -136,6 +136,19 @@ describe("hybrid controller", () => {
     expect(execute.mock.calls.some(([c]) => c.name === "browser_act")).toBe(false);
     expect(JSON.parse(store.getRun(rc.runId)!.continuation_json!).browserFallback).toBe(true);
   });
+  it("returns separately captured evidence after a fallback correction in the same primary turn", async () => {
+    const { rc, execute, adapter } = setup({ first: true, evaluate: async () => reply("BLOCKED"), script: [
+      { toolCalls: [{ name: "browser_task", args: { goal: "Search" } }] },
+      { toolCalls: [{ name: "browser_fallback", args: { tool: "browser_act", args: { action: { kind: "click", ref: "e1", revision: 1 } }, reason: "Complete the observed search" } }] }, { text: "Verified" },
+    ] });
+    let page = "Before correction";
+    execute.mockImplementation(async call => { if (call.name === "browser_act") { page = "Visible search results"; return { output: "{}" }; } return { output: page }; });
+    await rc.start();
+    const result = JSON.parse((adapter.inputs[2] as { toolResults: { output: string }[] }).toolResults[0]!.output);
+    expect(result).toMatchObject({ verified: false, evidence: { observation: "Visible search results", page: "Visible search results" } });
+    expect(execute.mock.calls.slice(-3).map(([c]) => c.name)).toEqual(["browser_act", "browser_observe", "browser_read"]);
+    expect(adapter.inputs).toHaveLength(3);
+  });
   it("Jev First never executes a denied initial navigation", async () => {
     const policy = new BrowserActionPolicy({ lastObservation: () => observation(), approvals: { isSessionAllowed: () => false, request: async () => "deny" } });
     const { rc, execute, evaluator, adapter } = setup({ first: true, policy, script: [
@@ -143,6 +156,13 @@ describe("hybrid controller", () => {
     ] });
     await rc.start(); expect(execute.mock.calls.some(([c]) => c.name === "browser_act")).toBe(false); expect(evaluator.evaluate).not.toHaveBeenCalled();
     expect(JSON.stringify(adapter.inputs[1])).toContain("navigation_failed_or_denied");
+  });
+  it("gives the planner a safe provider failure category without exposing exception text", async () => {
+    const { rc, store, adapter } = setup({ first: true, evaluate: async () => { throw new JevError("http_error", "private provider message", 503); } });
+    await rc.start();
+    expect(JSON.stringify(adapter.inputs[1])).toContain("jev_http_error_503");
+    expect(JSON.stringify(adapter.inputs)).not.toContain("private provider message");
+    expect(store.listEvents(rc.runId).find(e => e.type === "jev.error")?.payload).toMatchObject({ reason: "http_error", httpStatus: 503 });
   });
   it("Jev First Stop interrupts a pending decision and prevents evidence capture", async () => {
     let entered!: () => void; const started = new Promise<void>(r => { entered = r; });
