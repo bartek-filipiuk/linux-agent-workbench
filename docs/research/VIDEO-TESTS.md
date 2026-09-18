@@ -157,3 +157,14 @@ The outer planner's recorded OpenRouter cost was **$1.2756567**. Claude used an 
 The final page passes 18 targeted real-Chromium checks, including 1440/390 px layouts, keyboard checklist/reset, slider behavior, local fonts/assets, offline content and no browser errors. Source review removed an unsupported precise adaptation time and softened an absolute claim. Sonnet also independently corrected text contrast. A requested serif could not be used from the supplied sans-only kit (a setup mismatch); the desktop CTA width refinement was not achieved despite the model's self-report. These visual exceptions remain documented.
 
 This test adds concrete engineering follow-ups: process-aware waiting rather than repeated reads of a quiet screen; fresh completion markers rather than matching echoed commands; explicit CLI exit/result checks; unique per-attempt output files; provider backoff; and a capture/proxy lifecycle that accounts for still-running child work. **No app runtime fixes were implemented in this documentation/video task.**
+
+
+## Film 05: one authorized live X reply
+
+A separately scoped live-account test used **GPT-5.6-Luna / medium through the Codex subscription, Classic browser tools**, and the owner's existing X session. It posted one supplied Polish greeting with the repository URL under the latest visible original post. The original phase handed control back unnecessarily; an external follow-up and one scoped send approval enabled completion. Two covered-element clicks failed before the agent navigated to the observed reply URL. No runtime code fix was made.
+
+**33.743 s to handoff + 56.919 s continuation = 90.662 s for the task intervals**, including 19.868 s approval waiting. First Start → final completion was **161.324 s**, including 70.662 s of external review/setup between phases. There were 22 reported planner turns, 20 completed tool calls (21 database records including the interrupted handoff), and zero Jev calls. **USD cost is unavailable**, not zero, because this was subscription execution without a reliable per-task dollar estimate.
+
+The supervisor reloaded the reply and parent thread and checked the persisted text and GitHub preview. [Published reply](https://x.com/vince_pl/status/2100926830660211187) · [Full prompts, chronology, measurements and evidence](video-tests/05-x-reply/REPORT.md).
+
+The 2:07.7 local film preserves both phases at 1× and explains the omitted review gap. It is retained in `/home/bartek/linux-agent-tutorial-05/output/linux-agent-live-x-reply.mp4`; it has not been added to the public media release. This is assisted completion on one real account, separate from the earlier Gemini/Jev tests and frozen historical benchmarks.

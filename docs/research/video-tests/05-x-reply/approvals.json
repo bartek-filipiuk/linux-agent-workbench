@@ -1,0 +1,14 @@
+[
+  {
+    "id": "cdc6a4c2-36cf-43b9-954c-572780dec081",
+    "run_id": "e64e52de-52ce-40e9-ae1e-817228dba04a",
+    "command_hash": "a2488e6e332f1f250bf7744458efa9cd54c4ee4c5543667ba085a7a25eb38517",
+    "command": "click \"Reply\" on https://x.com/vince_pl/status/2017728162663145969",
+    "category": "send",
+    "rule_id": "browser-send",
+    "decision": "once",
+    "created_at": 1789734944333,
+    "decided_at": 1789734964201,
+    "expires_at": 1789735064332
+  }
+]

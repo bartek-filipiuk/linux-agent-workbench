@@ -1,0 +1,15 @@
+{
+  "verifiedAt": "2026-09-18",
+  "parentUrl": "https://x.com/vince_pl/status/2017728162663145969",
+  "replyUrl": "https://x.com/vince_pl/status/2100926830660211187",
+  "method": "Supervisor inspected browser frames after refreshing the reply and reopening the parent thread. No independent X API audit.",
+  "replyPersistedAfterReload": true,
+  "oneReplyVisibleUnderParent": true,
+  "intendedGitHubPreviewVisible": true,
+  "matchingSendApprovals": 1,
+  "duplicateSendAttempted": false,
+  "screenshots": [
+    "reply-after-refresh.jpg",
+    "parent-after-refresh.jpg"
+  ]
+}
