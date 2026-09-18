@@ -79,14 +79,14 @@ The final output passed the specific task. The original phase did not finish aut
 
 No application fix was implemented. Follow-ups suggested by the trace: distinguish an already authorized send from missing user permission; handle the app's normal approval card without an extra handoff; inspect modal/covered state before clicking; retain cumulative and incremental metrics separately. Unknown/covered element rejection worked here and prevented an unverified click.
 
-## Film and evidence
+## Watch the film
 
-The finished local film is `/home/bartek/linux-agent-tutorial-05/output/linux-agent-live-x-reply.mp4`: **2:07.7**, 1920 × 1080, 30 fps. It has English editorial text and English subtitles, with the actual Polish reply visible. Both task phases play continuously at **1×**. The 70.662-second external gap is replaced by an explicitly labeled explanation card. This is not an uninterrupted autonomous run.
+[![A real account: one authorized X reply](images/x-live-reply.png)](https://github.com/bartek-filipiuk/linux-agent-workbench/releases/download/demo-videos-2026-09-18/linux-agent-live-x-reply.mp4)
 
-The film crops the application header containing the subscription email and workspace path. The raw 1× recordings and full UI screenshots remain in the local production folder and contain account/UI context; they are not included in the repository evidence bundle. Original quiet synthesized tones play only under editorial cards. Fonts retain their bundled OFL notices. X/GitHub screenshots and marks remain third-party material.
+[Watch / download MP4](https://github.com/bartek-filipiuk/linux-agent-workbench/releases/download/demo-videos-2026-09-18/linux-agent-live-x-reply.mp4) · [English subtitles](https://github.com/bartek-filipiuk/linux-agent-workbench/releases/download/demo-videos-2026-09-18/x-live-reply.srt) · [Published reply](https://x.com/vince_pl/status/2100926830660211187)
 
-Local production folder: `/home/bartek/linux-agent-tutorial-05`. It retains both raw captures, exact prompts, scripts, event streams, scoped database exports, approvals, provider usage, rendered-page reads, measurements and verification screenshots. The first capture listener remained attached after the first clip ended, so `events-live.jsonl` is an aggregate stream; the per-phase `run.json` and `continuation.json` are the authoritative capture windows.
+**2:08 film, 1080p.** Both task phases play continuously at normal speed. A labeled explanation card replaces the 70.662-second external review gap. The actual greeting is in Polish; editorial text and optional subtitles are English. The application header with the subscription email and workspace path is cropped out.
 
-The public reply was intentionally published. The finished film and English subtitles are now available through the [demo walkthrough](../../../demos/x-live-reply.md#watch-the-film) and the repository media release. Raw captures and the private source archive remain local.
+[Full production report](../research/video-tests/05-x-reply/REPORT.md) · [Measurements](../research/video-tests/05-x-reply/measurements.json) · [Independent verification](../research/video-tests/05-x-reply/verification.json) · [Recorded events](../research/video-tests/05-x-reply/run_events.json)
 
-Local retained evidence: [measurements](measurements.json), [verification](verification.json), [task](task.txt), [follow-up](followup-task.txt), [published page read](published-reply-read.json), [provider usage](provider_usage.json), [approvals](approvals.json), [events](run_events.json).
+[All demonstrations](README.md) · [Full test ledger](../research/VIDEO-TESTS.md) · [Application README](../../README.md#watch-it-work)

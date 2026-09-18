@@ -1,6 +1,6 @@
 # Watch Linux Agent Workbench at work
 
-Three examples of the real desktop app: read sources, save useful files, and hand research to a coding agent. All films have English captions and retain the distinction between app execution, external review and editorial presentation. Recordings are from September 18, 2026.
+Four featured examples of the real desktop app: read sources, save useful files, hand research to a coding agent, and publish an authorized reply from an existing account. A release-lookup film is included as a bonus. All films have English captions and retain the distinction between app execution, external review and editorial presentation. Recordings are from September 18, 2026.
 
 The MP4 files and optional subtitle tracks are hosted in the repository's [Demo videos release](https://github.com/bartek-filipiuk/linux-agent-workbench/releases/tag/demo-videos-2026-09-18). Click a thumbnail to read its dedicated task report, including the exact prompts, execution history, results and a link to the film. The release is a media collection, not an application binary release. Video files are outside Git history; [videos.json](videos.json) records their URLs, sizes and SHA-256 hashes.
 
@@ -27,6 +27,16 @@ The app researches Uptime Kuma, Gatus and Tianji against weighted requirements, 
 Gemini reads four official pages from NASA, the National Park Service and DarkSky. It passes the research to Claude Code running **Sonnet 5** in the sandbox terminal. Claude builds **After Dark**, an HTML landing page with original SVG artwork, a schematic sky slider, a checklist and source links. The film includes a real Chromium preview of the saved page.
 
 [Read the full task, prompts, results and watch the film](research-to-landing.md)
+
+## One authorized live X reply · 2 minutes 8 seconds
+
+[![One authorized live X reply](images/x-live-reply.png)](x-live-reply.md)
+
+Codex Luna uses the owner's existing X session, finds the latest original post, and publishes one supplied greeting with the GitHub link. The film preserves an unnecessary handoff, the supervisor's follow-up, a scoped send approval and recovery from two covered-element errors. The reply is checked again after reload.
+
+**90.662 s across two task phases; 2:41 including external review.** Approval waiting is included. This uses Classic browser tools and a Codex subscription; USD cost is unavailable.
+
+[Read the full task, prompts, results and watch the film](x-live-reply.md)
 
 ## Bonus: find the latest release · 41 seconds
 

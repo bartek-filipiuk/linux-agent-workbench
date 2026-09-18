@@ -156,5 +156,13 @@
     "bytes": 187475,
     "sha256": "0e6f97ff736898441e050b9f92cba880260eecaf669fda99cc6dec7dd9a3c866",
     "retention": "Local artifact, not embedded in Git repository"
+  },
+  {
+    "film": "05-x-reply",
+    "localPath": "/home/bartek/linux-agent-tutorial-05/output/linux-agent-live-x-reply.mp4",
+    "bytes": 11140884,
+    "sha256": "efb152e81c0dab55d35b190f900687415be6e0e837c903b4428faf9f9c51044d",
+    "retention": "Finished film in GitHub Releases; raw captures and private source archive remain local",
+    "publicUrl": "https://github.com/bartek-filipiuk/linux-agent-workbench/releases/download/demo-videos-2026-09-18/linux-agent-live-x-reply.mp4"
   }
 ]

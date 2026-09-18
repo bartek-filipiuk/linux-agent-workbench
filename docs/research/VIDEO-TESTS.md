@@ -167,4 +167,4 @@ A separately scoped live-account test used **GPT-5.6-Luna / medium through the C
 
 The supervisor reloaded the reply and parent thread and checked the persisted text and GitHub preview. [Published reply](https://x.com/vince_pl/status/2100926830660211187) · [Full prompts, chronology, measurements and evidence](video-tests/05-x-reply/REPORT.md).
 
-The 2:07.7 local film preserves both phases at 1× and explains the omitted review gap. It is retained in `/home/bartek/linux-agent-tutorial-05/output/linux-agent-live-x-reply.mp4`; it has not been added to the public media release. This is assisted completion on one real account, separate from the earlier Gemini/Jev tests and frozen historical benchmarks.
+The 2:07.7 local film preserves both phases at 1× and explains the omitted review gap. [Watch it from the dedicated demo page](../demos/x-live-reply.md#watch-the-film); the MP4 and subtitles are hosted in the repository media release. This is assisted completion on one real account, separate from the earlier Gemini/Jev tests and frozen historical benchmarks.

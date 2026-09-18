@@ -33,6 +33,17 @@
     "thumbnail": "images/research-to-landing.png"
   },
   {
+    "id": "x-live-reply",
+    "title": "One authorized live X reply",
+    "durationLabel": "2:08",
+    "file": "linux-agent-live-x-reply.mp4",
+    "bytes": 11140884,
+    "sha256": "efb152e81c0dab55d35b190f900687415be6e0e837c903b4428faf9f9c51044d",
+    "url": "https://github.com/bartek-filipiuk/linux-agent-workbench/releases/download/demo-videos-2026-09-18/linux-agent-live-x-reply.mp4",
+    "subtitles": "https://github.com/bartek-filipiuk/linux-agent-workbench/releases/download/demo-videos-2026-09-18/x-live-reply.srt",
+    "thumbnail": "images/x-live-reply.png"
+  },
+  {
     "id": "release-lookup",
     "title": "Find the latest release",
     "durationLabel": "41 s",
