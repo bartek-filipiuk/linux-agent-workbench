@@ -1,0 +1,1277 @@
+{
+  "createdAt": "2026-09-18T05:15:03.428Z",
+  "model": "google/gemini-3.8-flash",
+  "effort": "low",
+  "upstream": "google-ai-studio",
+  "jev": "jev-1.13.0",
+  "engines": [
+    "app-auto"
+  ],
+  "repeats": 1,
+  "source": {
+    "app": "77846cb0d97af218dd8a2832dab9f488c703b210",
+    "poc": "77846cb0d97af218dd8a2832dab9f488c703b210",
+    "hashes": {
+      "run.mjs": "702814a3da378d9f4f622f06e12feaac26043271a679651a04cabb329aa8292e",
+      "tasks.mjs": "f95b4946e92195aee718221b842154ea7e3732deed21131f48ca361a610a7edd"
+    },
+    "candidate": "77846cb0d97af218dd8a2832dab9f488c703b210",
+    "sharedWorker": "candidate BrowserSession for all variants; baseline controller unchanged",
+    "upstreamDriverHash": "261a9cd28020b8b55a6652f3f928039188f025409c81283c352451af7f01f76e",
+    "dirty": true
+  },
+  "clock": "setup includes driver/browser startup, navigation, consent, first observation; task includes independent final verification; screenshots and cleanup outside task",
+  "settings": {
+    "timeoutMs": 240000,
+    "viewport": {
+      "width": 1120,
+      "height": 780
+    },
+    "channel": "chromium",
+    "warmAfter": null,
+    "priorReportedCostUsd": 0.025268250000000003
+  },
+  "results": [
+    {
+      "task": "search",
+      "category": "short-ui",
+      "repeat": 1,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Search catalog",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:33561/search"
+      ],
+      "setupMs": 309.7411269999999,
+      "agentMs": 3712.8243650000004,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 2415.291864,
+      "jevCalls": 3,
+      "jevMs": 1205.786756,
+      "costUsd": 0.004715598,
+      "actions": 2,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 2,
+          "elapsedMs": 1293.334061,
+          "verified": false,
+          "parentCallId": "call_280528"
+        }
+      ],
+      "routes": [
+        {
+          "mode": "fast",
+          "tool": "browser_task",
+          "switched": false
+        }
+      ],
+      "batches": [],
+      "verificationMs": 2.52958099999978,
+      "taskMs": 3715.353946,
+      "verification": {
+        "passed": true,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      }
+    },
+    {
+      "task": "wizard-6",
+      "category": "long-ui",
+      "repeat": 1,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:33561/wizard-6"
+      ],
+      "setupMs": 314.23918499999945,
+      "agentMs": 9931.185935000001,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 7,
+      "primaryMs": 7982.965326999999,
+      "jevCalls": 5,
+      "jevMs": 1375.9092240000018,
+      "costUsd": 0.024081864,
+      "actions": 24,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_operation",
+          "actions": 4,
+          "elapsedMs": 1516.0723670000007,
+          "verified": false,
+          "parentCallId": "call_362064"
+        }
+      ],
+      "routes": [
+        {
+          "mode": "fast",
+          "tool": "browser_task",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "fast",
+          "switched": true
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        }
+      ],
+      "batches": [
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 81.42641400000139,
+          "parentCallId": "call_292405"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 83.9508969999988,
+          "parentCallId": "call_356600"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 94.36318500000016,
+          "parentCallId": "call_272853"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 79.55732100000023,
+          "parentCallId": "call_383910"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 85.82075799999984,
+          "parentCallId": "call_197488"
+        }
+      ],
+      "verificationMs": 1.6366610000004584,
+      "taskMs": 9932.822596000002,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Basel",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Bern",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lucerne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lausanne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lugano",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Chur",
+            "person": "Ada",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "compare-offers",
+      "category": "reasoning",
+      "repeat": 1,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected hotel Choose Alba Bello Cielo Doria",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "Total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:33561/compare-offers"
+      ],
+      "setupMs": 328.0765589999992,
+      "agentMs": 7504.201104000002,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 4,
+      "primaryMs": 7389.470105,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.00911025,
+      "actions": 3,
+      "fallbacks": [],
+      "routes": [
+        {
+          "mode": "planned",
+          "tool": "browser_read",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_observe",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        }
+      ],
+      "batches": [
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 3,
+          "requested": 3,
+          "verified": false,
+          "elapsedMs": 102.28067200000078,
+          "parentCallId": "call_197366"
+        }
+      ],
+      "verificationMs": 1.3200010000000475,
+      "taskMs": 7505.521105000002,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "hotel": "Bello",
+          "total": "327"
+        }
+      }
+    },
+    {
+      "task": "tabs",
+      "category": "capability",
+      "repeat": 1,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [],
+      "initialPages": [
+        "http://127.0.0.1:33561/tabs"
+      ],
+      "setupMs": 296.4200200000014,
+      "agentMs": 7545.557058999999,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 3,
+      "primaryMs": 5826.354257000003,
+      "jevCalls": 4,
+      "jevMs": 1576.5413679999983,
+      "costUsd": 0.005869848,
+      "actions": 3,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_operation",
+          "actions": 3,
+          "elapsedMs": 1710.6673599999995,
+          "verified": false,
+          "parentCallId": "call_175196"
+        }
+      ],
+      "routes": [
+        {
+          "mode": "fast",
+          "tool": "browser_task",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_observe",
+          "previous": "fast",
+          "switched": true
+        }
+      ],
+      "batches": [],
+      "verificationMs": 3.239937000002101,
+      "taskMs": 7548.796996000001,
+      "verification": {
+        "passed": true,
+        "expected": "Reference article: the orbit period is 42 days."
+      }
+    },
+    {
+      "task": "google-flights",
+      "category": "live",
+      "repeat": 1,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Where from?",
+          "value": "Wrocław"
+        },
+        {
+          "role": "combobox",
+          "name": "Where to?",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Departure",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Return",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "https://www.google.com/travel/flights?hl=en"
+      ],
+      "setupMs": 1832.9949229999984,
+      "agentMs": 40991.415076000005,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 24,
+      "primaryMs": 34983.904082000015,
+      "jevCalls": 1,
+      "jevMs": 904.1553899999999,
+      "costUsd": 0.23751246299999995,
+      "actions": 13,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_operation",
+          "actions": 0,
+          "elapsedMs": 964.3583660000004,
+          "verified": false,
+          "parentCallId": "call_288197"
+        }
+      ],
+      "routes": [
+        {
+          "mode": "fast",
+          "tool": "browser_task",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "fast",
+          "switched": true
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        }
+      ],
+      "batches": [
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 98.55820200000016,
+          "parentCallId": "call_387795"
+        },
+        {
+          "status": "needs_help",
+          "reason": "context_changed; replan remaining actions",
+          "actions": 0,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 51.290249999998196,
+          "parentCallId": "call_280878"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 82.92094799999904,
+          "parentCallId": "call_274597"
+        },
+        {
+          "status": "needs_help",
+          "reason": "context_changed; replan remaining actions",
+          "actions": 0,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 52.37404699999752,
+          "parentCallId": "call_60349"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 86.98572899999999,
+          "parentCallId": "call_361877"
+        },
+        {
+          "status": "needs_help",
+          "reason": "context_changed; replan remaining actions",
+          "actions": 0,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 44.70199299999513,
+          "parentCallId": "call_264154"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 57.946906000004674,
+          "parentCallId": "call_388272"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 52.51283300000068,
+          "parentCallId": "call_430428"
+        },
+        {
+          "status": "needs_help",
+          "reason": "context_changed; replan remaining actions",
+          "actions": 0,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 52.24729700000171,
+          "parentCallId": "call_196092"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 90.06237799999508,
+          "parentCallId": "call_252484"
+        },
+        {
+          "status": "needs_help",
+          "reason": "context_changed; replan remaining actions",
+          "actions": 0,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 45.15777600000001,
+          "parentCallId": "call_205452"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 88.68217500000173,
+          "parentCallId": "call_313631"
+        },
+        {
+          "status": "needs_help",
+          "reason": "context_changed; replan remaining actions",
+          "actions": 0,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 52.18877000000066,
+          "parentCallId": "call_308099"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 176.7570790000027,
+          "parentCallId": "call_421864"
+        },
+        {
+          "status": "needs_help",
+          "reason": "transition_must_be_last",
+          "actions": 0,
+          "requested": 2,
+          "verified": false,
+          "elapsedMs": 82.68287699999928,
+          "parentCallId": "call_236644"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 205.33362299999862,
+          "parentCallId": "call_300341"
+        },
+        {
+          "status": "needs_help",
+          "reason": "context_changed; replan remaining actions",
+          "actions": 0,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 135.27456099999836,
+          "parentCallId": "call_284076"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 175.52479900000617,
+          "parentCallId": "call_277853"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 50.10079399999813,
+          "parentCallId": "call_272769"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 191.82484999998996,
+          "parentCallId": "call_282206"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 3076.7073440000095,
+          "parentCallId": "call_285888"
+        }
+      ],
+      "verificationMs": 25.974188000007416,
+      "taskMs": 41017.38926400001,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "searchPage": true,
+          "origin": true,
+          "destination": true,
+          "oneWay": true,
+          "departure": true,
+          "year": true,
+          "passenger": true,
+          "economy": true,
+          "results": true
+        },
+        "url": "https://www.google.com/travel/flights/search?tfs=CBwQAhooEgoyMDI2LTA5LTIwagwIAxIIL20vMDg5NjZyDAgDEggvbS8wNGpwbEABSAFwAYIBCwj___________8BmAEC&hl=en",
+        "controls": [
+          {
+            "role": "button",
+            "label": "Main menu",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "link",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "link",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "link",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "link",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Change appearance",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Google apps",
+            "value": ""
+          },
+          {
+            "role": "combobox",
+            "label": "One way",
+            "value": "One way"
+          },
+          {
+            "role": "button",
+            "label": "1 passenger, change number of passengers.",
+            "value": ""
+          },
+          {
+            "role": "combobox",
+            "label": "Economy",
+            "value": "Economy"
+          },
+          {
+            "role": "combobox",
+            "label": "Where from?",
+            "value": "Zürich"
+          },
+          {
+            "role": "button",
+            "label": "Swap origin and destination.",
+            "value": ""
+          },
+          {
+            "role": "combobox",
+            "label": "Where to?",
+            "value": "London"
+          },
+          {
+            "role": "input",
+            "label": "Departure",
+            "value": "Sun, Sep 20"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Stops, Not selected",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Airlines, Not selected",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Bags, Not selected",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Price, Not selected",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Times, Not selected",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Emissions, Not selected",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Connecting airports, Not selected",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Duration, Not selected",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Previous",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Next",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Learn more about ranking",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Learn more about ranking",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Learn more about ranking",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "bag fees"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "Passenger assistance"
+          },
+          {
+            "role": "button",
+            "label": "Sorted by top flights, Change sort order.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 79 kilograms. Average emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "This price for this flight doesn't include overhead bin access. If you need a carry-on bag, use the Bags filter to update prices.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 4:45 PM on Sunday, September 20 and arrives at London Gatwick Airport at 5:35 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 82 kilograms. Average emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 7:40 AM on Sunday, September 20 and arrives at Heathrow Airport at 8:35 AM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 71 kilograms. -13% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 6:20 PM on Sunday, September 20 and arrives at Heathrow Airport at 7:05 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Climate friendly",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "View price history",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "switch",
+            "label": "Track prices from Zürich to London departing 2026-09-20",
+            "value": ""
+          },
+          {
+            "role": "switch",
+            "label": "Track prices from Zürich to London - Any dates",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 143 kilograms. +74% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 11:20 AM on Sunday, September 20 and arrives at London Gatwick Airport at 6:45 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 93 kilograms. +13% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "This price for this flight doesn't include overhead bin access. If you need a carry-on bag, use the Bags filter to update prices.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 8:55 PM on Sunday, September 20 and arrives at London Luton Airport at 9:40 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 86 kilograms. Average emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "This price for this flight doesn't include overhead bin access. If you need a carry-on bag, use the Bags filter to update prices.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 8:40 PM on Sunday, September 20 and arrives at London Gatwick Airport at 9:20 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 100 kilograms. +22% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 8:25 PM on Sunday, September 20 and arrives at London City Airport at 9:00 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 82 kilograms. Average emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 1:20 PM on Sunday, September 20 and arrives at Heathrow Airport at 2:20 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 91 kilograms. +11% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 7:05 AM on Sunday, September 20 and arrives at Heathrow Airport at 7:55 AM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 96 kilograms. +17% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 7:35 AM on Sunday, September 20 and arrives at London Gatwick Airport at 8:20 AM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 89 kilograms. +9% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 12:05 PM on Sunday, September 20 and arrives at Heathrow Airport at 1:00 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 68 kilograms. -17% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 3:35 PM on Sunday, September 20 and arrives at Heathrow Airport at 4:25 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 68 kilograms. -17% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 5:00 PM on Sunday, September 20 and arrives at Heathrow Airport at 5:50 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 88 kilograms. +7% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 5:10 PM on Sunday, September 20 and arrives at London Gatwick Airport at 5:50 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 70 kilograms. -15% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 6:30 PM on Sunday, September 20 and arrives at Heathrow Airport at 7:20 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 89 kilograms. +9% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 8:55 PM on Sunday, September 20 and arrives at Heathrow Airport at 9:45 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 86 kilograms. Average emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 1:05 PM on Sunday, September 20 and arrives at London City Airport at 1:45 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 86 kilograms. Average emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 4:50 PM on Sunday, September 20 and arrives at London City Airport at 5:25 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 88 kilograms. +7% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 6:00 PM on Sunday, September 20 and arrives at London City Airport at 6:40 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 70 kilograms. -15% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 10:30 AM on Sunday, September 20 and arrives at Heathrow Airport at 11:20 AM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 71 kilograms. -13% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 7:45 PM on Sunday, September 20 and arrives at Heathrow Airport at 8:30 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "View more flights",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Currency PLN",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "Report Illegal Content"
+          }
+        ],
+        "visibleFlights": [
+          "From 633 Polish zlotys.This price does not include overhead bin access. Nonstop flight with easyJet. Leaves Zurich Airport at 4:45 PM on Sunday, September 20 and arrives at London Gatwick Airport at 5:35 PM on Sunday, September 20. Total duration 1 hr 50 min.   Select flight",
+          "From 675 Polish zlotys. Nonstop flight with British Airways. Leaves Zurich Airport at 7:40 AM on Sunday, September 20 and arrives at Heathrow Airport at 8:35 AM on Sunday, September 20. Total duration 1 hr 55 min.   Select flight",
+          "From 869 Polish zlotys. Nonstop flight with British Airways. Leaves Zurich Airport at 6:20 PM on Sunday, September 20 and arrives at Heathrow Airport at 7:05 PM on Sunday, September 20. Total duration 1 hr 45 min.   Select flight",
+          "From 507 Polish zlotys. 1 stop flight with Condor. Leaves Zurich Airport at 11:20 AM on Sunday, September 20 and arrives at London Gatwick Airport at 6:45 PM on Sunday, September 20. Total duration 8 hr 25 min.  Layover (1 of 1) is a 5 hr 50 min layover at Frankfurt Airport in Frankfurt am Main. Select flight",
+          "From 790 Polish zlotys.This price does not include overhead bin access. Nonstop flight with easyJet. Leaves Zurich Airport at 8:55 PM on Sunday, September 20 and arrives at London Luton Airport at 9:40 PM on Sunday, September 20. Total duration 1 hr 45 min.   Select flight",
+          "From 831 Polish zlotys.This price does not include overhead bin access. Nonstop flight with easyJet. Leaves Zurich Airport at 8:40 PM on Sunday, September 20 and arrives at London Gatwick Airport at 9:20 PM on Sunday, September 20. Total duration 1 hr 40 min.   Select flight",
+          "From 999 Polish zlotys. Nonstop flight with British Airways. Operated by BA Cityflyer. Leaves Zurich Airport at 8:25 PM on Sunday, September 20 and arrives at London City Airport at 9:00 PM on Sunday, September 20. Total duration 1 hr 35 min.   Select flight",
+          "From 1021 Polish zlotys. Nonstop flight with British Airways. Leaves Zurich Airport at 1:20 PM on Sunday, September 20 and arrives at Heathrow Airport at 2:20 PM on Sunday, September 20. Total duration 2 hr.   Select flight",
+          "From 1478 Polish zlotys. Nonstop flight with SWISS. Leaves Zurich Airport at 7:05 AM on Sunday, September 20 and arrives at Heathrow Airport at 7:55 AM on Sunday, September 20. Total duration 1 hr 50 min.   Select flight",
+          "From 1478 Polish zlotys. Nonstop flight with SWISS. Operated by Helvetic. Leaves Zurich Airport at 7:35 AM on Sunday, September 20 and arrives at London Gatwick Airport at 8:20 AM on Sunday, September 20. Total duration 1 hr 45 min.   Select flight",
+          "From 1478 Polish zlotys. Nonstop flight with SWISS. Operated by Air Baltic. Leaves Zurich Airport at 12:05 PM on Sunday, September 20 and arrives at Heathrow Airport at 1:00 PM on Sunday, September 20. Total duration 1 hr 55 min.   Select flight",
+          "From 1478 Polish zlotys. Nonstop flight with SWISS. Leaves Zurich Airport at 3:35 PM on Sunday, September 20 and arrives at Heathrow Airport at 4:25 PM on Sunday, September 20. Total duration 1 hr 50 min.   Select flight",
+          "From 1478 Polish zlotys. Nonstop flight with SWISS. Leaves Zurich Airport at 5:00 PM on Sunday, September 20 and arrives at Heathrow Airport at 5:50 PM on Sunday, September 20. Total duration 1 hr 50 min.   Select flight",
+          "From 1478 Polish zlotys. Nonstop flight with SWISS. Leaves Zurich Airport at 5:10 PM on Sunday, September 20 and arrives at London Gatwick Airport at 5:50 PM on Sunday, September 20. Total duration 1 hr 40 min.   Select flight",
+          "From 1478 Polish zlotys. Nonstop flight with SWISS. Leaves Zurich Airport at 6:30 PM on Sunday, September 20 and arrives at Heathrow Airport at 7:20 PM on Sunday, September 20. Total duration 1 hr 50 min.   Select flight",
+          "From 1478 Polish zlotys. Nonstop flight with SWISS. Operated by Air Baltic. Leaves Zurich Airport at 8:55 PM on Sunday, September 20 and arrives at Heathrow Airport at 9:45 PM on Sunday, September 20. Total duration 1 hr 50 min.   Select flight",
+          "From 1509 Polish zlotys. Nonstop flight with SWISS. Operated by Helvetic. Leaves Zurich Airport at 1:05 PM on Sunday, September 20 and arrives at London City Airport at 1:45 PM on Sunday, September 20. Total duration 1 hr 40 min.   Select flight",
+          "From 1509 Polish zlotys. Nonstop flight with SWISS. Operated by Helvetic. Leaves Zurich Airport at 4:50 PM on Sunday, September 20 and arrives at London City Airport at 5:25 PM on Sunday, September 20. Total duration 1 hr 35 min.   Select flight",
+          "From 1509 Polish zlotys. Nonstop flight with SWISS. Operated by Helvetic. Leaves Zurich Airport at 6:00 PM on Sunday, September 20 and arrives at London City Airport at 6:40 PM on Sunday, September 20. Total duration 1 hr 40 min.   Select flight",
+          "From 1837 Polish zlotys. Nonstop flight with SWISS. Leaves Zurich Airport at 10:30 AM on Sunday, September 20 and arrives at Heathrow Airport at 11:20 AM on Sunday, September 20. Total duration 1 hr 50 min.   Select flight",
+          "From 1996 Polish zlotys. Nonstop flight with British Airways. Leaves Zurich Airport at 7:45 PM on Sunday, September 20 and arrives at Heathrow Airport at 8:30 PM on Sunday, September 20. Total duration 1 hr 45 min.   Select flight"
+        ],
+        "text": "Skip to main content\nAccessibility feedback\nExplore\nFlights\nHotels\nVacation rentals\nChange appearance\nSign in\nLoading results\nFlight search\nOne way\n1\nEconomy\nZürich\nLondon\nFilters\nAll filters\nStops\nAirlines\nBags\nPrice\nTimes\nEmissions\nConnecting airports\nDuration\nSearch results\n21 results returned.\nBest\nCheapest\nfrom PLN 507\nTop options\nRanked based on price and conveniencePrices include required taxes + fees for 1 adult. Optional charges and bag fees may apply. Passenger assistance info.\nSorted by top flights\n4:45 PM\n – \n5:35 PM\neasyJet\n1 hr 50 min\nZRH–LGW\nNonstop\n79 kg CO2e\nAvg emissions\nPLN 633\n7:40 AM\n – \n8:35 AM\nBritish Airways\n1 hr 55 min\nZRH–LHR\nNonstop\n82 kg CO2e\nAvg emissions\nPLN 675\n6:20 PM\n – \n7:05 PM\nBritish Airways\n1 hr 45 min\nZRH–LHR\nNonstop\n71 kg CO2e\n-13% emissions\nPLN 869\nTrains to considerTo arrive closer to your destination\n3:34 PM – 10:00 PM\nZürich HB – St Pancras International\n7 hr 26 min\n2 stops\nSee more train options\nPrice insights\nThe cheapest time to book is usually earlier, about 2–5 months before takeoff\nPrices are currently typical\nView price history\nTrack prices\nTrack prices from Zürich to London departing 2026-09-20\nSep 20\nTrack prices from Zürich to London - Any dates\nAny dates\nDate grid\nPrice graph\nOther flights\n11:20 AM\n – \n6:45 PM\nCondor\n8 hr 25 min\nZRH–LGW\n1 stop\n5 hr 50 min FRA\n143 kg CO2e\n+74% emissions\nPLN 507\n8:55 PM\n – \n9:40 PM\neasyJet\n1 hr 45 min\nZRH–LTN\nNonstop\n93 kg CO2e\n+13% emissions\nPLN 790\n8:40 PM\n – \n9:20 PM\neasyJet\n1 hr 40 min\nZRH–LGW\nNonstop\n86 kg CO2e\nAvg emissions\nPLN 831\n8:25 PM\n – \n9:00 PM\nBritish AirwaysOperated by BA Cityflyer\n1 hr 35 min\nZRH–LCY\nNonstop\n100 kg CO2e\n+22% emissions\nPLN 999\n1:20 PM\n – \n2:20 PM\nBritish Airways\n2 hr\nZRH–LHR\nNonstop\n82 kg CO2e\nAvg emissions\nPLN 1,021\n7:05 AM\n – \n7:55 AM\nSWISS\n1 hr 50 min\nZRH–LHR\nNonstop\n91 kg CO2e\n+11% emissions\nPLN 1,478\n7:35 AM\n – \n8:20 AM\nSWISSOperated by Helvetic\n1 hr 45 min\nZRH–LGW\nNonstop\n96 kg CO2e\n+17% emissions\nPLN 1,478\n12:05 PM\n – \n1:00 PM\nSWISSOperated by Air Baltic\n1 hr 55 min\nZRH–LHR\nNonstop\n89 kg CO2e\n+9% emissions\nPLN 1,478\n3:35 PM\n – \n4:25 PM\nSWISS\n1 hr 50 min\nZRH–LHR\nNonstop\n68 kg CO2e\n-17% emissions\nPLN 1,478\n5:00 PM\n – \n5:50 PM\nSWISS\n1 hr 50 min\nZRH–LHR\nNonstop\n68 kg CO2e\n-17% emissions\nPLN 1,478\n5:10 PM\n – \n5:50 PM\nSWISS\n1 hr 40 min\nZRH–LGW\nNonstop\n88 kg CO2e\n+7% emissions\nPLN 1,478\n6:30 PM\n – \n7:20 PM\nSWISS\n1 hr 50 min\nZRH–LHR\nNonstop\n70 kg CO2e\n-15% emissions\nPLN 1,478\n8:55 PM\n – \n9:45 PM\nSWISSOperated by Air Baltic\n1 hr 50 min\nZRH–LHR\nNonstop\n89 kg CO2e\n+9% emissions\nPLN 1,478\n1:05 PM\n – \n1:45 PM\nSWISSOperated by Helvetic\n1 hr 40 min\nZRH–LCY\nNonstop\n86 kg CO2e\nAvg emissions\nPLN 1,509\n4:50 PM\n – \n5:25 PM\nSWISSOperated by Helvetic\n1 hr 35 min\nZRH–LCY\nNonstop\n86 kg CO2e\nAvg emissions\nPLN 1,509\n6:00 PM\n – \n6:40 PM\nSWISSOperated by Helvetic\n1 hr 40 min\nZRH–LCY\nNonstop\n88 kg CO2e\n+7% emissions\nPLN 1,509\n10:30 AM\n – \n11:20 AM\nSWISS\n1 hr 50 min\nZRH–LHR\nNonstop\n70 kg CO2e\n-15% emissions\nPLN 1,837\n7:45 PM\n – \n8:30 PM\nBritish Airways\n1 hr 45 min\nZRH–LHR\nNonstop\n71 kg CO2e\n-13% emissions\nPLN 1,996\nView more flights\nLanguage​English (United States)\nLocation​Poland\nCurrencyPLN\nAbout\nPrivacy\nTerms\nJoin user studies\nReport Illegal Content\nFeedback\nHelp Center and Consumer Information\n\nDisplayed currencies may differ from the currencies used to purchase flights. Learn more\n\nPrices are final prices and include all taxes and fees, including payment fees for the cheapest common payment method (which may differ depending on the provider). Additional charges may apply for other types of payment, luggage, meals, WLAN or other additional services. Prices, availability and travel details are provided based on the latest information received from our partners. This information is reflected in the results within a period of less than 24 hours. Additional conditions may also be applied by our partners. You should then check prices and conditions with the services providers before booking.\n\nfrom PLN 507\nPage loaded."
+      }
+    }
+  ]
+}

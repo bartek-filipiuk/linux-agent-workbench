@@ -1,0 +1,107 @@
+{
+  "rule": "Only provider account identifiers user_<opaque id> are redacted. Measurements and source metadata are otherwise unchanged. Private originals retained in artifacts.",
+  "files": [
+    {
+      "file": "pilot-guard-v5.json",
+      "originalSha256": "d51b9c24b5196ddcb380825c8ddeff61e028d714a5bc6e484290af909639fed0",
+      "exportSha256": "d51b9c24b5196ddcb380825c8ddeff61e028d714a5bc6e484290af909639fed0",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "file": "pilot-context-v2.json",
+      "originalSha256": "8a48be132cc8a09926987b38e6b34ccf442c8534b50c6a56c2e2faa7dd39a276",
+      "exportSha256": "8a48be132cc8a09926987b38e6b34ccf442c8534b50c6a56c2e2faa7dd39a276",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "file": "pilot-runner-validation.json",
+      "originalSha256": "839715557a0bd3152a710eacafe3affb44e8ea60fa3a85cb6d7022d34dfd824f",
+      "exportSha256": "839715557a0bd3152a710eacafe3affb44e8ea60fa3a85cb6d7022d34dfd824f",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "file": "security-final-audit.json",
+      "originalSha256": "8e74969ea8af5937959544ff49f910472435033e316e458c71ebc0f4de0addf5",
+      "exportSha256": "8e74969ea8af5937959544ff49f910472435033e316e458c71ebc0f4de0addf5",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "file": "decisions-final-heldout.json",
+      "originalSha256": "40d5cfbd0f0a05695cf0b7f50cf4646c57f3e22eb575cf2c273c693349b17238",
+      "exportSha256": "40d5cfbd0f0a05695cf0b7f50cf4646c57f3e22eb575cf2c273c693349b17238",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "file": "decisions-pilot-3.json",
+      "originalSha256": "b5d513956f3e5b028b06994d9dc39b58d595f8015214b3389f15fc9e85c996d9",
+      "exportSha256": "b5d513956f3e5b028b06994d9dc39b58d595f8015214b3389f15fc9e85c996d9",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "file": "pilot-occlusion-v3.json",
+      "originalSha256": "7ff3153946fa71daff708e2a9ab85ec40cd950a8e755638ce11b803e5aa1dbac",
+      "exportSha256": "7ff3153946fa71daff708e2a9ab85ec40cd950a8e755638ce11b803e5aa1dbac",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "file": "desktop-auto-schema.json",
+      "originalSha256": "0c49539f83b4827c70c309dd3440b35ec3b7e79797a27dc0d940809e7bd1e769",
+      "exportSha256": "0c49539f83b4827c70c309dd3440b35ec3b7e79797a27dc0d940809e7bd1e769",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "file": "security-audit.json",
+      "originalSha256": "469be436f88f1dd3577a972e634a64273185800311f0108d667a9582be6bfbe2",
+      "exportSha256": "469be436f88f1dd3577a972e634a64273185800311f0108d667a9582be6bfbe2",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "file": "desktop-auto.json",
+      "originalSha256": "67fb09ef823c7d0e398769f2a9e7cca8b17469030736c67d117cf84fd5b40a14",
+      "exportSha256": "67fb09ef823c7d0e398769f2a9e7cca8b17469030736c67d117cf84fd5b40a14",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "file": "final-local.json",
+      "originalSha256": "68dc1c852e76f308fdf1376511e19caddd4c87693f72c60fec5d630a00ee3cc6",
+      "exportSha256": "f0ae104efac5a3265d7e642869e869152de6db20d1c208a2893a1bda1da9bd50",
+      "accountIdentifierRedacted": true
+    },
+    {
+      "file": "decisions-pilot-2.json",
+      "originalSha256": "1dd5c9a7423074cd6ae04ba9eee3b37b21cb12208eb5b8581dfd662ebdd2a067",
+      "exportSha256": "1dd5c9a7423074cd6ae04ba9eee3b37b21cb12208eb5b8581dfd662ebdd2a067",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "file": "pilot-confidence-035.json",
+      "originalSha256": "2e32c4f655c152080d11fab5fd7da74ba237afcb270d1cfc65c04d482a8c7e76",
+      "exportSha256": "2e32c4f655c152080d11fab5fd7da74ba237afcb270d1cfc65c04d482a8c7e76",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "file": "pilot-auto-1.json",
+      "originalSha256": "27db4869b1405201f574c70b80cfc1a2a75dba0703618cb4e4beecd1ff4b19ea",
+      "exportSha256": "27db4869b1405201f574c70b80cfc1a2a75dba0703618cb4e4beecd1ff4b19ea",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "file": "decisions-pilot-1.json",
+      "originalSha256": "6d313a44e6d3776bb671ef1960e16d4b9559c8a3211ef60c3d2e12fab01b70b8",
+      "exportSha256": "6d313a44e6d3776bb671ef1960e16d4b9559c8a3211ef60c3d2e12fab01b70b8",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "file": "desktop-auto-recheck.json",
+      "originalSha256": "bd2edcfd0d8735bd59b6b924f0b181b4df216ae15ff7443e4963b94387c12ff4",
+      "exportSha256": "bd2edcfd0d8735bd59b6b924f0b181b4df216ae15ff7443e4963b94387c12ff4",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "file": "pilot-stale-v4.json",
+      "originalSha256": "7cdacb0e2af7b99db9dca64633a45331fb614d891e2933523929e6d9eb2ab33e",
+      "exportSha256": "7cdacb0e2af7b99db9dca64633a45331fb614d891e2933523929e6d9eb2ab33e",
+      "accountIdentifierRedacted": false
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "scope": "All runs in newly created isolated jev-auto desktop instance, including failed smoke attempts and Stop; costs with returned usage only. These are not benchmark-runner trials.",
+  "runs": [
+    {
+      "id": "245414a5-a542-4f70-b779-f34d1e1a8364",
+      "model": "google/gemini-3.8-flash",
+      "state": "completed",
+      "cost_usd": 0.00758217,
+      "turns": 4,
+      "tool_calls": 8,
+      "started_at": 1789713766590,
+      "ended_at": 1789713781095,
+      "end_reason": "final_answer",
+      "engine": "jev-auto"
+    },
+    {
+      "id": "ee0d385d-8e88-44aa-9cd5-e39c4f4c29da",
+      "model": "google/gemini-3.8-flash",
+      "state": "stopped",
+      "cost_usd": 0.0,
+      "turns": 0,
+      "tool_calls": 0,
+      "started_at": 1789713781404,
+      "ended_at": 1789713781583,
+      "end_reason": "user_stop",
+      "engine": "jev-auto"
+    },
+    {
+      "id": "b44a7a98-4123-4330-9b06-bbfea0eea67e",
+      "model": "google/gemini-3.8-flash",
+      "state": "completed",
+      "cost_usd": 0.04391025,
+      "turns": 13,
+      "tool_calls": 12,
+      "started_at": 1789713781668,
+      "ended_at": 1789713802562,
+      "end_reason": "final_answer",
+      "engine": "classic"
+    },
+    {
+      "id": "5b3d4b2b-cee8-4bc3-af22-8bf6c8aa2356",
+      "model": "google/gemini-3.8-flash",
+      "state": "completed",
+      "cost_usd": 0.00732612,
+      "turns": 4,
+      "tool_calls": 8,
+      "started_at": 1789713948023,
+      "ended_at": 1789713955024,
+      "end_reason": "final_answer",
+      "engine": "jev-auto"
+    },
+    {
+      "id": "3274ca02-0b77-4677-9d53-4fb63bebc0ea",
+      "model": "google/gemini-3.8-flash",
+      "state": "stopped",
+      "cost_usd": 0.0,
+      "turns": 0,
+      "tool_calls": 0,
+      "started_at": 1789713955340,
+      "ended_at": 1789713955496,
+      "end_reason": "user_stop",
+      "engine": "jev-auto"
+    },
+    {
+      "id": "2445eb69-6193-45ee-9284-717f53cc505d",
+      "model": "google/gemini-3.8-flash",
+      "state": "completed",
+      "cost_usd": 0.024191999999999998,
+      "turns": 9,
+      "tool_calls": 8,
+      "started_at": 1789713955619,
+      "ended_at": 1789713967848,
+      "end_reason": "final_answer",
+      "engine": "classic"
+    },
+    {
+      "id": "ddbef63c-e5d7-4ad9-9c1a-784428a3ba41",
+      "model": "google/gemini-3.8-flash",
+      "state": "completed",
+      "cost_usd": 0.007494546,
+      "turns": 4,
+      "tool_calls": 8,
+      "started_at": 1789714309003,
+      "ended_at": 1789714313931,
+      "end_reason": "final_answer",
+      "engine": "jev-auto"
+    },
+    {
+      "id": "7bf7356d-8125-44b5-acde-589880272781",
+      "model": "google/gemini-3.8-flash",
+      "state": "stopped",
+      "cost_usd": 0.0,
+      "turns": 0,
+      "tool_calls": 0,
+      "started_at": 1789714314329,
+      "ended_at": 1789714314484,
+      "end_reason": "user_stop",
+      "engine": "jev-auto"
+    },
+    {
+      "id": "41ca6664-7b28-48f6-b25b-30af49df46ed",
+      "model": "google/gemini-3.8-flash",
+      "state": "completed",
+      "cost_usd": 0.004413749999999999,
+      "turns": 2,
+      "tool_calls": 1,
+      "started_at": 1789714314605,
+      "ended_at": 1789714316576,
+      "end_reason": "final_answer",
+      "engine": "classic"
+    },
+    {
+      "id": "84590f99-c687-4367-a071-4609f9c53318",
+      "model": "google/gemini-3.8-flash",
+      "state": "completed",
+      "cost_usd": 0.00740775,
+      "turns": 3,
+      "tool_calls": 2,
+      "started_at": 1789714316768,
+      "ended_at": 1789714319640,
+      "end_reason": "final_answer",
+      "engine": "classic"
+    }
+  ],
+  "costUsd": 0.102326586
+}

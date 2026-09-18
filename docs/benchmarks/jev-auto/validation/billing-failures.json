@@ -1,0 +1,103 @@
+{
+  "criterion": "OpenRouter HTTP 402, with native logs confirming openrouter_credits; originals unchanged.",
+  "records": [
+    {
+      "task": "research-offers",
+      "engine": "browser-use",
+      "repeat": 2,
+      "providerBillingFailure": true,
+      "evidence": "native driver.log"
+    },
+    {
+      "task": "research-offers",
+      "engine": "app-auto",
+      "repeat": 2,
+      "providerBillingFailure": true,
+      "evidence": "endReason"
+    },
+    {
+      "task": "research-offers",
+      "engine": "browser-use",
+      "repeat": 3,
+      "providerBillingFailure": true,
+      "evidence": "native driver.log"
+    },
+    {
+      "task": "research-offers",
+      "engine": "app-auto",
+      "repeat": 3,
+      "providerBillingFailure": true,
+      "evidence": "endReason"
+    },
+    {
+      "task": "research-offers",
+      "engine": "app-first",
+      "repeat": 3,
+      "providerBillingFailure": true,
+      "evidence": "endReason"
+    },
+    {
+      "task": "tabs",
+      "engine": "app-first",
+      "repeat": 1,
+      "providerBillingFailure": true,
+      "evidence": "endReason"
+    },
+    {
+      "task": "tabs",
+      "engine": "browser-use",
+      "repeat": 1,
+      "providerBillingFailure": true,
+      "evidence": "native driver.log"
+    },
+    {
+      "task": "tabs",
+      "engine": "app-auto",
+      "repeat": 1,
+      "providerBillingFailure": true,
+      "evidence": "endReason"
+    },
+    {
+      "task": "tabs",
+      "engine": "browser-use",
+      "repeat": 2,
+      "providerBillingFailure": true,
+      "evidence": "native driver.log"
+    },
+    {
+      "task": "tabs",
+      "engine": "app-auto",
+      "repeat": 2,
+      "providerBillingFailure": true,
+      "evidence": "endReason"
+    },
+    {
+      "task": "tabs",
+      "engine": "app-first",
+      "repeat": 2,
+      "providerBillingFailure": true,
+      "evidence": "endReason"
+    },
+    {
+      "task": "tabs",
+      "engine": "app-auto",
+      "repeat": 3,
+      "providerBillingFailure": true,
+      "evidence": "endReason"
+    },
+    {
+      "task": "tabs",
+      "engine": "app-first",
+      "repeat": 3,
+      "providerBillingFailure": true,
+      "evidence": "endReason"
+    },
+    {
+      "task": "tabs",
+      "engine": "browser-use",
+      "repeat": 3,
+      "providerBillingFailure": true,
+      "evidence": "native driver.log"
+    }
+  ]
+}

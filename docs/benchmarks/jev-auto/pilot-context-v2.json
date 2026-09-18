@@ -1,0 +1,2036 @@
+{
+  "createdAt": "2026-09-18T05:20:03.564Z",
+  "model": "google/gemini-3.8-flash",
+  "effort": "low",
+  "upstream": "google-ai-studio",
+  "jev": "jev-1.13.0",
+  "engines": [
+    "app-auto"
+  ],
+  "repeats": 1,
+  "source": {
+    "app": "77846cb0d97af218dd8a2832dab9f488c703b210",
+    "poc": "77846cb0d97af218dd8a2832dab9f488c703b210",
+    "hashes": {
+      "run.mjs": "5b51304670034ed47bfc6a3569a40f4cc943abc64696eb41ce27e958a0c5e97c",
+      "tasks.mjs": "37682afd1c42f8f597ee36f743c902ef82303034934a9105bffb9166e9f81c04"
+    },
+    "candidate": "77846cb0d97af218dd8a2832dab9f488c703b210",
+    "candidateHashes": {
+      "services/agentd/dist/orchestrator/browser-auto.js": "bd6a0ef690cbacbc02d0f8d1a70c5cc8732522f956fb7f831feddb9298191ca9",
+      "services/agentd/dist/orchestrator/jev-browser.js": "1ee717bc7d12d3ee432eeaedcd028f1b12a08f6a876d00ffe014cffecf929ef5",
+      "services/agentd/dist/orchestrator/run-controller.js": "35ec88ea5830c313213893e6493f648b66c9b4740fdc788fc971d83d055810a9",
+      "services/browser-worker/dist/browser-session.js": "1f697254356470d7c275663dd4b3444934e9aec5b4d0dadf88b05d7f8dfac625"
+    },
+    "sharedWorker": "candidate BrowserSession for all variants; baseline controller unchanged",
+    "upstreamDriverHash": "261a9cd28020b8b55a6652f3f928039188f025409c81283c352451af7f01f76e",
+    "dirty": true
+  },
+  "clock": "setup includes driver/browser startup, navigation, consent, first observation; task includes independent final verification; screenshots and cleanup outside task",
+  "settings": {
+    "autoConfidence": 0.35,
+    "timeoutMs": 240000,
+    "viewport": {
+      "width": 1120,
+      "height": 780
+    },
+    "channel": "chromium",
+    "warmAfter": null,
+    "priorReportedCostUsd": 0.5896730549999999
+  },
+  "results": [
+    {
+      "task": "google-flights",
+      "category": "live",
+      "repeat": 1,
+      "engine": "app-auto",
+      "warm": false,
+      "success": false,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Where from?",
+          "value": "Wrocław"
+        },
+        {
+          "role": "combobox",
+          "name": "Where to?",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Departure",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Return",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "https://www.google.com/travel/flights?hl=en"
+      ],
+      "setupMs": 2448.435057,
+      "agentMs": 18309.979886,
+      "completed": false,
+      "state": "failed",
+      "endReason": "OpenRouter failed after 2 attempts: transport or response decoding error",
+      "primaryCalls": 2,
+      "primaryMs": 2015.0608959999981,
+      "jevCalls": 11,
+      "jevMs": 4771.724011,
+      "costUsd": 0.005164139999999999,
+      "actions": 20,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_action_or_denied; inspect state before any further action, never replay blindly",
+          "actions": 9,
+          "elapsedMs": 16289.470181,
+          "verified": false,
+          "parentCallId": "call_288167"
+        }
+      ],
+      "routes": [
+        {
+          "mode": "fast",
+          "tool": "browser_task",
+          "switched": false
+        }
+      ],
+      "batches": [],
+      "verificationMs": 23.592178999999305,
+      "taskMs": 18333.572065,
+      "verification": {
+        "passed": false,
+        "checks": {
+          "searchPage": false,
+          "origin": true,
+          "destination": true,
+          "oneWay": true,
+          "departure": false,
+          "year": false,
+          "passenger": true,
+          "economy": true,
+          "results": false
+        },
+        "url": "https://www.google.com/travel/flights?tfs=CBwQARocagwIAxIIL20vMDg5NjZyDAgDEggvbS8wNGpwbEABSAFwAYIBCwj___________8BmAEC&tfu=KgIIAw&hl=en",
+        "controls": [
+          {
+            "role": "button",
+            "label": "Main menu",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "link",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "link",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "link",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "link",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Change appearance",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Google apps",
+            "value": ""
+          },
+          {
+            "role": "combobox",
+            "label": "One way",
+            "value": "One way"
+          },
+          {
+            "role": "button",
+            "label": "1 passenger",
+            "value": ""
+          },
+          {
+            "role": "combobox",
+            "label": "Economy",
+            "value": "Economy"
+          },
+          {
+            "role": "combobox",
+            "label": "Where from?",
+            "value": "Zürich"
+          },
+          {
+            "role": "button",
+            "label": "Swap origin and destination.",
+            "value": ""
+          },
+          {
+            "role": "combobox",
+            "label": "Where to?",
+            "value": "London"
+          },
+          {
+            "role": "input",
+            "label": "Departure",
+            "value": ""
+          },
+          {
+            "role": "input",
+            "label": "Departure",
+            "value": ""
+          },
+          {
+            "role": "combobox",
+            "label": "One way",
+            "value": "One way"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "18511"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "19507"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "20507"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "21484"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "22507"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "23507"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "24507"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "25511"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "26654"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "27744"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "28394"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "29467"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "30403"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "1488"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "2775"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "3530"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "4573"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "5332"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "6421"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "7424"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "8348"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "9408"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "10440"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "11258"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "12251"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "13251"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "14258"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "15251"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "16233"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "17233"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "18207"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "19233"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "20237"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "21233"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "22212"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "23240"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "24251"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "25194"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "26207"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "27247"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "28207"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "29247"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "30332"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "31332"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "1"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "2"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "3"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "4"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "5"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "6"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "7"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "8"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "9"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "10"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "11"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "12"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "13"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "14"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "15"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "16"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "17"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "18"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "19"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "20"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "21"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "22"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "23"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "24"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "25"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "26"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "27"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "28"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "29"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "30"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "1"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "2"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "3"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "4"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "5"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "6"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "7"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "8"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "9"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "10"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "11"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "12"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "13"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "14"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "15"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "16"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "17"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "18"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "19"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "20"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "21"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "22"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "23"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "24"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "25"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "26"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "27"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "28"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "29"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "30"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "31"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "1"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "2"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "3"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "4"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "5"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "6"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "7"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "8"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "9"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "10"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "11"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "12"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "13"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "14"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "15"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "16"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "17"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "18"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "19"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "20"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "21"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "22"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "23"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "24"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "25"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "26"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "27"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "28"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "29"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "30"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "31"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "1"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "2"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "3"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "4"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "5"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "6"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "7"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "8"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "9"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "10"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "11"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "12"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "13"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "14"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "15"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "16"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "17"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "18"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "19"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "20"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "21"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "22"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "23"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "24"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "25"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "26"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "27"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "28"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "1"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "2"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "3"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "4"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "5"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "6"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "7"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "8"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "9"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "10"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "11"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "12"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "13"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "14"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "15"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "16"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "17"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "18"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "19"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "20"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "21"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "22"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "23"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "24"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "25"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "26"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "27"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "28"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "29"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "30"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "31"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "1"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "2"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "3"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "4"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "5"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "6"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "7"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "8"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "9"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "10"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "11"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "12"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "13"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "14"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "15"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "16"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "17"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "18"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "19"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "20"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "21"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "22"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "23"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "24"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "25"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "26"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "27"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "28"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "29"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "30"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "1"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "2"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "3"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "4"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "5"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "6"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "7"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "8"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "9"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "10"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "11"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "12"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "13"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "14"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "15"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "16"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "17"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "18"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "19"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "20"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "21"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "22"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "23"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "24"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "25"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "26"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "27"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "28"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "29"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "30"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "31"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "1"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "2"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "3"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "4"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "5"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "6"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "7"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "8"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "9"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "10"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "11"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "12"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "13"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "14"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "15"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "16"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "17"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "18"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "19"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "20"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "21"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "22"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "23"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "24"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "25"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "26"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "27"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "28"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "29"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "30"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "1"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "2"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "3"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "4"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "5"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "6"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "7"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "8"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "9"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "10"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "11"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "12"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "13"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "14"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "15"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "16"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "17"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "18"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "19"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "20"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "21"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "22"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "23"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "24"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "25"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "26"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "27"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "28"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "29"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "30"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "31"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "1"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "2"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "3"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "4"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "5"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "6"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "7"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "8"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "9"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "10"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "11"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "12"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "13"
+          },
+          {
+            "role": "button",
+            "label": "Previous",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Next",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Done.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Search",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Learn more about this section",
+            "value": ""
+          },
+          {
+            "role": "tab",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "tab",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "tab",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "tab",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Previous",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Next",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Find flights from Wrocław (WRO) to London (LTN) from PLN 130.  Operated by Ryanair. Oct 22 to Oct 30. Nonstop",
+            "value": "WrocławLondonOct 22 — Oct 30Nonstopfrom PLN 130"
+          },
+          {
+            "role": "button",
+            "label": "Find flights from Wrocław (WRO) to Paris (BVA) from PLN 209.  Operated by Ryanair. Nov 15 to Nov 22. Nonstop",
+            "value": "WrocławParisNov 15 — Nov 22Nonstopfrom PLN 209"
+          },
+          {
+            "role": "button",
+            "label": "Find flights from Wrocław (WRO) to Milan (BGY) from PLN 130.  Operated by Ryanair. Oct 31 to Nov 7. Nonstop",
+            "value": "WrocławMilanOct 31 — Nov 7Nonstopfrom PLN 130"
+          },
+          {
+            "role": "button",
+            "label": "Explore more destinations from Wrocław",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Previous",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Next",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "What are some good flight destinations from Poland?",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "How can I find last-minute flight deals?",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "How can I find cheap flights for a weekend getaway?",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "How can I find flight deals if my travel plans are flexible?",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "How can I find cheap flights to anywhere?",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "How can I get flight alerts for my trip?",
+            "value": ""
+          },
+          {
+            "role": "tab",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "tab",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Currency PLN",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "Report Illegal Content"
+          },
+          {
+            "role": "button",
+            "label": "International sites",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Explore flights",
+            "value": ""
+          }
+        ],
+        "visibleFlights": [],
+        "text": "Skip to main content\nAccessibility feedback\nExplore\nFlights\nHotels\nVacation rentals\nChange appearance\nSign in\nFlights\nOne way\n1\nEconomy\nZürich\nLondon\nOne way\nReset\nSeptember\nM\nT\nW\nT\nF\nS\nS\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n511\n19\n507\n20\n507\n21\n484\n22\n507\n23\n507\n24\n507\n25\n511\n26\n654\n27\n744\n28\n394\n29\n467\n30\n403\nOctober\nM\nT\nW\nT\nF\nS\nS\n1\n488\n2\n775\n3\n530\n4\n573\n5\n332\n6\n421\n7\n424\n8\n348\n9\n408\n10\n440\n11\n258\n12\n251\n13\n251\n14\n258\n15\n251\n16\n233\n17\n233\n18\n207\n19\n233\n20\n237\n21\n233\n22\n212\n23\n240\n24\n251\n25\n194\n26\n207\n27\n247\n28\n207\n29\n247\n30\n332\n31\n332\nNovember\nM\nT\nW\nT\nF\nS\nS\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\nDecember\nM\nT\nW\nT\nF\nS\nS\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\nJanuary 2027\nM\nT\nW\nT\nF\nS\nS\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\nFebruary 2027\nM\nT\nW\nT\nF\nS\nS\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\nMarch 2027\nM\nT\nW\nT\nF\nS\nS\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\nApril 2027\nM\nT\nW\nT\nF\nS\nS\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\nMay 2027\nM\nT\nW\nT\nF\nS\nS\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\nJune 2027\nM\nT\nW\nT\nF\nS\nS\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\nJuly 2027\nM\nT\nW\nT\nF\nS\nS\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\nAugust 2027\nM\nT\nW\nT\nF\nS\nS\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\nUnderlined prices indicate cheapest compared with other prices shown\nDone\nSearch\nFlexible? Discover the best flight deals with AI\nDescribe your ideal trip, and let Google Flights find the best deals for you\nExplore deals with AI\nFind and book cheap flights worldwide and track prices\nFind cheap flights from Poland to anywhere\nWrocław\nWarsaw\nKraków\nGdańsk\nWrocław\nLondon\nOct 22 — Oct 30\nNonstop\nfrom PLN 130\nWrocław\nParis\nNov 15 — Nov 22\nNonstop\nfrom PLN 209\nWrocław\nMilan\nOct 31 — Nov 7\nNonstop\nfrom PLN 130\nExplore destinations\nUseful tools to help you find the best airline tickets\nFind the cheapest days to fly\nThe Date grid and Price graph make it easy to find the best flight deals\nKnow when to book with price insights\nPrice history and trend data show you the best time to book your airline ticket to get the cheapest price for your flight\nTrack flight prices for a trip\nNot ready to book yet? Observe price changes for a route or flight and get notified when prices drop.\nExplore the best flight deals with AI\nDescribe your ideal trip and let Google Flights find you the best deals\nInsightful tools help you choose your trip dates\nIf your travel plans are flexible, use the form above to start searching for a specific trip. Then, play around with the Date grid and Price graph options on the Search page to find the cheapest days to fly and book your tickets.\nPopular flight destinations from Poland\nLondon\nMilan\nParis\nTokyo\nOslo\nBarcelona\nFrankfurt am Main\nCopenhagen\nRome\nMunich\nFrequently asked questions\nWhat are some good flight destinations from Poland?\nHow can I find last-minute flight deals?\nHow can I find cheap flights for a weekend getaway?\nHow can I find flight deals if my travel plans are flexible?\nHow can I find cheap flights to anywhere?\nHow can I get flight alerts for my trip?\nSearch more flights\nFind cheap flights on popular routes\nFlights from cities in Poland\nInternational flights from Poland\nFlights from Warsaw\nFlights from Kraków\nFlights from Gdańsk\nFlights from Wrocław\nFlights from Poznań\nFlights from Rzeszów\nLanguage​English (United States)\nLocation​Poland\nCurrencyPLN\n\nCurrent language and currency options applied: English (United States) - Poland - PLN\n\nDisplayed currencies may differ from the currencies used to purchase flights. Learn more\n\nPrices are final prices and include all taxes and fees, including payment fees for the cheapest common payment method (which may differ depending on the provider). Additional charges may apply for other types of payment, luggage, meals, WLAN or other additional services. Prices, availability and travel details are provided based on the latest information received from our partners. This information is reflected in the results within a period of less than 24 hours. Additional conditions may also be applied by our partners. You should then check prices and conditions with the services providers before booking.\n\nAbout\nPrivacy\nTerms\nJoin user studies\nReport Illegal Content\nFeedback\nHelp Center and Consumer Information\nInternational sites\nExplore flights\nThe cheapest price shown is 194 Polish zlotys on Sun, Oct 25."
+      }
+    }
+  ]
+}

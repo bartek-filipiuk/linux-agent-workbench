@@ -52,3 +52,9 @@ Gemini `google/gemini-3.8-flash / low`, OpenRouter `google-ai-studio`; Jev `jev-
 - Piloty wykonania i ich niepowodzenia zachowane w `experiments/browser-auto/artifacts/`; osobna seria końcowa nie miesza ich z finalnym wynikiem.
 - Dwa testy desktopu wykazały zły format argumentów Classic. Konwerter schematu uwzględniał `anyOf`, a rzeczywiste narzędzie używa `oneOf`. Poprawka zachowuje ograniczenia i runtime validation, dodaje typ `object`. Regresja korzysta z rzeczywistego schematu. Po poprawce cały desktop 4/4 PASS, Stop 27 ms. W porównaniu oba warianty aplikacji używają tego samego poprawionego adaptera; repo baseline pozostaje nietknięte.
 - Końcowa próba: lokalne 8 × 3 silniki × 3 powtórzenia, nowe 3 × 3 × 3, Flights 5 × 4 = 119. Ultrafast pozostaje dodatkowym odniesieniem Flights; jego ograniczenia analityczne już zmierzono w poprzednim PoC.
+
+## Stan realizacji i wznowienie po limicie dostawcy
+
+A i B wykonane; aplikacja oraz główne kontrole D gotowe (452 testy, 4 kontenerowe, 4/4 desktop po naprawie schematu). C pozostaje otwarte. Sześć lokalnych grup: 54/54 poprawne; dalsza część serii ma 4 sukcesy research i 14 błędów kredytów OpenRouter. Runner zatrzymuje teraz kolejne serie na 401/402. Pełny zapis: [wyniki](jev-auto-results.md).
+
+Po doładowaniu tego samego konta: zachować wszystkie oryginały, uruchomić osobno `research-offers,tabs` (3 silniki × 3), `holdout` (3 × 3), `google-flights` (4 × 5). Nie zmieniać modelu, providerów, promptów, progu ani kodu aplikacji. W podsumowaniu rozdzielić niedokończoną część pierwotnej serii od wznowienia, aby nie mieszać liczności. Dodatkowy retest decyzji i opcjonalny smoke runnera z widocznym oknem wykonać po seriach czasowych. Nie zamykać celu jako osiągniętego, dopóki te wymagane pomiary pozostają niewykonane, chyba że użytkownik jawnie ograniczy zakres.

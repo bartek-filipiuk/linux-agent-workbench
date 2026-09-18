@@ -1,5 +1,7 @@
 # Linux Agent Workbench
 
+This worktree adds **Jev Auto · experimental**: Gemini chooses fast Jev execution or guarded action batches per subtask, with the existing UI, session, policy and Stop. Run `pnpm dev:auto` for the isolated `jev-auto` profile. [Setup and architecture](docs/jev-auto.md) · [Measured results and outstanding validation](docs/jev-auto-results.md) · [Implementation plan](docs/jev-auto-plan.md).
+
 A Linux desktop workspace where an AI agent operates a containerized terminal and browser while you watch, review approvals, and take control.
 
 **The primary provider is Codex with ChatGPT subscription sign-in.** The separately billed OpenAI Responses API is also supported. Switching providers currently uses configuration files; a unified provider setup in Settings is the first major [roadmap](ROADMAP.md) item.

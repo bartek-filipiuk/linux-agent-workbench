@@ -1,0 +1,558 @@
+{
+  "criterion": "Offline runtime schema validation of recorded arguments; distinct from route selection and action execution.",
+  "reports": [
+    {
+      "file": "decisions-final-heldout.json",
+      "cases": [
+        {
+          "id": "italian-city",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_task",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "inventory",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_task",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "lease-cost",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_batch",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "multi-page",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_observe",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "registration-wizard",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_batch",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "missing-card",
+          "routePassed": true,
+          "calls": []
+        }
+      ],
+      "totalCalls": 5,
+      "invalidCalls": 0
+    },
+    {
+      "file": "decisions-pilot-1.json",
+      "cases": [
+        {
+          "id": "search",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_task",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "filters",
+          "routePassed": false,
+          "calls": [
+            {
+              "tool": "browser_observe",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "autocomplete",
+          "routePassed": false,
+          "calls": [
+            {
+              "tool": "browser_observe",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "flights",
+          "routePassed": false,
+          "calls": [
+            {
+              "tool": "browser_observe",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "polish-search",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_task",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "new-tab",
+          "routePassed": false,
+          "calls": [
+            {
+              "tool": "browser_observe",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "hotel",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_read",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "research",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_observe",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "polish-analysis",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_observe",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "missing-values",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_observe",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "article",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_read",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "mixed",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_observe",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "wizard",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_observe",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "form",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_batch",
+              "valid": false
+            }
+          ]
+        },
+        {
+          "id": "form-polish",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_batch",
+              "valid": false
+            }
+          ]
+        },
+        {
+          "id": "cycle-recovery",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_observe",
+              "valid": true
+            }
+          ]
+        }
+      ],
+      "totalCalls": 16,
+      "invalidCalls": 2
+    },
+    {
+      "file": "decisions-pilot-2.json",
+      "cases": [
+        {
+          "id": "search",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_task",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "filters",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_task",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "autocomplete",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_task",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "flights",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_task",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "polish-search",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_task",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "new-tab",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_task",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "hotel",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_read",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "research",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_observe",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "polish-analysis",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_observe",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "missing-values",
+          "routePassed": true,
+          "calls": []
+        },
+        {
+          "id": "article",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_read",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "mixed",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_observe",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "wizard",
+          "routePassed": false,
+          "calls": [
+            {
+              "tool": "browser_task",
+              "valid": false
+            }
+          ]
+        },
+        {
+          "id": "form",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_batch",
+              "valid": false
+            }
+          ]
+        },
+        {
+          "id": "form-polish",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_batch",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "cycle-recovery",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_observe",
+              "valid": true
+            }
+          ]
+        }
+      ],
+      "totalCalls": 15,
+      "invalidCalls": 2
+    },
+    {
+      "file": "decisions-pilot-3.json",
+      "cases": [
+        {
+          "id": "search",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_task",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "filters",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_task",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "autocomplete",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_task",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "flights",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_task",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "polish-search",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_task",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "new-tab",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_task",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "hotel",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_read",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "research",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_observe",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "polish-analysis",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_read",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "missing-values",
+          "routePassed": true,
+          "calls": []
+        },
+        {
+          "id": "article",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_read",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "mixed",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_batch",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "wizard",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_batch",
+              "valid": true
+            }
+          ]
+        },
+        {
+          "id": "form",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_batch",
+              "valid": false
+            }
+          ]
+        },
+        {
+          "id": "form-polish",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_batch",
+              "valid": false
+            }
+          ]
+        },
+        {
+          "id": "cycle-recovery",
+          "routePassed": true,
+          "calls": [
+            {
+              "tool": "browser_observe",
+              "valid": true
+            }
+          ]
+        }
+      ],
+      "totalCalls": 15,
+      "invalidCalls": 2
+    }
+  ]
+}

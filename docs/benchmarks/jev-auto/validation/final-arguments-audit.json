@@ -1,0 +1,492 @@
+{
+  "criterion": "Runtime schema validation of actual model browser_batch/browser_task calls in frozen local series; generated child calls and native Python tools excluded.",
+  "calls": [
+    {
+      "run": "autocomplete-app-auto-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "autocomplete-app-auto-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "autocomplete-app-auto-3",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "autocomplete-app-first-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "autocomplete-app-first-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "autocomplete-app-first-3",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "compare-offers-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "compare-offers-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "compare-offers-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "compare-offers-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "compare-offers-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "compare-offers-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "compare-offers-app-first-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "compare-offers-app-first-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "compare-offers-app-first-3",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "filters-app-auto-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "filters-app-auto-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "filters-app-auto-3",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "filters-app-first-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "filters-app-first-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "filters-app-first-3",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "research-offers-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "research-offers-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "research-offers-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "research-offers-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "research-offers-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "research-offers-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "research-offers-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "research-offers-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "research-offers-app-first-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "research-offers-app-first-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "search-app-auto-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "search-app-auto-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "search-app-auto-3",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "search-app-first-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "search-app-first-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "search-app-first-3",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-first-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-first-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "wizard-10-app-first-3",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "wizard-6-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-6-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-6-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-6-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-6-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-6-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-6-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-6-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-6-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-6-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-6-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-6-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-6-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-6-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-6-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-6-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-6-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-6-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-6-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-6-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-6-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "run": "wizard-6-app-first-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "wizard-6-app-first-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "run": "wizard-6-app-first-3",
+      "tool": "browser_task",
+      "valid": true
+    }
+  ],
+  "totalCalls": 97,
+  "invalidCalls": 0
+}
