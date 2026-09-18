@@ -29,7 +29,9 @@ export function openRouterSchema(value: unknown): unknown {
   if (!value || typeof value !== "object") return value;
   const input = value as Record<string, unknown>;
   const out = Object.fromEntries(Object.entries(input).filter(([key]) => key !== "$schema").map(([key, child]) => [key, openRouterSchema(child)]));
-  if (!out.type && Array.isArray(out.anyOf) && out.anyOf.length && out.anyOf.every(child => child.type === "object")) out.type = "object";
+  for (const union of [out.anyOf, out.oneOf]) {
+    if (!out.type && Array.isArray(union) && union.length && union.every(child => child && typeof child === "object" && child.type === "object")) out.type = "object";
+  }
   return out;
 }
 

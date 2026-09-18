@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { ProtocolError } from "@law/protocol";
 import { OpenRouterAdapter, openRouterSchema } from "../src/provider/openrouter.js";
+import { BROWSER_TOOLS } from "../src/tools/browser-tools.js";
 
 const tool = { name: "observe", description: "Observe", parameters: { type: "object", properties: {} } };
 const ctx = (previousResponseId?: string, signal = new AbortController().signal) => ({ tools: [tool], system: "policy", signal, ...(previousResponseId ? { previousResponseId } : {}) });
@@ -86,3 +87,14 @@ describe("OpenRouter adapter", () => {
    const branches = [{ type: "object", properties: { kind: { const: "click" } }, required: ["kind", "ref"] }, { type: "object", properties: { kind: { const: "type" } }, required: ["kind", "text"] }];
    expect(openRouterSchema({ $schema: "draft-7", properties: { action: { anyOf: branches } } })).toEqual({ properties: { action: { type: "object", anyOf: branches } } });
  });
+
+it("sends the actual browser action oneOf as an object without removing constraints", async () => {
+  const actionTool = BROWSER_TOOLS.find(t => t.name === "browser_act")!;
+  const f = fixture([response({ content: "done" })]);
+  await f.make().turn({ goal: "navigate" }, { ...ctx(), tools: [actionTool] });
+  const converted = f.calls[0].tools[0].function.parameters.properties.action;
+  const original = (actionTool.parameters as any).properties.action;
+  expect(converted.type).toBe("object");
+  expect(converted.oneOf).toEqual(original.oneOf);
+  expect(openRouterSchema({ oneOf: [{ type: "object" }, { type: "string" }] })).toEqual({ oneOf: [{ type: "object" }, { type: "string" }] });
+});

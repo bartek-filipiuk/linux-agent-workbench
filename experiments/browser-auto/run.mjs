@@ -56,8 +56,8 @@ const report={createdAt:new Date().toISOString(),model,effort:'low',upstream:'go
   settings:{autoConfidence:Number(flag('--auto-confidence','0.35')),timeoutMs,viewport:{width:1120,height:780},channel:'chromium',warmAfter:flag('--warm-after',null)},results:[]};
 report.source.hashes=Object.fromEntries(['run.mjs','tasks.mjs'].map(file=>[file,createHash('sha256').update(fs.readFileSync(path.join(root,file))).digest('hex')]));
 report.source.candidate=execFileSync('git',['rev-parse','HEAD'],{cwd:repo,encoding:'utf8'}).trim();
-report.source.candidateHashes=Object.fromEntries(['services/agentd/dist/orchestrator/browser-auto.js','services/agentd/dist/orchestrator/jev-browser.js','services/agentd/dist/orchestrator/run-controller.js','services/browser-worker/dist/browser-session.js'].map(f=>[f,createHash('sha256').update(fs.readFileSync(path.join(repo,f))).digest('hex')]));
-report.source.sharedWorker='same Chrome build/settings; app-first uses unchanged baseline controller, tools and worker; app-auto uses candidate; Python engines use pinned native drivers';
+report.source.candidateHashes=Object.fromEntries(['services/agentd/dist/provider/openrouter.js','services/agentd/dist/orchestrator/browser-auto.js','services/agentd/dist/orchestrator/jev-browser.js','services/agentd/dist/orchestrator/run-controller.js','services/browser-worker/dist/browser-session.js'].map(f=>[f,createHash('sha256').update(fs.readFileSync(path.join(repo,f))).digest('hex')]));
+report.source.sharedWorker='same Chrome build/settings; app-first uses unchanged baseline controller, tools and worker; app-auto uses candidate; both app engines share candidate OpenRouter schema adapter (explicit object oneOf); Python engines use pinned native drivers';
 report.source.upstreamDriverHash=createHash('sha256').update(fs.readFileSync(path.join(upstreamRoot,'driver.py'))).digest('hex');
 report.source.dirty=!!execFileSync('git',['status','--porcelain'],{cwd:root,encoding:'utf8'}).trim();
 report.settings.priorReportedCostUsd=fs.readdirSync(path.dirname(output)).filter(f=>f.endsWith('.json')).reduce((sum,f)=>{
@@ -71,7 +71,8 @@ const reportedCost=()=>report.results.reduce((s,r)=>s+(r.costUsd??0),0);
 const jevCost=usage=>((usage?.input_tokens??usage?.prompt_tokens??0)*0.042)/1e6;
 
 async function appDriver(browser,task,goal,workDir,engine){
-  const {Store,RunController,OpenRouterAdapter}=engine==='app-auto'?candidate:baseline;
+  const {Store,RunController}=engine==='app-auto'?candidate:baseline;
+  const {OpenRouterAdapter}=candidate; // Shared schema correction; execution/controller remain engine-specific.
   const browserExecutor=engine==='app-auto'?candidateBrowserExecutor:baselineBrowserExecutor;
   const store=new Store(':memory:');let lastObservation;
   const target={status:{state:'ready'},start:async()=>({state:'ready'}),observe:async input=>(lastObservation=await browser.observe(input)),act:a=>browser.act(a),read:i=>browser.read(i),wait:i=>browser.wait(i),downloads:async()=>[]};

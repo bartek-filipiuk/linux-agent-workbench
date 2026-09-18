@@ -31,7 +31,7 @@ Następnie po jednym zadaniu search, formularz, analiza, karty i Flights z nieza
 
 ### C. Zamrożone porównanie
 
-Zamrozić kod i zestaw zadań przed serią. Porównać Auto z niezmienionym First + Gemini oraz Ultrafast/Browser Use na wspólnej przeglądarce i zegarze. Co najmniej trzy powtórzenia lokalnych zadań różnych typów i pięć Flights na świeżych profilach; rotacja kolejności, sekwencyjne wykonanie. Dołączyć nowe warianty danych/zadań niewykorzystywane przy dostrajaniu. Jeśli koszt lub czas wymusi redukcję, jawnie opisać liczność i ograniczenia.
+Zamrozić kod i zestaw zadań przed serią. Porównać Auto z bazowym First + Gemini (wspólna poprawka adaptera OpenRouter: jawny typ obiektu dla `oneOf`; kontroler, narzędzia i worker First z 77846cb) oraz Ultrafast/Browser Use na wspólnej przeglądarce i zegarze. Co najmniej trzy powtórzenia lokalnych zadań różnych typów i pięć Flights na świeżych profilach; rotacja kolejności, sekwencyjne wykonanie. Dołączyć nowe warianty danych/zadań niewykorzystywane przy dostrajaniu. Jeśli koszt lub czas wymusi redukcję, jawnie opisać liczność i ograniczenia.
 
 Sukces = zakończenie + niezależnie poprawny wynik. Wszystkie błędy pozostają w danych. Osobno: setup, czas zadania z weryfikacją, model główny, Jev, reszta, liczby wywołań, tryby i przełączenia, koszt. Wybór trybu jest częścią odpowiedzi planisty: nie nazywać całego czasu tej odpowiedzi czystym narzutem routera. Mała próbka nie dowodzi równej niezawodności.
 
@@ -44,3 +44,11 @@ Typecheck/build, pełna suite, headful, realny desktop/container smoke z nowym w
 ## Granice i koszt
 
 Gemini `google/gemini-3.8-flash / low`, OpenRouter `google-ai-studio`; Jev `jev-1.13.0`. Bez Mercury i eskalacji modelu. Zachowane klucze pobierane z OS keyring tylko do pamięci hosta, nigdy do repo, argumentów komend lub środowiska Chrome. Dedykowane profile i dozwolone domeny. Początkowy limit wykonawczy nowych eksperymentów: $15 raportowanego usage, $1 na próbę, 240 s na zadanie; koszty przerwanych zapytań mogą nie wrócić w usage. To nie budżet tokenów celu.
+
+## Przed zamrożeniem serii końcowej
+
+- Kontrakty batch/Stop/policy/cycle sprawdzone jednostkowo; pełna suite przed ostatnią poprawką: 451 PASS, 12 skip. Test kontenera: 4 PASS.
+- Routing: piloty 12/16 → 15/16 → 16/16, następnie 6/6 nowych poleceń bez wykonania. To test wyboru narzędzia, nie dowód poprawności zadania.
+- Piloty wykonania i ich niepowodzenia zachowane w `experiments/browser-auto/artifacts/`; osobna seria końcowa nie miesza ich z finalnym wynikiem.
+- Dwa testy desktopu wykazały zły format argumentów Classic. Konwerter schematu uwzględniał `anyOf`, a rzeczywiste narzędzie używa `oneOf`. Poprawka zachowuje ograniczenia i runtime validation, dodaje typ `object`. Regresja korzysta z rzeczywistego schematu. Po poprawce cały desktop 4/4 PASS, Stop 27 ms. W porównaniu oba warianty aplikacji używają tego samego poprawionego adaptera; repo baseline pozostaje nietknięte.
+- Końcowa próba: lokalne 8 × 3 silniki × 3 powtórzenia, nowe 3 × 3 × 3, Flights 5 × 4 = 119. Ultrafast pozostaje dodatkowym odniesieniem Flights; jego ograniczenia analityczne już zmierzono w poprzednim PoC.
