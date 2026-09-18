@@ -1,5 +1,7 @@
 # Jev Auto: plan wdrożenia i bramki decyzyjne
 
+**Stan końcowy: A–D wykonane.** Po doładowaniu dokończono zadeklarowane 119 prób porównawczych (119 poprawnych), testy routingu, widoczne okno, Stop, audyt i raport. Opis blokady poniżej jest historią przebiegu, nie bieżącym statusem. [Wyniki końcowe](jev-auto-results.md).
+
 Cel z 18 września 2026: działająca hybryda w obecnej aplikacji, sprawdzona etapami. Osobny worktree `/home/bartek/linux-agent-auto`, branch `experiment/jev-auto`, baseline `77846cb`. Zachowujemy dotychczasowe UI, RunController, jedną sesję, politykę każdej akcji i Stop. Nie zmieniamy main ani baseline’u Jev First. Poprzednie wyniki: [pełne archiwum](../../linux-agent-browser-poc/WSZYSTKIE-WYNIKI-TESTOW.md).
 
 ## Hipotezy wynikające z pomiarów
@@ -63,3 +65,12 @@ Po doładowaniu tego samego konta: zachować wszystkie oryginały, uruchomić os
 ## Status celu po ponownej weryfikacji
 
 18 września 2026, 07:22:58 UTC: bezpłatny odczyt API konta potwierdził działający klucz oraz brak dodatniego salda na płatne zapytania. Nie wywoływano modelu i nie zmieniano konfiguracji benchmarku. Po utrzymaniu się tej samej blokady przez trzy kolejne tury cel oznaczono **blocked**, nie complete. Implementacja i zachowane wyniki pozostają gotowe; brakujące porównania wymagają doładowania konta. Dokładne saldo konta nie jest publikowane w repozytorium.
+
+
+## Zamknięcie zakresu po wznowieniu
+
+- Zamrożony kod aplikacji pozostał bez zmian. 18 prób research/kart po wznowieniu, 27 nowych wariantów i 20 Flights zakończone. Główna próbka 119/119; pierwotny przerwany blok 18 (4 sukcesy, 14 błędów kredytów) zachowany w całości osobno.
+- Końcowy routing: 13/16 w pierwszym reteście, w tym 2 błędy HTTP 429 oraz jedna dozwolona, lecz inna od oczekiwanej ścieżka dla nowej karty. Nowe polecenia 6/6. Powtórzono wyłącznie 2 przypadki bez odpowiedzi: 2/2; wszystkie 20 zwróconych wywołań z tych końcowych kontroli mają poprawny schemat. Odchylenia nie usunięto z wyników.
+- Widoczna przeglądarka PASS. Stop na żywym Flights: stan stopped, zamknięcie przeglądarki 129,9 ms, cleanup 139,1 ms. Kontrole desktopu/containera i 452 testy dotyczą niezmienionej aplikacji.
+- Raport z czasami modeli, pozostałym czasem, kosztami, routingiem, wszystkimi próbami i wykresami PNG/SVG oraz zbiorczy plik MD uaktualnione. Zachowano błędy argumentów, providerów i niestabilny wcześniejszy test terminala; nie są maskowane dodatkowymi sukcesami.
+- Wyniki uzasadniają opcjonalne Auto dla długich formularzy i analiz; prostsze zadania bywają szybsze w First, a native Ultrafast wygrywa Flights. Browser Use pozostaje punktem odniesienia, domyślny Classic i main bez zmian. Nie jest to gwarancja niezawodności na dowolnej witrynie.

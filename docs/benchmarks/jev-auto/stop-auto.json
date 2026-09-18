@@ -1,0 +1,108 @@
+{
+  "createdAt": "2026-09-18T07:52:57.707Z",
+  "model": "google/gemini-3.8-flash",
+  "effort": "low",
+  "upstream": "google-ai-studio",
+  "jev": "jev-1.13.0",
+  "engines": [
+    "app-auto"
+  ],
+  "repeats": 1,
+  "source": {
+    "app": "77846cb0d97af218dd8a2832dab9f488c703b210",
+    "poc": "b561533640a76bcd229cc87167fb344965abf61b",
+    "hashes": {
+      "run.mjs": "05af657595b3ea928a18b34b592cbe592684bb08f2b8515a74486d2c3e18505e",
+      "tasks.mjs": "c194830be3e27755b0dfdd228477b9af34238f0338ef7d383b09c34863a336c9"
+    },
+    "candidate": "b561533640a76bcd229cc87167fb344965abf61b",
+    "candidateHashes": {
+      "services/agentd/dist/provider/openrouter.js": "d1556c37fd28c92de25c33a606c7b3f36b39d6b71a742d6d73363bf4865f05e6",
+      "services/agentd/dist/orchestrator/browser-auto.js": "c294a9c1adbb9606f812b353eecb2cd694e8fb4310e80715fc2b1721b9faca36",
+      "services/agentd/dist/orchestrator/jev-browser.js": "65263e7fc27598036610ef2917296bd2855341aed7b6d6e204a5638e11aab8aa",
+      "services/agentd/dist/orchestrator/run-controller.js": "35ec88ea5830c313213893e6493f648b66c9b4740fdc788fc971d83d055810a9",
+      "services/browser-worker/dist/browser-session.js": "839ef80647ad8956d89048e251a0c43c05f256ea3e84d1e28937f459528af77e"
+    },
+    "sharedWorker": "same Chrome build/settings; app-first uses unchanged baseline controller, tools and worker; app-auto uses candidate; both app engines share candidate OpenRouter schema adapter (explicit object oneOf); Python engines use pinned native drivers",
+    "upstreamDriverHash": "261a9cd28020b8b55a6652f3f928039188f025409c81283c352451af7f01f76e",
+    "dirty": false
+  },
+  "clock": "setup includes driver/browser startup, navigation, consent, first observation; task includes independent final verification; screenshots and cleanup outside task",
+  "settings": {
+    "autoConfidence": 0.35,
+    "timeoutMs": 240000,
+    "viewport": {
+      "width": 1120,
+      "height": 780
+    },
+    "channel": "chromium",
+    "warmAfter": null,
+    "priorReportedCostUsd": 4.781469327
+  },
+  "results": [
+    {
+      "task": "google-flights",
+      "category": "live",
+      "repeat": 1,
+      "engine": "app-auto",
+      "warm": false,
+      "success": false,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Where from?",
+          "value": "Wrocław"
+        },
+        {
+          "role": "combobox",
+          "name": "Where to?",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Departure",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Return",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "https://www.google.com/travel/flights?hl=en"
+      ],
+      "setupMs": 2793.9215920000006,
+      "agentMs": 2504.6900669999995,
+      "completed": false,
+      "state": "stopped",
+      "endReason": "benchmark_stop",
+      "primaryCalls": 1,
+      "primaryMs": 1467.9889469999998,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.00198675,
+      "jevErrors": [],
+      "actions": 0,
+      "fallbacks": [],
+      "routes": [
+        {
+          "mode": "fast",
+          "tool": "browser_task",
+          "switched": false
+        }
+      ],
+      "batches": [],
+      "engineState": "stopped",
+      "verificationMs": 0.007263000000421016,
+      "taskMs": 2504.69733,
+      "verification": {
+        "passed": false,
+        "reason": "interrupted before verification"
+      },
+      "stopMs": 139.1339939999998,
+      "browserStopMs": 129.88763500000005
+    }
+  ],
+  "stoppedReason": "interrupted"
+}

@@ -1,0 +1,29 @@
+{
+  "selectedComparisonTrials": 119,
+  "passed": 119,
+  "rawFinalTrials": 137,
+  "interruptedBlockRecords": 18,
+  "balancedTaskEngineGroups": 37,
+  "frozenCompiledHashesMatch": true,
+  "frozenSourceHashesMatch": true,
+  "sameProviderModelAndFixtures": true,
+  "exportedJsonFilesVerified": 29,
+  "archiveEntriesVerified": 210,
+  "headfulPassed": true,
+  "stopPassed": true,
+  "stopBrowserMs": 129.88763500000005,
+  "stopCleanupMs": 139.1339939999998,
+  "reportLinksResolve": true,
+  "accountTotalsNotExported": true,
+  "remainingOwnedAppProcesses": [],
+  "softwareValidation": "452 tests passed + 4 container checks + desktop 4/4; unchanged production source since validated freeze",
+  "knownLimitations": [
+    "one different first-turn route",
+    "two routing checks initially HTTP 429; targeted retry 2/2",
+    "one malformed wait argument rejected and corrected",
+    "small samples; historical interrupted block retained separately",
+    "pre-existing global Podman allocated-storage cap exceeded; built image is functional"
+  ],
+  "markdownRegeneratedFromExportsMatchesRaw": true,
+  "plotReviewed": "Generated PNG visually reviewed; SVG preserves text and same measurements"
+}

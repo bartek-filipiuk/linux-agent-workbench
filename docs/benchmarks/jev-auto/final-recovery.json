@@ -1,0 +1,1300 @@
+{
+  "createdAt": "2026-09-18T07:28:18.190Z",
+  "model": "google/gemini-3.8-flash",
+  "effort": "low",
+  "upstream": "google-ai-studio",
+  "jev": "jev-1.13.0",
+  "engines": [
+    "app-auto",
+    "app-first",
+    "browser-use"
+  ],
+  "repeats": 3,
+  "source": {
+    "app": "77846cb0d97af218dd8a2832dab9f488c703b210",
+    "poc": "ac1c0f517a8429df36c6313195165902cbc8319d",
+    "hashes": {
+      "run.mjs": "05af657595b3ea928a18b34b592cbe592684bb08f2b8515a74486d2c3e18505e",
+      "tasks.mjs": "c194830be3e27755b0dfdd228477b9af34238f0338ef7d383b09c34863a336c9"
+    },
+    "candidate": "ac1c0f517a8429df36c6313195165902cbc8319d",
+    "candidateHashes": {
+      "services/agentd/dist/provider/openrouter.js": "d1556c37fd28c92de25c33a606c7b3f36b39d6b71a742d6d73363bf4865f05e6",
+      "services/agentd/dist/orchestrator/browser-auto.js": "c294a9c1adbb9606f812b353eecb2cd694e8fb4310e80715fc2b1721b9faca36",
+      "services/agentd/dist/orchestrator/jev-browser.js": "65263e7fc27598036610ef2917296bd2855341aed7b6d6e204a5638e11aab8aa",
+      "services/agentd/dist/orchestrator/run-controller.js": "35ec88ea5830c313213893e6493f648b66c9b4740fdc788fc971d83d055810a9",
+      "services/browser-worker/dist/browser-session.js": "839ef80647ad8956d89048e251a0c43c05f256ea3e84d1e28937f459528af77e"
+    },
+    "sharedWorker": "same Chrome build/settings; app-first uses unchanged baseline controller, tools and worker; app-auto uses candidate; both app engines share candidate OpenRouter schema adapter (explicit object oneOf); Python engines use pinned native drivers",
+    "upstreamDriverHash": "261a9cd28020b8b55a6652f3f928039188f025409c81283c352451af7f01f76e",
+    "dirty": false
+  },
+  "clock": "setup includes driver/browser startup, navigation, consent, first observation; task includes independent final verification; screenshots and cleanup outside task",
+  "settings": {
+    "autoConfidence": 0.35,
+    "timeoutMs": 240000,
+    "viewport": {
+      "width": 1120,
+      "height": 780
+    },
+    "channel": "chromium",
+    "warmAfter": null,
+    "priorReportedCostUsd": 2.6661846120000003
+  },
+  "results": [
+    {
+      "task": "research-offers",
+      "category": "reasoning",
+      "repeat": 1,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected provider Choose Atlas Boreal Cedar",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "First-year total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36051/research-offers"
+      ],
+      "setupMs": 439.55819399999996,
+      "agentMs": 13722.027399999999,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 7,
+      "primaryMs": 13208.318750999999,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.022533,
+      "jevErrors": [],
+      "actions": 7,
+      "fallbacks": [],
+      "routes": [
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        }
+      ],
+      "batches": [
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 0,
+          "requested": 0,
+          "verified": false,
+          "elapsedMs": 23.830089999999927,
+          "parentCallId": "call_417790"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 134.22298499999943,
+          "parentCallId": "call_480966"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 45.853940999999395,
+          "parentCallId": "call_312893"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 45.696029000000635,
+          "parentCallId": "call_248182"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 115.90212400000019,
+          "parentCallId": "call_240288"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 3,
+          "requested": 3,
+          "verified": false,
+          "elapsedMs": 136.7507540000006,
+          "parentCallId": "call_329555"
+        }
+      ],
+      "verificationMs": 2.6553690000000643,
+      "taskMs": 13724.682769,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "provider": "Boreal",
+          "total": "744"
+        },
+        "visited": [
+          "atlas",
+          "boreal",
+          "cedar"
+        ]
+      }
+    },
+    {
+      "task": "research-offers",
+      "category": "reasoning",
+      "repeat": 1,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected provider Choose Atlas Boreal Cedar",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "First-year total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36051/research-offers"
+      ],
+      "setupMs": 439.789929999999,
+      "agentMs": 21492.083270000003,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 10,
+      "primaryMs": 18878.272871000012,
+      "jevCalls": 2,
+      "jevMs": 1742.9415729999964,
+      "costUsd": 0.039080118000000004,
+      "jevErrors": [],
+      "actions": 10,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_operation",
+          "actions": 1,
+          "elapsedMs": 1951.31711,
+          "verified": false,
+          "parentCallId": "call_500631"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 2.5618519999989076,
+      "taskMs": 21494.645122,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "provider": "Boreal",
+          "total": "744"
+        },
+        "visited": [
+          "atlas",
+          "boreal",
+          "cedar"
+        ]
+      }
+    },
+    {
+      "task": "research-offers",
+      "category": "reasoning",
+      "repeat": 1,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected provider Choose Atlas Boreal Cedar",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "First-year total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36051/research-offers"
+      ],
+      "setupMs": 1991.8598300000012,
+      "agentMs": 28540.318955000002,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 10,
+      "final": "Visited all three offer pages (Atlas, Boreal, and Cedar) and evaluated them against the criteria (at least 20 users, SSO, and EU data residency):\n- Atlas: 25 users, SSO, EU residency. Cost: 49 EUR/month * 12 + 250 EUR setup = 838 EUR.\n- Boreal: 20 users, SSO, EU residency. Cost: 62 EUR/month * 12 + 0 EUR setup = 744 EUR.\n- Cedar: 30 users, SSO, US data residency only (disqualified).\n\nSelected the qualifying winner Boreal, entered the first-year total of 744 EUR, and saved the comparison.",
+      "errors": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "primaryCalls": 8,
+      "primaryMs": 21383.83620296372,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.054545249999999997,
+      "verificationMs": 3.382418000008329,
+      "taskMs": 28543.70137300001,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "provider": "Boreal",
+          "total": "744"
+        },
+        "visited": [
+          "atlas",
+          "boreal",
+          "cedar"
+        ]
+      }
+    },
+    {
+      "task": "research-offers",
+      "category": "reasoning",
+      "repeat": 2,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected provider Choose Atlas Boreal Cedar",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "First-year total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36051/research-offers"
+      ],
+      "setupMs": 395.5702799999999,
+      "agentMs": 14848.794647000002,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 8,
+      "primaryMs": 13256.732586999991,
+      "jevCalls": 2,
+      "jevMs": 1089.917530000006,
+      "costUsd": 0.028531128,
+      "jevErrors": [],
+      "actions": 8,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_operation",
+          "actions": 1,
+          "elapsedMs": 1279.2189669999934,
+          "verified": false,
+          "parentCallId": "call_477757"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 2.455832999999984,
+      "taskMs": 14851.250480000002,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "provider": "Boreal",
+          "total": "744"
+        },
+        "visited": [
+          "atlas",
+          "boreal",
+          "cedar"
+        ]
+      }
+    },
+    {
+      "task": "research-offers",
+      "category": "reasoning",
+      "repeat": 2,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected provider Choose Atlas Boreal Cedar",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "First-year total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36051/research-offers"
+      ],
+      "setupMs": 2009.7471289999958,
+      "agentMs": 33741.890604,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 10,
+      "final": "Completed the evaluation of Atlas, Boreal, and Cedar hosting offers:\n- Atlas: 25 users, SSO, EU data residency, 49 EUR/mo + 250 EUR setup = 838 EUR first-year total (Qualifies)\n- Boreal: 20 users, SSO, EU data residency, 62 EUR/mo + 0 EUR setup = 744 EUR first-year total (Qualifies)\n- Cedar: 30 users, SSO, US data residency only (Disqualified)\n\nSelected Boreal as the qualifying winner, entered 744 EUR as the first-year total, and saved the comparison.",
+      "errors": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "primaryCalls": 8,
+      "primaryMs": 26737.968768866267,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.05644275,
+      "verificationMs": 3.4267670000117505,
+      "taskMs": 33745.31737100001,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "provider": "Boreal",
+          "total": "744"
+        },
+        "visited": [
+          "atlas",
+          "boreal",
+          "cedar"
+        ]
+      }
+    },
+    {
+      "task": "research-offers",
+      "category": "reasoning",
+      "repeat": 2,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected provider Choose Atlas Boreal Cedar",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "First-year total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36051/research-offers"
+      ],
+      "setupMs": 387.15104399999836,
+      "agentMs": 13997.321954999992,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 9,
+      "primaryMs": 13141.136224000002,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.03301125,
+      "jevErrors": [],
+      "actions": 9,
+      "fallbacks": [],
+      "routes": [
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        }
+      ],
+      "batches": [
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 0,
+          "requested": 0,
+          "verified": false,
+          "elapsedMs": 15.930959000004805,
+          "parentCallId": "call_397964"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 113.99098600000434,
+          "parentCallId": "call_504450"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 113.47611499999766,
+          "parentCallId": "call_517093"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 116.48900200000207,
+          "parentCallId": "call_229699"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 119.59757299999183,
+          "parentCallId": "call_481978"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 100.22713400000066,
+          "parentCallId": "call_646266"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 120.07123699999647,
+          "parentCallId": "call_271378"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 3,
+          "requested": 3,
+          "verified": false,
+          "elapsedMs": 147.73128900001757,
+          "parentCallId": "call_299286"
+        }
+      ],
+      "verificationMs": 2.515406999998959,
+      "taskMs": 13999.837361999991,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "provider": "Boreal",
+          "total": "744"
+        },
+        "visited": [
+          "atlas",
+          "boreal",
+          "cedar"
+        ]
+      }
+    },
+    {
+      "task": "research-offers",
+      "category": "reasoning",
+      "repeat": 3,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected provider Choose Atlas Boreal Cedar",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "First-year total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36051/research-offers"
+      ],
+      "setupMs": 2022.3000089999987,
+      "agentMs": 29025.460180999973,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 10,
+      "final": "Visited all three offer pages (Atlas, Boreal, and Cedar) to evaluate plans requiring at least 20 users, SSO, and EU data residency:\n- Atlas: 25 users, SSO, EU data residency. 49 EUR/month * 12 + 250 EUR setup fee = 838 EUR.\n- Boreal: 20 users, SSO, EU data residency. 62 EUR/month * 12 + 0 EUR setup fee = 744 EUR.\n- Cedar: 30 users, SSO, US data residency only (disqualified).\n\nBoreal is the qualifying winner with the lowest total first-year cost of 744 EUR. Returned to the Comparison page, selected Boreal, entered 744, and saved the comparison.",
+      "errors": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "primaryCalls": 8,
+      "primaryMs": 22065.976154932287,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.05667900000000001,
+      "verificationMs": 3.9734860000025947,
+      "taskMs": 29029.433666999976,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "provider": "Boreal",
+          "total": "744"
+        },
+        "visited": [
+          "atlas",
+          "boreal",
+          "cedar"
+        ]
+      }
+    },
+    {
+      "task": "research-offers",
+      "category": "reasoning",
+      "repeat": 3,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected provider Choose Atlas Boreal Cedar",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "First-year total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36051/research-offers"
+      ],
+      "setupMs": 399.1171789999935,
+      "agentMs": 13418.037376000022,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 9,
+      "primaryMs": 12619.832632999984,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.03099,
+      "jevErrors": [],
+      "actions": 9,
+      "fallbacks": [],
+      "routes": [
+        {
+          "mode": "planned",
+          "tool": "browser_observe",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        }
+      ],
+      "batches": [
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 100.26778300001752,
+          "parentCallId": "call_357989"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 97.06562599999597,
+          "parentCallId": "call_311014"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 107.36010499999975,
+          "parentCallId": "call_241439"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 109.56842100000358,
+          "parentCallId": "call_330031"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 109.09056599999894,
+          "parentCallId": "call_451627"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 121.21670600000652,
+          "parentCallId": "call_299107"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 3,
+          "requested": 3,
+          "verified": false,
+          "elapsedMs": 132.9088520000223,
+          "parentCallId": "call_288583"
+        }
+      ],
+      "verificationMs": 2.2167649999901187,
+      "taskMs": 13420.254141000012,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "provider": "Boreal",
+          "total": "744"
+        },
+        "visited": [
+          "atlas",
+          "boreal",
+          "cedar"
+        ]
+      }
+    },
+    {
+      "task": "research-offers",
+      "category": "reasoning",
+      "repeat": 3,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected provider Choose Atlas Boreal Cedar",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "First-year total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36051/research-offers"
+      ],
+      "setupMs": 397.7343900000269,
+      "agentMs": 18963.904438000027,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 9,
+      "primaryMs": 12108.245763999963,
+      "jevCalls": 2,
+      "jevMs": 6166.422690000007,
+      "costUsd": 0.033327888,
+      "jevErrors": [
+        {
+          "reason": "timeout_or_transport",
+          "elapsedMs": 5002.658155000012,
+          "parentCallId": "call_420533"
+        }
+      ],
+      "actions": 10,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "jev_timeout_or_transport; inspect attached evidence and use fallback instead of immediately repeating the same delegation",
+          "actions": 2,
+          "elapsedMs": 6455.326535,
+          "verified": false,
+          "parentCallId": "call_420533"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 2.228638000000501,
+      "taskMs": 18966.133076000027,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "provider": "Boreal",
+          "total": "744"
+        },
+        "visited": [
+          "atlas",
+          "atlas",
+          "boreal",
+          "cedar"
+        ]
+      }
+    },
+    {
+      "task": "tabs",
+      "category": "capability",
+      "repeat": 1,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [],
+      "initialPages": [
+        "http://127.0.0.1:36051/tabs"
+      ],
+      "setupMs": 372.9950349999999,
+      "agentMs": 4984.321442999993,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 3,
+      "primaryMs": 3424.733865999995,
+      "jevCalls": 2,
+      "jevMs": 1291.9727149999817,
+      "costUsd": 0.006333858,
+      "jevErrors": [],
+      "actions": 3,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_operation",
+          "actions": 1,
+          "elapsedMs": 1445.7297789999866,
+          "verified": false,
+          "parentCallId": "call_417038"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 3.4895549999782816,
+      "taskMs": 4987.810997999972,
+      "verification": {
+        "passed": true,
+        "expected": "Reference article: the orbit period is 42 days."
+      }
+    },
+    {
+      "task": "tabs",
+      "category": "capability",
+      "repeat": 1,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [],
+      "initialPages": [
+        "http://127.0.0.1:36051/tabs"
+      ],
+      "setupMs": 1966.4889989999938,
+      "agentMs": 9153.200102999981,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 2,
+      "final": "Opened the reference in a new tab and left the Reference article visible (showing 'Reference article: the orbit period is 42 days.').",
+      "errors": [
+        "Error code: 429 - {'error': {'message': 'Provider returned error', 'code': 429, 'metadata': {'raw': 'google/gemini-3.8-flash is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your rate limits: https://openrouter.ai/settings/integrations', 'provider_name': 'Google AI Studio', 'is_byok': False, 'provider_error_code': '429', 'limit_source': 'upstream_provider_shared_pool', 'remedy_hint': 'Retry shortly, add your own provider key (https://openrouter.ai/settings/integrations), or route to another provider with provider routing: https://openrouter.ai/docs/features/provider-routing'}}, 'user_id': '[account-redacted]'}",
+        null,
+        null
+      ],
+      "primaryCalls": 5,
+      "primaryMs": 6516.256726055872,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.0023985,
+      "verificationMs": 4.435207999980776,
+      "taskMs": 9157.635310999962,
+      "verification": {
+        "passed": true,
+        "expected": "Reference article: the orbit period is 42 days."
+      }
+    },
+    {
+      "task": "tabs",
+      "category": "capability",
+      "repeat": 1,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [],
+      "initialPages": [
+        "http://127.0.0.1:36051/tabs"
+      ],
+      "setupMs": 405.8535210000118,
+      "agentMs": 5984.592195000005,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 3,
+      "primaryMs": 4123.819373000006,
+      "jevCalls": 4,
+      "jevMs": 1627.6336209999863,
+      "costUsd": 0.006007266,
+      "jevErrors": [],
+      "actions": 4,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_operation",
+          "actions": 3,
+          "elapsedMs": 1849.2239200000186,
+          "verified": false,
+          "parentCallId": "call_465258"
+        }
+      ],
+      "routes": [
+        {
+          "mode": "fast",
+          "tool": "browser_task",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_observe",
+          "previous": "fast",
+          "switched": true
+        }
+      ],
+      "batches": [],
+      "verificationMs": 3.285128999996232,
+      "taskMs": 5987.877324000001,
+      "verification": {
+        "passed": true,
+        "expected": "Reference article: the orbit period is 42 days."
+      }
+    },
+    {
+      "task": "tabs",
+      "category": "capability",
+      "repeat": 2,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [],
+      "initialPages": [
+        "http://127.0.0.1:36051/tabs"
+      ],
+      "setupMs": 2021.639388999989,
+      "agentMs": 4942.205836000008,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 2,
+      "final": "Opened the reference article in a new tab and left it visible. The reference article states: 'Reference article: the orbit period is 42 days.'",
+      "errors": [
+        null,
+        null
+      ],
+      "primaryCalls": 2,
+      "primaryMs": 3426.093749993015,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.00270525,
+      "verificationMs": 4.418514999997569,
+      "taskMs": 4946.624351000006,
+      "verification": {
+        "passed": true,
+        "expected": "Reference article: the orbit period is 42 days."
+      }
+    },
+    {
+      "task": "tabs",
+      "category": "capability",
+      "repeat": 2,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [],
+      "initialPages": [
+        "http://127.0.0.1:36051/tabs"
+      ],
+      "setupMs": 386.7458270000061,
+      "agentMs": 6608.981294999976,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 3,
+      "primaryMs": 3957.826728999993,
+      "jevCalls": 4,
+      "jevMs": 2432.044195000024,
+      "costUsd": 0.006236766,
+      "jevErrors": [],
+      "actions": 4,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_operation",
+          "actions": 3,
+          "elapsedMs": 2637.485419000004,
+          "verified": false,
+          "parentCallId": "call_356850"
+        }
+      ],
+      "routes": [
+        {
+          "mode": "fast",
+          "tool": "browser_task",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "fast",
+          "switched": true
+        }
+      ],
+      "batches": [
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 0,
+          "requested": 0,
+          "verified": false,
+          "elapsedMs": 11.133972999989055,
+          "parentCallId": "call_358195"
+        }
+      ],
+      "verificationMs": 3.4002270000055432,
+      "taskMs": 6612.3815219999815,
+      "verification": {
+        "passed": true,
+        "expected": "Reference article: the orbit period is 42 days."
+      }
+    },
+    {
+      "task": "tabs",
+      "category": "capability",
+      "repeat": 2,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [],
+      "initialPages": [
+        "http://127.0.0.1:36051/tabs"
+      ],
+      "setupMs": 373.1148840000096,
+      "agentMs": 5144.009376000002,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 3,
+      "primaryMs": 4000.1795919999713,
+      "jevCalls": 2,
+      "jevMs": 977.4784320000035,
+      "costUsd": 0.006141768000000001,
+      "jevErrors": [],
+      "actions": 2,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_operation",
+          "actions": 1,
+          "elapsedMs": 1135.9935790000018,
+          "verified": false,
+          "parentCallId": "call_282181"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 3.4940950000018347,
+      "taskMs": 5147.503471000004,
+      "verification": {
+        "passed": true,
+        "expected": "Reference article: the orbit period is 42 days."
+      }
+    },
+    {
+      "task": "tabs",
+      "category": "capability",
+      "repeat": 3,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [],
+      "initialPages": [
+        "http://127.0.0.1:36051/tabs"
+      ],
+      "setupMs": 372.8603820000135,
+      "agentMs": 5424.000900999992,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 3,
+      "primaryMs": 3980.5333519999986,
+      "jevCalls": 4,
+      "jevMs": 1215.5107190000126,
+      "costUsd": 0.006001266,
+      "jevErrors": [],
+      "actions": 4,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_operation",
+          "actions": 3,
+          "elapsedMs": 1432.7770679999958,
+          "verified": false,
+          "parentCallId": "call_311095"
+        }
+      ],
+      "routes": [
+        {
+          "mode": "fast",
+          "tool": "browser_task",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_observe",
+          "previous": "fast",
+          "switched": true
+        }
+      ],
+      "batches": [],
+      "verificationMs": 3.2437140000110958,
+      "taskMs": 5427.244615000003,
+      "verification": {
+        "passed": true,
+        "expected": "Reference article: the orbit period is 42 days."
+      }
+    },
+    {
+      "task": "tabs",
+      "category": "capability",
+      "repeat": 3,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [],
+      "initialPages": [
+        "http://127.0.0.1:36051/tabs"
+      ],
+      "setupMs": 393.9430509999802,
+      "agentMs": 7581.08327100001,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 3,
+      "primaryMs": 5637.424859999999,
+      "jevCalls": 4,
+      "jevMs": 1635.0897499999555,
+      "costUsd": 0.006389364,
+      "jevErrors": [],
+      "actions": 5,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_operation",
+          "actions": 3,
+          "elapsedMs": 1831.7185979999776,
+          "verified": false,
+          "parentCallId": "call_208091"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 3.619810000003781,
+      "taskMs": 7584.703081000014,
+      "verification": {
+        "passed": true,
+        "expected": "Reference article: the orbit period is 42 days."
+      }
+    },
+    {
+      "task": "tabs",
+      "category": "capability",
+      "repeat": 3,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [],
+      "initialPages": [
+        "http://127.0.0.1:36051/tabs"
+      ],
+      "setupMs": 1999.9025879999972,
+      "agentMs": 7044.911664999992,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 2,
+      "final": "Opened the reference article in its new tab and left the Reference article visible.",
+      "errors": [
+        null,
+        null
+      ],
+      "primaryCalls": 2,
+      "primaryMs": 5510.471452027559,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.00301275,
+      "verificationMs": 4.602476999978535,
+      "taskMs": 7049.514141999971,
+      "verification": {
+        "passed": true,
+        "expected": "Reference article: the orbit period is 42 days."
+      }
+    }
+  ]
+}

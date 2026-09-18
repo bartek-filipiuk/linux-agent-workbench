@@ -1,0 +1,98 @@
+{
+  "createdAt": "2026-09-18T07:52:32.896Z",
+  "model": "google/gemini-3.8-flash",
+  "effort": "low",
+  "upstream": "google-ai-studio",
+  "jev": "jev-1.13.0",
+  "engines": [
+    "app-auto"
+  ],
+  "repeats": 1,
+  "source": {
+    "app": "77846cb0d97af218dd8a2832dab9f488c703b210",
+    "poc": "b561533640a76bcd229cc87167fb344965abf61b",
+    "hashes": {
+      "run.mjs": "05af657595b3ea928a18b34b592cbe592684bb08f2b8515a74486d2c3e18505e",
+      "tasks.mjs": "c194830be3e27755b0dfdd228477b9af34238f0338ef7d383b09c34863a336c9"
+    },
+    "candidate": "b561533640a76bcd229cc87167fb344965abf61b",
+    "candidateHashes": {
+      "services/agentd/dist/provider/openrouter.js": "d1556c37fd28c92de25c33a606c7b3f36b39d6b71a742d6d73363bf4865f05e6",
+      "services/agentd/dist/orchestrator/browser-auto.js": "c294a9c1adbb9606f812b353eecb2cd694e8fb4310e80715fc2b1721b9faca36",
+      "services/agentd/dist/orchestrator/jev-browser.js": "65263e7fc27598036610ef2917296bd2855341aed7b6d6e204a5638e11aab8aa",
+      "services/agentd/dist/orchestrator/run-controller.js": "35ec88ea5830c313213893e6493f648b66c9b4740fdc788fc971d83d055810a9",
+      "services/browser-worker/dist/browser-session.js": "839ef80647ad8956d89048e251a0c43c05f256ea3e84d1e28937f459528af77e"
+    },
+    "sharedWorker": "same Chrome build/settings; app-first uses unchanged baseline controller, tools and worker; app-auto uses candidate; both app engines share candidate OpenRouter schema adapter (explicit object oneOf); Python engines use pinned native drivers",
+    "upstreamDriverHash": "261a9cd28020b8b55a6652f3f928039188f025409c81283c352451af7f01f76e",
+    "dirty": false
+  },
+  "clock": "setup includes driver/browser startup, navigation, consent, first observation; task includes independent final verification; screenshots and cleanup outside task",
+  "settings": {
+    "autoConfidence": 0.35,
+    "timeoutMs": 240000,
+    "viewport": {
+      "width": 1120,
+      "height": 780
+    },
+    "channel": "chromium",
+    "warmAfter": null,
+    "priorReportedCostUsd": 4.777527843
+  },
+  "results": [
+    {
+      "task": "search",
+      "category": "short-ui",
+      "repeat": 1,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Search catalog",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:38791/search"
+      ],
+      "setupMs": 1597.1184669999998,
+      "agentMs": 3923.311353,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 1935.7510509999997,
+      "jevCalls": 3,
+      "jevMs": 1635.9977249999997,
+      "costUsd": 0.003941484,
+      "jevErrors": [],
+      "actions": 4,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 2,
+          "elapsedMs": 1981.723316,
+          "verified": false,
+          "parentCallId": "call_247961"
+        }
+      ],
+      "routes": [
+        {
+          "mode": "fast",
+          "tool": "browser_task",
+          "switched": false
+        }
+      ],
+      "batches": [],
+      "verificationMs": 3.6392900000000736,
+      "taskMs": 3926.950643,
+      "verification": {
+        "passed": true,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      }
+    }
+  ]
+}

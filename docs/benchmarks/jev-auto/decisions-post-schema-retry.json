@@ -1,0 +1,98 @@
+{
+  "createdAt": "2026-09-18T07:52:08.898Z",
+  "source": "b561533640a76bcd229cc87167fb344965abf61b",
+  "model": "google/gemini-3.8-flash",
+  "effort": "low",
+  "heldout": false,
+  "criterion": "first-turn mode only; no browser execution, not an end-to-end success metric",
+  "caseIds": [
+    "form",
+    "form-polish"
+  ],
+  "results": [
+    {
+      "id": "form",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 1185.33659,
+      "costUsd": 0.001794,
+      "toolCalls": [
+        {
+          "callId": "call_358076",
+          "name": "browser_batch",
+          "args": {
+            "reason": "Fill Name with Ada, select Department Research, and click Preview button.",
+            "actions": [
+              {
+                "revision": 3,
+                "ref": "e1",
+                "text": "Ada",
+                "kind": "type"
+              },
+              {
+                "revision": 3,
+                "values": [
+                  "Research"
+                ],
+                "kind": "select",
+                "ref": "e2"
+              },
+              {
+                "kind": "click",
+                "revision": 3,
+                "ref": "e3"
+              }
+            ]
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "form-polish",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 1106.2939870000002,
+      "costUsd": 0.0019215,
+      "toolCalls": [
+        {
+          "callId": "call_274829",
+          "name": "browser_batch",
+          "args": {
+            "reason": "Wypełnienie pól formularza Name, City, Transport oraz kliknięcie przycisku Review.",
+            "actions": [
+              {
+                "text": "Jan",
+                "kind": "type",
+                "revision": 3,
+                "ref": "e1"
+              },
+              {
+                "kind": "type",
+                "ref": "e2",
+                "text": "Gdańsk",
+                "revision": 3
+              },
+              {
+                "values": [
+                  "Train"
+                ],
+                "ref": "e3",
+                "kind": "select",
+                "revision": 3
+              },
+              {
+                "ref": "e4",
+                "kind": "click",
+                "revision": 3
+              }
+            ]
+          }
+        }
+      ],
+      "text": ""
+    }
+  ]
+}

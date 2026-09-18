@@ -1,20 +1,39 @@
-# Jev Auto — wdrożenie i dotychczasowe wyniki
+# Jev Auto — wdrożenie i końcowe porównanie
 
-**Status: kod i testy aplikacji gotowe; pełna seria porównawcza pozostaje niedokończona z powodu HTTP 402 OpenRouter (brak kredytów).** Nie zamykamy celu ani nie traktujemy pilotów Flights jako pomiaru finalnego. Po doładowaniu trzeba dokończyć research/karty, nowe warianty zadań i pięć prób Flights na każdy z czterech silników.
+**Porównanie zakończone: 119/119 poprawnych prób w zadeklarowanej próbce.** Gemini wybiera szybką pętlę Jev lub planowane grupy akcji w tej samej aplikacji. Zachowano UX, sesję, uprawnienia, dowody i Stop. Nowy tryb pozostaje eksperymentalny; domyślny Classic i main nie zostały zmienione.
 
-Najmocniejszy obecny wynik: formularz 10-etapowy **26,14 s Auto vs 74,49 s First vs 40,21 s Browser Use** (mediany, każdy 3/3 poprawny). Formularz 6-etapowy: 13,35 / 30,08 / 24,28 s. Porównanie hoteli: 4,71 / 12,26 / 8,99 s. Auto nie wygrywa wszędzie: filtry i autocomplete były w tej próbie szybsze w First. **Zachowujemy wybór trybu i obecny domyślny Classic; nie ma podstaw do pełnej migracji na Browser Use.**
+**Wniosek architektoniczny:** warto zachować obecną aplikację i dobierać wykonanie do podzadania. Auto wyraźnie przyspieszyło długie formularze i porównania ofert. Nie uzyskuje najlepszego czasu w każdej kategorii; native Ultrafast i prostszy First nadal są ważnymi punktami odniesienia. Wyniki nie uzasadniają pełnej migracji aplikacji do Browser Use.
 
-Seria końcowa ma **72 zarejestrowane próby: 58 PASS i 14 błędów kredytowych**. Sześć typów zadań ukończono w pełni: 54/54. Research ma tylko 4 poprawne próby łącznie; wszystkie końcowe próby kart zatrzymał provider przed wykonaniem zadania. Nie są dowodem awarii funkcji kart. Klasyfikację przyczyn potwierdzają `endReason` oraz logi native drivera, zapisane w `validation/billing-failures.json`.
+Formularz 10-etapowy: **26,14 s Auto / 74,49 s First / 40,21 s Browser Use**, każdy 3/3. Formularz 6-etapowy: 13,35 / 30,08 / 24,28 s. Hotel: 4,71 / 12,26 / 8,99 s. Nowe dane także zostały zmierzone: 27/27 sukcesów. Auto przyspieszyło nowy formularz i nowe porównanie cen; przy prostych zadaniach wyniki są mieszane. To pomiar pełnych wariantów, nie osobna ablacja batchowania, promptu, progu confidence i kontroli elementów.
 
-Razem z pilotami zachowano **92 próby runnera (76 PASS, 1 FAIL pilota, 15 HTTP 402; w tym osobna kontrola zatrzymania serii)**, **54 odpowiedzi w testach routingu** i **10 kontroli desktopu** (dwie nieudane kontrole Classic przed poprawką schematu). Koszt zarejestrowany: **$2,666184612** runner/routing + **$0,102326586** desktop = **$2,768511198**. To wyłącznie ten etap Auto, bez kosztów wcześniejszego PoC. Niepełne usage po Stop może zaniżać rachunek.
+## Google Flights: mediana i koszt wolnych prób
 
-Po wykryciu 402 dodano zatrzymanie całego runnera po pierwszej próbie z błędem 401/402 (`69e3280`). Nie zmienia to działania modeli ani aplikacji; wcześniejszych 14 błędów nie usunięto. Zamrożone kompilaty aplikacji pozostają takie jak w zmierzonej serii.
+| Silnik | Sukcesy | Mediana s | Min–max s | Średnia wszystkich prób s | Koszt 5 prób USD |
+|---|---:|---:|---:|---:|---:|
+| app-auto | 5/5 | 21.79 | 17.83–64.02 | 30.11 | 0.359967 |
+| app-first | 5/5 | 36.82 | 27.20–45.18 | 37.65 | 0.754658 |
+| browser-use | 5/5 | 35.45 | 35.14–39.09 | 36.53 | 0.226265 |
+| ultrafast | 5/5 | 13.32 | 11.70–14.38 | 13.25 | 0.024067 |
+
+Pierwsza próba Auto trwała **64,02 s**: Jev zgłosił `uncertain_operation` po dwóch akcjach, więc zadanie ukończył Gemini (26 wywołań; 59,28 s głównego modelu, 1,78 s Jev). Wynik pozostał w próbie. Poprawny fallback chroni ukończenie zadania, ale może wyraźnie zwiększać czas i koszt. Piloty 18,65/18,90 s nie zastępują tej finalnej serii.
+
+## Co dokładnie jest liczone
+
+Próbka główna: 54 kompletne próby pierwszych sześciu grup z `final-local.json`, 18 prób **całego** wznowionego bloku research/kart z `final-recovery.json`, 27 nowych wariantów i 20 Flights. Dobór tego wznowionego bloku ustalono przed jego uruchomieniem. Pozostałe 18 rekordów pierwotnego research/kart — **4 sukcesy i 14 błędów kredytów** — zachowano jako osobny przerwany blok; nie usuwamy samych porażek i nie dokładamy samych sukcesów do median wznowienia.
+
+Wszystkie zachowane rekordy Auto: **159 prób runnera**, **78 decyzji routingu**, **10 kontroli desktopu**. Tabele zawierają także piloty, celowy Stop i sprawdzenie 402. Koszt runner/routing: **$4.783456077**; desktop: **$0.102326586**; razem **$4.885782663**, wyłącznie ten etap Auto. Usage po przerwaniu może być niepełne. Nie należy sumować kopii danych i archiwów drugi raz.
+
+Odczyt konta po doładowaniu potwierdził dostępne środki, a hashe kompilatów zgodność z zamrożoną aplikacją. Nie zmieniano promptów, modeli, progu ani kodu aplikacji między blokami. Jedyna wcześniejsza zmiana runnera po zamrożeniu to zatrzymanie na 401/402 (`69e3280`). Nie wpływa na poprawne wykonania. Oba warianty aplikacji używają wspólnej naprawy schematu OpenRouter.
+
+Końcowy retest routingu: **13/16** standardowych i **6/6** nowych poleceń; **20/20** zaproponowanych wywołań ma poprawny schemat argumentów. W pierwszym reteście 2 przypadki nie dostały odpowiedzi z powodu HTTP 429, a w jednym Gemini wybrał dozwolone `browser_observe` dla nowej karty zamiast oczekiwanego fast. Osobna powtórka wyłącznie dwóch przypadków 429 dała 2/2 poprawne decyzje i argumenty; oryginalne błędy pozostają w tabelach. Nie zmieniano oczekiwanej kategorii nowej karty, więc odchylenie routingu pozostaje jawne. Jest to ocena wyboru ścieżki i formatu, nie poprawności wykonania ani całej polityki bezpieczeństwa. W 38 próbach Auto pierwsza ścieżka była fast 20 razy, planned 18 razy; zmiana ścieżki wystąpiła w 6 przebiegach. Routing korzysta z normalnej odpowiedzi planisty, bez osobnego wywołania klasyfikatora; nie zmierzono jego czystego narzutu osobną ablacją.
+
+[Wykres PNG](benchmarks/jev-auto/comparison.png) · [Wykres SVG](benchmarks/jev-auto/comparison.svg). Pokazują mediany i zakres min–max, z osobną skalą każdego panelu.
 
 18 września 2026. Implementacja w osobnym worktree `/home/bartek/linux-agent-auto`, branch `experiment/jev-auto`. [Uruchomienie i architektura](jev-auto.md), [plan i bramki](jev-auto-plan.md). Poniżej oddzielono zamrożone porównanie od pilotów, routingu i testów aplikacji.
 
 ## Metoda
 
-Kod porównania zamrożony na `0ea227b271dbc71b5dc7d503a4a4438e3141c361`; każdy plik serii zawiera rewizję, `dirty`, SHA-256 runnera, fixture’ów i kompilatów. Baseline First: `77846cb0d97af218dd8a2832dab9f488c703b210`. Oba warianty aplikacji korzystają z **tego samego poprawionego adaptera OpenRouter**; First zachowuje bazowy kontroler, narzędzia i worker. Nie przypisujemy naprawy schematu tylko Auto. Native Browser Use/Ultrafast pochodzą z dotychczasowego, przypiętego PoC; nie są podłączone do polityki aplikacji.
+Kod aplikacji zamrożony na `0ea227b271dbc71b5dc7d503a4a4438e3141c361`; każdy plik serii zawiera rewizję, `dirty`, SHA-256 runnera, fixture’ów i kompilatów. Baseline First: `77846cb0d97af218dd8a2832dab9f488c703b210`. Oba warianty aplikacji korzystają z **tego samego poprawionego adaptera OpenRouter**; First zachowuje bazowy kontroler, narzędzia i worker. Nie przypisujemy naprawy schematu tylko Auto. Native Browser Use/Ultrafast pochodzą z dotychczasowego, przypiętego PoC; nie są podłączone do polityki aplikacji.
 
 Gemini `google/gemini-3.8-flash / low`, OpenRouter `google-ai-studio`, Jev `jev-1.13.0`. Ta sama wersja Chromium, viewport 1120×780, `en-US`, strefa `Europe/Zurich`, świeże profile, sekwencyjne wykonanie i rotacja kolejności silników. Nie prowadzono równolegle innych zadań modelowych ani suite testowej. Lokalny serwer fixture’ów; Flights na żywej stronie Google. Wyszukiwanie Zurich–London, 20 września 2026, one-way, jedna osoba, Economy; bez rezerwacji.
 
@@ -26,7 +45,7 @@ Kwoty to usage kosztu OpenRouter plus koszt Jev obliczony z tokenów wejściowyc
 
 ## Etapy i wszystkie niepowodzenia przed zamrożeniem
 
-1. Routing bez wykonania narzędzi: 12/16 → 15/16 → 16/16 po poprawieniu instrukcji wyboru w już otwartej stronie i wizardach. Następnie 6/6 nowych poleceń. Nie mylić z sukcesem zadania. Późniejszy audyt argumentów wykazał po 2 niepoprawne wywołania batch w każdej z trzech wcześniejszych serii routingu (JSON jako tekst); ich wynik 16/16 dotyczy wyłącznie wyboru ścieżki. Po poprawce schematu dodatkowy audyt 97 rzeczywistych wywołań `browser_task`/`browser_batch` w serii końcowej wykazał 0 niepoprawnych argumentów (`validation/final-arguments-audit.json`). Dodatkowy płatny retest pierwszej decyzji po poprawce pozostaje odłożony przez brak kredytów.
+1. Routing bez wykonania narzędzi: 12/16 → 15/16 → 16/16 po poprawieniu instrukcji wyboru w już otwartej stronie i wizardach. Następnie 6/6 nowych poleceń. Nie mylić z sukcesem zadania. Późniejszy audyt argumentów wykazał po 2 niepoprawne wywołania batch w każdej z trzech wcześniejszych serii routingu (JSON jako tekst); ich wynik 16/16 dotyczy wyłącznie wyboru ścieżki. Po poprawce schematu dodatkowy audyt 97 rzeczywistych wywołań `browser_task`/`browser_batch` w serii końcowej wykazał 0 niepoprawnych argumentów (`validation/final-arguments-audit.json`). Końcowy retest wykonano po doładowaniu; wynik podano wyżej.
 2. Pierwszy pilot Auto ukończył 5/5 zadań, ale Flights wracało prawie całkowicie do Gemini: 41,02 s. Sam próg confidence 0,35 pogorszył kolejną próbę do 50,94 s.
 3. Dokładniejsze podcele, wybór sugestii autocomplete, krótkie oczekiwania po edycji oraz mniejszy stan wejściowy Jev. Próba `pilot-context-v2` zakończyła się **FAIL** (18,33 s): niedokończona data, timeout zasłoniętej kontrolki i błąd transportu/dekodowania OpenRouter.
 4. Oznaczanie zasłoniętych celów, ograniczony powrót po bezpiecznie odrzuconym stale ref, licznik kolejnych odrzuceń i kontrola zasłonięcia bezpośrednio przed dispatch. Piloty zachowują także wolną próbę 37,97 s. Końcowe dwa piloty Flights: 18,65 i 18,90 s, oba PASS, po 2 Gemini i 19 Jev. Nie użyto tych pilotów do finalnych median.
@@ -43,11 +62,13 @@ Kwoty to usage kosztu OpenRouter plus koszt Jev obliczony z tokenów wejściowyc
 - Audyt rzeczywistych sekretów: skan plików, środowiska i argumentów Chrome oraz konfiguracji własnych kontenerów; wyniki w `security-audit.json`. Klucze nie są wypisywane. Nie jest to pełny pentest ani dowód odporności na każdy prompt injection.
 - Obraz został zbudowany i działa w testach. Końcowa kontrola skryptu build zgłosiła istniejący wcześniej globalny limit storage Podmana: 22,40 GB przy limicie 14 GB (przed zadaniem ok. 22,34 GB). Nie usuwano cudzych obrazów. Jest to jawne ograniczenie środowiska przy kolejnej przebudowie, nie błąd wykonania aktualnego obrazu.
 
-## Dane
+Końcowy audyt śladów wszystkich porównań: **193/194** wywołania task/batch zgodne ze schematem. Jedyny błąd to `wait` z `durationMs` zamiast `ms` w drugim Auto Flights. Runtime odmówił wykonania, model poprawił argument i ukończył zadanie. To nie błąd obiektowego `oneOf`; walidacja pozostała ścisła, a koszt naprawy jest w czasie próby.
 
-JSON-y, ślady i logi kontroli są w katalogu [benchmarks/jev-auto](benchmarks/jev-auto). Eksporty usuwają jedynie identyfikatory konta dostawcy; manifest podaje hashe oryginałów i eksportów, pomiary pozostają niezmienione. Archiwum śladów zawiera także piloty i niepowodzenia; nie dublują one prób z tabel. Pełne historyczne wyniki wcześniejszych wariantów pozostają w [zbiorczym archiwum](../../linux-agent-browser-poc/WSZYSTKIE-WYNIKI-TESTOW.md).
+Dodatkowy test z widoczną przeglądarką: search Auto **PASS, 3,927 s**. Celowy Stop na Flights po 2,5 s: stan stopped, zamknięcie przeglądarki **129,9 ms**, całe sprzątanie **139,1 ms**; `success=false` w tym rekordzie jest oczekiwane, bo zadanie zostało celowo przerwane. Niezależne testy jednostkowe obejmują również Stop podczas inferencji Jev i pomiędzy edycjami batcha. Skan po wznowieniu objął 1062 pliki/eksporty, a końcowy skan po przygotowaniu eksportów 1081: brak rzeczywistych kluczy. Runtime Chrome sprawdzano osobno wcześniej; końcowa kontrola potwierdziła brak pozostawionych własnych procesów.
 
-**Uwaga do tabel:** niepowodzenia research/kart w końcowej serii są błędami kredytowymi. Ich czasy nie są czasami wykonania zadania i nie trafiają do median sukcesów. Flights występuje wyłącznie w osobno oznaczonych pilotach.
+## Dane i każda zachowana próba
+
+[JSON-y, ślady i logi](benchmarks/jev-auto) zawierają wszystkie serie. Eksporty usuwają identyfikatory konta dostawcy, zachowując pomiary; manifesty podają hashe. Pełna wcześniejsza historia jest w [zbiorczym archiwum](../../linux-agent-browser-poc/WSZYSTKIE-WYNIKI-TESTOW.md).
 
 | Zadanie | Auto | First | Browser Use | Ultrafast | Zmiana mediany Auto vs First |
 |---|---:|---:|---:|---:|---:|
@@ -57,8 +78,12 @@ JSON-y, ślady i logi kontroli są w katalogu [benchmarks/jev-auto](benchmarks/j
 | wizard-6 | 13.35 s · 3/3 | 30.08 s · 3/3 | 24.28 s · 3/3 | — | -55.6% |
 | wizard-10 | 26.14 s · 3/3 | 74.49 s · 3/3 | 40.21 s · 3/3 | — | -64.9% |
 | compare-offers | 4.71 s · 3/3 | 12.26 s · 3/3 | 8.99 s · 3/3 | — | -61.6% |
-| research-offers | 17.09 s · 1/3 | 15.32 s · 2/3 | 31.16 s · 1/3 | — | +11.6% |
-| tabs | — s · 0/3 | — s · 0/3 | — s · 0/3 | — | — |
+| research-offers | 13.72 s · 3/3 | 18.97 s · 3/3 | 29.03 s · 3/3 | — | -27.6% |
+| tabs | 5.99 s · 3/3 | 5.15 s · 3/3 | 7.05 s · 3/3 | — | +16.3% |
+| wizard-4-new | 10.29 s · 3/3 | 14.77 s · 3/3 | 15.01 s · 3/3 | — | -30.3% |
+| compare-new | 3.99 s · 3/3 | 8.27 s · 3/3 | 12.93 s · 3/3 | — | -51.7% |
+| autocomplete-new | 4.76 s · 3/3 | 4.91 s · 3/3 | 12.84 s · 3/3 | — | -3.1% |
+| google-flights | 21.79 s · 5/5 | 36.82 s · 5/5 | 35.45 s · 5/5 | 13.32 s · 5/5 | -40.8% |
 
 Średnie składników ze wszystkich prób danej grupy (nie tylko sukcesów):
 
@@ -82,25 +107,46 @@ JSON-y, ślady i logi kontroli są w katalogu [benchmarks/jev-auto](benchmarks/j
 | compare-offers / app-auto | 3 | 0.40 | 5.13 | 4.97 | 0.00 | 0.16 | 3.0 / 0.0 | 0.022216 |
 | compare-offers / app-first | 3 | 0.40 | 12.65 | 11.23 | 1.22 | 0.20 | 5.7 / 2.3 | 0.047695 |
 | compare-offers / browser-use | 3 | 2.06 | 10.23 | 8.44 | 0.00 | 1.79 | 2.0 / 0.0 | 0.047077 |
-| research-offers / app-auto | 3 | 0.40 | 5.82 | 5.53 | 0.00 | 0.28 | 3.7 / 0.0 | 0.033310 |
-| research-offers / app-first | 3 | 0.40 | 10.26 | 8.97 | 0.86 | 0.43 | 6.7 / 1.3 | 0.073241 |
-| research-offers / browser-use | 3 | 2.00 | 11.41 | 8.47 | 0.00 | 2.95 | 5.3 / 0.0 | 0.050451 |
-| tabs / app-auto | 3 | 0.39 | 0.17 | 0.17 | 0.00 | 0.01 | 1.0 / 0.0 | 0.000000 |
-| tabs / app-first | 3 | 0.40 | 0.11 | 0.10 | 0.00 | 0.01 | 1.0 / 0.0 | 0.000000 |
-| tabs / browser-use | 3 | 1.99 | 1.38 | 0.49 | 0.00 | 0.90 | 4.0 / 0.0 | 0.000000 |
+| research-offers / app-auto | 3 | 0.41 | 13.71 | 12.99 | 0.00 | 0.73 | 8.3 / 0.0 | 0.086534 |
+| research-offers / app-first | 3 | 0.41 | 18.44 | 14.75 | 3.00 | 0.69 | 9.0 / 2.0 | 0.100939 |
+| research-offers / browser-use | 3 | 2.01 | 30.44 | 23.40 | 0.00 | 7.04 | 8.0 / 0.0 | 0.167667 |
+| tabs / app-auto | 3 | 0.39 | 6.01 | 4.02 | 1.76 | 0.23 | 3.0 / 4.0 | 0.018245 |
+| tabs / app-first | 3 | 0.38 | 5.91 | 4.35 | 1.30 | 0.25 | 3.0 / 2.7 | 0.018865 |
+| tabs / browser-use | 3 | 2.00 | 7.05 | 5.15 | 0.00 | 1.90 | 3.0 / 0.0 | 0.008117 |
+| wizard-4-new / app-auto | 3 | 0.41 | 10.89 | 10.33 | 0.00 | 0.56 | 6.0 / 0.0 | 0.053623 |
+| wizard-4-new / app-first | 3 | 0.41 | 16.92 | 10.85 | 5.57 | 0.49 | 5.7 / 13.3 | 0.058475 |
+| wizard-4-new / browser-use | 3 | 2.12 | 15.70 | 9.47 | 0.00 | 6.24 | 5.0 / 0.0 | 0.023171 |
+| compare-new / app-auto | 3 | 0.41 | 4.70 | 4.53 | 0.00 | 0.17 | 3.3 / 0.0 | 0.024005 |
+| compare-new / app-first | 3 | 0.40 | 9.21 | 7.88 | 1.15 | 0.19 | 4.7 / 1.3 | 0.040009 |
+| compare-new / browser-use | 3 | 2.21 | 12.95 | 11.00 | 0.00 | 1.95 | 3.0 / 0.0 | 0.070527 |
+| autocomplete-new / app-auto | 3 | 0.39 | 5.95 | 3.41 | 1.90 | 0.64 | 2.0 / 4.0 | 0.011867 |
+| autocomplete-new / app-first | 3 | 0.39 | 4.86 | 2.94 | 1.56 | 0.36 | 2.3 / 3.3 | 0.014471 |
+| autocomplete-new / browser-use | 3 | 2.03 | 13.75 | 11.33 | 0.00 | 2.42 | 4.0 / 0.0 | 0.015052 |
+| google-flights / app-auto | 5 | 3.17 | 30.11 | 17.80 | 8.66 | 3.65 | 8.2 / 14.4 | 0.359967 |
+| google-flights / app-first | 5 | 3.24 | 37.65 | 33.26 | 1.33 | 3.07 | 19.2 / 1.4 | 0.754658 |
+| google-flights / browser-use | 5 | 4.82 | 36.53 | 19.09 | 0.00 | 17.44 | 11.4 / 0.0 | 0.226265 |
+| google-flights / ultrafast | 5 | 3.85 | 13.25 | 2.48 | 8.64 | 2.14 | 2.0 / 18.0 | 0.024067 |
 
 Wszystkie serie (routing i desktop mają osobne kryteria):
 
 | Plik | Rodzaj | Wynik | Raportowany USD |
 |---|---|---:|---:|
+| credit-recheck-1.json | wykonanie | 0/1 | 0.000000 |
 | decisions-final-heldout.json | routing | 6/6 | 0.009403 |
 | decisions-pilot-1.json | routing | 12/16 | 0.023632 |
 | decisions-pilot-2.json | routing | 15/16 | 0.025827 |
 | decisions-pilot-3.json | routing | 16/16 | 0.025509 |
+| decisions-post-schema-heldout.json | routing | 6/6 | 0.009306 |
+| decisions-post-schema-retry.json | routing | 2/2 | 0.003716 |
+| decisions-post-schema.json | routing | 13/16 | 0.021797 |
 | desktop-auto-recheck.json | desktop | 2/3 | nie zmierzono tutaj |
 | desktop-auto-schema.json | desktop | 4/4 | nie zmierzono tutaj |
 | desktop-auto.json | desktop | 2/3 | nie zmierzono tutaj |
+| final-flights.json | wykonanie | 20/20 | 1.364958 |
+| final-holdout.json | wykonanie | 27/27 | 0.311200 |
 | final-local.json | wykonanie | 58/72 | 1.798193 |
+| final-recovery.json | wykonanie | 18/18 | 0.400367 |
+| headful-auto.json | wykonanie | 1/1 | 0.003941 |
 | pilot-auto-1.json | wykonanie | 5/5 | 0.281290 |
 | pilot-confidence-035.json | wykonanie | 1/1 | 0.233415 |
 | pilot-context-v2.json | wykonanie | 0/1 | 0.005164 |
@@ -108,11 +154,60 @@ Wszystkie serie (routing i desktop mają osobne kryteria):
 | pilot-occlusion-v3.json | wykonanie | 4/4 | 0.144828 |
 | pilot-runner-validation.json | wykonanie | 4/4 | 0.011144 |
 | pilot-stale-v4.json | wykonanie | 2/2 | 0.071233 |
+| stop-auto.json | wykonanie | 0/1 | 0.001987 |
 
 Każda próba wykonawcza, również nieudana (czas zadania w s):
 
 | Seria | Zadanie | Silnik | Powt. | Wynik | Czas s | Model / Jev | USD |
 |---|---|---|---:|---|---:|---:|---:|
+| credit-recheck-1.json | search | app-auto | 1 | FAIL | 0.46 | 1 / 0 | 0.000000 |
+| final-flights.json | google-flights | app-auto | 1 | PASS | 64.02 | 26 / 3 | 0.224888 |
+| final-flights.json | google-flights | app-first | 1 | PASS | 27.20 | 15 / 3 | 0.117888 |
+| final-flights.json | google-flights | ultrafast | 1 | PASS | 13.32 | 2 / 19 | 0.005259 |
+| final-flights.json | google-flights | browser-use | 1 | PASS | 39.09 | 12 / 0 | 0.047603 |
+| final-flights.json | google-flights | app-first | 2 | PASS | 45.18 | 20 / 1 | 0.155895 |
+| final-flights.json | google-flights | ultrafast | 2 | PASS | 14.38 | 2 / 19 | 0.005139 |
+| final-flights.json | google-flights | browser-use | 2 | PASS | 35.45 | 11 / 0 | 0.043342 |
+| final-flights.json | google-flights | app-auto | 2 | PASS | 26.71 | 5 / 15 | 0.047684 |
+| final-flights.json | google-flights | ultrafast | 3 | PASS | 13.65 | 2 / 16 | 0.004164 |
+| final-flights.json | google-flights | browser-use | 3 | PASS | 35.14 | 11 / 0 | 0.045314 |
+| final-flights.json | google-flights | app-auto | 3 | PASS | 20.18 | 2 / 19 | 0.017911 |
+| final-flights.json | google-flights | app-first | 3 | PASS | 35.81 | 19 / 1 | 0.157691 |
+| final-flights.json | google-flights | browser-use | 4 | PASS | 35.43 | 11 / 0 | 0.043614 |
+| final-flights.json | google-flights | app-auto | 4 | PASS | 21.79 | 6 / 16 | 0.051692 |
+| final-flights.json | google-flights | app-first | 4 | PASS | 36.82 | 18 / 1 | 0.139616 |
+| final-flights.json | google-flights | ultrafast | 4 | PASS | 13.18 | 2 / 19 | 0.005028 |
+| final-flights.json | google-flights | app-auto | 5 | PASS | 17.83 | 2 / 19 | 0.017793 |
+| final-flights.json | google-flights | app-first | 5 | PASS | 43.25 | 24 / 1 | 0.183568 |
+| final-flights.json | google-flights | ultrafast | 5 | PASS | 11.70 | 2 / 17 | 0.004477 |
+| final-flights.json | google-flights | browser-use | 5 | PASS | 37.56 | 12 / 0 | 0.046391 |
+| final-holdout.json | wizard-4-new | app-auto | 1 | PASS | 10.29 | 6 / 0 | 0.017770 |
+| final-holdout.json | wizard-4-new | app-first | 1 | PASS | 14.16 | 2 / 17 | 0.006948 |
+| final-holdout.json | wizard-4-new | browser-use | 1 | PASS | 15.01 | 5 / 0 | 0.007622 |
+| final-holdout.json | wizard-4-new | app-first | 2 | PASS | 21.82 | 9 / 10 | 0.032373 |
+| final-holdout.json | wizard-4-new | browser-use | 2 | PASS | 17.32 | 5 / 0 | 0.008051 |
+| final-holdout.json | wizard-4-new | app-auto | 2 | PASS | 8.94 | 6 / 0 | 0.017926 |
+| final-holdout.json | wizard-4-new | browser-use | 3 | PASS | 14.79 | 5 / 0 | 0.007498 |
+| final-holdout.json | wizard-4-new | app-auto | 3 | PASS | 13.43 | 6 / 0 | 0.017927 |
+| final-holdout.json | wizard-4-new | app-first | 3 | PASS | 14.77 | 6 / 13 | 0.019154 |
+| final-holdout.json | compare-new | app-first | 1 | PASS | 8.27 | 5 / 1 | 0.014830 |
+| final-holdout.json | compare-new | browser-use | 1 | PASS | 13.42 | 3 / 0 | 0.024883 |
+| final-holdout.json | compare-new | app-auto | 1 | PASS | 6.22 | 4 / 0 | 0.009100 |
+| final-holdout.json | compare-new | browser-use | 2 | PASS | 12.93 | 3 / 0 | 0.022957 |
+| final-holdout.json | compare-new | app-auto | 2 | PASS | 3.99 | 3 / 0 | 0.007561 |
+| final-holdout.json | compare-new | app-first | 2 | PASS | 11.41 | 4 / 3 | 0.010892 |
+| final-holdout.json | compare-new | app-auto | 3 | PASS | 3.87 | 3 / 0 | 0.007345 |
+| final-holdout.json | compare-new | app-first | 3 | PASS | 7.97 | 5 / 0 | 0.014287 |
+| final-holdout.json | compare-new | browser-use | 3 | PASS | 12.50 | 3 / 0 | 0.022687 |
+| final-holdout.json | autocomplete-new | browser-use | 1 | PASS | 20.15 | 4 / 0 | 0.004816 |
+| final-holdout.json | autocomplete-new | app-auto | 1 | PASS | 4.76 | 2 / 4 | 0.003954 |
+| final-holdout.json | autocomplete-new | app-first | 1 | PASS | 4.91 | 2 / 4 | 0.004055 |
+| final-holdout.json | autocomplete-new | app-auto | 2 | PASS | 8.39 | 2 / 4 | 0.003962 |
+| final-holdout.json | autocomplete-new | app-first | 2 | PASS | 5.06 | 2 / 4 | 0.004131 |
+| final-holdout.json | autocomplete-new | browser-use | 2 | PASS | 8.26 | 4 / 0 | 0.005224 |
+| final-holdout.json | autocomplete-new | app-first | 3 | PASS | 4.62 | 3 / 2 | 0.006285 |
+| final-holdout.json | autocomplete-new | browser-use | 3 | PASS | 12.84 | 4 / 0 | 0.005012 |
+| final-holdout.json | autocomplete-new | app-auto | 3 | PASS | 4.69 | 2 / 4 | 0.003951 |
 | final-local.json | search | app-auto | 1 | PASS | 4.16 | 2 / 3 | 0.003938 |
 | final-local.json | search | app-first | 1 | PASS | 5.94 | 2 / 3 | 0.003989 |
 | final-local.json | search | browser-use | 1 | PASS | 4.85 | 2 / 0 | 0.002577 |
@@ -185,6 +280,25 @@ Każda próba wykonawcza, również nieudana (czas zadania w s):
 | final-local.json | tabs | app-auto | 3 | FAIL | 0.19 | 1 / 0 | 0.000000 |
 | final-local.json | tabs | app-first | 3 | FAIL | 0.16 | 1 / 0 | 0.000000 |
 | final-local.json | tabs | browser-use | 3 | FAIL | 1.51 | 4 / 0 | 0.000000 |
+| final-recovery.json | research-offers | app-auto | 1 | PASS | 13.72 | 7 / 0 | 0.022533 |
+| final-recovery.json | research-offers | app-first | 1 | PASS | 21.49 | 10 / 2 | 0.039080 |
+| final-recovery.json | research-offers | browser-use | 1 | PASS | 28.54 | 8 / 0 | 0.054545 |
+| final-recovery.json | research-offers | app-first | 2 | PASS | 14.85 | 8 / 2 | 0.028531 |
+| final-recovery.json | research-offers | browser-use | 2 | PASS | 33.75 | 8 / 0 | 0.056443 |
+| final-recovery.json | research-offers | app-auto | 2 | PASS | 14.00 | 9 / 0 | 0.033011 |
+| final-recovery.json | research-offers | browser-use | 3 | PASS | 29.03 | 8 / 0 | 0.056679 |
+| final-recovery.json | research-offers | app-auto | 3 | PASS | 13.42 | 9 / 0 | 0.030990 |
+| final-recovery.json | research-offers | app-first | 3 | PASS | 18.97 | 9 / 2 | 0.033328 |
+| final-recovery.json | tabs | app-first | 1 | PASS | 4.99 | 3 / 2 | 0.006334 |
+| final-recovery.json | tabs | browser-use | 1 | PASS | 9.16 | 5 / 0 | 0.002399 |
+| final-recovery.json | tabs | app-auto | 1 | PASS | 5.99 | 3 / 4 | 0.006007 |
+| final-recovery.json | tabs | browser-use | 2 | PASS | 4.95 | 2 / 0 | 0.002705 |
+| final-recovery.json | tabs | app-auto | 2 | PASS | 6.61 | 3 / 4 | 0.006237 |
+| final-recovery.json | tabs | app-first | 2 | PASS | 5.15 | 3 / 2 | 0.006142 |
+| final-recovery.json | tabs | app-auto | 3 | PASS | 5.43 | 3 / 4 | 0.006001 |
+| final-recovery.json | tabs | app-first | 3 | PASS | 7.58 | 3 / 4 | 0.006389 |
+| final-recovery.json | tabs | browser-use | 3 | PASS | 7.05 | 2 / 0 | 0.003013 |
+| headful-auto.json | search | app-auto | 1 | PASS | 3.93 | 2 / 3 | 0.003941 |
 | pilot-auto-1.json | search | app-auto | 1 | PASS | 3.72 | 2 / 3 | 0.004716 |
 | pilot-auto-1.json | wizard-6 | app-auto | 1 | PASS | 9.93 | 7 / 5 | 0.024082 |
 | pilot-auto-1.json | compare-offers | app-auto | 1 | PASS | 7.51 | 4 / 0 | 0.009110 |
@@ -204,6 +318,7 @@ Każda próba wykonawcza, również nieudana (czas zadania w s):
 | pilot-runner-validation.json | search | browser-use | 1 | PASS | 5.03 | 2 / 0 | 0.002756 |
 | pilot-stale-v4.json | google-flights | app-auto | 1 | PASS | 17.55 | 2 / 18 | 0.017521 |
 | pilot-stale-v4.json | google-flights | app-auto | 2 | PASS | 37.97 | 6 / 14 | 0.053712 |
+| stop-auto.json | google-flights | app-auto | 1 | STOP (celowy) | 2.50 | 1 / 0 | 0.001987 |
 
 Każda decyzja routingu (narzędzia nie są wykonywane):
 
@@ -263,6 +378,30 @@ Każda decyzja routingu (narzędzia nie są wykonywane):
 | decisions-pilot-3.json | form | planned | planned | PASS | 2.36 | 0.001749 |
 | decisions-pilot-3.json | form-polish | planned | planned | PASS | 1.14 | 0.001891 |
 | decisions-pilot-3.json | cycle-recovery | planned | planned | PASS | 1.29 | 0.001460 |
+| decisions-post-schema-heldout.json | italian-city | fast | fast | PASS | 3.00 | 0.001622 |
+| decisions-post-schema-heldout.json | inventory | fast | fast | PASS | 2.05 | 0.001591 |
+| decisions-post-schema-heldout.json | lease-cost | planned | planned | PASS | 4.08 | 0.001476 |
+| decisions-post-schema-heldout.json | multi-page | planned | planned | PASS | 1.10 | 0.001467 |
+| decisions-post-schema-heldout.json | registration-wizard | planned | planned | PASS | 0.88 | 0.001533 |
+| decisions-post-schema-heldout.json | missing-card | planned | planned | PASS | 1.10 | 0.001617 |
+| decisions-post-schema-retry.json | form | planned | planned | PASS | 1.19 | 0.001794 |
+| decisions-post-schema-retry.json | form-polish | planned | planned | PASS | 1.11 | 0.001922 |
+| decisions-post-schema.json | search | fast | fast | PASS | 1.33 | 0.001656 |
+| decisions-post-schema.json | filters | fast | fast | PASS | 1.74 | 0.001583 |
+| decisions-post-schema.json | autocomplete | fast | fast | PASS | 0.97 | 0.001570 |
+| decisions-post-schema.json | flights | fast | fast | PASS | 1.14 | 0.001874 |
+| decisions-post-schema.json | polish-search | fast | fast | PASS | 1.10 | 0.001712 |
+| decisions-post-schema.json | new-tab | fast | planned | FAIL | 1.79 | 0.001446 |
+| decisions-post-schema.json | hotel | planned | planned | PASS | 0.94 | 0.001481 |
+| decisions-post-schema.json | research | planned | planned | PASS | 1.09 | 0.001480 |
+| decisions-post-schema.json | polish-analysis | planned | planned | PASS | 0.89 | 0.001484 |
+| decisions-post-schema.json | missing-values | planned | planned | PASS | 1.02 | 0.001539 |
+| decisions-post-schema.json | article | planned | planned | PASS | 1.31 | 0.001466 |
+| decisions-post-schema.json | mixed | planned | planned | PASS | 2.55 | 0.001473 |
+| decisions-post-schema.json | wizard | planned | planned | PASS | 0.99 | 0.001556 |
+| decisions-post-schema.json | form | planned | — | FAIL | 1.29 | 0.000000 |
+| decisions-post-schema.json | form-polish | planned | — | FAIL | 1.10 | 0.000000 |
+| decisions-post-schema.json | cycle-recovery | planned | planned | PASS | 2.19 | 0.001478 |
 
 Każda kontrola desktopu:
 
@@ -278,17 +417,3 @@ Każda kontrola desktopu:
 | desktop-auto.json | auto_navigation | PASS | 15.51 |
 | desktop-auto.json | stop | PASS | 0.03 |
 | desktop-auto.json | classic_after_stop | FAIL | — |
-
-
-## Ponowna kontrola blokady dostawcy
-
-`credit-recheck-1.json`, 18 września 2026, 07:21:26 UTC: zaplanowano search na trzech silnikach; pierwszy wariant Auto otrzymał HTTP 402 po 0,459 s. Runner zakończył całą serię (`provider_unavailable`), nie uruchomił dwóch pozostałych wariantów, Jev nie został wywołany. Zarejestrowany koszt $0. To test zatrzymania po błędzie dostawcy, nie pomiar szybkości wykonania zadania. Brak kredytów nadal blokuje brakujące porównania.
-
-| Seria | Zadanie | Silnik | Wynik | Czas do błędu | Koszt |
-|---|---|---|---|---:|---:|
-| credit-recheck-1.json | search | app-auto | HTTP 402; seria zatrzymana | 0,459 s | $0 |
-
-
-## Status celu po ponownej weryfikacji
-
-18 września 2026, 07:22:58 UTC: bezpłatny odczyt API konta potwierdził działający klucz oraz brak dodatniego salda na płatne zapytania. Nie wywoływano modelu i nie zmieniano konfiguracji benchmarku. Po utrzymaniu się tej samej blokady przez trzy kolejne tury cel oznaczono **blocked**, nie complete. Implementacja i zachowane wyniki pozostają gotowe; brakujące porównania wymagają doładowania konta. Dokładne saldo konta nie jest publikowane w repozytorium.

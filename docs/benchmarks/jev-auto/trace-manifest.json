@@ -1,6 +1,408 @@
 {
-  "scope": "All retained runner traces and native driver logs, pilots and interrupted final series. Raw screenshots remain in private artifacts; desktop screenshots are in validation. Provider account identifiers redacted in exported logs; API keys already removed by runner.",
+  "scope": "All retained runner traces and native logs, including pilots, interrupted trials, headful and Stop. Original screenshots remain private; desktop screenshots exported in validation.",
   "entries": [
+    {
+      "path": "credit-recheck-1-traces/search-app-auto-1/trace.json",
+      "sha256": "d834e9d655c4f8916cdb9895db2c7cd9cdb42b8f9c77695a45d815694b2dba14",
+      "originalSha256": "d834e9d655c4f8916cdb9895db2c7cd9cdb42b8f9c77695a45d815694b2dba14",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-app-auto-1/trace.json",
+      "sha256": "34847ecf1af7bb32584569c9aceec2af0f52c24aa8e80c6d2024f8d778444ed4",
+      "originalSha256": "34847ecf1af7bb32584569c9aceec2af0f52c24aa8e80c6d2024f8d778444ed4",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-app-auto-2/trace.json",
+      "sha256": "0f2abef3d2adb6cfa823f4fce1e7a77f8332e2440e0dc79d470570aa55e1d55c",
+      "originalSha256": "0f2abef3d2adb6cfa823f4fce1e7a77f8332e2440e0dc79d470570aa55e1d55c",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-app-auto-3/trace.json",
+      "sha256": "fa33886f655e261b96a6b9b50a15cd94e566a2612f7628e9f7e7ddecba83262a",
+      "originalSha256": "fa33886f655e261b96a6b9b50a15cd94e566a2612f7628e9f7e7ddecba83262a",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-app-auto-4/trace.json",
+      "sha256": "e3773fe686e129b6799af087d6d58b6a506826153ddd7ec62eee7b8b462b621b",
+      "originalSha256": "e3773fe686e129b6799af087d6d58b6a506826153ddd7ec62eee7b8b462b621b",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-app-auto-5/trace.json",
+      "sha256": "e199007d35b98747273e05fea66ca721f92de14540d11e7cf6135bf5f68b1a2f",
+      "originalSha256": "e199007d35b98747273e05fea66ca721f92de14540d11e7cf6135bf5f68b1a2f",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-app-first-1/trace.json",
+      "sha256": "0c97c04820716cb849031586673cf3baa117b4cdc1d9c34071f36449a4ab88b4",
+      "originalSha256": "0c97c04820716cb849031586673cf3baa117b4cdc1d9c34071f36449a4ab88b4",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-app-first-2/trace.json",
+      "sha256": "c890867eb231f0eaaf217c625d6730ea81e5700c22244aa119072b1d1bee6cc9",
+      "originalSha256": "c890867eb231f0eaaf217c625d6730ea81e5700c22244aa119072b1d1bee6cc9",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-app-first-3/trace.json",
+      "sha256": "0c3380149949dd4dd659f296a8e7114f5d251b3d16425f718200691c11cb5963",
+      "originalSha256": "0c3380149949dd4dd659f296a8e7114f5d251b3d16425f718200691c11cb5963",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-app-first-4/trace.json",
+      "sha256": "c4364d2d98cf8590f2377f3e8ef638f39e6065d1ddba89b4bf3cdb0a371f567b",
+      "originalSha256": "c4364d2d98cf8590f2377f3e8ef638f39e6065d1ddba89b4bf3cdb0a371f567b",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-app-first-5/trace.json",
+      "sha256": "10d945a778dcddfd71b08584d60a243c3ca53187a06483808e5bf302477ed1e6",
+      "originalSha256": "10d945a778dcddfd71b08584d60a243c3ca53187a06483808e5bf302477ed1e6",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-browser-use-1/driver.log",
+      "sha256": "a9f7d4e5fded1ef07e91606e02541801145979fd0b7caa676aa5b7af4321f71d",
+      "originalSha256": "a9f7d4e5fded1ef07e91606e02541801145979fd0b7caa676aa5b7af4321f71d",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-browser-use-1/trace.json",
+      "sha256": "29f6ade34a3a8a7980de2bf7e58111d1b4b8e7b3f45154295ddd9473c8748560",
+      "originalSha256": "29f6ade34a3a8a7980de2bf7e58111d1b4b8e7b3f45154295ddd9473c8748560",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-browser-use-2/driver.log",
+      "sha256": "56169c94dd79d8dc34a1f2afdd0f3d15869c2e75d40e07e222f3f142def85796",
+      "originalSha256": "56169c94dd79d8dc34a1f2afdd0f3d15869c2e75d40e07e222f3f142def85796",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-browser-use-2/trace.json",
+      "sha256": "6bd3782849ef1b231276377665e940fd951be783faf7ba6bedabb8147594fb9e",
+      "originalSha256": "6bd3782849ef1b231276377665e940fd951be783faf7ba6bedabb8147594fb9e",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-browser-use-3/driver.log",
+      "sha256": "1076087ddee441ed18aad2d80e9ddacf7eab5d14f704a2ea572e96c70de53db1",
+      "originalSha256": "1076087ddee441ed18aad2d80e9ddacf7eab5d14f704a2ea572e96c70de53db1",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-browser-use-3/trace.json",
+      "sha256": "3a08832ad5093ba7819c49c4df8ff92e14beddfe53f3d5b2f5bb04dd6296f365",
+      "originalSha256": "3a08832ad5093ba7819c49c4df8ff92e14beddfe53f3d5b2f5bb04dd6296f365",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-browser-use-4/driver.log",
+      "sha256": "40d71b89e66879eb3bcd19ae4b0d30884d55364275d746c1fa8a0b0316bfc5c5",
+      "originalSha256": "40d71b89e66879eb3bcd19ae4b0d30884d55364275d746c1fa8a0b0316bfc5c5",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-browser-use-4/trace.json",
+      "sha256": "f1885edb8465d56060473a71f5c84d4e3b7353188d9b58336330933af2a54e8d",
+      "originalSha256": "f1885edb8465d56060473a71f5c84d4e3b7353188d9b58336330933af2a54e8d",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-browser-use-5/driver.log",
+      "sha256": "358b5e531d997e5b9659450a6c9341ac6a2a173bb06bb325ded49e6791787543",
+      "originalSha256": "358b5e531d997e5b9659450a6c9341ac6a2a173bb06bb325ded49e6791787543",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-browser-use-5/trace.json",
+      "sha256": "a7448b13f5783ded3dac405a8cedc6e06b56a253b95c32f7a10eda75cc1a06a4",
+      "originalSha256": "a7448b13f5783ded3dac405a8cedc6e06b56a253b95c32f7a10eda75cc1a06a4",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-ultrafast-1/driver.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-ultrafast-1/trace.json",
+      "sha256": "a3b7e61b50405487daa78096ca2f4ee28eb69f53a8134d267098baefd9ed09d0",
+      "originalSha256": "a3b7e61b50405487daa78096ca2f4ee28eb69f53a8134d267098baefd9ed09d0",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-ultrafast-2/driver.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-ultrafast-2/trace.json",
+      "sha256": "2c3382fd895b7e2deb42dd55c320c3de7c32ac0e1efcf3f51a02bf9995d23ccf",
+      "originalSha256": "2c3382fd895b7e2deb42dd55c320c3de7c32ac0e1efcf3f51a02bf9995d23ccf",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-ultrafast-3/driver.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-ultrafast-3/trace.json",
+      "sha256": "ffa0ef89aed9142385011f36cb53b31128000e5053d69abfb5955ed84a5103ba",
+      "originalSha256": "ffa0ef89aed9142385011f36cb53b31128000e5053d69abfb5955ed84a5103ba",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-ultrafast-4/driver.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-ultrafast-4/trace.json",
+      "sha256": "1568963b1d29f7690590a3119318574adaa1e9bd5db2dbe4afe2e7dc3c7c79cf",
+      "originalSha256": "1568963b1d29f7690590a3119318574adaa1e9bd5db2dbe4afe2e7dc3c7c79cf",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-ultrafast-5/driver.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-flights-traces/google-flights-ultrafast-5/trace.json",
+      "sha256": "609fd237902e163d9bc415e5d83d0b36ccaa6c71ea218116abac86fac6f32e22",
+      "originalSha256": "609fd237902e163d9bc415e5d83d0b36ccaa6c71ea218116abac86fac6f32e22",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/autocomplete-new-app-auto-1/trace.json",
+      "sha256": "9a4332c7684557d5ab266461a4ecf1933bdcb1558427a5851a1274b490312400",
+      "originalSha256": "9a4332c7684557d5ab266461a4ecf1933bdcb1558427a5851a1274b490312400",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/autocomplete-new-app-auto-2/trace.json",
+      "sha256": "32fb1d73a6fccf9eb11024142691c6a83c10d93320c50db9caf2ef4be1f774bf",
+      "originalSha256": "32fb1d73a6fccf9eb11024142691c6a83c10d93320c50db9caf2ef4be1f774bf",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/autocomplete-new-app-auto-3/trace.json",
+      "sha256": "75ce730e30b64d8a7245aa0b670d459c02aee6f3d9e477e8f876dc14896ed715",
+      "originalSha256": "75ce730e30b64d8a7245aa0b670d459c02aee6f3d9e477e8f876dc14896ed715",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/autocomplete-new-app-first-1/trace.json",
+      "sha256": "07ba2ed50b1a9b1efb55b4386528967e00b79f0aa7a9151833f12ee1a422d00d",
+      "originalSha256": "07ba2ed50b1a9b1efb55b4386528967e00b79f0aa7a9151833f12ee1a422d00d",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/autocomplete-new-app-first-2/trace.json",
+      "sha256": "7dd476f977a35f3dc28369c6e98832f255ff267992d8a3ec4e4f761f40231f6a",
+      "originalSha256": "7dd476f977a35f3dc28369c6e98832f255ff267992d8a3ec4e4f761f40231f6a",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/autocomplete-new-app-first-3/trace.json",
+      "sha256": "d559ce8f41dd9e2245b7a0aa3b0d75bbe3a855723a63e85b7eb36a78f56ac2cc",
+      "originalSha256": "d559ce8f41dd9e2245b7a0aa3b0d75bbe3a855723a63e85b7eb36a78f56ac2cc",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/autocomplete-new-browser-use-1/driver.log",
+      "sha256": "6203a90b465b489879640d7035e94caca92dab5840f0d507abbde94af0ca4c58",
+      "originalSha256": "6203a90b465b489879640d7035e94caca92dab5840f0d507abbde94af0ca4c58",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/autocomplete-new-browser-use-1/trace.json",
+      "sha256": "046d64fda40e39ee4ac6b67cbff7f1ee064a825dd153e067cf618e138eb995ba",
+      "originalSha256": "046d64fda40e39ee4ac6b67cbff7f1ee064a825dd153e067cf618e138eb995ba",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/autocomplete-new-browser-use-2/driver.log",
+      "sha256": "e515145b06ae1ddaad68a226f5e5081abe14374ab24519892fc58726d9012c45",
+      "originalSha256": "e515145b06ae1ddaad68a226f5e5081abe14374ab24519892fc58726d9012c45",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/autocomplete-new-browser-use-2/trace.json",
+      "sha256": "971d2bf5374b3567607c383903a62b2c933354330f1e0e691e58193d94831258",
+      "originalSha256": "971d2bf5374b3567607c383903a62b2c933354330f1e0e691e58193d94831258",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/autocomplete-new-browser-use-3/driver.log",
+      "sha256": "b1bea1a28b9bab33ec2956b0f20f3625f1ef32f16729516f7394ef69fb79b635",
+      "originalSha256": "b1bea1a28b9bab33ec2956b0f20f3625f1ef32f16729516f7394ef69fb79b635",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/autocomplete-new-browser-use-3/trace.json",
+      "sha256": "7a6c41c5abf204d8b18d1578f7bd79e884dd465a827ba0686de1c763f7bdf72a",
+      "originalSha256": "7a6c41c5abf204d8b18d1578f7bd79e884dd465a827ba0686de1c763f7bdf72a",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/compare-new-app-auto-1/trace.json",
+      "sha256": "13fbd5c76b5f02bf531e4d5c697ef8ace961b32f90213db49c158fa2ee140544",
+      "originalSha256": "13fbd5c76b5f02bf531e4d5c697ef8ace961b32f90213db49c158fa2ee140544",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/compare-new-app-auto-2/trace.json",
+      "sha256": "703b16ca79c9dafb0d33556fcc74e7f19ad7403fc456359182c4bc06085cb11d",
+      "originalSha256": "703b16ca79c9dafb0d33556fcc74e7f19ad7403fc456359182c4bc06085cb11d",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/compare-new-app-auto-3/trace.json",
+      "sha256": "7acc3d6262ade37477bd27c71dc3018d29a6c4e04e706b4ef469b2ebc881b779",
+      "originalSha256": "7acc3d6262ade37477bd27c71dc3018d29a6c4e04e706b4ef469b2ebc881b779",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/compare-new-app-first-1/trace.json",
+      "sha256": "2ba7f65178498c5a1d731cd041cc8eebb6961bc6155c52f4a36a69b182d0623c",
+      "originalSha256": "2ba7f65178498c5a1d731cd041cc8eebb6961bc6155c52f4a36a69b182d0623c",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/compare-new-app-first-2/trace.json",
+      "sha256": "c8bccafbc47bddca69a8247dc74fbec940ac58be31a9d6c561433e5e5cd260fa",
+      "originalSha256": "c8bccafbc47bddca69a8247dc74fbec940ac58be31a9d6c561433e5e5cd260fa",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/compare-new-app-first-3/trace.json",
+      "sha256": "12b1903184740bbc57bafe756692c04edfd2395ab7c881e40e606165b99a8476",
+      "originalSha256": "12b1903184740bbc57bafe756692c04edfd2395ab7c881e40e606165b99a8476",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/compare-new-browser-use-1/driver.log",
+      "sha256": "148b48af1b2b7a5b7a9f735c3f0c8452568f830f8aa82e245db2b97738829b27",
+      "originalSha256": "148b48af1b2b7a5b7a9f735c3f0c8452568f830f8aa82e245db2b97738829b27",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/compare-new-browser-use-1/trace.json",
+      "sha256": "179e9a8bc16514eab0695e701b31ed5d1551f4c066d7cccff05195473c95fb7f",
+      "originalSha256": "179e9a8bc16514eab0695e701b31ed5d1551f4c066d7cccff05195473c95fb7f",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/compare-new-browser-use-2/driver.log",
+      "sha256": "464421678c6477a98121ace998b333685403989a3a9bfefd3c61b3d64a9381bc",
+      "originalSha256": "464421678c6477a98121ace998b333685403989a3a9bfefd3c61b3d64a9381bc",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/compare-new-browser-use-2/trace.json",
+      "sha256": "4886a7fdbc1a28e2912148f5c29026206760c0deb9313dbc6e858db299e6adec",
+      "originalSha256": "4886a7fdbc1a28e2912148f5c29026206760c0deb9313dbc6e858db299e6adec",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/compare-new-browser-use-3/driver.log",
+      "sha256": "273b67d83e61ae0b592b9ed7dfa478b24b4f35a245fca95f199874839ebaa25f",
+      "originalSha256": "273b67d83e61ae0b592b9ed7dfa478b24b4f35a245fca95f199874839ebaa25f",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/compare-new-browser-use-3/trace.json",
+      "sha256": "763b4aaba0dbe9f2cd968d1f2583858452543f1506f45c8085cbb6143a6a0a4d",
+      "originalSha256": "763b4aaba0dbe9f2cd968d1f2583858452543f1506f45c8085cbb6143a6a0a4d",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/wizard-4-new-app-auto-1/trace.json",
+      "sha256": "46ef3593be6318116ff0808d62c3034096b9cf82c050bf07190eec8135d68170",
+      "originalSha256": "46ef3593be6318116ff0808d62c3034096b9cf82c050bf07190eec8135d68170",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/wizard-4-new-app-auto-2/trace.json",
+      "sha256": "b1d0525fea413a78f2450da0ced682ac7436a66c4bbb0401d3681881b86a35cc",
+      "originalSha256": "b1d0525fea413a78f2450da0ced682ac7436a66c4bbb0401d3681881b86a35cc",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/wizard-4-new-app-auto-3/trace.json",
+      "sha256": "88e0016ac062e69b4b81cf65e39fec07cb04234c6f42837c8bf5ddc9118163ea",
+      "originalSha256": "88e0016ac062e69b4b81cf65e39fec07cb04234c6f42837c8bf5ddc9118163ea",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/wizard-4-new-app-first-1/trace.json",
+      "sha256": "6bc5e014f020ecec9b31a4899b4c713f9b435d91f27ae393991c039d7614adc2",
+      "originalSha256": "6bc5e014f020ecec9b31a4899b4c713f9b435d91f27ae393991c039d7614adc2",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/wizard-4-new-app-first-2/trace.json",
+      "sha256": "e82b38b08b5646ca4c72f8e382575bcdd2abf72b9d8c67a87c84efb3098fbf1e",
+      "originalSha256": "e82b38b08b5646ca4c72f8e382575bcdd2abf72b9d8c67a87c84efb3098fbf1e",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/wizard-4-new-app-first-3/trace.json",
+      "sha256": "5de578214282f6beae2fc9e1ca44077be7fc2c13d17a02aaa406f32a4e1f3b04",
+      "originalSha256": "5de578214282f6beae2fc9e1ca44077be7fc2c13d17a02aaa406f32a4e1f3b04",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/wizard-4-new-browser-use-1/driver.log",
+      "sha256": "442264eccec1fc507d63f1e35e66f003bf7507a28a93785365b78cc5a9e57ae2",
+      "originalSha256": "442264eccec1fc507d63f1e35e66f003bf7507a28a93785365b78cc5a9e57ae2",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/wizard-4-new-browser-use-1/trace.json",
+      "sha256": "fd394040dadb8ff54fa16048f03188299645e577cce758b78c7c26f630224075",
+      "originalSha256": "fd394040dadb8ff54fa16048f03188299645e577cce758b78c7c26f630224075",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/wizard-4-new-browser-use-2/driver.log",
+      "sha256": "3785b012711252fdd4b6af2a4ffea71b02f7bf6a481d6ea07021b702496f2c3e",
+      "originalSha256": "3785b012711252fdd4b6af2a4ffea71b02f7bf6a481d6ea07021b702496f2c3e",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/wizard-4-new-browser-use-2/trace.json",
+      "sha256": "8131dd69449655a006f705ee3a6fa67a2e9784bac1b764df87436a30a766b255",
+      "originalSha256": "8131dd69449655a006f705ee3a6fa67a2e9784bac1b764df87436a30a766b255",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/wizard-4-new-browser-use-3/driver.log",
+      "sha256": "0889687cf5bf5ec8835c3d7e6d7ae899c78676bbe656f704c090612f68852c52",
+      "originalSha256": "0889687cf5bf5ec8835c3d7e6d7ae899c78676bbe656f704c090612f68852c52",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-holdout-traces/wizard-4-new-browser-use-3/trace.json",
+      "sha256": "fdb73a563ee4399c421bd9032454b702ffe6c26536dd349d3b856a8e990a45b5",
+      "originalSha256": "fdb73a563ee4399c421bd9032454b702ffe6c26536dd349d3b856a8e990a45b5",
+      "accountIdentifierRedacted": false
+    },
     {
       "path": "final-local-traces/autocomplete-app-auto-1/trace.json",
       "sha256": "bb2a3403c36cec4aa3b18e50bda7482cffa90d820006751d01059fafabfde857",
@@ -578,6 +980,156 @@
       "accountIdentifierRedacted": false
     },
     {
+      "path": "final-recovery-traces/research-offers-app-auto-1/trace.json",
+      "sha256": "8101979a87a9f725cdc16e46b05751d28e897ac90e67ccbc9697bc1e87def87c",
+      "originalSha256": "8101979a87a9f725cdc16e46b05751d28e897ac90e67ccbc9697bc1e87def87c",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-recovery-traces/research-offers-app-auto-2/trace.json",
+      "sha256": "d011cf7318414fe7cda43a8a21487710f69609530520809623cdedc9f6936ce6",
+      "originalSha256": "d011cf7318414fe7cda43a8a21487710f69609530520809623cdedc9f6936ce6",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-recovery-traces/research-offers-app-auto-3/trace.json",
+      "sha256": "aa50b0cdab6e41def017e7eb8e40a858738306959d1e34776e76d39446db289f",
+      "originalSha256": "aa50b0cdab6e41def017e7eb8e40a858738306959d1e34776e76d39446db289f",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-recovery-traces/research-offers-app-first-1/trace.json",
+      "sha256": "03362463341d0f66b245affe2cee28dd89e8177750810bfe794f5a4e4313ab60",
+      "originalSha256": "03362463341d0f66b245affe2cee28dd89e8177750810bfe794f5a4e4313ab60",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-recovery-traces/research-offers-app-first-2/trace.json",
+      "sha256": "d29f4566fe16b4d89e9850b2460d982b6efddd39c6236c37cc0cc45a5be6d56d",
+      "originalSha256": "d29f4566fe16b4d89e9850b2460d982b6efddd39c6236c37cc0cc45a5be6d56d",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-recovery-traces/research-offers-app-first-3/trace.json",
+      "sha256": "1e32604fbf0ab665bf80029453d963cd2207f2810c59de88828bf82180555b48",
+      "originalSha256": "1e32604fbf0ab665bf80029453d963cd2207f2810c59de88828bf82180555b48",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-recovery-traces/research-offers-browser-use-1/driver.log",
+      "sha256": "d12301549c539100606b119a39bf2f9181e01c4229d3a91d6b7f0e56c641c7ae",
+      "originalSha256": "d12301549c539100606b119a39bf2f9181e01c4229d3a91d6b7f0e56c641c7ae",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-recovery-traces/research-offers-browser-use-1/trace.json",
+      "sha256": "3c6073e5fc5202833c8d51e9d46706c28749d467b18b1995363b46063675570f",
+      "originalSha256": "3c6073e5fc5202833c8d51e9d46706c28749d467b18b1995363b46063675570f",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-recovery-traces/research-offers-browser-use-2/driver.log",
+      "sha256": "832f66e07acc6aad84e63ecf5ce11622110b20a98ba6cbe7c2aefa5df6a926f1",
+      "originalSha256": "832f66e07acc6aad84e63ecf5ce11622110b20a98ba6cbe7c2aefa5df6a926f1",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-recovery-traces/research-offers-browser-use-2/trace.json",
+      "sha256": "c1272ff4dfe78f93564b213a2f56b3ace70b67827895f669352e1f28f5c36b78",
+      "originalSha256": "c1272ff4dfe78f93564b213a2f56b3ace70b67827895f669352e1f28f5c36b78",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-recovery-traces/research-offers-browser-use-3/driver.log",
+      "sha256": "cb16038c2d698109924d9e542a6d8610310cdbb24b6a4e64cab0a6382ef33bef",
+      "originalSha256": "cb16038c2d698109924d9e542a6d8610310cdbb24b6a4e64cab0a6382ef33bef",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-recovery-traces/research-offers-browser-use-3/trace.json",
+      "sha256": "2d0649376330a4b6fcde841c5abeb94408d508699c15160ccf42851ddd1e72c3",
+      "originalSha256": "2d0649376330a4b6fcde841c5abeb94408d508699c15160ccf42851ddd1e72c3",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-recovery-traces/tabs-app-auto-1/trace.json",
+      "sha256": "acde1d816b4f00504aa0b7c6aa7432fa551617436cbfc0929689b4a95dedb201",
+      "originalSha256": "acde1d816b4f00504aa0b7c6aa7432fa551617436cbfc0929689b4a95dedb201",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-recovery-traces/tabs-app-auto-2/trace.json",
+      "sha256": "59bd5725aca356c2d145e3f3e92a61a4a7e9bede9148d2260a46eeb9ccab0eea",
+      "originalSha256": "59bd5725aca356c2d145e3f3e92a61a4a7e9bede9148d2260a46eeb9ccab0eea",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-recovery-traces/tabs-app-auto-3/trace.json",
+      "sha256": "79eec82e2e2c461c001286f7541c36042d46a4122983d7ea650a6e6f630fe548",
+      "originalSha256": "79eec82e2e2c461c001286f7541c36042d46a4122983d7ea650a6e6f630fe548",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-recovery-traces/tabs-app-first-1/trace.json",
+      "sha256": "f348e2c0ea9a08eec35bb11e945cfb2ebfa8d617175288c104d67abffac026fa",
+      "originalSha256": "f348e2c0ea9a08eec35bb11e945cfb2ebfa8d617175288c104d67abffac026fa",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-recovery-traces/tabs-app-first-2/trace.json",
+      "sha256": "1079cc7f2ef011f94b60af7ff649667a5497a3d1e7771016ec53b2e4fe894366",
+      "originalSha256": "1079cc7f2ef011f94b60af7ff649667a5497a3d1e7771016ec53b2e4fe894366",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-recovery-traces/tabs-app-first-3/trace.json",
+      "sha256": "7bc9eb0e3d1a3bd0cfb6e93b55eac7b316892ea723679b7d2be108aa49656874",
+      "originalSha256": "7bc9eb0e3d1a3bd0cfb6e93b55eac7b316892ea723679b7d2be108aa49656874",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-recovery-traces/tabs-browser-use-1/driver.log",
+      "sha256": "e6bea7551e5a45c4969fdaf777270a1e6c52f79a780704c2a93feae41f707a70",
+      "originalSha256": "6ba9d5e5503530c38fc73d63b4c0fcf8df12efd2682ee9024a15977229838f28",
+      "accountIdentifierRedacted": true
+    },
+    {
+      "path": "final-recovery-traces/tabs-browser-use-1/trace.json",
+      "sha256": "08adfd27a1630ce2bab5ba4bc820864e896e55dd08f448d10ac41ce3f38c3b16",
+      "originalSha256": "a31b943dad302210fa0f75ddbaa7237131acde5dc526d072ab3a6acfc0c77b91",
+      "accountIdentifierRedacted": true
+    },
+    {
+      "path": "final-recovery-traces/tabs-browser-use-2/driver.log",
+      "sha256": "5ef5bd86c61eb1c876addcd0bd0e64827dd5b13aa03122cae047fa6c41b22af9",
+      "originalSha256": "5ef5bd86c61eb1c876addcd0bd0e64827dd5b13aa03122cae047fa6c41b22af9",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-recovery-traces/tabs-browser-use-2/trace.json",
+      "sha256": "617569d5f60d8a52e68507fd775c7bf2df978073d7ee29770b498253240348db",
+      "originalSha256": "617569d5f60d8a52e68507fd775c7bf2df978073d7ee29770b498253240348db",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-recovery-traces/tabs-browser-use-3/driver.log",
+      "sha256": "3385676e671293cb26155b3773e0a1ec04b7b0aa8bb16b00fc413811c511aa98",
+      "originalSha256": "3385676e671293cb26155b3773e0a1ec04b7b0aa8bb16b00fc413811c511aa98",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "final-recovery-traces/tabs-browser-use-3/trace.json",
+      "sha256": "d9dfbbc41f2122087bf21e8b728edbc81cb340e9901ca956e56a036a87c646da",
+      "originalSha256": "d9dfbbc41f2122087bf21e8b728edbc81cb340e9901ca956e56a036a87c646da",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "headful-auto-traces/search-app-auto-1/trace.json",
+      "sha256": "d1e606ed7499a349783ff699d39d7bf8ea4005ded5c6ca9dff9a7934350917ab",
+      "originalSha256": "d1e606ed7499a349783ff699d39d7bf8ea4005ded5c6ca9dff9a7934350917ab",
+      "accountIdentifierRedacted": false
+    },
+    {
       "path": "pilot-auto-1-traces/compare-offers-app-auto-1/trace.json",
       "sha256": "5d924fbe864a15e38a8860b6ec231207656fe59446aa850d6cd94e19e92b2598",
       "originalSha256": "5d924fbe864a15e38a8860b6ec231207656fe59446aa850d6cd94e19e92b2598",
@@ -701,6 +1253,12 @@
       "path": "pilot-stale-v4-traces/google-flights-app-auto-2/trace.json",
       "sha256": "ba6d2c0b2b5a49a86f6f89b88184cf8f4560472ab970e403377c3202e22e9f4d",
       "originalSha256": "ba6d2c0b2b5a49a86f6f89b88184cf8f4560472ab970e403377c3202e22e9f4d",
+      "accountIdentifierRedacted": false
+    },
+    {
+      "path": "stop-auto-traces/google-flights-app-auto-1/trace.json",
+      "sha256": "4db6e953875fbd422b318f45f5e33782fa18e475cd47a58b1f4a14623484e70a",
+      "originalSha256": "4db6e953875fbd422b318f45f5e33782fa18e475cd47a58b1f4a14623484e70a",
       "accountIdentifierRedacted": false
     }
   ]

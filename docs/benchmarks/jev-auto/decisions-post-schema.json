@@ -1,0 +1,307 @@
+{
+  "createdAt": "2026-09-18T07:50:27.647Z",
+  "source": "ac1c0f517a8429df36c6313195165902cbc8319d",
+  "model": "google/gemini-3.8-flash",
+  "effort": "low",
+  "heldout": false,
+  "criterion": "first-turn mode only; no browser execution, not an end-to-end success metric",
+  "results": [
+    {
+      "id": "search",
+      "expected": "fast",
+      "mode": "fast",
+      "passed": true,
+      "elapsedMs": 1326.913204,
+      "costUsd": 0.001656,
+      "toolCalls": [
+        {
+          "callId": "call_354491",
+          "name": "browser_task",
+          "args": {
+            "values": [
+              {
+                "text": "blue notebook",
+                "name": "search_query"
+              }
+            ],
+            "maxSteps": 10,
+            "url": "https://example.com/catalog",
+            "goal": "Open the catalog, search for 'blue notebook' and display the results"
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "filters",
+      "expected": "fast",
+      "mode": "fast",
+      "passed": true,
+      "elapsedMs": 1744.2646690000001,
+      "costUsd": 0.00158325,
+      "toolCalls": [
+        {
+          "callId": "call_524728",
+          "name": "browser_task",
+          "args": {
+            "values": [],
+            "goal": "Select the 'Books' category, check or enable the 'In stock' filter, and apply the filters.",
+            "maxSteps": 10
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "autocomplete",
+      "expected": "fast",
+      "mode": "fast",
+      "passed": true,
+      "elapsedMs": 967.9116939999999,
+      "costUsd": 0.00156975,
+      "toolCalls": [
+        {
+          "callId": "call_432292",
+          "name": "browser_task",
+          "args": {
+            "goal": "Select Paris, France from the destination autocomplete",
+            "maxSteps": 10,
+            "values": [
+              {
+                "name": "destination",
+                "text": "Paris"
+              }
+            ]
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "flights",
+      "expected": "fast",
+      "mode": "fast",
+      "passed": true,
+      "elapsedMs": 1139.3462049999998,
+      "costUsd": 0.00187425,
+      "toolCalls": [
+        {
+          "callId": "call_320785",
+          "name": "browser_task",
+          "args": {
+            "maxSteps": 20,
+            "goal": "Search for one-way flights from Zurich (ZRH) to London (any/all airports), departure date 20 September 2026, 1 adult, economy class. Stop at the matching flight results list.",
+            "values": [
+              {
+                "text": "Zurich",
+                "name": "origin"
+              },
+              {
+                "name": "destination",
+                "text": "London"
+              },
+              {
+                "text": "September 20, 2026",
+                "name": "departure_date"
+              }
+            ]
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "polish-search",
+      "expected": "fast",
+      "mode": "fast",
+      "passed": true,
+      "elapsedMs": 1099.1344599999993,
+      "costUsd": 0.00171225,
+      "toolCalls": [
+        {
+          "callId": "call_484012",
+          "name": "browser_task",
+          "args": {
+            "goal": "Navigate to https://example.com/sklep and search for \"zielony plecak\", leave the results on screen.",
+            "values": [
+              {
+                "text": "zielony plecak",
+                "name": "search_query"
+              }
+            ],
+            "url": "https://example.com/sklep",
+            "maxSteps": 10
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "new-tab",
+      "expected": "fast",
+      "mode": "planned",
+      "passed": false,
+      "elapsedMs": 1791.0104340000007,
+      "costUsd": 0.001446,
+      "toolCalls": [
+        {
+          "callId": "call_362734",
+          "name": "browser_observe",
+          "args": {}
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "hotel",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 939.2164339999999,
+      "costUsd": 0.0014805,
+      "toolCalls": [
+        {
+          "callId": "call_313560",
+          "name": "browser_read",
+          "args": {
+            "scope": "page"
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "research",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 1092.2415509999992,
+      "costUsd": 0.00147975,
+      "toolCalls": [
+        {
+          "callId": "call_428137",
+          "name": "browser_observe",
+          "args": {
+            "pageText": true
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "polish-analysis",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 885.0097530000003,
+      "costUsd": 0.00148425,
+      "toolCalls": [
+        {
+          "callId": "call_254133",
+          "name": "browser_read",
+          "args": {
+            "scope": "page"
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "missing-values",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 1022.0232680000008,
+      "costUsd": 0.001539,
+      "toolCalls": [],
+      "text": "Please provide your passport number and home address so I can fill them into the application for you. (As per system instructions, I cannot invent or assume missing personal details.)"
+    },
+    {
+      "id": "article",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 1308.5573350000013,
+      "costUsd": 0.0014655,
+      "toolCalls": [
+        {
+          "callId": "call_534276",
+          "name": "browser_read",
+          "args": {
+            "scope": "main"
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "mixed",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 2553.4896180000014,
+      "costUsd": 0.001473,
+      "toolCalls": [
+        {
+          "callId": "call_289670",
+          "name": "browser_observe",
+          "args": {
+            "pageText": true
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "wizard",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 994.0079809999988,
+      "costUsd": 0.0015555,
+      "toolCalls": [
+        {
+          "callId": "call_381208",
+          "name": "browser_batch",
+          "args": {
+            "actions": [],
+            "reason": "Inspect the currently open page to understand the form structure for trip segments."
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "form",
+      "expected": "planned",
+      "passed": false,
+      "error": "OpenRouter failed after 2 attempts: HTTP 429",
+      "elapsedMs": 1291.5880089999991
+    },
+    {
+      "id": "form-polish",
+      "expected": "planned",
+      "passed": false,
+      "error": "OpenRouter failed after 2 attempts: HTTP 429",
+      "elapsedMs": 1104.2965929999991
+    },
+    {
+      "id": "cycle-recovery",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 2191.9808840000005,
+      "costUsd": 0.00147825,
+      "toolCalls": [
+        {
+          "callId": "call_438340",
+          "name": "browser_observe",
+          "args": {
+            "pageText": true
+          }
+        }
+      ],
+      "text": ""
+    }
+  ]
+}

@@ -47,6 +47,8 @@ Wspólna poprawka OpenRouter jawnie oznacza obiektowe `oneOf`/`anyOf` jako `type
 
 ## Testy i odtwarzanie
 
+[Końcowe wyniki 119 prób, zakresy czasów i wszystkie diagnostyki](jev-auto-results.md).
+
 ```bash
 pnpm test
 pnpm typecheck
@@ -59,3 +61,13 @@ pnpm bench:auto --engines app-auto,app-first,ultrafast,browser-use --tasks googl
 ```
 
 Testy live zużywają API; runner nie nadpisuje plików wynikowych. Limit raportowanego kosztu domyślnie $15 uwzględnia poprzednie pliki JSON w folderze wynikowym. Każda próba ma limit $1 i 240 s. Usage przerwanego zapytania może nie wrócić do klienta. Zadania Flights są wyszukiwaniem, bez wyboru lub rezerwacji lotu.
+
+
+Agregacja i wykres po odtworzeniu serii (skrypty nie zmieniają oryginałów):
+
+```bash
+python3 experiments/browser-auto/summarize.py --input docs/benchmarks/jev-auto --output /tmp/auto-tables.md
+python3 experiments/browser-auto/plot.py --input docs/benchmarks/jev-auto --output /tmp/auto-charts
+```
+
+Do wykresu potrzebny jest Matplotlib. Reguła próbki głównej jest jawna w skryptach: sześć kompletnych pierwotnych grup + cały wznowiony research/karty + nowe warianty + Flights. Wszystkie przerwane próby nadal występują w tabelach wszystkich serii.
