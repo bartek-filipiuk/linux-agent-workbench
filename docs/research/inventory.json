@@ -1,0 +1,558 @@
+{
+  "scope": "Retained historical evidence through 2026-09-18; no new live tests. Missing usage and subscription costs are unknown, not zero.",
+  "runnerRecords": 606,
+  "routingCases": 78,
+  "directDriverCases": 8,
+  "desktopChecks": 24,
+  "desktopSources": [
+    {
+      "source": "docs/benchmarks/jev-desktop-2026-09-17.json",
+      "checks": 4,
+      "sha256": "04bb1002b8c01ac1aaac1a0be3c661f450521e5555d6bac36accc65761d149ce"
+    },
+    {
+      "source": "docs/benchmarks/jev-first-desktop-2026-09-17.json",
+      "checks": 3,
+      "sha256": "79797c2faff6aadd0a0b620db00b18f2425dfab81ce94e34dff5be610fc193eb"
+    },
+    {
+      "source": "docs/benchmarks/jev-first-desktop-final-2026-09-17.json",
+      "checks": 3,
+      "sha256": "c846b1f7101542590163fe674f4958788c910bc06585e6e30932791e19dc340b"
+    },
+    {
+      "source": "docs/benchmarks/jev-openrouter-desktop-2026-09-17.json",
+      "checks": 4,
+      "sha256": "d126bb25979a7568d560502fdf1115c550761bb5c752c15e4969b056f83fa612"
+    },
+    {
+      "source": "docs/benchmarks/jev-auto/desktop-auto-recheck.json",
+      "checks": 3,
+      "sha256": "bd2edcfd0d8735bd59b6b924f0b181b4df216ae15ff7443e4963b94387c12ff4"
+    },
+    {
+      "source": "docs/benchmarks/jev-auto/desktop-auto-schema.json",
+      "checks": 4,
+      "sha256": "0c49539f83b4827c70c309dd3440b35ec3b7e79797a27dc0d940809e7bd1e769"
+    },
+    {
+      "source": "docs/benchmarks/jev-auto/desktop-auto.json",
+      "checks": 3,
+      "sha256": "67fb09ef823c7d0e398769f2a9e7cca8b17469030736c67d117cf84fd5b40a14"
+    }
+  ],
+  "counts": {
+    "auto/credit-check": 1,
+    "auto/final-file": 137,
+    "auto/headful": 1,
+    "auto/pilot": 19,
+    "auto/routing": 78,
+    "auto/stop": 1,
+    "historical/diagnostic": 40,
+    "historical/driver": 8,
+    "historical/final": 281,
+    "poc/final": 102,
+    "poc/headful": 1,
+    "poc/pilot": 16,
+    "poc/stop": 7
+  },
+  "knownCostByStageUsd": {
+    "historical": "1.869226992",
+    "poc": "4.295353056",
+    "auto": "4.783456077"
+  },
+  "autoDesktopReportedUsd": "0.102326586",
+  "knownTotalUsd": "11.050362711",
+  "series": [
+    {
+      "source": "docs/benchmarks/jev-2026-09-17.json",
+      "stage": "historical",
+      "kind": "final",
+      "records": 80,
+      "successes": 80,
+      "knownUsd": "0.002188536000000000266",
+      "unknownPrimaryCostRecords": 80,
+      "sha256": "78c76984c5553c5fa4dd15a1199c91ec9ee9bbd0ae32efbcdd26bfddd1e64ec0"
+    },
+    {
+      "source": "docs/benchmarks/jev-driver-2026-09-17.json",
+      "stage": "historical",
+      "kind": "driver",
+      "records": 8,
+      "successes": 7,
+      "knownUsd": "0.00120401400000000006",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "aeb282442a20d34f4bbc49b5cb72c8c0a7570f157fd5f2b74a35b316a5b5e040"
+    },
+    {
+      "source": "docs/benchmarks/jev-first-comparison-2026-09-17.json",
+      "stage": "historical",
+      "kind": "final",
+      "records": 72,
+      "successes": 72,
+      "knownUsd": "0.00695221800000000052",
+      "unknownPrimaryCostRecords": 72,
+      "sha256": "dca4345a2d1f21b4a7910b3980bf1d34080d9ea14087fab1b89fcd721827219e"
+    },
+    {
+      "source": "docs/benchmarks/jev-first-diagnostic-2026-09-17.json",
+      "stage": "historical",
+      "kind": "diagnostic",
+      "records": 16,
+      "successes": 15,
+      "knownUsd": "0.00207496800000000016",
+      "unknownPrimaryCostRecords": 16,
+      "sha256": "4d764efcfc3a66da97cab7eb7f432ca198a6a8c440fd30109610e3c6dcfab616"
+    },
+    {
+      "source": "docs/benchmarks/jev-first-luna-final-2026-09-17.json",
+      "stage": "historical",
+      "kind": "final",
+      "records": 48,
+      "successes": 47,
+      "knownUsd": "0.00353031000000000027",
+      "unknownPrimaryCostRecords": 48,
+      "sha256": "23ed3898053babade7a1d98e0813b8069e9c8b37dc019eece48aaa01e87bba73"
+    },
+    {
+      "source": "docs/benchmarks/jev-first-pilot-2026-09-17.json",
+      "stage": "historical",
+      "kind": "diagnostic",
+      "records": 2,
+      "successes": 2,
+      "knownUsd": "0.00034158600000000002",
+      "unknownPrimaryCostRecords": 2,
+      "sha256": "2f1c5b37063517e1e1f3c23d5576cded2cfb94b3c35e66b24c7471327e661926"
+    },
+    {
+      "source": "docs/benchmarks/jev-first-service-errors-2026-09-17.json",
+      "stage": "historical",
+      "kind": "diagnostic",
+      "records": 16,
+      "successes": 15,
+      "knownUsd": "0.00125680800000000016",
+      "unknownPrimaryCostRecords": 16,
+      "sha256": "100c27cd2d0e80152a26cf5a36e7210050e7662cbd24d39c2187cc171dc8819b"
+    },
+    {
+      "source": "docs/benchmarks/jev-openrouter-flights-2026-09-17.json",
+      "stage": "historical",
+      "kind": "final",
+      "records": 9,
+      "successes": 9,
+      "knownUsd": "0.9360550199999999700",
+      "unknownPrimaryCostRecords": 3,
+      "sha256": "611abeaaa3d5b0e843db072b8c557867048ab063cd8753cad47fdc931204b00b"
+    },
+    {
+      "source": "docs/benchmarks/jev-openrouter-flights-diagnostic-2026-09-17.json",
+      "stage": "historical",
+      "kind": "diagnostic",
+      "records": 2,
+      "successes": 0,
+      "knownUsd": "0.38676310799999996003",
+      "unknownPrimaryCostRecords": 1,
+      "sha256": "3e4b06ffc5b849a60ea0b4a74ce1a401061d90b3c0726b6df5d7e5e8cb1cd1f9"
+    },
+    {
+      "source": "docs/benchmarks/jev-openrouter-flights-pilot-2026-09-17.json",
+      "stage": "historical",
+      "kind": "diagnostic",
+      "records": 2,
+      "successes": 0,
+      "knownUsd": "0.1582064699999999971",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "671d8875b7f7e28783b36e7f2e2774ad42d167d6752eb093e452db593a2c93d1"
+    },
+    {
+      "source": "docs/benchmarks/jev-openrouter-local-2026-09-17.json",
+      "stage": "historical",
+      "kind": "final",
+      "records": 72,
+      "successes": 70,
+      "knownUsd": "0.35792675399999999248",
+      "unknownPrimaryCostRecords": 24,
+      "sha256": "18094532841126b54ee75a8b60dd1e931f29f99b387400a58291dd65a6f0b503"
+    },
+    {
+      "source": "docs/benchmarks/jev-openrouter-pilot-2026-09-17.json",
+      "stage": "historical",
+      "kind": "diagnostic",
+      "records": 2,
+      "successes": 2,
+      "knownUsd": "0.01272719999999999962",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "58cc538e835e98298cef50dae59cbb0ec73ec88fef449301559a36f264c4441d"
+    },
+    {
+      "source": "docs/benchmarks/browser-poc/results/final-flights.json",
+      "stage": "poc",
+      "kind": "final",
+      "records": 30,
+      "successes": 30,
+      "knownUsd": "2.076432767999999985",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "028c411d90f4a63c65faf8cd67681b4f7c1bfb540bef5f61905448a20019a922"
+    },
+    {
+      "source": "docs/benchmarks/browser-poc/results/final-local.json",
+      "stage": "poc",
+      "kind": "final",
+      "records": 72,
+      "successes": 63,
+      "knownUsd": "1.92240764400000000984",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "fd571311b5d09fefbbb58b8d2cb29660cf1bd690863a3ca503dac3b670c2f112"
+    },
+    {
+      "source": "docs/benchmarks/browser-poc/results/diagnostics.json.gz#headed-smoke.json",
+      "stage": "poc",
+      "kind": "headful",
+      "records": 1,
+      "successes": 1,
+      "knownUsd": "0.00047619000000000003",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "e17deac662515c2f5f678bee41d98873c43e2e0d430cd84c44dbe186457a024f"
+    },
+    {
+      "source": "docs/benchmarks/browser-poc/results/diagnostics.json.gz#pilot-cleanup.json",
+      "stage": "poc",
+      "kind": "pilot",
+      "records": 1,
+      "successes": 1,
+      "knownUsd": "0.00473175",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "e17deac662515c2f5f678bee41d98873c43e2e0d430cd84c44dbe186457a024f"
+    },
+    {
+      "source": "docs/benchmarks/browser-poc/results/diagnostics.json.gz#pilot-complex.json",
+      "stage": "poc",
+      "kind": "pilot",
+      "records": 6,
+      "successes": 4,
+      "knownUsd": "0.086577839999999996",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "e17deac662515c2f5f678bee41d98873c43e2e0d430cd84c44dbe186457a024f"
+    },
+    {
+      "source": "docs/benchmarks/browser-poc/results/diagnostics.json.gz#pilot-flights-v3.json",
+      "stage": "poc",
+      "kind": "pilot",
+      "records": 3,
+      "successes": 3,
+      "knownUsd": "0.196695324",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "e17deac662515c2f5f678bee41d98873c43e2e0d430cd84c44dbe186457a024f"
+    },
+    {
+      "source": "docs/benchmarks/browser-poc/results/diagnostics.json.gz#pilot-search.json",
+      "stage": "poc",
+      "kind": "pilot",
+      "records": 3,
+      "successes": 2,
+      "knownUsd": "0.00707916",
+      "unknownPrimaryCostRecords": 1,
+      "sha256": "e17deac662515c2f5f678bee41d98873c43e2e0d430cd84c44dbe186457a024f"
+    },
+    {
+      "source": "docs/benchmarks/browser-poc/results/diagnostics.json.gz#pilot-ultrafast-search.json",
+      "stage": "poc",
+      "kind": "pilot",
+      "records": 1,
+      "successes": 0,
+      "knownUsd": "0.00047619000000000003",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "e17deac662515c2f5f678bee41d98873c43e2e0d430cd84c44dbe186457a024f"
+    },
+    {
+      "source": "docs/benchmarks/browser-poc/results/diagnostics.json.gz#pilot-ultrafast-v2.json",
+      "stage": "poc",
+      "kind": "pilot",
+      "records": 2,
+      "successes": 1,
+      "knownUsd": "0.00047619000000000003",
+      "unknownPrimaryCostRecords": 1,
+      "sha256": "e17deac662515c2f5f678bee41d98873c43e2e0d430cd84c44dbe186457a024f"
+    },
+    {
+      "source": "docs/benchmarks/browser-poc/results/diagnostics.json.gz#stop-app-first.json",
+      "stage": "poc",
+      "kind": "stop",
+      "records": 1,
+      "successes": 0,
+      "knownUsd": "0",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "e17deac662515c2f5f678bee41d98873c43e2e0d430cd84c44dbe186457a024f"
+    },
+    {
+      "source": "docs/benchmarks/browser-poc/results/diagnostics.json.gz#stop-browser-use.json",
+      "stage": "poc",
+      "kind": "stop",
+      "records": 1,
+      "successes": 0,
+      "knownUsd": "0",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "e17deac662515c2f5f678bee41d98873c43e2e0d430cd84c44dbe186457a024f"
+    },
+    {
+      "source": "docs/benchmarks/browser-poc/results/diagnostics.json.gz#stop-final-app-first.json",
+      "stage": "poc",
+      "kind": "stop",
+      "records": 1,
+      "successes": 0,
+      "knownUsd": "0",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "e17deac662515c2f5f678bee41d98873c43e2e0d430cd84c44dbe186457a024f"
+    },
+    {
+      "source": "docs/benchmarks/browser-poc/results/diagnostics.json.gz#stop-final-browser-use.json",
+      "stage": "poc",
+      "kind": "stop",
+      "records": 1,
+      "successes": 0,
+      "knownUsd": "0",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "e17deac662515c2f5f678bee41d98873c43e2e0d430cd84c44dbe186457a024f"
+    },
+    {
+      "source": "docs/benchmarks/browser-poc/results/diagnostics.json.gz#stop-final-ultrafast.json",
+      "stage": "poc",
+      "kind": "stop",
+      "records": 1,
+      "successes": 0,
+      "knownUsd": "0",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "e17deac662515c2f5f678bee41d98873c43e2e0d430cd84c44dbe186457a024f"
+    },
+    {
+      "source": "docs/benchmarks/browser-poc/results/diagnostics.json.gz#stop-ultrafast.json",
+      "stage": "poc",
+      "kind": "stop",
+      "records": 1,
+      "successes": 0,
+      "knownUsd": "0",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "e17deac662515c2f5f678bee41d98873c43e2e0d430cd84c44dbe186457a024f"
+    },
+    {
+      "source": "docs/benchmarks/browser-poc/results/diagnostics.json.gz#stop-verified-browser-use.json",
+      "stage": "poc",
+      "kind": "stop",
+      "records": 1,
+      "successes": 0,
+      "knownUsd": "0",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "e17deac662515c2f5f678bee41d98873c43e2e0d430cd84c44dbe186457a024f"
+    },
+    {
+      "source": "docs/benchmarks/jev-auto/credit-recheck-1.json",
+      "stage": "auto",
+      "kind": "credit-check",
+      "records": 1,
+      "successes": 0,
+      "knownUsd": "0",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "8cf841f6c03463397794928aa05e1fcb6a30d70c1d94ef1adc783ae5930226ca"
+    },
+    {
+      "source": "docs/benchmarks/jev-auto/decisions-final-heldout.json",
+      "stage": "auto",
+      "kind": "routing",
+      "records": 6,
+      "successes": 6,
+      "knownUsd": "0.00940275",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "40d5cfbd0f0a05695cf0b7f50cf4646c57f3e22eb575cf2c273c693349b17238"
+    },
+    {
+      "source": "docs/benchmarks/jev-auto/decisions-pilot-1.json",
+      "stage": "auto",
+      "kind": "routing",
+      "records": 16,
+      "successes": 12,
+      "knownUsd": "0.02363175",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "6d313a44e6d3776bb671ef1960e16d4b9559c8a3211ef60c3d2e12fab01b70b8"
+    },
+    {
+      "source": "docs/benchmarks/jev-auto/decisions-pilot-2.json",
+      "stage": "auto",
+      "kind": "routing",
+      "records": 16,
+      "successes": 15,
+      "knownUsd": "0.02582700",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "1dd5c9a7423074cd6ae04ba9eee3b37b21cb12208eb5b8581dfd662ebdd2a067"
+    },
+    {
+      "source": "docs/benchmarks/jev-auto/decisions-pilot-3.json",
+      "stage": "auto",
+      "kind": "routing",
+      "records": 16,
+      "successes": 16,
+      "knownUsd": "0.02550900",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "b5d513956f3e5b028b06994d9dc39b58d595f8015214b3389f15fc9e85c996d9"
+    },
+    {
+      "source": "docs/benchmarks/jev-auto/decisions-post-schema-heldout.json",
+      "stage": "auto",
+      "kind": "routing",
+      "records": 6,
+      "successes": 6,
+      "knownUsd": "0.00930600",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "45cd7193dd7fc645a262f684813517ffe4562e199bb1d9348577153b33ceca57"
+    },
+    {
+      "source": "docs/benchmarks/jev-auto/decisions-post-schema-retry.json",
+      "stage": "auto",
+      "kind": "routing",
+      "records": 2,
+      "successes": 2,
+      "knownUsd": "0.0037155",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "cff2e40f026a8df0a25e7df232565d030edc42fe6c8bf10c8d2b1d55e1330f9a"
+    },
+    {
+      "source": "docs/benchmarks/jev-auto/decisions-post-schema.json",
+      "stage": "auto",
+      "kind": "routing",
+      "records": 16,
+      "successes": 13,
+      "knownUsd": "0.02179725",
+      "unknownPrimaryCostRecords": 2,
+      "sha256": "912f22cf330701012673a1fd346881db2b69e7f8c69e9f102ee355b97bdf0221"
+    },
+    {
+      "source": "docs/benchmarks/jev-auto/final-flights.json",
+      "stage": "auto",
+      "kind": "final-file",
+      "records": 20,
+      "successes": 20,
+      "knownUsd": "1.3649576609999999585",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "ef4e7c654ad329b1e9c781bb8c530be32fbcc4ee9c4ac7110c55a6ac7af8c374"
+    },
+    {
+      "source": "docs/benchmarks/jev-auto/final-holdout.json",
+      "stage": "auto",
+      "kind": "final-file",
+      "records": 27,
+      "successes": 27,
+      "knownUsd": "0.3111996480000000029",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "97bc82a94cb856a07ac3cf1b600991f9897598baf5b179a999f6273f34e32f39"
+    },
+    {
+      "source": "docs/benchmarks/jev-auto/final-local.json",
+      "stage": "auto",
+      "kind": "final-file",
+      "records": 72,
+      "successes": 58,
+      "knownUsd": "1.7981930519999999764",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "f0ae104efac5a3265d7e642869e869152de6db20d1c208a2893a1bda1da9bd50"
+    },
+    {
+      "source": "docs/benchmarks/jev-auto/final-recovery.json",
+      "stage": "auto",
+      "kind": "final-file",
+      "records": 18,
+      "successes": 18,
+      "knownUsd": "0.400367172000000012",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "bfd3a29646d64d950a483fea598c70ec64480aef5853c0259e88a0fd5671b314"
+    },
+    {
+      "source": "docs/benchmarks/jev-auto/headful-auto.json",
+      "stage": "auto",
+      "kind": "headful",
+      "records": 1,
+      "successes": 1,
+      "knownUsd": "0.003941484",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "c9cb7ab8df73f80a2efb70cbc6599f2b41fc55adfc1752b73f437d367be16c4f"
+    },
+    {
+      "source": "docs/benchmarks/jev-auto/pilot-auto-1.json",
+      "stage": "auto",
+      "kind": "pilot",
+      "records": 5,
+      "successes": 5,
+      "knownUsd": "0.28129002299999995",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "27db4869b1405201f574c70b80cfc1a2a75dba0703618cb4e4beecd1ff4b19ea"
+    },
+    {
+      "source": "docs/benchmarks/jev-auto/pilot-confidence-035.json",
+      "stage": "auto",
+      "kind": "pilot",
+      "records": 1,
+      "successes": 1,
+      "knownUsd": "0.23341528199999997",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "2e32c4f655c152080d11fab5fd7da74ba237afcb270d1cfc65c04d482a8c7e76"
+    },
+    {
+      "source": "docs/benchmarks/jev-auto/pilot-context-v2.json",
+      "stage": "auto",
+      "kind": "pilot",
+      "records": 1,
+      "successes": 0,
+      "knownUsd": "0.005164139999999999",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "8a48be132cc8a09926987b38e6b34ccf442c8534b50c6a56c2e2faa7dd39a276"
+    },
+    {
+      "source": "docs/benchmarks/jev-auto/pilot-guard-v5.json",
+      "stage": "auto",
+      "kind": "pilot",
+      "records": 2,
+      "successes": 2,
+      "knownUsd": "0.036547506",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "d51b9c24b5196ddcb380825c8ddeff61e028d714a5bc6e484290af909639fed0"
+    },
+    {
+      "source": "docs/benchmarks/jev-auto/pilot-occlusion-v3.json",
+      "stage": "auto",
+      "kind": "pilot",
+      "records": 4,
+      "successes": 4,
+      "knownUsd": "0.144827882999999995",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "7ff3153946fa71daff708e2a9ab85ec40cd950a8e755638ce11b803e5aa1dbac"
+    },
+    {
+      "source": "docs/benchmarks/jev-auto/pilot-runner-validation.json",
+      "stage": "auto",
+      "kind": "pilot",
+      "records": 4,
+      "successes": 4,
+      "knownUsd": "0.01114357800000000003",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "839715557a0bd3152a710eacafe3affb44e8ea60fa3a85cb6d7022d34dfd824f"
+    },
+    {
+      "source": "docs/benchmarks/jev-auto/pilot-stale-v4.json",
+      "stage": "auto",
+      "kind": "pilot",
+      "records": 2,
+      "successes": 2,
+      "knownUsd": "0.071232647999999998",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "7cdacb0e2af7b99db9dca64633a45331fb614d891e2933523929e6d9eb2ab33e"
+    },
+    {
+      "source": "docs/benchmarks/jev-auto/stop-auto.json",
+      "stage": "auto",
+      "kind": "stop",
+      "records": 1,
+      "successes": 0,
+      "knownUsd": "0.00198675",
+      "unknownPrimaryCostRecords": 0,
+      "sha256": "5fa9557fd81a4f8c7f1c3ccad2c2a104449cf1c00fa90fbed052f9fb6bf7f7e0"
+    }
+  ]
+}

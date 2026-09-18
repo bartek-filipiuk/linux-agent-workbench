@@ -1,0 +1,134 @@
+{
+  "upstreamOfflineTests": {
+    "passed": 31,
+    "command": ".venv/bin/python check_upstream.py"
+  },
+  "independentVerifierSuite": {
+    "passed": true,
+    "command": "node --test verify.test.mjs",
+    "checks": "incomplete wizards, wrong segment hidden behind success heading, unsaved fields, incorrect computed price, missing required page visits"
+  },
+  "stop": {
+    "app-first": {
+      "interrupted": true,
+      "browserStopMs": 962.7028049999999,
+      "allCleanupMs": 968.4257469999998,
+      "state": "stopped",
+      "error": null,
+      "source": {
+        "app": "77846cb0d97af218dd8a2832dab9f488c703b210",
+        "poc": "6354eac83e6985d4082fb116e986da089886fc7c",
+        "hashes": {
+          "run.mjs": "25d1da517db1d943b0b5c859e40664f2677128d91cb00f3662f5ec4747daa327",
+          "driver.py": "261a9cd28020b8b55a6652f3f928039188f025409c81283c352451af7f01f76e",
+          "tasks.mjs": "f95b4946e92195aee718221b842154ea7e3732deed21131f48ca361a610a7edd"
+        },
+        "dirty": true
+      }
+    },
+    "ultrafast": {
+      "interrupted": true,
+      "browserStopMs": 150.011892,
+      "allCleanupMs": 2086.273222,
+      "state": "ready",
+      "error": "stopped",
+      "source": {
+        "app": "77846cb0d97af218dd8a2832dab9f488c703b210",
+        "poc": "6354eac83e6985d4082fb116e986da089886fc7c",
+        "hashes": {
+          "run.mjs": "25d1da517db1d943b0b5c859e40664f2677128d91cb00f3662f5ec4747daa327",
+          "driver.py": "261a9cd28020b8b55a6652f3f928039188f025409c81283c352451af7f01f76e",
+          "tasks.mjs": "f95b4946e92195aee718221b842154ea7e3732deed21131f48ca361a610a7edd"
+        },
+        "dirty": true
+      }
+    },
+    "browser-use": {
+      "interrupted": true,
+      "browserStopMs": 148.9672660000001,
+      "allCleanupMs": 369.39099399999986,
+      "state": "stopped",
+      "error": null,
+      "source": {
+        "app": "77846cb0d97af218dd8a2832dab9f488c703b210",
+        "poc": "6354eac83e6985d4082fb116e986da089886fc7c",
+        "hashes": {
+          "run.mjs": "516c1bc4c03439f4b2f0e167139a450e925436ba31e772c51d02681c3a0fb7bb",
+          "driver.py": "261a9cd28020b8b55a6652f3f928039188f025409c81283c352451af7f01f76e",
+          "tasks.mjs": "f95b4946e92195aee718221b842154ea7e3732deed21131f48ca361a610a7edd"
+        },
+        "dirty": true
+      }
+    }
+  },
+  "headedSmoke": {
+    "task": "search",
+    "category": "short-ui",
+    "repeat": 1,
+    "engine": "ultrafast",
+    "warm": false,
+    "success": true,
+    "initialControls": [
+      {
+        "role": "textbox",
+        "name": "Search catalog",
+        "value": ""
+      }
+    ],
+    "initialPages": [
+      "http://127.0.0.1:43067/search"
+    ],
+    "setupMs": 1126.128984,
+    "agentMs": 2339.468065,
+    "kind": "result",
+    "state": "done",
+    "completed": true,
+    "error": null,
+    "actions": 2,
+    "textCalls": [
+      {
+        "model": "google/gemini-3.8-flash",
+        "latency_ms": 1045,
+        "usage": {
+          "prompt_tokens": 267,
+          "completion_tokens": 7,
+          "total_tokens": 274,
+          "cost": 0.0002265,
+          "is_byok": false,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 0,
+            "audio_tokens": 0,
+            "video_tokens": 0
+          },
+          "cost_details": {
+            "upstream_inference_cost": 0.0002265,
+            "upstream_inference_prompt_cost": 0.00020025,
+            "upstream_inference_completions_cost": 2.625e-05
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 0,
+            "image_tokens": 0,
+            "audio_tokens": 0
+          }
+        },
+        "field": "Search catalog",
+        "value": "blue notebook"
+      }
+    ],
+    "primaryCalls": 1,
+    "primaryMs": 1044.8166389833204,
+    "jevCalls": 3,
+    "jevMs": 1233.4989379742183,
+    "costUsd": 0.00047619000000000003,
+    "verificationMs": 4.313682999999855,
+    "taskMs": 2343.781748,
+    "verification": {
+      "passed": true,
+      "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+    }
+  },
+  "reportedFinalApiCostUsd": 3.998840412,
+  "reportedAllRetainedApiCostUsd": 4.295353056000001,
+  "upstreamSourceIntegrity": true
+}

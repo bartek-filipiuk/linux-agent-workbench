@@ -1,0 +1,24 @@
+{
+  "date": "2026-09-18",
+  "scope": "Documentation/evidence consolidation, no new live benchmark or runtime changes",
+  "runnerRecords": 606,
+  "routingCases": 78,
+  "driverCases": 8,
+  "desktopChecks": 24,
+  "csvRows": 692,
+  "selectedComparisonRows": 119,
+  "localLinksAndFragmentsChecked": 301,
+  "canonicalSourceEntriesHashed": 56,
+  "importedSourceFilesVerified": 22,
+  "knownRetainedCostUsd": "11.050362711",
+  "credentialPatternScan": {
+    "payloadsIncludingArchives": 2028,
+    "reachableHistoryBlobs": 1045,
+    "matches": 0,
+    "limits": "Selected credential/private-key patterns only; not a comprehensive secrets or privacy audit."
+  },
+  "runtimeUnchangedSince": "55f53e5",
+  "remoteMainObserved": "72eaed24131d548d70da992a589edf7dbca33b6c",
+  "paidCallsInThisPass": 0,
+  "remainingReleaseWork": "See docs/RELEASE-READINESS.md; license, candidate integration and clean-user install remain uncompleted."
+}

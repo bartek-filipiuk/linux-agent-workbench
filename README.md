@@ -1,6 +1,6 @@
 # Linux Agent Workbench
 
-This worktree adds **Jev Auto · experimental**: Gemini chooses fast Jev execution or guarded action batches per subtask, with the existing UI, session, policy and Stop. Run `pnpm dev:auto` for the isolated `jev-auto` profile. [Setup and architecture](docs/jev-auto.md) · [Measured results and outstanding validation](docs/jev-auto-results.md) · [Implementation plan](docs/jev-auto-plan.md).
+This branch adds **Jev Auto · experimental**: the primary planner chooses fast Jev execution or guarded action batches per subtask, with the existing UI, session, policy and Stop. The measured configuration uses Gemini through OpenRouter. Run `pnpm dev:auto` for an isolated profile of the same application. [Current application and setup](docs/APPLICATION.md) · [Complete research and costs](docs/research/README.md) · [Release readiness](docs/RELEASE-READINESS.md).
 
 A Linux desktop workspace where an AI agent operates a containerized terminal and browser while you watch, review approvals, and take control.
 
@@ -84,6 +84,9 @@ The app uses a dedicated Codex home, separate from your usual coding-agent login
 
 | Document | What it covers |
 | --- | --- |
+| [Current application](docs/APPLICATION.md) | Shared runtime, browser modes, Auto routing, recovery, security boundaries and Gemini/Jev setup |
+| [Research and publication kit](docs/research/README.md) | All retained experiments, methodology, per-trial CSV, costs and shareable charts |
+| [Release readiness](docs/RELEASE-READINESS.md) | One-app integration, license, clean installation and reproducible benchmark work |
 | [User guide](docs/USER_GUIDE.md) | Installation details, daily workflow, browser login, approvals, limits, history, troubleshooting |
 | [Configuration](docs/CONFIGURATION.md) | Current Settings controls, environment variables, providers, credentials and local data |
 | [Codex integration](docs/codex-integration.md) | Dedicated sign-in, App Server, model/effort selection and tool boundary |

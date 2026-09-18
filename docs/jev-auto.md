@@ -1,5 +1,7 @@
 # Jev Auto: wykonawca wybierany według podzadania
 
+Aktualna dokumentacja publikacyjna: [aplikacja i routing](APPLICATION.md), [pełne badania i koszty](research/README.md), [co pozostało do wydania](RELEASE-READINESS.md). Poniższy dokument zachowuje kontekst lokalnego eksperymentu.
+
 Eksperymentalny tryb istniejącej aplikacji. Gemini wybiera między szybką pętlą Jev a krótkim planem akcji. Interfejs, rozmowa, przeglądarka i uprawnienia pozostają wspólne. Nie wbudowujemy Browser Use jako kolejnego runtime’u: jego zysk trzeba porównać z prostszym batchowaniem, które zachowuje aktualną kontrolę akcji.
 
 ## Uruchomienie

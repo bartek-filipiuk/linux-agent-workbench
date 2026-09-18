@@ -1,0 +1,24 @@
+{
+  "jev-ultrafast": {
+    "commit": "452c1ad2dd628008f1d5608f28158d76e49e6cc0",
+    "files": {
+      "jev_ultrafast/agent.py": "aaf8b271cb0ee6643fe7beb525328ab80de8568c7ac044d02b9c6721161e7c8b",
+      "jev_ultrafast/model.py": "a85ada8458d23642c5c8a4095acf0565e6268f81dcda26f6308942b653e9c9f3",
+      "jev_ultrafast/browser.py": "ee08dafa93d731bd292aa0263a578a29c8001cf22eef3c59fe44a159649155ee",
+      "jev_ultrafast/snapshot.js": "e50473501c8fb8e70f3b21866d987393e3f2315c639d638bd477d170e81ed78d",
+      "jev_ultrafast/questions.py": "66a7054b85040b949e1757311257ea0c5a843c635f9a40c99f6d15ad660fb422",
+      "pyproject.toml": "3afd9e12c2c1c1efb32231669cd2d415b16c098cc057e91fc05844f4ab6c19e2"
+    }
+  },
+  "browser-use": {
+    "commit": "d8110c5ff87ccba887aaa726cdb780f2f84bef8d",
+    "files": {
+      "browser_use/agent/service.py": "10f7c14458ed7089c49f34a06ad7b3ce12212a589d9d000c5cf4d9cc7ddd8479",
+      "browser_use/llm/openrouter/chat.py": "386b23f1a4974ea67be5ba2e28e730f059ef7ac8eca5a84dd197f7bdabaa1240",
+      "browser_use/browser/session.py": "223d987b994bb63e0baa1a66d5e5809b7dca274c0ac1abf4488e58925efe184b",
+      "browser_use/browser/profile.py": "5b42a8285bab5116c08ec61cad643ed71b546cc9c82cfd77a7d7929330b40a47",
+      "browser_use/tools/service.py": "25746ddfe719c0a800b2b4fcc399aea4fc8be20c48b04ab4118841fd5419eb73",
+      "pyproject.toml": "f06f598f90b6b71f6509013174fab0e7c625e8aa59797ef97430043f3c1dec82"
+    }
+  }
+}

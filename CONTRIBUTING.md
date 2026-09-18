@@ -52,6 +52,8 @@ Do not add integrations merely by copying credentials from another application. 
 
 ## Before publishing
 
+See the current [release readiness review](docs/RELEASE-READINESS.md) for the consolidated Auto branch and concrete integration criteria.
+
 - [ ] Select the repository license, add its full text and review contributor/provenance requirements.
 - [x] Enable GitHub private vulnerability reporting and verify the setting through its API. No test vulnerability report was submitted.
 - [x] Review publication files and reachable repository history with selected credential patterns; review staged filenames before pushing. Repeat for each publication. Ignore rules do not remove older commits.
@@ -59,6 +61,7 @@ Do not add integrations merely by copying credentials from another application. 
 - [x] Run typecheck, tests, build and dependency audit; separately record skipped container tests in [the security review](docs/security-review.md).
 - [ ] Review container OS/browser dependencies and the external Codex CLI version; npm audit does not cover them all.
 - [ ] Review shared credential/profile limitations, optional remote approvals and shell-gate limitations before choosing release positioning.
-- [ ] Add CI, choose a supported release policy and verify distribution/signing when binary releases are introduced.
+- [x] Add CI for typecheck, build, tests, UI fixtures and dependency auditing; require a green run on each release candidate.
+- [ ] Choose a supported release policy and verify distribution/signing when binary releases are introduced.
 
 GitHub issues and pull requests are enabled, with English templates. Secret scanning and push protection are enabled. These settings supplement local review; they do not prove that the repository contains no secrets. Source publication is separate from a packaged release or an open-source license grant.
