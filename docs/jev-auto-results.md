@@ -6,7 +6,7 @@ Najmocniejszy obecny wynik: formularz 10-etapowy **26,14 s Auto vs 74,49 s First
 
 Seria końcowa ma **72 zarejestrowane próby: 58 PASS i 14 błędów kredytowych**. Sześć typów zadań ukończono w pełni: 54/54. Research ma tylko 4 poprawne próby łącznie; wszystkie końcowe próby kart zatrzymał provider przed wykonaniem zadania. Nie są dowodem awarii funkcji kart. Klasyfikację przyczyn potwierdzają `endReason` oraz logi native drivera, zapisane w `validation/billing-failures.json`.
 
-Razem z pilotami zachowano **91 prób runnera (76 PASS, 1 FAIL pilota, 14 HTTP 402)**, **54 odpowiedzi w testach routingu** i **10 kontroli desktopu** (dwie nieudane kontrole Classic przed poprawką schematu). Koszt zarejestrowany: **$2,666184612** runner/routing + **$0,102326586** desktop = **$2,768511198**. To wyłącznie ten etap Auto, bez kosztów wcześniejszego PoC. Niepełne usage po Stop może zaniżać rachunek.
+Razem z pilotami zachowano **92 próby runnera (76 PASS, 1 FAIL pilota, 15 HTTP 402; w tym osobna kontrola zatrzymania serii)**, **54 odpowiedzi w testach routingu** i **10 kontroli desktopu** (dwie nieudane kontrole Classic przed poprawką schematu). Koszt zarejestrowany: **$2,666184612** runner/routing + **$0,102326586** desktop = **$2,768511198**. To wyłącznie ten etap Auto, bez kosztów wcześniejszego PoC. Niepełne usage po Stop może zaniżać rachunek.
 
 Po wykryciu 402 dodano zatrzymanie całego runnera po pierwszej próbie z błędem 401/402 (`69e3280`). Nie zmienia to działania modeli ani aplikacji; wcześniejszych 14 błędów nie usunięto. Zamrożone kompilaty aplikacji pozostają takie jak w zmierzonej serii.
 
@@ -278,3 +278,12 @@ Każda kontrola desktopu:
 | desktop-auto.json | auto_navigation | PASS | 15.51 |
 | desktop-auto.json | stop | PASS | 0.03 |
 | desktop-auto.json | classic_after_stop | FAIL | — |
+
+
+## Ponowna kontrola blokady dostawcy
+
+`credit-recheck-1.json`, 18 września 2026, 07:21:26 UTC: zaplanowano search na trzech silnikach; pierwszy wariant Auto otrzymał HTTP 402 po 0,459 s. Runner zakończył całą serię (`provider_unavailable`), nie uruchomił dwóch pozostałych wariantów, Jev nie został wywołany. Zarejestrowany koszt $0. To test zatrzymania po błędzie dostawcy, nie pomiar szybkości wykonania zadania. Brak kredytów nadal blokuje brakujące porównania.
+
+| Seria | Zadanie | Silnik | Wynik | Czas do błędu | Koszt |
+|---|---|---|---|---:|---:|
+| credit-recheck-1.json | search | app-auto | HTTP 402; seria zatrzymana | 0,459 s | $0 |
