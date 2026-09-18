@@ -10,9 +10,11 @@ import {fileURLToPath} from 'node:url';
 import {tasks,startSite,verify} from './tasks.mjs';
 import {readJevKey,readOpenRouterKey} from '/home/bartek/linux-agent-jev/scripts/jev-key.mjs';
 import {BrowserSession} from '../../services/browser-worker/dist/browser-session.js';
+import {BrowserSession as BaselineBrowserSession} from '/home/bartek/linux-agent-jev/services/browser-worker/dist/browser-session.js';
 import * as baseline from '/home/bartek/linux-agent-jev/services/agentd/dist/index.js';
 import * as candidate from '../../services/agentd/dist/index.js';
-import {browserExecutor} from '../../services/agentd/dist/tools/browser-tools.js';
+import {browserExecutor as candidateBrowserExecutor} from '../../services/agentd/dist/tools/browser-tools.js';
+import {browserExecutor as baselineBrowserExecutor} from '/home/bartek/linux-agent-jev/services/agentd/dist/tools/browser-tools.js';
 import {BrowserActionPolicy} from '/home/bartek/linux-agent-jev/services/agentd/dist/policy/browser-policy.js';
 import {JevClient as AutoJevClient,JevConfig as AutoJevConfig} from '../../services/agentd/dist/provider/jev.js';
 import {JevClient,JevConfig} from '/home/bartek/linux-agent-jev/services/agentd/dist/provider/jev.js';
@@ -20,13 +22,16 @@ import {JevClient,JevConfig} from '/home/bartek/linux-agent-jev/services/agentd/
 const root=path.dirname(fileURLToPath(import.meta.url));
 const upstreamRoot='/home/bartek/linux-agent-browser-poc';
 const repo=path.resolve(root,'../..');
-const require=createRequire('/home/bartek/linux-agent-jev/services/browser-worker/package.json');
-const {chromium}=require('playwright');
-const originalLaunch=chromium.launchPersistentContext.bind(chromium);
-// Identical browser launch for all variants; expose only the owned browser over loopback CDP.
-chromium.launchPersistentContext=(profile,opts)=>originalLaunch(profile,{...opts,
-  env:Object.fromEntries(Object.entries(process.env).filter(([k])=>!/API_KEY|TOKEN|SECRET/.test(k))),
-  args:[...opts.args,'--remote-debugging-address=127.0.0.1','--remote-debugging-port=0']});
+// Patch both module instances: each isolated worktree owns its Playwright package.
+for(const chromium of new Set([
+  createRequire('/home/bartek/linux-agent-jev/services/browser-worker/package.json')('playwright').chromium,
+  createRequire(path.join(repo,'services/browser-worker/package.json'))('playwright').chromium,
+])){
+  const launch=chromium.launchPersistentContext.bind(chromium);
+  chromium.launchPersistentContext=(profile,opts)=>launch(profile,{...opts,
+    env:Object.fromEntries(Object.entries(process.env).filter(([k])=>!/API_KEY|TOKEN|SECRET/.test(k))),
+    args:[...opts.args,'--remote-debugging-address=127.0.0.1','--remote-debugging-port=0']});
+}
 const argv=process.argv.slice(2), flag=(key,fallback)=>argv.includes(key)?argv[argv.indexOf(key)+1]:fallback;
 const engines=flag('--engines','app-auto,app-first,ultrafast,browser-use').split(',');
 if(engines.some(e=>!['app-auto','app-first','ultrafast','browser-use'].includes(e)))throw Error('Unknown engine');
@@ -52,7 +57,7 @@ const report={createdAt:new Date().toISOString(),model,effort:'low',upstream:'go
 report.source.hashes=Object.fromEntries(['run.mjs','tasks.mjs'].map(file=>[file,createHash('sha256').update(fs.readFileSync(path.join(root,file))).digest('hex')]));
 report.source.candidate=execFileSync('git',['rev-parse','HEAD'],{cwd:repo,encoding:'utf8'}).trim();
 report.source.candidateHashes=Object.fromEntries(['services/agentd/dist/orchestrator/browser-auto.js','services/agentd/dist/orchestrator/jev-browser.js','services/agentd/dist/orchestrator/run-controller.js','services/browser-worker/dist/browser-session.js'].map(f=>[f,createHash('sha256').update(fs.readFileSync(path.join(repo,f))).digest('hex')]));
-report.source.sharedWorker='candidate BrowserSession for all variants; baseline controller unchanged';
+report.source.sharedWorker='same Chrome build/settings; app-first uses unchanged baseline controller, tools and worker; app-auto uses candidate; Python engines use pinned native drivers';
 report.source.upstreamDriverHash=createHash('sha256').update(fs.readFileSync(path.join(upstreamRoot,'driver.py'))).digest('hex');
 report.source.dirty=!!execFileSync('git',['status','--porcelain'],{cwd:root,encoding:'utf8'}).trim();
 report.settings.priorReportedCostUsd=fs.readdirSync(path.dirname(output)).filter(f=>f.endsWith('.json')).reduce((sum,f)=>{
@@ -67,6 +72,7 @@ const jevCost=usage=>((usage?.input_tokens??usage?.prompt_tokens??0)*0.042)/1e6;
 
 async function appDriver(browser,task,goal,workDir,engine){
   const {Store,RunController,OpenRouterAdapter}=engine==='app-auto'?candidate:baseline;
+  const browserExecutor=engine==='app-auto'?candidateBrowserExecutor:baselineBrowserExecutor;
   const store=new Store(':memory:');let lastObservation;
   const target={status:{state:'ready'},start:async()=>({state:'ready'}),observe:async input=>(lastObservation=await browser.observe(input)),act:a=>browser.act(a),read:i=>browser.read(i),wait:i=>browser.wait(i),downloads:async()=>[]};
   const policy=new BrowserActionPolicy({lastObservation:()=>lastObservation,allowPrivate:task.category!=='live',approvals:{isSessionAllowed:()=>false,request:async()=> 'deny'}});
@@ -163,7 +169,7 @@ try{
     const runId=`${task.id}-${engine}-${repeat}`;
     const workDir=path.join(path.dirname(output),path.basename(output,'.json')+'-traces',runId);
     fs.mkdirSync(workDir,{recursive:true,mode:0o700});
-    const browser=new BrowserSession({profileDir:profile,channel:'chromium',headless:!argv.includes('--headed'),locale:'en-US',timeZone:'Europe/Zurich',viewport:{width:1120,height:780}});
+    const browser=new (engine==='app-first'?BaselineBrowserSession:BrowserSession)({profileDir:profile,channel:'chromium',headless:!argv.includes('--headed'),locale:'en-US',timeZone:'Europe/Zurich',viewport:{width:1120,height:780}});
     activeBrowser=browser;let driver,record={task:task.id,category:task.category,repeat,engine,warm,success:false},taskStarted,stopTimer;
     const setupAt=performance.now();
     try{
