@@ -3,7 +3,7 @@ import type { ApprovalView } from "./ApprovalCard";
 import { label, STATE_LABEL } from "./labels";
 
 export type RunEvent = (
-  | { type: "run.state"; runId: string; state: string; goal?: string; endReason?: string; finalText?: string; turns: number; toolCalls: number; costUsd: number | null; jev?: import("@law/protocol").JevStats; snapshot: boolean; browserEngine?: "classic" | "jev-hybrid" | "jev-first"; budget?: RunBudgetStatus; model?: string; effort?: string; profile?: string }
+  | { type: "run.state"; runId: string; state: string; goal?: string; endReason?: string; finalText?: string; turns: number; toolCalls: number; costUsd: number | null; jev?: import("@law/protocol").JevStats; snapshot: boolean; browserEngine?: "classic" | "jev-hybrid" | "jev-first" | "jev-auto"; budget?: RunBudgetStatus; model?: string; effort?: string; profile?: string }
   | { type: "run.commentary"; runId: string; text: string }
   | { type: "run.tool"; runId: string; name: string; status: "executing" | "done" | "denied" | "error"; callId: string; preview?: string; turns: number; toolCalls: number; costUsd: number | null; jev?: import("@law/protocol").JevStats }
   | { type: "run.handoff"; runId: string; reason: string }
@@ -33,7 +33,7 @@ export type RunView = {
   model?: string;
   effort?: string;
   profile?: string;
-  browserEngine?: "classic" | "jev-hybrid" | "jev-first";
+  browserEngine?: "classic" | "jev-hybrid" | "jev-first" | "jev-auto";
   restored?: string;
   approvals: ApprovalView[];
   log: LogRow[];

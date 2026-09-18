@@ -3,6 +3,10 @@ import { DEFAULT_TASK_PREFERENCES, readTaskPreferences, taskLimits } from "../sr
 import { RunLimits, BudgetAction } from "@law/protocol";
 
 describe("task limits", () => {
+  it("persists the Auto experiment while keeping the default engine", () => {
+    expect(readTaskPreferences(JSON.stringify({...DEFAULT_TASK_PREFERENCES,browserEngine:"jev-auto"})).browserEngine).toBe("jev-auto");
+    expect(DEFAULT_TASK_PREFERENCES.browserEngine).toBe("classic");
+  });
   it("defaults to unlimited steps with an explicit 30 minute pause", () => {
     expect(taskLimits(readTaskPreferences(null))).toEqual({ limits: { maxTurns: null, maxDurationMinutes: 30 } });
     expect(taskLimits({ ...DEFAULT_TASK_PREFERENCES, timeMode: "none" })).toEqual({ limits: { maxTurns: null, maxDurationMinutes: null } });

@@ -14,6 +14,7 @@ export type Continuation = {
   limits?: Budgets;
   /** Mutating fallback opens only after a completed Jev exception. */
   browserFallback?: boolean;
+  browserExecutor?: "fast" | "planned";
   jev?: import("@law/protocol").JevStats;
 };
 

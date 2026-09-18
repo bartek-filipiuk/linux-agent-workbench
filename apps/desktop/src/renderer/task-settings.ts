@@ -5,7 +5,7 @@ export const STYLES = {
   research: { name: "Research & data", description: "Reads sources in the browser and saves captured text with source links for comparison or a coding agent." },
   project: { name: "Build with a coding agent", description: "Coordinates another coding agent in the terminal and checks its work. That agent needs its own setup and sign-in." },
 } as const;
-export type TaskPreferences = { browserEngine: "classic" | "jev-hybrid" | "jev-first"; profile: keyof typeof STYLES; stepMode: "unlimited" | "custom"; steps: string; timeMode: "none" | "30" | "60" | "custom"; minutes: string };
+export type TaskPreferences = { browserEngine: "classic" | "jev-hybrid" | "jev-first" | "jev-auto"; profile: keyof typeof STYLES; stepMode: "unlimited" | "custom"; steps: string; timeMode: "none" | "30" | "60" | "custom"; minutes: string };
 export const DEFAULT_TASK_PREFERENCES: TaskPreferences = { browserEngine: "classic", profile: "quick", stepMode: "unlimited", steps: "100", timeMode: "30", minutes: "30" };
 export const TASK_PREFERENCES_KEY = "law.task-preferences";
 
@@ -14,7 +14,7 @@ export function readTaskPreferences(raw: string | null): TaskPreferences {
     const p = JSON.parse(raw ?? "null");
     if (!p || !Object.hasOwn(STYLES, p.profile) || !["unlimited", "custom"].includes(p.stepMode) || !["none", "30", "60", "custom"].includes(p.timeMode)
       || typeof p.steps !== "string" || p.steps.length > 8 || typeof p.minutes !== "string" || p.minutes.length > 8) return { ...DEFAULT_TASK_PREFERENCES };
-    return { browserEngine: (p.browserEngine === "jev-hybrid" || p.browserEngine === "jev-first") ? p.browserEngine : "classic", profile: p.profile, stepMode: p.stepMode, steps: p.steps, timeMode: p.timeMode, minutes: p.minutes };
+    return { browserEngine: (p.browserEngine === "jev-hybrid" || p.browserEngine === "jev-first" || p.browserEngine === "jev-auto") ? p.browserEngine : "classic", profile: p.profile, stepMode: p.stepMode, steps: p.steps, timeMode: p.timeMode, minutes: p.minutes };
   } catch { return { ...DEFAULT_TASK_PREFERENCES }; }
 }
 export function taskLimits(p: TaskPreferences): { limits?: Limits; error?: string } {

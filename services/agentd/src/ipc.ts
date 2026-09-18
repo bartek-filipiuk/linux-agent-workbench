@@ -1,3 +1,4 @@
+import { AUTO_MIN_CONFIDENCE } from "./orchestrator/browser-auto.js";
 import { JevClient, JevConfig } from "./provider/jev.js";
 import fs from "node:fs";
 import path from "node:path";
@@ -75,7 +76,7 @@ export const RunStart = z.object({
   profile: RunProfile.optional(),
   modelSelection: ModelSelection.optional(),
   limits: RunLimits.optional(),
-  browserEngine: z.enum(["classic", "jev-hybrid", "jev-first"]).optional(),
+  browserEngine: z.enum(["classic", "jev-hybrid", "jev-first", "jev-auto"]).optional(),
   maxTurns: z.number().int().min(5).max(400).optional(),
 });
 export const UiQuery = z.object({ type: z.literal("ui.query"), requestId: z.string(), kind: z.enum(["history", "detail", "browser", "browser_restart", "conversation", "followup", "pause"]), runId: z.string().optional(), message: z.string().trim().min(1).max(4000).optional(), command: BrowserControl.optional() });
@@ -111,7 +112,7 @@ export const AgentdError = z.object({ type: z.literal("agentd.error"), message: 
 export type AgentdError = z.infer<typeof AgentdError>;
 export type SessionStateMsg = { type: "session.state" } & SessionStatus;
 export type TerminalData = { type: "terminal.data"; data: Uint8Array };
-export type RunStateMsg = { type: "run.state"; runId: string; goal?: string; state: RunState; endReason?: string; finalText?: string; turns: number; toolCalls: number; costUsd: number | null; jev?: import("@law/protocol").JevStats; snapshot: boolean; browserEngine?: "classic" | "jev-hybrid" | "jev-first"; budget?: RunBudgetStatus; model?: string; effort?: string; profile?: string };
+export type RunStateMsg = { type: "run.state"; runId: string; goal?: string; state: RunState; endReason?: string; finalText?: string; turns: number; toolCalls: number; costUsd: number | null; jev?: import("@law/protocol").JevStats; snapshot: boolean; browserEngine?: "classic" | "jev-hybrid" | "jev-first" | "jev-auto"; budget?: RunBudgetStatus; model?: string; effort?: string; profile?: string };
 export type RunCommentary = { type: "run.commentary"; runId: string; text: string };
 export type RunTool = { type: "run.tool"; runId: string; name: string; status: "executing" | "done" | "denied" | "error"; callId: string; preview: string; turns: number; toolCalls: number; costUsd: number | null; jev?: import("@law/protocol").JevStats };
 export type RunHandoff = { type: "run.handoff"; runId: string; reason: string };
@@ -545,7 +546,7 @@ export class Daemon {
     });
   }
 
-  private async startRun(goal: string, opts: { browserEngine?: "classic" | "jev-hybrid" | "jev-first"; profile?: RunProfileName; maxTurns?: number; modelSelection?: ModelSelection; limits?: RunLimits; parentId?: string; continuation?: Continuation; context?: string } = {}): Promise<void> {
+  private async startRun(goal: string, opts: { browserEngine?: "classic" | "jev-hybrid" | "jev-first" | "jev-auto"; profile?: RunProfileName; maxTurns?: number; modelSelection?: ModelSelection; limits?: RunLimits; parentId?: string; continuation?: Continuation; context?: string } = {}): Promise<void> {
     if (this.browserHumanOnly) return this.deps.post({ type: "agentd.error", message: "Finish manual login before starting the agent" });
     const manager = this.manager;
     const runtime = this.runtime;
@@ -562,7 +563,7 @@ export class Daemon {
       this.deps.post({ type: "agentd.error", message: "Model selection is available for the Codex provider only" });
       return;
     }
-    if ((opts.browserEngine === "jev-hybrid" || opts.browserEngine === "jev-first") && (!this.jev || !this.browser)) {
+    if ((opts.browserEngine === "jev-hybrid" || opts.browserEngine === "jev-first" || opts.browserEngine === "jev-auto") && (!this.jev || !this.browser)) {
       this.deps.post({ type: "agentd.error", message: "Jev needs a configured TypeSafe key and browser support. Choose Classic or configure Jev." }); return;
     }
     this.startingRun = true; // the snapshot below awaits; a second click in that window must not create a second run
@@ -595,7 +596,7 @@ export class Daemon {
     const rc = new RunController(
       {
         store: runtime.store,
-        ...((opts.browserEngine === "jev-hybrid" || opts.browserEngine === "jev-first") && this.jev && browser ? { hybrid: { evaluator: new JevClient(this.jev), observation: () => browser.lastObservation, minConfidence: this.jev.minConfidence, ...(opts.browserEngine === "jev-first" ? { strategy: "first" as const } : {}) } } : {}),
+        ...((opts.browserEngine === "jev-hybrid" || opts.browserEngine === "jev-first" || opts.browserEngine === "jev-auto") && this.jev && browser ? { hybrid: { evaluator: new JevClient(this.jev), observation: () => browser.lastObservation, minConfidence: opts.browserEngine === "jev-auto" ? AUTO_MIN_CONFIDENCE : this.jev.minConfidence, ...(opts.browserEngine === "jev-auto" ? { strategy: "auto" as const } : opts.browserEngine === "jev-first" ? { strategy: "first" as const } : {}) } } : {}),
         adapter: this.deps.makeAdapter(model, runtime.apiKey, provider),
         worker,
         tools: composeExecutors(...executors),

@@ -37,6 +37,7 @@ export function formatBrowserObservation(obs: BrowserObservation, opts: { bounds
     if (e.options) line += ` options: ${e.options.map(o => `${JSON.stringify(o.value)}=${JSON.stringify(o.label)}${o.disabled ? " [disabled]" : ""}`).join(", ")}`;
     if (!e.enabled) line += " [disabled]";
     if (!e.inViewport) line += " [off]";
+    if (e.occluded) line += " [covered]";
     if (opts.bounds) line += ` @${e.bounds.x},${e.bounds.y} ${e.bounds.width}x${e.bounds.height}`;
     lines.push(line);
   }

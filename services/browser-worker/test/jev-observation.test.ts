@@ -13,6 +13,28 @@ beforeAll(async () => { site = await startFixtureServer(); session = new Browser
 afterAll(async () => { await session?.close(); await site?.close(); fs.rmSync(profileDir, { recursive: true, force: true }); });
 const page = () => (session as unknown as { context: BrowserContext }).context.pages()[0]!;
 
+it("keeps node identity across observations but changes it for replacement and navigation", async () => {
+  await session.navigate(`${site.url}/index.html`);
+  const first=await session.observe();
+  const link=first.elements.find(e=>e.name.includes("Go to form"))!;
+  expect(link.nodeId).toBeTruthy();
+  expect((await session.observe()).elements.find(e=>e.name===link.name)!.nodeId).toBe(link.nodeId);
+  await page().evaluate(()=>{const a=document.querySelector('a')!;a.replaceWith(a.cloneNode(true));});
+  expect((await session.observe()).elements.find(e=>e.name===link.name)!.nodeId).not.toBe(link.nodeId);
+  await session.navigate(`${site.url}/index.html`);
+  expect((await session.observe()).elements.find(e=>e.name===link.name)!.nodeId).not.toBe(link.nodeId);
+});
+
+it("marks covered controls without making unrelated visible controls unavailable", async () => {
+  await session.navigate(`${site.url}/index.html`);
+  const before=await session.observe();const link=before.elements.find(e=>e.name.includes('Go to form'))!;
+  await page().evaluate(()=>{const cover=document.createElement('div');cover.id='test-cover';cover.style.cssText='position:fixed;inset:0;background:white;z-index:99999';cover.innerHTML='<button>Dialog action</button>';document.body.append(cover);});
+  await expect(session.act({kind:"click",ref:link.ref,revision:before.revision})).rejects.toMatchObject({code:"STALE_OBSERVATION"});
+  const covered=await session.observe();
+  expect(covered.elements.find(e=>e.name.includes('Go to form'))?.occluded).toBe(true);
+  expect(covered.elements.find(e=>e.name==='Dialog action')?.occluded).toBe(false);
+});
+
 it("observes select choices, checkbox state and safe capabilities without exporting secret fields", async () => {
   await session.navigate(`${site.url}/form.html`);
   await page().evaluate(() => {

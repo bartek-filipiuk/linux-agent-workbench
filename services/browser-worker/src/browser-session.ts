@@ -93,6 +93,8 @@ const OBSERVE_SCRIPT = `
     const t = el.tagName.toLowerCase();
     const editable = t === "input" || t === "textarea" || t === "select" || el.isContentEditable === true;
     const item = { el, role: roleOf(el), name: clip(nameOf(el)), text: clip(el.innerText), enabled: !(el.disabled === true || el.getAttribute("aria-disabled") === "true"), editable, inViewport, bounds: { x: Math.round(r.x), y: Math.round(r.y), width: Math.round(r.width), height: Math.round(r.height) } };
+    const hit = inViewport ? document.elementFromPoint(Math.max(0,Math.min(vw-1,r.x+r.width/2)),Math.max(0,Math.min(vh-1,r.y+r.height/2))) : null;
+    item.occluded = inViewport && (!hit || !(hit === el || el.contains(hit)));
     if (t === "a") item.href = clip(el.getAttribute("href") || "", 400);
     if (editable && t !== "select" && el.type !== "password" && el.autocomplete !== "one-time-code") item.value = clip(el.value || "");
     if (t === "select") item.value = clip(el.options[el.selectedIndex]?.text || "");
@@ -107,9 +109,13 @@ const OBSERVE_SCRIPT = `
   }
   out.sort((a, b) => (a.inViewport === b.inViewport ? 0 : a.inViewport ? -1 : 1));
   const kept = out.slice(0, max);
+  const prior = window[key];
+  const identities = prior?.identities || new WeakMap();
+  const documentId = prior?.documentId || Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+  let nextId = prior?.nextId || 0;
   const els = new Map();
-  const elements = kept.map((it, i) => { const ref = "e" + (start + i + 1); els.set(ref, { el: it.el, signature: signature(it.el) }); const { el, ...rest } = it; return { ref, ...rest }; });
-  window[key] = { els, signature };
+  const elements = kept.map((it, i) => { const ref = "e" + (start + i + 1); els.set(ref, { el: it.el, signature: signature(it.el) }); const { el, ...rest } = it; if (!identities.has(el)) identities.set(el, documentId + ":" + (++nextId)); return { ref, nodeId: identities.get(el), ...rest }; });
+  window[key] = { els, signature, identities, documentId, nextId };
   const doc = document.documentElement;
   return { elements, scroll: { x: Math.round(window.scrollX), y: Math.round(window.scrollY), maxY: Math.max(0, doc.scrollHeight - vh) } };
 })
@@ -617,7 +623,10 @@ export class BrowserSession {
       throw new ProtocolError("STALE_OBSERVATION", `revision ${revision} is stale (current ${this.revision}); observe again before acting`);
     }
     const frame = this.refFrames.get(ref);
-    const h = frame && !frame.isDetached() ? await frame.evaluateHandle(`(() => { const registry = window[${JSON.stringify(this.registryKey)}]; const item = registry?.els.get(${JSON.stringify(ref)}); if (!item || !item.el.isConnected || item.signature !== registry.signature(item.el)) return null; return item.el; })()`) : undefined;
+    const h = frame && !frame.isDetached() ? await frame.evaluateHandle(`(() => { const registry = window[${JSON.stringify(this.registryKey)}]; const item = registry?.els.get(${JSON.stringify(ref)}); if (!item || !item.el.isConnected || item.signature !== registry.signature(item.el)) return null;
+      const r=item.el.getBoundingClientRect(), x=r.x+r.width/2, y=r.y+r.height/2;
+      if (x>=0 && y>=0 && x<innerWidth && y<innerHeight) { const hit=document.elementFromPoint(x,y); if (!hit || !(hit===item.el || item.el.contains(hit))) return null; }
+      return item.el; })()`) : undefined;
     const el = h?.asElement();
     if (!el) throw new ProtocolError("STALE_OBSERVATION", `unknown element ref ${ref}; observe again`);
     return el;

@@ -1,3 +1,4 @@
+import { AUTO_INSTRUCTIONS, BROWSER_BATCH, runBrowserBatch } from "./browser-auto.js";
 import { BROWSER_TASK, BROWSER_FIRST_TASK, BrowserFallback, FIRST_INSTRUCTIONS, HYBRID_INSTRUCTIONS, captureBrowserEvidence, runBrowserTask } from "./jev-browser.js";
 import { z } from "zod";
 import type { JevEvaluator, JevReply } from "../provider/jev.js";
@@ -14,7 +15,7 @@ import { SYSTEM_PROMPT } from "./system-prompt.js";
 import { pendingResults, type Continuation } from "./continuation.js";
 
 export type RunControllerDeps = {
-  hybrid?: { evaluator: JevEvaluator; observation: () => BrowserObservation | undefined; minConfidence: number; strategy?: "first" };
+  hybrid?: { evaluator: JevEvaluator; observation: () => BrowserObservation | undefined; minConfidence: number; strategy?: "first" | "auto" };
   provider?: "codex" | "openai" | "openrouter";
   continuation?: Continuation;
   store: Store;
@@ -94,7 +95,7 @@ export class RunController extends EventEmitter {
     this.policy = deps.policy ?? allowAllPolicy;
     this.prices = deps.prices ?? {};
     this.costKnown = deps.adapter.model in this.prices;
-    this.system = (deps.systemPrompt ?? SYSTEM_PROMPT) + (deps.hybrid ? deps.hybrid.strategy === "first" ? FIRST_INSTRUCTIONS : HYBRID_INSTRUCTIONS : "");
+    this.system = (deps.systemPrompt ?? SYSTEM_PROMPT) + (deps.hybrid ? deps.hybrid.strategy === "auto" ? AUTO_INSTRUCTIONS : deps.hybrid.strategy === "first" ? FIRST_INSTRUCTIONS : HYBRID_INSTRUCTIONS : "");
     this.tools = deps.tools ?? terminalExecutor(deps.worker);
     this.budget = new BudgetTracker({ ...(deps.budgets ?? DEFAULT_BUDGETS) }, deps.now);
     this.checkpoint = { provider: deps.provider ?? "openai", pending: [], results: [], ...deps.continuation };
@@ -309,6 +310,11 @@ export class RunController extends EventEmitter {
   }
 
   private modelTools() {
+    if (this.deps.hybrid?.strategy === "auto") return [
+      ...this.tools.specs.filter(s => !["browser_act", "browser_wait"].includes(s.name)),
+      { ...BROWSER_FIRST_TASK, description: "FIRST call for mechanical navigation, search, filters, autocomplete and opening a new tab: use fast Jev execution. No preliminary observation is needed even on an already open page; omit url in that case. Include optional starting URL and exact non-secret values with field meanings. Do not delegate unresolved comparisons, calculations or cross-page research. Returns fresh untrusted evidence and completion_candidate or needs_help. Independently check every requirement. On no progress or uncertainty, inspect evidence and use browser_batch to change approach; never blindly repeat denied or uncertain actions." },
+      BROWSER_BATCH,
+    ];
     if (this.deps.hybrid?.strategy !== "first") return [...this.tools.specs, ...(this.deps.hybrid ? [BROWSER_TASK] : [])];
     const fallbackNames = ["browser_observe", "browser_act", "browser_wait"];
     return [...this.tools.specs.filter(s => !fallbackNames.includes(s.name)), BROWSER_FIRST_TASK, {
@@ -351,7 +357,18 @@ export class RunController extends EventEmitter {
       this.throwIfStopped();
       if (this.humanPause || revision !== this.controlRevision) throw new ProtocolError("INVALID_INPUT", "Human took control; re-observe after resuming");
       if (this.deps.hybrid?.strategy === "first" && !child && ["browser_observe", "browser_act", "browser_wait"].includes(call.name)) throw new ProtocolError("INVALID_INPUT", "Use browser_task for browser work, or browser_fallback after an exception");
-      const result = call.name === "browser_task" && this.deps.hybrid
+      if (this.deps.hybrid?.strategy === "auto" && !child) {
+        if (["browser_act", "browser_wait", "browser_fallback"].includes(call.name)) throw new ProtocolError("INVALID_INPUT", "Use browser_task or browser_batch in Jev Auto");
+        if (["browser_task", "browser_batch", "browser_observe", "browser_read"].includes(call.name)) {
+          const mode = call.name === "browser_task" ? "fast" : "planned";
+          store.appendEvent(this.runId, "browser.route", { mode, tool:call.name, previous:this.checkpoint.browserExecutor,
+            switched:!!this.checkpoint.browserExecutor && mode !== this.checkpoint.browserExecutor });
+          this.checkpoint.browserExecutor = mode;
+        }
+      }
+      const result = call.name === "browser_batch" && this.deps.hybrid?.strategy === "auto"
+        ? { output: JSON.stringify(await this.runAutoBatch(call, worker, signal)) }
+        : call.name === "browser_task" && this.deps.hybrid
         ? { output: JSON.stringify(await this.runHybrid(call, worker, signal)) }
         : call.name === "browser_fallback" && this.deps.hybrid?.strategy === "first"
           ? await this.runFallback(call, worker, signal)
@@ -402,6 +419,18 @@ export class RunController extends EventEmitter {
     return result;
   }
 
+  private async runAutoBatch(parent: ToolCall, worker: TerminalWorker, signal: AbortSignal) {
+    const revision = this.controlRevision;
+    return runBrowserBatch(parent.args, {
+      signal, current: () => !signal.aborted && !this.humanPause && revision === this.controlRevision,
+      observation: this.deps.hybrid!.observation,
+      beforeDecision: async () => { await this.checkBudget("model"); return revision === this.controlRevision; },
+      execute: call => this.runBrowserChild(parent, call, worker, signal, revision),
+      record: reply => this.recordJev(reply),
+      event: (type,payload) => this.deps.store.appendEvent(this.runId,type,{...payload,parentCallId:parent.callId}),
+    });
+  }
+
   private async runHybrid(parent: ToolCall, worker: TerminalWorker, signal: AbortSignal) {
     const hybrid = this.deps.hybrid!;
     const revision = this.controlRevision;
@@ -417,7 +446,7 @@ export class RunController extends EventEmitter {
         if (type === "browser.task" && payload.status === "needs_help") { this.jevStats.fallbacks++; this.checkpoint.browserFallback = true; this.saveCheckpoint(); }
         this.deps.store.appendEvent(this.runId, type, { ...payload, parentCallId: parent.callId });
       },
-    }, hybrid.minConfidence, hybrid.strategy === "first");
+    }, hybrid.minConfidence, hybrid.strategy === "first" || hybrid.strategy === "auto", hybrid.strategy === "auto");
   }
 
   private recordJev(reply: JevReply): void {

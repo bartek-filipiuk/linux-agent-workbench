@@ -83,6 +83,9 @@ export function decodeBrowserFrame(bytes: Uint8Array): { width: number; height: 
 
 export const BrowserElement = z.object({
   ref: z.string().regex(/^e\d+$/),
+  /** Stable identity of the observed DOM node within its document. Never a selector. */
+  nodeId: z.string().max(100).optional(),
+  occluded: z.boolean().optional(),
   role: z.string(),
   name: z.string().max(120),
   text: z.string().max(120).optional(),

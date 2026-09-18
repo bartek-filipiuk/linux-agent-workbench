@@ -21,7 +21,10 @@
     "images:build:browser": "bash scripts/build-image.sh browser",
     "dev:jev": "LAW_INSTANCE=jev pnpm dev",
     "images:build:jev": "LAW_INSTANCE=jev bash scripts/build-image.sh browser",
-    "bench:jev": "pnpm build && node scripts/bench-jev.mjs"
+    "bench:jev": "pnpm build && node scripts/bench-jev.mjs",
+    "dev:auto": "LAW_INSTANCE=jev-auto pnpm dev",
+    "images:build:auto": "LAW_INSTANCE=jev-auto bash scripts/build-image.sh browser",
+    "bench:auto": "node experiments/browser-auto/run.mjs"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

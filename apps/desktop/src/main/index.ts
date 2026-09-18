@@ -80,7 +80,7 @@ async function writeDiagnostics(): Promise<string> {
   diagnosticsAbort = new AbortController();
   const dir = path.join(path.dirname(dbPath()), "diagnostics");
 
-  const { openaiKeyEncrypted: _k, jevKeyEncrypted: _j, ...settingsNoKey } = settings;
+  const { openaiKeyEncrypted: _k, jevKeyEncrypted: _j, openrouterKeyEncrypted: _o, ...settingsNoKey } = settings;
   const sections: [string, string][] = [
     ["versions", `app ${app.getVersion()}\nelectron ${process.versions.electron}\nnode ${process.versions.node}`],
     ["images", `terminal ${readImageId("terminal") ?? "missing"}\nbrowser ${readImageId("browser") ?? "missing"}`],
@@ -422,7 +422,7 @@ handleTrusted("run:start", async (_e, goal: unknown, opts: unknown) => {
   if (typeof goal !== "string" || !goal.trim()) return;
   const o = (opts ?? {}) as { profile?: unknown; maxTurns?: unknown; modelSelection?: unknown; limits?: unknown; browserEngine?: unknown };
   const browserEngine = o.browserEngine ?? "classic";
-  if (browserEngine !== "classic" && browserEngine !== "jev-hybrid" && browserEngine !== "jev-first") throw new Error("Choose Classic, Jev Hybrid or Jev First");
+  if (browserEngine !== "classic" && browserEngine !== "jev-hybrid" && browserEngine !== "jev-first" && browserEngine !== "jev-auto") throw new Error("Choose Classic, Jev Hybrid, Jev First or Jev Auto");
   if (browserEngine !== "classic" && !loadJevKey(loadEnv().env, loadEnv().file)) throw new Error("Configure TYPESAFE_API_KEY on the host or choose Classic");
   const modelSelection = ModelSelection.parse(o.modelSelection ?? {});
   const limits = o.limits === undefined ? undefined : RunLimits.parse(o.limits);

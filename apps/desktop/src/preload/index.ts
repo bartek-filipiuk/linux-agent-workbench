@@ -42,7 +42,7 @@ const api = {
   onTerminalStalled: on<boolean>("terminal:stalled"),
   onTerminalReset: on<null>("terminal:reset"),
   getLease: () => ipcRenderer.invoke("lease:get"),
-  startRun: (goal: string, opts?: { browserEngine?: "classic" | "jev-hybrid" | "jev-first"; profile?: "quick" | "research" | "project"; maxTurns?: number; modelSelection?: ModelSelection; limits?: RunLimits }) => ipcRenderer.invoke("run:start", goal, opts),
+  startRun: (goal: string, opts?: { browserEngine?: "classic" | "jev-hybrid" | "jev-first" | "jev-auto"; profile?: "quick" | "research" | "project"; maxTurns?: number; modelSelection?: ModelSelection; limits?: RunLimits }) => ipcRenderer.invoke("run:start", goal, opts),
   stopRun: () => ipcRenderer.invoke("run:stop"),
   continueBudget: (runId: string, action: BudgetAction) => ipcRenderer.invoke("run:budget", runId, action),
   resumeRun: () => ipcRenderer.invoke("run:resume"),

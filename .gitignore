@@ -17,3 +17,6 @@ auth.json
 .impeccable/
 *.log
 .DS_Store
+
+# Raw local experiment traces (published metrics are curated separately)
+experiments/browser-auto/artifacts/
