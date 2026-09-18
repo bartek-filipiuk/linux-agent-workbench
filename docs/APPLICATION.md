@@ -43,6 +43,16 @@ The same task can use both fast and planned execution. Selecting Auto is not a p
 
 The **primary planner** chooses its next tool using the task, previous results, available tools and Auto instructions. In our measurements that planner is Gemini. Jev chooses actions within a delegated mechanical subgoal; it does not decide which overall architecture or model to use.
 
+The responsibilities are:
+
+- **Gemini (or another configured primary model):** understand the request, plan the work, choose a tool for the next step, read and compare information, and assess completion against the user's requirements.
+- **Jev:** use the current page observation to choose clicks, typing and other browser actions for a concrete delegated subgoal. The planner supplies known text values and handles broader reasoning.
+- **The application:** `RunController` in the host-side `agentd` service processes the planner's tool calls. It runs the Jev loop or the planner's action batch, enforces policy and control checks, and sends permitted actions to the browser worker. Results return to the planner for its next decision.
+
+For example, Gemini can resolve the route and date for a Zurich–London flight search, ask Jev to set the search controls and show results, then read and compare those results itself. For a form with several known fields, Gemini can instead plan a guarded batch; a batch may also contain just one action when the next step depends on its result. The choice is made during the task, not once for the entire request.
+
+The potential speed gain comes from fewer primary-model planning turns: Jev can handle several interactions within one delegated subgoal, and one Gemini response can plan several independent form edits. Extra planning or recovery can offset that gain on simple tasks, as the benchmark counterexamples show.
+
 | Situation | Planner instruction / tool | Example |
 | --- | --- | --- |
 | Mechanical navigation, search, filters, autocomplete | Start with `browser_task`; include outcome, optional URL and exact known non-secret text values | Search for a specified product and leave results visible |

@@ -32,9 +32,13 @@ We publish the unsuccessful runs too: **606 retained historical runner records**
 
 ## How Auto chooses execution
 
+**Gemini plans; Jev handles delegated browser interactions.** Gemini is the primary planner in our tested configuration. It understands the request, chooses the next tool, compares results and checks whether the goal has been met. Auto makes this choice throughout the task, so different steps can use different methods. Other configured primary models fill the same planner role.
+
 - **Mechanical UI work:** the planner delegates a short outcome and known text values to Jev.
 - **Several known form fields:** the planner groups up to eight actions, with freshness and permission checks on every action.
 - **Research, comparisons and calculations:** the primary model reads and reasons, then executes a concrete result.
+
+For example, Gemini can turn “find a Zurich–London flight” into a concrete search goal, delegate the search controls to Jev, then read and compare the returned flights itself. Jev chooses the browser actions needed for that subgoal; the app validates and executes them. Grouping actions or delegating several interactions can save time by reducing how often Gemini needs to plan an individual click.
 
 Tool selection is part of the normal planner response; there is no extra classifier request. Jev chooses actions within a subgoal, not the application's overall architecture. Lack of progress or uncertainty returns control to the planner with fresh evidence; uncertain mutations are not blindly replayed. Native Browser Use and Ultrafast are research references, not extra app runtimes.
 
