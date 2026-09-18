@@ -1,0 +1,9 @@
+{
+  "checkedAt": "2026-09-18T07:22:58.767Z",
+  "kind": "Read-only account availability check; no model requests. Exact account totals are omitted from the export.",
+  "creditsEndpointStatus": 200,
+  "remainingCreditsNonPositive": true,
+  "keyEndpointStatus": 200,
+  "goalStatus": "blocked",
+  "reason": "OpenRouter account credits exhausted; paid comparative validation cannot continue."
+}

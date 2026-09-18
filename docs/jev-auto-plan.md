@@ -58,3 +58,8 @@ Gemini `google/gemini-3.8-flash / low`, OpenRouter `google-ai-studio`; Jev `jev-
 A i B wykonane; aplikacja oraz główne kontrole D gotowe (452 testy, 4 kontenerowe, 4/4 desktop po naprawie schematu). C pozostaje otwarte. Sześć lokalnych grup: 54/54 poprawne; dalsza część serii ma 4 sukcesy research i 14 błędów kredytów OpenRouter. Runner zatrzymuje teraz kolejne serie na 401/402. Pełny zapis: [wyniki](jev-auto-results.md).
 
 Po doładowaniu tego samego konta: zachować wszystkie oryginały, uruchomić osobno `research-offers,tabs` (3 silniki × 3), `holdout` (3 × 3), `google-flights` (4 × 5). Nie zmieniać modelu, providerów, promptów, progu ani kodu aplikacji. W podsumowaniu rozdzielić niedokończoną część pierwotnej serii od wznowienia, aby nie mieszać liczności. Dodatkowy retest decyzji i opcjonalny smoke runnera z widocznym oknem wykonać po seriach czasowych. Nie zamykać celu jako osiągniętego, dopóki te wymagane pomiary pozostają niewykonane, chyba że użytkownik jawnie ograniczy zakres.
+
+
+## Status celu po ponownej weryfikacji
+
+18 września 2026, 07:22:58 UTC: bezpłatny odczyt API konta potwierdził działający klucz oraz brak dodatniego salda na płatne zapytania. Nie wywoływano modelu i nie zmieniano konfiguracji benchmarku. Po utrzymaniu się tej samej blokady przez trzy kolejne tury cel oznaczono **blocked**, nie complete. Implementacja i zachowane wyniki pozostają gotowe; brakujące porównania wymagają doładowania konta. Dokładne saldo konta nie jest publikowane w repozytorium.

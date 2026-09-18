@@ -287,3 +287,8 @@ Każda kontrola desktopu:
 | Seria | Zadanie | Silnik | Wynik | Czas do błędu | Koszt |
 |---|---|---|---|---:|---:|
 | credit-recheck-1.json | search | app-auto | HTTP 402; seria zatrzymana | 0,459 s | $0 |
+
+
+## Status celu po ponownej weryfikacji
+
+18 września 2026, 07:22:58 UTC: bezpłatny odczyt API konta potwierdził działający klucz oraz brak dodatniego salda na płatne zapytania. Nie wywoływano modelu i nie zmieniano konfiguracji benchmarku. Po utrzymaniu się tej samej blokady przez trzy kolejne tury cel oznaczono **blocked**, nie complete. Implementacja i zachowane wyniki pozostają gotowe; brakujące porównania wymagają doładowania konta. Dokładne saldo konta nie jest publikowane w repozytorium.
