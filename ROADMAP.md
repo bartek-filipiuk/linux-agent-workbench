@@ -49,7 +49,7 @@ The OpenRouter adapter is implemented on this branch; a unified provider Setting
 
 ## 4. Prepare dependable releases
 
-- Select a license and review provenance of source, images and dependencies.
+- Maintain the MIT license and third-party notices; review the actual bundled dependencies again before distributing images or binaries.
 - Maintain the enabled GitHub private vulnerability-reporting channel and define a sustainable triage process.
 - Maintain the existing CI for typecheck, tests, build, UI fixtures and dependency auditing; add documentation/link checks.
 - Add separately scheduled container tests and documented supported Linux environments.

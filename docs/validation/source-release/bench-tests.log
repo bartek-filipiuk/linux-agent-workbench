@@ -1,0 +1,17 @@
+
+> linux-agent-workbench@ test:bench /home/bartek/linux-agent-auto
+> node --test tests/bench/*.test.mjs
+
+✔ Flight date rejects malformed, normalized and expired calendar dates (1.42474ms)
+✔ Flights verifier uses the requested date and year, rejects a different result day and empty results (1.151315ms)
+✔ Portable paths respect explicit directories and an absent config does not require maintainer settings (1.772963ms)
+✔ Bootstrap refuses a different existing checkout without changing it or installing dependencies (57.537199ms)
+✔ Runner rejects invalid budgets and options before requesting credentials (2023.365826ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2154.249737

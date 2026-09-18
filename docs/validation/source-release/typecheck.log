@@ -1,0 +1,23 @@
+
+> linux-agent-workbench@ typecheck /home/bartek/linux-agent-auto
+> pnpm --filter @law/protocol build && pnpm --filter @law/agentd build && pnpm -r --if-present typecheck
+
+
+> @law/protocol@0.0.1 build /home/bartek/linux-agent-auto/packages/protocol
+> tsc -p tsconfig.json
+
+
+> @law/agentd@0.0.1 build /home/bartek/linux-agent-auto/services/agentd
+> tsc -p tsconfig.json && mkdir -p dist/storage/migrations && cp src/storage/migrations/*.sql dist/storage/migrations/
+
+Scope: 5 of 6 workspace projects
+packages/protocol typecheck$ tsc -p tsconfig.json --noEmit
+packages/protocol typecheck: Done
+services/agentd typecheck$ tsc -p tsconfig.json --noEmit
+services/browser-worker typecheck$ tsc -p tsconfig.json --noEmit
+services/terminal-worker typecheck$ tsc -p tsconfig.json --noEmit
+services/terminal-worker typecheck: Done
+services/browser-worker typecheck: Done
+services/agentd typecheck: Done
+apps/desktop typecheck$ tsc -p tsconfig.json --noEmit
+apps/desktop typecheck: Done

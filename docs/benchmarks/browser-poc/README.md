@@ -1,10 +1,10 @@
 # Gemini browser PoC
 
-> Historical PoC snapshot from `c9ced3a`. Source and measurements are retained for provenance; local run commands are not portable installation instructions. See the [current application](../../APPLICATION.md), [research kit](../../research/README.md) and [release readiness](../../RELEASE-READINESS.md).
+> Historical PoC snapshot from `c9ced3a`. Source and measurements are retained for provenance; local run commands are not portable installation instructions. For new runs use the [portable benchmark guide](../../BENCHMARKS.md). See the [current application](../../APPLICATION.md), [research kit](../../research/README.md) and [release readiness](../../RELEASE-READINESS.md).
 
 Independent experiment; existing application source remains untouched. [Plan](PLAN.md) · [Measured results and recommendation](RESULTS.md).
 
-[All test results, including earlier app experiments, pilots and validation (Polish)](../../research/ALL-RESULTS.md).
+[All test results, including earlier app experiments, pilots and validation (English)](../../research/ALL-RESULTS.md).
 
 Three engines: `app-first` (existing application), `ultrafast` (Jev Ultrafast with Gemini field helper), `browser-use` (Gemini drives the standard Browser Use agent). Gemini is `google/gemini-3.8-flash / low` through OpenRouter, pinned to `google-ai-studio`. No Mercury or stronger-model fallback.
 
@@ -48,4 +48,4 @@ Warm repetitions reuse the profile from repetition 5, including cache and site p
 
 An interrupted benchmark intentionally exits nonzero. Read `browserStopMs` (browser closed) separately from `stopMs` (all runner cleanup). A failed run or agent `DONE` is never counted as a verified success without the independent task checks.
 
-Nowszy eksperyment **Jev Auto** jest zaimplementowany w osobnej aplikacji; końcowe porównanie 119 prób, razem z historią błędów HTTP 402, opisano w [zbiorczym archiwum](../../research/ALL-RESULTS.md#auto). Wyniki tego PoC pozostają historycznym, osobnym pomiarem.
+The later Jev Auto implementation is part of the shared application. Its 119-trial comparison and retained credit-error history are documented in the [complete archive](../../research/ALL-RESULTS.md#auto). These PoC measurements remain a separate historical series.

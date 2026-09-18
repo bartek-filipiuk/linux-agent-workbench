@@ -1,76 +1,36 @@
-# Jev Auto — wdrożenie i końcowe porównanie
+# Jev Auto: frozen comparison and validation
 
-**Porównanie zakończone: 119/119 poprawnych prób w zadeklarowanej próbce.** Gemini wybiera szybką pętlę Jev lub planowane grupy akcji w tej samej aplikacji. Zachowano UX, sesję, uprawnienia, dowody i Stop. Nowy tryb pozostaje eksperymentalny; domyślny Classic i main nie zostały zmienione.
+**119/119 selected attempts completed successfully**, using the existing application with shared UX, session, per-action policy and Stop. Auto is experimental; Classic remains the fresh-install default.
 
-**Wniosek architektoniczny:** warto zachować obecną aplikację i dobierać wykonanie do podzadania. Auto wyraźnie przyspieszyło długie formularze i porównania ofert. Nie uzyskuje najlepszego czasu w każdej kategorii; native Ultrafast i prostszy First nadal są ważnymi punktami odniesienia. Wyniki nie uzasadniają pełnej migracji aplikacji do Browser Use.
+Auto reduced the ten-stage form median from First's 74.49 s to 26.14 s (64.9% less time); Browser Use took 40.21 s. Flights medians were Auto 21.79 s, First 36.82 s, Browser Use 35.45 s and native Ultrafast 13.32 s. Auto did not win every simple task and its Flights range was **17.83–64.02 s**. The worst attempt spent about 59.28 s in the planner across 26 model calls, after an uncertain Jev operation. It is retained, not discarded.
 
-Formularz 10-etapowy: **26,14 s Auto / 74,49 s First / 40,21 s Browser Use**, każdy 3/3. Formularz 6-etapowy: 13,35 / 30,08 / 24,28 s. Hotel: 4,71 / 12,26 / 8,99 s. Nowe dane także zostały zmierzone: 27/27 sukcesów. Auto przyspieszyło nowy formularz i nowe porównanie cen; przy prostych zadaniach wyniki są mieszane. To pomiar pełnych wariantów, nie osobna ablacja batchowania, promptu, progu confidence i kontroli elementów.
+These are complete configured variants, not an ablation isolating batching, prompts, confidence thresholds or target guards. The results support keeping the application and selecting execution per subtask; they do not support a full migration to Browser Use or a universal speed claim.
 
-## Google Flights: mediana i koszt wolnych prób
+## Method and provenance
 
-| Silnik | Sukcesy | Mediana s | Min–max s | Średnia wszystkich prób s | Koszt 5 prób USD |
-|---|---:|---:|---:|---:|---:|
-| app-auto | 5/5 | 21.79 | 17.83–64.02 | 30.11 | 0.359967 |
-| app-first | 5/5 | 36.82 | 27.20–45.18 | 37.65 | 0.754658 |
-| browser-use | 5/5 | 35.45 | 35.14–39.09 | 36.53 | 0.226265 |
-| ultrafast | 5/5 | 13.32 | 11.70–14.38 | 13.25 | 0.024067 |
+Production logic was frozen at `0ea227b271dbc71b5dc7d503a4a4438e3141c361`. First uses baseline `77846cb0d97af218dd8a2832dab9f488c703b210`, with the same corrected OpenRouter object-schema adapter as Auto. Native sources are pinned in [sources.json](benchmarks/browser-poc/sources.json); [resumption provenance](benchmarks/jev-auto/validation/resume-provenance.json) checks source hashes.
 
-Pierwsza próba Auto trwała **64,02 s**: Jev zgłosił `uncertain_operation` po dwóch akcjach, więc zadanie ukończył Gemini (26 wywołań; 59,28 s głównego modelu, 1,78 s Jev). Wynik pozostał w próbie. Poprawny fallback chroni ukończenie zadania, ale może wyraźnie zwiększać czas i koszt. Piloty 18,65/18,90 s nie zastępują tej finalnej serii.
+All engines used Gemini `google/gemini-3.8-flash / low`, OpenRouter `google-ai-studio`, Jev `jev-1.13.0` where applicable, the same Chrome build/settings and fresh profiles. Trials were sequential with rotating order. Task time includes retries, recovery and independent verification; setup, final screenshots and cleanup are separate. Local cells have 3 attempts; Flights has 5. Most tasks are synthetic; changed-data fixtures are not unseen sites.
 
-## Co dokładnie jest liczone
+The 119-record sample contains the first six complete groups from `final-local.json` (54), the complete restarted research/tabs block (18), all changed-data records (27) and all Flights records (20). The original interrupted research/tabs block—4 successes and 14 credit failures—remains separately preserved in its entirety. Raw final files contain 137 records. The sample rule was declared before resumption.
 
-Próbka główna: 54 kompletne próby pierwszych sześciu grup z `final-local.json`, 18 prób **całego** wznowionego bloku research/kart z `final-recovery.json`, 27 nowych wariantów i 20 Flights. Dobór tego wznowionego bloku ustalono przed jego uruchomieniem. Pozostałe 18 rekordów pierwotnego research/kart — **4 sukcesy i 14 błędów kredytów** — zachowano jako osobny przerwany blok; nie usuwamy samych porażek i nie dokładamy samych sukcesów do median wznowienia.
+[Full methodology and test definitions](research/TEST-CATALOG.md) · [All historical stages and attempts](research/ALL-RESULTS.md) · [Application behavior](APPLICATION.md) · [Current reproduction commands](BENCHMARKS.md).
 
-Wszystkie zachowane rekordy Auto: **159 prób runnera**, **78 decyzji routingu**, **10 kontroli desktopu**. Tabele zawierają także piloty, celowy Stop i sprawdzenie 402. Koszt runner/routing: **$4.783456077**; desktop: **$0.102326586**; razem **$4.885782663**, wyłącznie ten etap Auto. Usage po przerwaniu może być niepełne. Nie należy sumować kopii danych i archiwów drugi raz.
+## Validation, routing and costs
 
-Odczyt konta po doładowaniu potwierdził dostępne środki, a hashe kompilatów zgodność z zamrożoną aplikacją. Nie zmieniano promptów, modeli, progu ani kodu aplikacji między blokami. Jedyna wcześniejsza zmiana runnera po zamrożeniu to zatrzymanie na 401/402 (`69e3280`). Nie wpływa na poprawne wykonania. Oba warianty aplikacji używają wspólnej naprawy schematu OpenRouter.
+The original application validation passed 452 tests (12 skipped), typecheck/build, 4 container checks and final desktop 4/4. Visible-window search passed in 3.927 s. Intentional Stop closed the browser in 129.888 ms and finished cleanup in 139.134 ms; UI response was a distinct 27 ms measurement. The working container image exceeded the developer host's global storage ceiling at the build script's final check, so it is not a clean-install pass.
 
-Końcowy retest routingu: **13/16** standardowych i **6/6** nowych poleceń; **20/20** zaproponowanych wywołań ma poprawny schemat argumentów. W pierwszym reteście 2 przypadki nie dostały odpowiedzi z powodu HTTP 429, a w jednym Gemini wybrał dozwolone `browser_observe` dla nowej karty zamiast oczekiwanego fast. Osobna powtórka wyłącznie dwóch przypadków 429 dała 2/2 poprawne decyzje i argumenty; oryginalne błędy pozostają w tabelach. Nie zmieniano oczekiwanej kategorii nowej karty, więc odchylenie routingu pozostaje jawne. Jest to ocena wyboru ścieżki i formatu, nie poprawności wykonania ani całej polityki bezpieczeństwa. W 38 próbach Auto pierwsza ścieżka była fast 20 razy, planned 18 razy; zmiana ścieżki wystąpiła w 6 przebiegach. Routing korzysta z normalnej odpowiedzi planisty, bez osobnego wywołania klasyfikatora; nie zmierzono jego czystego narzutu osobną ablacją.
+Post-schema routing scored 13/16: one valid but unexpected planned observation and two HTTP 429 responses with no model answer. Held-out scored 6/6; targeted retries of those two unavailable cases scored 2/2. All 20 returned calls had valid schemas. Actual comparison traces contained 193/194 valid task/batch calls; one malformed wait argument was rejected and corrected within the measured time. Early routing pilots had malformed object arguments despite category success; these are retained in raw data. No separately timed router request or universal production verifier exists.
 
-[Wykres PNG](benchmarks/jev-auto/comparison.png) · [Wykres SVG](benchmarks/jev-auto/comparison.svg). Pokazują mediany i zakres min–max, z osobną skalą każdego panelu.
+All Auto records include 159 runner attempts, 78 routing cases and 10 desktop checks. Known runner/routing cost was $4.783456077 and desktop $0.102326586, totaling **$4.885782663**. The selected comparison cost $3.717715692 and is already included. Charges are returned OpenRouter usage plus estimated Jev input-token cost; interrupted usage can be missing. [Costs](research/COSTS.md).
 
-18 września 2026. Implementacja w osobnym worktree `/home/bartek/linux-agent-auto`, branch `experiment/jev-auto`. [Uruchomienie i architektura](jev-auto.md), [plan i bramki](jev-auto-plan.md). Poniżej oddzielono zamrożone porównanie od pilotów, routingu i testów aplikacji.
+[PNG chart](benchmarks/jev-auto/comparison.png) · [SVG chart](benchmarks/jev-auto/comparison.svg) · [Completion audit](benchmarks/jev-auto/validation/completion-audit.json) · [Export manifest](benchmarks/jev-auto/exports-manifest.json) · [Trace manifest](benchmarks/jev-auto/trace-manifest.json) · [Trace archive](benchmarks/jev-auto/traces.tar.gz).
 
-## Metoda
+## Complete tables
 
-Kod aplikacji zamrożony na `0ea227b271dbc71b5dc7d503a4a4438e3141c361`; każdy plik serii zawiera rewizję, `dirty`, SHA-256 runnera, fixture’ów i kompilatów. Baseline First: `77846cb0d97af218dd8a2832dab9f488c703b210`. Oba warianty aplikacji korzystają z **tego samego poprawionego adaptera OpenRouter**; First zachowuje bazowy kontroler, narzędzia i worker. Nie przypisujemy naprawy schematu tylko Auto. Native Browser Use/Ultrafast pochodzą z dotychczasowego, przypiętego PoC; nie są podłączone do polityki aplikacji.
+The following tables are generated from the unchanged exported JSON. Missing measurements are not zero; routing and desktop have distinct criteria. Desktop costs are recorded in the separate usage ledger, rather than in individual smoke reports.
 
-Gemini `google/gemini-3.8-flash / low`, OpenRouter `google-ai-studio`, Jev `jev-1.13.0`. Ta sama wersja Chromium, viewport 1120×780, `en-US`, strefa `Europe/Zurich`, świeże profile, sekwencyjne wykonanie i rotacja kolejności silników. Nie prowadzono równolegle innych zadań modelowych ani suite testowej. Lokalny serwer fixture’ów; Flights na żywej stronie Google. Wyszukiwanie Zurich–London, 20 września 2026, one-way, jedna osoba, Economy; bez rezerwacji.
-
-**Sukces wymaga ukończenia i niezależnej weryfikacji stanu strony**, a nie tylko deklaracji modelu. Formularze sprawdzają zapisane pola, porównania sprawdzają wybór i obliczoną kwotę, research wymaga wizyty na każdej z trzech stron. Weryfikator Flights sprawdza trasę, datę i rok, kierunek podróży, pasażerów, klasę i wyniki. Nowe warianty zostały sprawdzone deterministycznie wraz z negatywnymi przypadkami, a następnie odłożone do serii końcowej: cztery inne miasta i osoba, inne ceny i liczba nocy, Rome zamiast Paris. To nowe dane w znanych typach fixture’ów, **nie** dowód uogólnienia na nieznane witryny.
-
-`taskMs` = praca agenta wraz z naprawami oraz niezależna weryfikacja. `setupMs` = uruchomienie drivera/przeglądarki, nawigacja, consent, pierwsza obserwacja. Screenshot i cleanup są poza czasem zadania. Uruchomienie całego Electron/Podman ma osobny test. Mediany dotyczą poprawnych prób, a porażki pozostają w mianowniku. Składniki czasu to średnie wszystkich prób danej grupy; adapter obejmuje transport i retry, nie samą inferencję. Pozostałe = czas zadania minus model i Jev, w tym narzędzia, oczekiwania i weryfikacja. Nie ma osobnego wywołania routera, ale nie zmierzono jego czystego narzutu przez ablację.
-
-Kwoty to usage kosztu OpenRouter plus koszt Jev obliczony z tokenów wejściowych i skonfigurowanej stawki $0,042 / mln. Nie obejmują opłat infrastrukturalnych ani ewentualnych przerwanych zapytań bez zwróconego usage. Desktop ma osobne kontrole; eksport 10 przebiegów z nowej izolowanej bazy (`validation/desktop-usage.json`) wykazuje dodatkowe $0,102326586 zwróconego usage, w tym nieudane kontrole i Stop. Mała próbka 3 lub 5 powtórzeń nie dowodzi produkcyjnej niezawodności ani stabilnego rankingu opóźnień dostawcy.
-
-## Etapy i wszystkie niepowodzenia przed zamrożeniem
-
-1. Routing bez wykonania narzędzi: 12/16 → 15/16 → 16/16 po poprawieniu instrukcji wyboru w już otwartej stronie i wizardach. Następnie 6/6 nowych poleceń. Nie mylić z sukcesem zadania. Późniejszy audyt argumentów wykazał po 2 niepoprawne wywołania batch w każdej z trzech wcześniejszych serii routingu (JSON jako tekst); ich wynik 16/16 dotyczy wyłącznie wyboru ścieżki. Po poprawce schematu dodatkowy audyt 97 rzeczywistych wywołań `browser_task`/`browser_batch` w serii końcowej wykazał 0 niepoprawnych argumentów (`validation/final-arguments-audit.json`). Końcowy retest wykonano po doładowaniu; wynik podano wyżej.
-2. Pierwszy pilot Auto ukończył 5/5 zadań, ale Flights wracało prawie całkowicie do Gemini: 41,02 s. Sam próg confidence 0,35 pogorszył kolejną próbę do 50,94 s.
-3. Dokładniejsze podcele, wybór sugestii autocomplete, krótkie oczekiwania po edycji oraz mniejszy stan wejściowy Jev. Próba `pilot-context-v2` zakończyła się **FAIL** (18,33 s): niedokończona data, timeout zasłoniętej kontrolki i błąd transportu/dekodowania OpenRouter.
-4. Oznaczanie zasłoniętych celów, ograniczony powrót po bezpiecznie odrzuconym stale ref, licznik kolejnych odrzuceń i kontrola zasłonięcia bezpośrednio przed dispatch. Piloty zachowują także wolną próbę 37,97 s. Końcowe dwa piloty Flights: 18,65 i 18,90 s, oba PASS, po 2 Gemini i 19 Jev. Nie użyto tych pilotów do finalnych median.
-5. Poprawiono harness: osobno konfigurujemy oba egzemplarze Playwright z różnych worktree’ów; First używa własnego JevClient i workera. Wszystkie cztery silniki przeszły pilot wyszukiwania. Wcześniejsze piloty nie są identyczną konfiguracją finalną.
-6. Dwa testy desktopu zaliczyły Auto i Stop, ale nie Classic po Stop. Gemini wysyłał `action` jako tekst zamiast obiektu. Konwerter schematu uwzględniał `anyOf`, a rzeczywiste narzędzie używało `oneOf`. Dodano jawny typ obiektu bez osłabiania walidacji i regresję na rzeczywistym schemacie. Powtórka zaliczyła nawigację Auto, Stop, Classic i follow-up. Zachowano oba nieudane wyniki.
-
-## Walidacja aplikacji
-
-- Pełna suite po poprawce: **452 PASS, 12 skip**; typecheck i build PASS. Poprzedni przebieg miał jeden niestabilny test terminala `idle_shell` podczas równoległego desktopu; powtórka pełnej suite bez tego obciążenia przeszła. Wcześniejszy taki sam przypadek i jego izolowana powtórka również są odnotowane. Nie zmieniano kodu terminala.
-- Kontener: **4 PASS**. Obraz browser-worker `acdd06112e93b62d8909c13ddde4a42af8c029f4f31f0bfc3094d9c86829f044`, tag `8f78896`. Hostowa poprawka adaptera nie wymaga przebudowania workera.
-- Desktop po poprawce: **4/4 PASS**, Auto → IANA 6,394 s, Stop **27 ms**, Classic po Stop i kontynuacja kontekstu. Brak błędów renderera i poziomego overflow w 1400×900 oraz 1024×768. To smoke, nie pełny audyt dostępności.
-- Testy batch: zastąpiony lub zmieniony cel, zmiana kontekstu, brak efektu fill, częściowo wykonana operacja, odmowa approval, Stop/takeover pomiędzy akcjami, cykle pomimo nowych ref/revision. Zasłonięcie kontrolki przed dispatch odrzuca akcję. Każde dziecko nadal przechodzi normalną politykę.
-- Audyt końcowy: 721 sprawdzonych plików/eksportów (w tym zdekompresowane archiwum), 0 trafień rzeczywistych kluczy; wcześniejsza kontrola objęła 8 procesów Chrome, także bez sekretów. Usunięto 4 własne kontenery desktop smoke, zachowując gotowy obraz i profil.
-- Audyt rzeczywistych sekretów: skan plików, środowiska i argumentów Chrome oraz konfiguracji własnych kontenerów; wyniki w `security-audit.json`. Klucze nie są wypisywane. Nie jest to pełny pentest ani dowód odporności na każdy prompt injection.
-- Obraz został zbudowany i działa w testach. Końcowa kontrola skryptu build zgłosiła istniejący wcześniej globalny limit storage Podmana: 22,40 GB przy limicie 14 GB (przed zadaniem ok. 22,34 GB). Nie usuwano cudzych obrazów. Jest to jawne ograniczenie środowiska przy kolejnej przebudowie, nie błąd wykonania aktualnego obrazu.
-
-Końcowy audyt śladów wszystkich porównań: **193/194** wywołania task/batch zgodne ze schematem. Jedyny błąd to `wait` z `durationMs` zamiast `ms` w drugim Auto Flights. Runtime odmówił wykonania, model poprawił argument i ukończył zadanie. To nie błąd obiektowego `oneOf`; walidacja pozostała ścisła, a koszt naprawy jest w czasie próby.
-
-Dodatkowy test z widoczną przeglądarką: search Auto **PASS, 3,927 s**. Celowy Stop na Flights po 2,5 s: stan stopped, zamknięcie przeglądarki **129,9 ms**, całe sprzątanie **139,1 ms**; `success=false` w tym rekordzie jest oczekiwane, bo zadanie zostało celowo przerwane. Niezależne testy jednostkowe obejmują również Stop podczas inferencji Jev i pomiędzy edycjami batcha. Skan po wznowieniu objął 1062 pliki/eksporty, a końcowy skan po przygotowaniu eksportów 1081: brak rzeczywistych kluczy. Runtime Chrome sprawdzano osobno wcześniej; końcowa kontrola potwierdziła brak pozostawionych własnych procesów.
-
-## Dane i każda zachowana próba
-
-[JSON-y, ślady i logi](benchmarks/jev-auto) zawierają wszystkie serie. Eksporty usuwają identyfikatory konta dostawcy, zachowując pomiary; manifesty podają hashe. Pełna wcześniejsza historia jest w [zbiorczym archiwum](../../linux-agent-browser-poc/WSZYSTKIE-WYNIKI-TESTOW.md).
-
-| Zadanie | Auto | First | Browser Use | Ultrafast | Zmiana mediany Auto vs First |
+| Task | Auto | First | Browser Use | Ultrafast | Auto vs First median change |
 |---|---:|---:|---:|---:|---:|
 | search | 4.64 s · 3/3 | 5.23 s · 3/3 | 6.68 s · 3/3 | — | -11.3% |
 | filters | 4.98 s · 3/3 | 3.84 s · 3/3 | 6.07 s · 3/3 | — | +29.7% |
@@ -85,9 +45,9 @@ Dodatkowy test z widoczną przeglądarką: search Auto **PASS, 3,927 s**. Celowy
 | autocomplete-new | 4.76 s · 3/3 | 4.91 s · 3/3 | 12.84 s · 3/3 | — | -3.1% |
 | google-flights | 21.79 s · 5/5 | 36.82 s · 5/5 | 35.45 s · 5/5 | 13.32 s · 5/5 | -40.8% |
 
-Średnie składników ze wszystkich prób danej grupy (nie tylko sukcesów):
+Mean components across every attempt in each group (not only successes):
 
-| Zadanie / silnik | n | Setup s | Zadanie s | Model s | Jev s | Pozostałe s | Wywołania model / Jev | Koszt USD |
+| Task / engine | n | Setup s | Task s | Model s | Jev s | Other s | Model / Jev calls | Cost USD |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | search / app-auto | 3 | 0.42 | 4.51 | 2.39 | 1.77 | 0.34 | 2.0 / 3.0 | 0.011820 |
 | search / app-first | 3 | 0.39 | 5.18 | 3.15 | 1.87 | 0.16 | 2.0 / 3.0 | 0.013154 |
@@ -127,11 +87,11 @@ Dodatkowy test z widoczną przeglądarką: search Auto **PASS, 3,927 s**. Celowy
 | google-flights / browser-use | 5 | 4.82 | 36.53 | 19.09 | 0.00 | 17.44 | 11.4 / 0.0 | 0.226265 |
 | google-flights / ultrafast | 5 | 3.85 | 13.25 | 2.48 | 8.64 | 2.14 | 2.0 / 18.0 | 0.024067 |
 
-Wszystkie serie (routing i desktop mają osobne kryteria):
+All series (routing and desktop use separate criteria):
 
-| Plik | Rodzaj | Wynik | Raportowany USD |
+| File | Kind | Result | Reported USD |
 |---|---|---:|---:|
-| credit-recheck-1.json | wykonanie | 0/1 | 0.000000 |
+| credit-recheck-1.json | execution | 0/1 | 0.000000 |
 | decisions-final-heldout.json | routing | 6/6 | 0.009403 |
 | decisions-pilot-1.json | routing | 12/16 | 0.023632 |
 | decisions-pilot-2.json | routing | 15/16 | 0.025827 |
@@ -139,26 +99,26 @@ Wszystkie serie (routing i desktop mają osobne kryteria):
 | decisions-post-schema-heldout.json | routing | 6/6 | 0.009306 |
 | decisions-post-schema-retry.json | routing | 2/2 | 0.003716 |
 | decisions-post-schema.json | routing | 13/16 | 0.021797 |
-| desktop-auto-recheck.json | desktop | 2/3 | nie zmierzono tutaj |
-| desktop-auto-schema.json | desktop | 4/4 | nie zmierzono tutaj |
-| desktop-auto.json | desktop | 2/3 | nie zmierzono tutaj |
-| final-flights.json | wykonanie | 20/20 | 1.364958 |
-| final-holdout.json | wykonanie | 27/27 | 0.311200 |
-| final-local.json | wykonanie | 58/72 | 1.798193 |
-| final-recovery.json | wykonanie | 18/18 | 0.400367 |
-| headful-auto.json | wykonanie | 1/1 | 0.003941 |
-| pilot-auto-1.json | wykonanie | 5/5 | 0.281290 |
-| pilot-confidence-035.json | wykonanie | 1/1 | 0.233415 |
-| pilot-context-v2.json | wykonanie | 0/1 | 0.005164 |
-| pilot-guard-v5.json | wykonanie | 2/2 | 0.036548 |
-| pilot-occlusion-v3.json | wykonanie | 4/4 | 0.144828 |
-| pilot-runner-validation.json | wykonanie | 4/4 | 0.011144 |
-| pilot-stale-v4.json | wykonanie | 2/2 | 0.071233 |
-| stop-auto.json | wykonanie | 0/1 | 0.001987 |
+| desktop-auto-recheck.json | desktop | 2/3 | not measured here |
+| desktop-auto-schema.json | desktop | 4/4 | not measured here |
+| desktop-auto.json | desktop | 2/3 | not measured here |
+| final-flights.json | execution | 20/20 | 1.364958 |
+| final-holdout.json | execution | 27/27 | 0.311200 |
+| final-local.json | execution | 58/72 | 1.798193 |
+| final-recovery.json | execution | 18/18 | 0.400367 |
+| headful-auto.json | execution | 1/1 | 0.003941 |
+| pilot-auto-1.json | execution | 5/5 | 0.281290 |
+| pilot-confidence-035.json | execution | 1/1 | 0.233415 |
+| pilot-context-v2.json | execution | 0/1 | 0.005164 |
+| pilot-guard-v5.json | execution | 2/2 | 0.036548 |
+| pilot-occlusion-v3.json | execution | 4/4 | 0.144828 |
+| pilot-runner-validation.json | execution | 4/4 | 0.011144 |
+| pilot-stale-v4.json | execution | 2/2 | 0.071233 |
+| stop-auto.json | execution | 0/1 | 0.001987 |
 
-Każda próba wykonawcza, również nieudana (czas zadania w s):
+Every execution attempt, including failures (task time in seconds):
 
-| Seria | Zadanie | Silnik | Powt. | Wynik | Czas s | Model / Jev | USD |
+| Series | Task | Engine | Repeat | Result | Time s | Model / Jev | USD |
 |---|---|---|---:|---|---:|---:|---:|
 | credit-recheck-1.json | search | app-auto | 1 | FAIL | 0.46 | 1 / 0 | 0.000000 |
 | final-flights.json | google-flights | app-auto | 1 | PASS | 64.02 | 26 / 3 | 0.224888 |
@@ -318,11 +278,11 @@ Każda próba wykonawcza, również nieudana (czas zadania w s):
 | pilot-runner-validation.json | search | browser-use | 1 | PASS | 5.03 | 2 / 0 | 0.002756 |
 | pilot-stale-v4.json | google-flights | app-auto | 1 | PASS | 17.55 | 2 / 18 | 0.017521 |
 | pilot-stale-v4.json | google-flights | app-auto | 2 | PASS | 37.97 | 6 / 14 | 0.053712 |
-| stop-auto.json | google-flights | app-auto | 1 | STOP (celowy) | 2.50 | 1 / 0 | 0.001987 |
+| stop-auto.json | google-flights | app-auto | 1 | STOP (intentional) | 2.50 | 1 / 0 | 0.001987 |
 
-Każda decyzja routingu (narzędzia nie są wykonywane):
+Every routing decision (tools are not executed):
 
-| Seria | Przypadek | Oczekiwano | Wybrano | Wynik | Czas s | USD |
+| Series | Case | Expected | Selected | Result | Time s | USD |
 |---|---|---|---|---|---:|---:|
 | decisions-final-heldout.json | italian-city | fast | fast | PASS | 1.24 | 0.001599 |
 | decisions-final-heldout.json | inventory | fast | fast | PASS | 1.46 | 0.001605 |
@@ -403,9 +363,9 @@ Każda decyzja routingu (narzędzia nie są wykonywane):
 | decisions-post-schema.json | form-polish | planned | — | FAIL | 1.10 | 0.000000 |
 | decisions-post-schema.json | cycle-recovery | planned | planned | PASS | 2.19 | 0.001478 |
 
-Każda kontrola desktopu:
+Every desktop check:
 
-| Seria | Kontrola | Wynik | Czas s (jeśli zmierzono) |
+| Series | Check | Result | Time s (when measured) |
 |---|---|---|---:|
 | desktop-auto-recheck.json | auto_navigation | PASS | 7.39 |
 | desktop-auto-recheck.json | stop | PASS | 0.03 |

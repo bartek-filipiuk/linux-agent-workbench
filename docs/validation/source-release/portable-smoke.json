@@ -1,0 +1,282 @@
+{
+  "createdAt": "2026-09-18T08:41:16.730Z",
+  "model": "google/gemini-3.8-flash",
+  "effort": "low",
+  "upstream": "google-ai-studio",
+  "jev": "jev-1.13.0",
+  "engines": [
+    "app-auto",
+    "app-first",
+    "ultrafast",
+    "browser-use"
+  ],
+  "repeats": 1,
+  "source": {
+    "app": "77846cb0d97af218dd8a2832dab9f488c703b210",
+    "nativeSources": {
+      "jev-ultrafast": {
+        "commit": "452c1ad2dd628008f1d5608f28158d76e49e6cc0",
+        "files": {
+          "jev_ultrafast/agent.py": "aaf8b271cb0ee6643fe7beb525328ab80de8568c7ac044d02b9c6721161e7c8b",
+          "jev_ultrafast/model.py": "a85ada8458d23642c5c8a4095acf0565e6268f81dcda26f6308942b653e9c9f3",
+          "jev_ultrafast/browser.py": "ee08dafa93d731bd292aa0263a578a29c8001cf22eef3c59fe44a159649155ee",
+          "jev_ultrafast/snapshot.js": "e50473501c8fb8e70f3b21866d987393e3f2315c639d638bd477d170e81ed78d",
+          "jev_ultrafast/questions.py": "66a7054b85040b949e1757311257ea0c5a843c635f9a40c99f6d15ad660fb422",
+          "pyproject.toml": "3afd9e12c2c1c1efb32231669cd2d415b16c098cc057e91fc05844f4ab6c19e2"
+        }
+      },
+      "browser-use": {
+        "commit": "d8110c5ff87ccba887aaa726cdb780f2f84bef8d",
+        "files": {
+          "browser_use/agent/service.py": "10f7c14458ed7089c49f34a06ad7b3ce12212a589d9d000c5cf4d9cc7ddd8479",
+          "browser_use/llm/openrouter/chat.py": "386b23f1a4974ea67be5ba2e28e730f059ef7ac8eca5a84dd197f7bdabaa1240",
+          "browser_use/browser/session.py": "223d987b994bb63e0baa1a66d5e5809b7dca274c0ac1abf4488e58925efe184b",
+          "browser_use/browser/profile.py": "5b42a8285bab5116c08ec61cad643ed71b546cc9c82cfd77a7d7929330b40a47",
+          "browser_use/tools/service.py": "25746ddfe719c0a800b2b4fcc399aea4fc8be20c48b04ab4118841fd5419eb73",
+          "pyproject.toml": "f06f598f90b6b71f6509013174fab0e7c625e8aa59797ef97430043f3c1dec82"
+        }
+      }
+    },
+    "poc": "16b11305eb665c6a9207caa4342aaf0a5c8d8888",
+    "hashes": {
+      "run.mjs": "37dff3b2274d3d4e56c14f3d85764761bfdb32ec2e4c8b2982cb3ca7cdab21a1",
+      "tasks.mjs": "ecec06cc9466bfd102dded02beeb412bb4f9db0b6dd1b66480dbe3da8c2eda7c"
+    },
+    "candidate": "16b11305eb665c6a9207caa4342aaf0a5c8d8888",
+    "candidateHashes": {
+      "services/agentd/dist/provider/openrouter.js": "d1556c37fd28c92de25c33a606c7b3f36b39d6b71a742d6d73363bf4865f05e6",
+      "services/agentd/dist/orchestrator/browser-auto.js": "c294a9c1adbb9606f812b353eecb2cd694e8fb4310e80715fc2b1721b9faca36",
+      "services/agentd/dist/orchestrator/jev-browser.js": "65263e7fc27598036610ef2917296bd2855341aed7b6d6e204a5638e11aab8aa",
+      "services/agentd/dist/orchestrator/run-controller.js": "35ec88ea5830c313213893e6493f648b66c9b4740fdc788fc971d83d055810a9",
+      "services/browser-worker/dist/browser-session.js": "839ef80647ad8956d89048e251a0c43c05f256ea3e84d1e28937f459528af77e"
+    },
+    "sharedWorker": "same Chrome build/settings; app-first uses unchanged baseline controller, tools and worker; app-auto uses candidate; both app engines share candidate OpenRouter schema adapter (explicit object oneOf); Python engines use pinned native drivers",
+    "upstreamDriverHash": "261a9cd28020b8b55a6652f3f928039188f025409c81283c352451af7f01f76e",
+    "dirty": true
+  },
+  "clock": "setup includes driver/browser startup, navigation, consent, first observation; task includes independent final verification; screenshots and cleanup outside task",
+  "settings": {
+    "flightDate": null,
+    "autoConfidence": 0.35,
+    "timeoutMs": 240000,
+    "viewport": {
+      "width": 1120,
+      "height": 780
+    },
+    "channel": "chromium",
+    "warmAfter": null,
+    "priorReportedCostUsd": 0
+  },
+  "results": [
+    {
+      "task": "search",
+      "category": "short-ui",
+      "repeat": 1,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Search catalog",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:39375/search"
+      ],
+      "setupMs": 337.16378900000007,
+      "agentMs": 5771.941478,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 2692.6426420000007,
+      "jevCalls": 3,
+      "jevMs": 2761.7868959999996,
+      "costUsd": 0.003938484,
+      "jevErrors": [],
+      "actions": 4,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 2,
+          "elapsedMs": 3074.2017900000005,
+          "verified": false,
+          "parentCallId": "call_491899"
+        }
+      ],
+      "routes": [
+        {
+          "mode": "fast",
+          "tool": "browser_task",
+          "switched": false
+        }
+      ],
+      "batches": [],
+      "verificationMs": 3.152165000000423,
+      "taskMs": 5775.093643,
+      "verification": {
+        "passed": true,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      }
+    },
+    {
+      "task": "search",
+      "category": "short-ui",
+      "repeat": 1,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Search catalog",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:39375/search"
+      ],
+      "setupMs": 326.41493999999966,
+      "agentMs": 3416.7851340000007,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 2306.9454969999997,
+      "jevCalls": 3,
+      "jevMs": 989.5626709999997,
+      "costUsd": 0.00398391,
+      "jevErrors": [],
+      "actions": 3,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 2,
+          "elapsedMs": 1105.7923109999992,
+          "verified": false,
+          "parentCallId": "call_301717"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 2.131918000000951,
+      "taskMs": 3418.9170520000016,
+      "verification": {
+        "passed": true,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      }
+    },
+    {
+      "task": "search",
+      "category": "short-ui",
+      "repeat": 1,
+      "engine": "ultrafast",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Search catalog",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:39375/search"
+      ],
+      "setupMs": 916.8031269999992,
+      "agentMs": 2969.163549000001,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 2,
+      "textCalls": [
+        {
+          "model": "google/gemini-3.8-flash",
+          "latency_ms": 1095,
+          "usage": {
+            "prompt_tokens": 267,
+            "completion_tokens": 7,
+            "total_tokens": 274,
+            "cost": 0.0002265,
+            "is_byok": false,
+            "prompt_tokens_details": {
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "audio_tokens": 0,
+              "video_tokens": 0
+            },
+            "cost_details": {
+              "upstream_inference_cost": 0.0002265,
+              "upstream_inference_prompt_cost": 0.00020025,
+              "upstream_inference_completions_cost": 2.625e-05
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 0,
+              "image_tokens": 0,
+              "audio_tokens": 0
+            }
+          },
+          "field": "Search catalog",
+          "value": "blue notebook"
+        }
+      ],
+      "primaryCalls": 1,
+      "primaryMs": 1095.3537659952417,
+      "jevCalls": 3,
+      "jevMs": 1776.3304730178788,
+      "costUsd": 0.00047619000000000003,
+      "verificationMs": 4.0467680000001565,
+      "taskMs": 2973.210317000001,
+      "verification": {
+        "passed": true,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      }
+    },
+    {
+      "task": "search",
+      "category": "short-ui",
+      "repeat": 1,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Search catalog",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:39375/search"
+      ],
+      "setupMs": 2173.928673999999,
+      "agentMs": 6414.344670000002,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 3,
+      "final": "Successfully searched the catalog for 'blue notebook'. The search results ('Blue Notebook, 12 EUR') are visible on the page.",
+      "errors": [
+        null,
+        null
+      ],
+      "primaryCalls": 2,
+      "primaryMs": 4636.747292010114,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.0025087499999999997,
+      "verificationMs": 3.244845000001078,
+      "taskMs": 6417.589515000003,
+      "verification": {
+        "passed": true,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      }
+    }
+  ]
+}

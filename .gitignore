@@ -20,3 +20,4 @@ auth.json
 
 # Raw local experiment traces (published metrics are curated separately)
 experiments/browser-auto/artifacts/
+.cache/browser-bench/

@@ -1,18 +1,18 @@
 // Live first-turn routing evaluation. No proposed browser actions are executed.
 import fs from 'node:fs';
-import os from 'node:os';
+import {paths,privateConfig} from './config.mjs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {execFileSync} from 'node:child_process';
 import {Store,RunController,OpenRouterAdapter} from '../../services/agentd/dist/index.js';
 import {BROWSER_TOOLS} from '../../services/agentd/dist/tools/browser-tools.js';
 import {AUTO_INSTRUCTIONS} from '../../services/agentd/dist/orchestrator/browser-auto.js';
-import {readOpenRouterKey} from '/home/bartek/linux-agent-jev/scripts/jev-key.mjs';
+import {readOpenRouterKey} from '../../scripts/jev-key.mjs';
 
 const root=path.dirname(fileURLToPath(import.meta.url));
 const file=process.argv[2];if(!file||fs.existsSync(file))throw Error('Give a new output filename');
-const config=path.join(os.homedir(),'.config/linux-agent-workbench-jev/.env');
-const env=Object.fromEntries(fs.readFileSync(config,'utf8').split(/\r?\n/).filter(l=>/^[A-Z_]+=/.test(l)).map(l=>l.split(/=(.*)/s).slice(0,2)));
+const config=paths().config;
+const env=privateConfig(config);
 const key=await readOpenRouterKey(config,env);
 const developmentCases=[
   ['search','fast','Open https://example.com/catalog, search for a blue notebook and leave results visible.'],

@@ -1,28 +1,28 @@
 {
   "sourceRepository": "linux-agent-browser-poc",
   "sourceCommit": "c9ced3af96c2d127254c90e18345869714721f03",
-  "scope": "Tracked research source and evidence snapshot only; no vendors, environments, credentials or private artifacts. Source/data bytes preserved except the documented notices/link rewrites in three Markdown files. Not a second shipped application.",
+  "scope": "Research source and evidence snapshot; excludes vendors, environments, credentials and private artifacts. Code/data bytes preserved; Markdown rewritten in English with current links. Original document hashes retained.",
   "files": [
     {
       "source": "PLAN.md",
       "destination": "docs/benchmarks/browser-poc/PLAN.md",
       "sourceSha256": "2da4941658d217dff54b00c83718d591425b10c6f69a22c0871dc1a52ef95444",
       "sha256": "56a4bf27d4ff8a9d9f1aa06b9ce001101f563c02b957d1f6a3ba2e0997b7d977",
-      "transformation": "Added snapshot notice and repository-relative archive links; historical measurements unchanged."
+      "transformation": "English publication documentation: translated/re-rendered narrative and repository-relative links. Source/data/trace measurements remain unchanged; sourceSha256 preserves the original document."
     },
     {
       "source": "README.md",
       "destination": "docs/benchmarks/browser-poc/README.md",
       "sourceSha256": "70661b9e4e3d0e382954493b77b4723156ddd7c660549ba289c842b00db08746",
-      "sha256": "ebce3903edb5a9c98d727ee339f218ec6d0452ba43e1440d3e91d3fc07003d75",
-      "transformation": "Added snapshot notice and repository-relative archive links; historical measurements unchanged."
+      "sha256": "1489a09167d3d34544b59dde6f408c70be57dd7207c425a910fd6d2da74f09cb",
+      "transformation": "English publication documentation: translated/re-rendered narrative and repository-relative links. Source/data/trace measurements remain unchanged; sourceSha256 preserves the original document."
     },
     {
       "source": "RESULTS.md",
       "destination": "docs/benchmarks/browser-poc/RESULTS.md",
       "sourceSha256": "7683528413e4a8b964b74ef52dccf151a9fb02345214f94304ed132e12259b23",
-      "sha256": "c5e12c7a5fbe35dc80d1659b8fbcff1eaaa515557e9cc259e4c4671e8f9371fd",
-      "transformation": "Added snapshot notice and repository-relative archive links; historical measurements unchanged."
+      "sha256": "7d26d0f56fa8606279700961e0e0923117b6eb12af9b2bf7d908e14825f9d0f4",
+      "transformation": "English publication documentation: translated/re-rendered narrative and repository-relative links. Source/data/trace measurements remain unchanged; sourceSha256 preserves the original document."
     },
     {
       "source": "bootstrap.py",

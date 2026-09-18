@@ -6,25 +6,72 @@ import readline from 'node:readline';
 import {createRequire} from 'node:module';
 import {createHash} from 'node:crypto';
 import {spawn,execFileSync} from 'node:child_process';
-import {fileURLToPath} from 'node:url';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+import {paths,privateConfig,verifyBaseline,verifyNative} from './config.mjs';
+import {createFlights} from '../../scripts/jev-flights.mjs';
 import {tasks,startSite,verify} from './tasks.mjs';
-import {readJevKey,readOpenRouterKey} from '/home/bartek/linux-agent-jev/scripts/jev-key.mjs';
+import {readJevKey,readOpenRouterKey} from '../../scripts/jev-key.mjs';
 import {BrowserSession} from '../../services/browser-worker/dist/browser-session.js';
-import {BrowserSession as BaselineBrowserSession} from '/home/bartek/linux-agent-jev/services/browser-worker/dist/browser-session.js';
-import * as baseline from '/home/bartek/linux-agent-jev/services/agentd/dist/index.js';
 import * as candidate from '../../services/agentd/dist/index.js';
 import {browserExecutor as candidateBrowserExecutor} from '../../services/agentd/dist/tools/browser-tools.js';
-import {browserExecutor as baselineBrowserExecutor} from '/home/bartek/linux-agent-jev/services/agentd/dist/tools/browser-tools.js';
-import {BrowserActionPolicy} from '/home/bartek/linux-agent-jev/services/agentd/dist/policy/browser-policy.js';
 import {JevClient as AutoJevClient,JevConfig as AutoJevConfig} from '../../services/agentd/dist/provider/jev.js';
-import {JevClient,JevConfig} from '/home/bartek/linux-agent-jev/services/agentd/dist/provider/jev.js';
 
 const root=path.dirname(fileURLToPath(import.meta.url));
-const upstreamRoot='/home/bartek/linux-agent-browser-poc';
+const benchmarkPaths=paths();
+const upstreamRoot=benchmarkPaths.native;
+const baselineRoot=benchmarkPaths.baseline;
 const repo=path.resolve(root,'../..');
+const argv=process.argv.slice(2), flag=(key,fallback)=>argv.includes(key)?argv[argv.indexOf(key)+1]:fallback;
+if(argv.includes('--help')){
+  console.log('Usage: pnpm bench:auto [--check] [--engines app-auto,app-first,ultrafast,browser-use] [--tasks local|holdout|TASKS] [--flight-date YYYY-MM-DD] [--runs N] [--output FILE] [--config FILE] [--model MODEL] [--provider UPSTREAM] [--timeout SECONDS] [--max-cost USD] [--auto-confidence 0..1] [--warm-after N] [--headed] [--stop-after MILLISECONDS]\nSetup: pnpm bench:setup. --check/--help make no model calls. See docs/BENCHMARKS.md.');
+  process.exit(0);
+}
+const switches=new Set(['--check','--headed']);
+const options=new Set(['--engines','--tasks','--flight-date','--runs','--output','--config','--model','--provider','--timeout','--max-cost','--auto-confidence','--warm-after','--stop-after']);
+const seen=new Set();
+for(let i=0;i<argv.length;i++){
+  const name=argv[i];
+  if(seen.has(name)||(!switches.has(name)&&!options.has(name)))throw Error(`Unknown or duplicate option: ${name}`);
+  seen.add(name);
+  if(options.has(name)&&(!argv[++i]||argv[i].startsWith('--')))throw Error(`Missing value for ${name}`);
+}
+for(const name of ['--timeout','--max-cost']){
+  const value=Number(flag(name,name==='--timeout'?'240':'15'));
+  if(!Number.isFinite(value)||value<=0)throw Error(`${name} must be positive and finite`);
+}
+const confidence=Number(flag('--auto-confidence','0.35'));
+if(!Number.isFinite(confidence)||confidence<0||confidence>1)throw Error('--auto-confidence must be between 0 and 1');
+for(const name of ['--warm-after','--stop-after'])if(!Number.isInteger(Number(flag(name,'0')))||Number(flag(name,'0'))<0)throw Error(`${name} must be a nonnegative integer`);
+const engines=flag('--engines','app-auto,app-first,ultrafast,browser-use').split(',');
+if(engines.some(e=>!['app-auto','app-first','ultrafast','browser-use'].includes(e)))throw Error('Unknown engine');
+if(new Set(engines).size!==engines.length)throw Error('Duplicate engine');
+const selected=flag('--tasks','local').split(',');
+if(selected.some(id=>!['local','holdout',...tasks.map(t=>t.id)].includes(id)))throw Error('Unknown task');
+const live=selected.includes('google-flights');
+const flightDate=flag('--flight-date',null);
+if(live&&!flightDate)throw Error('Live Flights requires --flight-date YYYY-MM-DD in the future. Historical results keep their original date.');
+const configuredTasks=tasks.map(t=>t.id==='google-flights'&&live?{...createFlights(flightDate,{requireFuture:true}),category:'live'}:t);
+const suite=configuredTasks.filter(t=>selected.includes(t.id)||(selected.includes('local')&&t.category!=='live'&&!t.holdout)||(selected.includes('holdout')&&t.holdout));
+if(!suite.length)throw Error('Unknown task');
+const repeats=Number(flag('--runs','3')),timeoutMs=Number(flag('--timeout','240'))*1000;
+if(!Number.isInteger(repeats)||repeats<1||repeats>20)throw Error('Invalid runs');
+const model=flag('--model','google/gemini-3.8-flash');
+const upstream=flag('--provider','google-ai-studio');
+const needsBaseline=engines.includes('app-first');
+const needsNative=engines.some(e=>e==='ultrafast'||e==='browser-use');
+if(needsNative&&upstream!=='google-ai-studio')throw Error('Pinned native drivers require --provider google-ai-studio.');
+if(needsBaseline)verifyBaseline(baselineRoot);
+const nativeSources=needsNative?verifyNative(upstreamRoot):undefined;
+const baselineImport=file=>import(pathToFileURL(path.join(baselineRoot,file)).href);
+const baseline=needsBaseline?await baselineImport('services/agentd/dist/index.js'):undefined;
+const {BrowserSession:BaselineBrowserSession}=needsBaseline?await baselineImport('services/browser-worker/dist/browser-session.js'):{};
+const {browserExecutor:baselineBrowserExecutor}=needsBaseline?await baselineImport('services/agentd/dist/tools/browser-tools.js'):{};
+const {BrowserActionPolicy}=await import('../../services/agentd/dist/policy/browser-policy.js');
+const {JevClient,JevConfig}=needsBaseline?await baselineImport('services/agentd/dist/provider/jev.js'):{};
+if(argv.includes('--check')){console.log(JSON.stringify({engines,tasks:suite.map(t=>t.id),flightDate,model,upstream,baselineVerified:needsBaseline,nativeVerified:needsNative,noApiCalls:true},null,2));process.exit(0);}
 // Patch both module instances: each isolated worktree owns its Playwright package.
 for(const chromium of new Set([
-  createRequire('/home/bartek/linux-agent-jev/services/browser-worker/package.json')('playwright').chromium,
+  ...(needsBaseline?[createRequire(path.join(baselineRoot,'services/browser-worker/package.json'))('playwright').chromium]:[]),
   createRequire(path.join(repo,'services/browser-worker/package.json'))('playwright').chromium,
 ])){
   const launch=chromium.launchPersistentContext.bind(chromium);
@@ -32,33 +79,25 @@ for(const chromium of new Set([
     env:Object.fromEntries(Object.entries(process.env).filter(([k])=>!/API_KEY|TOKEN|SECRET/.test(k))),
     args:[...opts.args,'--remote-debugging-address=127.0.0.1','--remote-debugging-port=0']});
 }
-const argv=process.argv.slice(2), flag=(key,fallback)=>argv.includes(key)?argv[argv.indexOf(key)+1]:fallback;
-const engines=flag('--engines','app-auto,app-first,ultrafast,browser-use').split(',');
-if(engines.some(e=>!['app-auto','app-first','ultrafast','browser-use'].includes(e)))throw Error('Unknown engine');
-const selected=flag('--tasks','local').split(',');
-const suite=tasks.filter(t=>selected.includes(t.id)||(selected.includes('local')&&t.category!=='live'&&!t.holdout)||(selected.includes('holdout')&&t.holdout));
-if(!suite.length)throw Error('Unknown task');
-const repeats=Number(flag('--runs','3')),timeoutMs=Number(flag('--timeout','240'))*1000;
-if(!Number.isInteger(repeats)||repeats<1||repeats>20)throw Error('Invalid runs');
-const model='google/gemini-3.8-flash';
+
 const output=path.resolve(flag('--output',path.join(root,'artifacts',`run-${Date.now()}.json`)));
 if(fs.existsSync(output))throw Error('Output already exists; preserve previous attempts under a new filename');
 fs.mkdirSync(path.dirname(output),{recursive:true,mode:0o700});
-const configFile=path.join(os.homedir(),'.config/linux-agent-workbench-jev/.env');
-const env=Object.fromEntries(fs.readFileSync(configFile,'utf8').split(/\r?\n/).filter(l=>/^[A-Z_]+=/.test(l)).map(l=>l.split(/=(.*)/s).slice(0,2)));
+const configFile=flag('--config',benchmarkPaths.config);
+const env=privateConfig(configFile);
 const [jevKey,openrouterKey]=await Promise.all([readJevKey(configFile,env),readOpenRouterKey(configFile,env)]);
 const clean=text=>String(text).replaceAll(jevKey,'[redacted]').replaceAll(openrouterKey,'[redacted]');
 const temp=fs.mkdtempSync(path.join(os.tmpdir(),'browser-poc-'));
 const site=await startSite();
-const report={createdAt:new Date().toISOString(),model,effort:'low',upstream:'google-ai-studio',jev:'jev-1.13.0',engines,repeats,
-  source:{app:execFileSync('git',['rev-parse','HEAD'],{cwd:'/home/bartek/linux-agent-jev',encoding:'utf8'}).trim(),poc:execFileSync('git',['rev-parse','--verify','HEAD'],{cwd:root,encoding:'utf8',stdio:['ignore','pipe','ignore']}).trim()},
+const report={createdAt:new Date().toISOString(),model,effort:'low',upstream,jev:'jev-1.13.0',engines,repeats,
+  source:{app:needsBaseline?execFileSync('git',['rev-parse','HEAD'],{cwd:baselineRoot,encoding:'utf8'}).trim():null,nativeSources,poc:execFileSync('git',['rev-parse','--verify','HEAD'],{cwd:root,encoding:'utf8',stdio:['ignore','pipe','ignore']}).trim()},
   clock:'setup includes driver/browser startup, navigation, consent, first observation; task includes independent final verification; screenshots and cleanup outside task',
-  settings:{autoConfidence:Number(flag('--auto-confidence','0.35')),timeoutMs,viewport:{width:1120,height:780},channel:'chromium',warmAfter:flag('--warm-after',null)},results:[]};
+  settings:{flightDate,autoConfidence:Number(flag('--auto-confidence','0.35')),timeoutMs,viewport:{width:1120,height:780},channel:'chromium',warmAfter:flag('--warm-after',null)},results:[]};
 report.source.hashes=Object.fromEntries(['run.mjs','tasks.mjs'].map(file=>[file,createHash('sha256').update(fs.readFileSync(path.join(root,file))).digest('hex')]));
 report.source.candidate=execFileSync('git',['rev-parse','HEAD'],{cwd:repo,encoding:'utf8'}).trim();
 report.source.candidateHashes=Object.fromEntries(['services/agentd/dist/provider/openrouter.js','services/agentd/dist/orchestrator/browser-auto.js','services/agentd/dist/orchestrator/jev-browser.js','services/agentd/dist/orchestrator/run-controller.js','services/browser-worker/dist/browser-session.js'].map(f=>[f,createHash('sha256').update(fs.readFileSync(path.join(repo,f))).digest('hex')]));
 report.source.sharedWorker='same Chrome build/settings; app-first uses unchanged baseline controller, tools and worker; app-auto uses candidate; both app engines share candidate OpenRouter schema adapter (explicit object oneOf); Python engines use pinned native drivers';
-report.source.upstreamDriverHash=createHash('sha256').update(fs.readFileSync(path.join(upstreamRoot,'driver.py'))).digest('hex');
+if(needsNative)report.source.upstreamDriverHash=createHash('sha256').update(fs.readFileSync(path.join(upstreamRoot,'driver.py'))).digest('hex');
 report.source.dirty=!!execFileSync('git',['status','--porcelain'],{cwd:root,encoding:'utf8'}).trim();
 report.settings.priorReportedCostUsd=fs.readdirSync(path.dirname(output)).filter(f=>f.endsWith('.json')).reduce((sum,f)=>{
   try{return sum+JSON.parse(fs.readFileSync(path.join(path.dirname(output),f),'utf8')).results.reduce((s,r)=>s+(r.costUsd??0),0);}catch{return sum;}
@@ -78,7 +117,7 @@ async function appDriver(browser,task,goal,workDir,engine){
   const target={status:{state:'ready'},start:async()=>({state:'ready'}),observe:async input=>(lastObservation=await browser.observe(input)),act:a=>browser.act(a),read:i=>browser.read(i),wait:i=>browser.wait(i),downloads:async()=>[]};
   const policy=new BrowserActionPolicy({lastObservation:()=>lastObservation,allowPrivate:task.category!=='live',approvals:{isSessionAllowed:()=>false,request:async()=> 'deny'}});
   const config=(engine==='app-auto'?AutoJevConfig:JevConfig).parse({apiKey:jevKey,model:'jev-1.13.0'});
-  const rc=new RunController({store,provider:'openrouter',adapter:new OpenRouterAdapter({model,effort:'low',provider:'google-ai-studio',apiKey:openrouterKey}),
+  const rc=new RunController({store,provider:'openrouter',adapter:new OpenRouterAdapter({model,effort:'low',provider:upstream,apiKey:openrouterKey}),
     worker:{cancel(){},observe:async()=>({})},tools:browserExecutor(target),policy,
     budgets:{maxTurns:80,maxToolCalls:240,maxDurationMs:timeoutMs,maxCostUsd:1},systemPrompt:rules(task),
     hybrid:{evaluator:new (engine==='app-auto'?AutoJevClient:JevClient)(config),observation:()=>lastObservation,minConfidence:engine==='app-auto'?Number(flag('--auto-confidence','0.35')):config.minConfidence,strategy:engine==='app-auto'?'auto':'first'}},

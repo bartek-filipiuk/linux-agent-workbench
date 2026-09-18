@@ -6,7 +6,7 @@ Evidence collected on September 17–18, 2026; consolidated on September 18. Thi
 
 | Material | Purpose |
 | --- | --- |
-| [All results, Polish historical archive](ALL-RESULTS.md) | Every retained runner attempt, stage-by-stage interpretation, failures, timing breakdowns and original provenance |
+| [All results, English archive](ALL-RESULTS.md) | Every retained runner attempt, stage-by-stage interpretation, failures, timing breakdowns and original provenance |
 | [Test catalog and methodology](TEST-CATALOG.md) | Exact tasks, success criteria, conditions, limits and what was not tested |
 | [Cost ledger](COSTS.md) | Disjoint costs, unknowns and each canonical source |
 | [Inventory](inventory.json) / [CSV](trials.csv) | Source hashes and 692 rows: 606 runner records, 78 routing cases, 8 driver cases; desktop checks are separate |
@@ -62,6 +62,7 @@ From the repository root, using Python 3:
 
 ```bash
 python3 scripts/research-catalog.py
+python3 scripts/research-report.py
 python3 experiments/browser-auto/summarize.py --input docs/benchmarks/jev-auto --output /tmp/auto-tables.md
 # Requires Matplotlib:
 python3 experiments/browser-auto/plot.py --input docs/benchmarks/jev-auto --output /tmp/auto-charts
@@ -73,4 +74,4 @@ The [consolidation audit](consolidation-audit.json) records source/import hash c
 
 Earlier app evidence lives in `docs/benchmarks/`; Auto evidence in `docs/benchmarks/jev-auto/`; the imported PoC snapshot in `docs/benchmarks/browser-poc/`. [Import provenance](import-manifest.json) records the original PoC commit and hashes. Its Python/Node files are archived research source, not a second application dependency or portable installer. Historical paths, fixture ports, dates and account placeholders in raw evidence are provenance, not setup instructions. The app does not import this snapshot.
 
-Running new live comparisons still requires making the benchmark harness portable, preparing the pinned reference checkouts and installing their environments. See [release readiness](../RELEASE-READINESS.md). The fixed Flights date is September 20, 2026; after that date, use a documented new future date, update its verifier and begin a new series. Never rewrite historical results to match a new task.
+New live comparisons use the [portable benchmark guide](../BENCHMARKS.md), including a pinned baseline/native bootstrap and an explicit future flight date. Historical Flights measurements retain September 20, 2026. New dates, models or code revisions start a new series; never rewrite historical results to match a new task.

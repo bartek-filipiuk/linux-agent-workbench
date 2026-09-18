@@ -1,6 +1,6 @@
 # Linux Agent Workbench: current application
 
-Source snapshot: `experiment/jev-auto`, application logic frozen at `0ea227b` and completed evidence at `55f53e5` (September 18, 2026). This is one Linux desktop application with a terminal, a browser, a shared conversation, approval controls, history and human takeover. Auto changes how browser work is executed within that application. It does not launch a second application for each task.
+The consolidated source release includes the Jev Auto implementation. Its published benchmark used application logic frozen at `0ea227b` and completed evidence at `55f53e5` (September 18, 2026); later portability and documentation checks are recorded separately. This is one Linux desktop application with a terminal, a browser, a shared conversation, approval controls, history and human takeover. Auto changes how browser work is executed within that application. It does not launch a second application for each task.
 
 ## Components and data flow
 
@@ -121,4 +121,4 @@ OpenRouter returned usage and Jev token-price estimates feed tracked spending. L
 | User workflow / full configuration | [User guide](USER_GUIDE.md), [Configuration](CONFIGURATION.md), [OpenRouter](openrouter.md) |
 | Evidence and next release | [Research kit](research/README.md), [release readiness](RELEASE-READINESS.md) |
 
-Auto is implemented and locally validated, but remains experimental. Broader live-site reliability, provider onboarding, portable benchmark setup and release packaging have distinct remaining work; the [release checklist](RELEASE-READINESS.md) separates these from missing core execution features.
+Auto is implemented and locally validated, but remains experimental. Portable benchmark setup is available in [BENCHMARKS.md](BENCHMARKS.md). Broader live-site reliability, provider onboarding and binary packaging have distinct remaining work; the [release checklist](RELEASE-READINESS.md) separates these from missing core execution features.

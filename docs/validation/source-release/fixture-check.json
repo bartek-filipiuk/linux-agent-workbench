@@ -1,0 +1,57 @@
+{
+  "kind": "deterministic fixture check; no model calls",
+  "results": [
+    {
+      "task": "wizard-4-new",
+      "passed": true,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Oslo",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Riga",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Tallinn",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Helsinki",
+            "person": "Lea",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "compare-new",
+      "passed": true,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "hotel": "Doria",
+          "total": "392"
+        }
+      }
+    },
+    {
+      "task": "autocomplete-new",
+      "passed": true,
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Rome, Italy"
+      }
+    }
+  ]
+}

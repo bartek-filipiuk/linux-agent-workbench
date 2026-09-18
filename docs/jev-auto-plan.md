@@ -1,76 +1,42 @@
-# Jev Auto: plan wdrożenia i bramki decyzyjne
+# Jev Auto implementation history
 
-**Stan końcowy: A–D wykonane.** Po doładowaniu dokończono zadeklarowane 119 prób porównawczych (119 poprawnych), testy routingu, widoczne okno, Stop, audyt i raport. Opis blokady poniżej jest historią przebiegu, nie bieżącym statusem. [Wyniki końcowe](jev-auto-results.md).
+The September 18, 2026 implementation goal was completed: a hybrid in the existing application, validated in stages and measured against frozen references. The final comparison completed 119/119 attempts. This document records the implementation decisions and interruptions; current setup is in [APPLICATION.md](APPLICATION.md) and [BENCHMARKS.md](BENCHMARKS.md).
 
-Cel z 18 września 2026: działająca hybryda w obecnej aplikacji, sprawdzona etapami. Osobny worktree `/home/bartek/linux-agent-auto`, branch `experiment/jev-auto`, baseline `77846cb`. Zachowujemy dotychczasowe UI, RunController, jedną sesję, politykę każdej akcji i Stop. Nie zmieniamy main ani baseline’u Jev First. Poprzednie wyniki: [pełne archiwum](../../linux-agent-browser-poc/WSZYSTKIE-WYNIKI-TESTOW.md).
+## Evidence behind the design
 
-## Hipotezy wynikające z pomiarów
+Native Ultrafast reduced main-model calls on Flights but failed six offer-analysis tasks and could not finish new-tab tasks independently. Browser Use benefited from grouping form actions. Lowering Jev's confidence threshold alone did not improve the Flights pilot. These results favored retaining the existing RunController and policy while choosing execution per subtask.
 
-- Flights i proste UI: koszt ogranicza liczba wizyt u głównego modelu. Krótkie cele z wartościami może wykonywać Jev bez analizy Gemini po każdym kliknięciu.
-- Długie formularze: potrzebne jest grupowanie działań i wartości pochodzące z planu. Browser Use wygrywał przy 11 wywołaniach Gemini wobec 20 helperów Ultrafast i 42–43 wywołań obecnej aplikacji.
-- Analiza: Gemini czyta, pamięta i liczy; nie delegujemy nierozstrzygniętego porównania samej pętli Jev. W finalnym PoC Ultrafast przegrał wszystkie sześć takich prób.
-- Brak postępu i nowe karty: kontrolowany powrót do planisty zamiast wielokrotnego powtarzania działań. Confidence nie jest weryfikatorem wyniku.
+The design kept one conversation, one browser session, existing UX, individual action checks, human takeover and Stop. The primary model plans and reasons; Jev handles concrete mechanical subgoals; known form values can be executed in guarded batches. No Mercury helper or automatic stronger-model escalation was introduced.
 
-## Implementacja
+## Staged implementation and validation
 
-1. Nowy wybieralny tryb `jev-auto`, bez zmiany zachowania Classic/Hybrid/First. Wyboru wykonawcy dokonuje główny model przez wybór narzędzia podczas normalnego planowania, bez osobnego płatnego klasyfikatora.
-2. `browser_task`: krótki cel mechaniczny, adres opcjonalny i dokładne niesekretne wartości. Szybka pętla Jev z historią semantyczną, ograniczonym budżetem, wykrywaniem cykli niezależnie od numerów obserwacji i świeżymi dowodami po zakończeniu. Zachować sprawdzanie celu przed wykonaniem.
-3. `browser_batch`: ograniczona sekwencja działań zaplanowana na podstawie jednej obserwacji. Każda akcja otrzymuje świeżą obserwację, sprawdzenie zgodności celu/kontekstu, indywidualną autoryzację i zapis w dzienniku. Sekwencja kończy się przy zmianie strony, błędzie, odmowie, przejęciu przez człowieka lub niepewnym wyniku; nie powtarza wykonanych akcji. Wartości ustala model z polecenia lub przeczytanych danych, nie skrypt z odpowiedziami benchmarku.
-4. Odczyty i analiza pozostają u planisty. Przejścia między fast/planned są zdarzeniami dziennika, możliwymi do zmierzenia. Jedna sesja przeglądarki i brak równoległych wykonawców.
-5. Browser Use pozostaje trzecim eksperymentalnym punktem odniesienia w istniejącym PoC. Pełne podłączenie do aplikacji jest warunkowe: musi dawać korzyść, której nie osiąga bezpieczny batch, oraz respektować obecną politykę akcji. Nie wystawiamy użytkownikowi niedziałającego wyboru Browser Use.
+| Stage | Work and acceptance evidence |
+| --- | --- |
+| A: routing and contract | First-tool category tests, held-out categories, explicit planner instructions; no separate classifier API call |
+| B: execution | Up to eight actions per batch; target identity/context checks; verify prior edits; semantic cycle detection; covered-target rejection; no blind mutation replay |
+| C: frozen comparison | Shared Gemini/OpenRouter configuration, baseline First controller/tools/worker at `77846cb`, pinned native sources, rotating sequential order, independent verification |
+| D: application validation | Typecheck/build, full suite, rebuilt container checks, actual desktop smoke, visible window, Stop, credential audits and retained reports |
 
-## Etapy i kryteria
+Early routing category scores were 12/16, 15/16 and 16/16, followed by 6/6 held-out. Argument inspection later found JSON strings where object actions were required, despite correct category choices. The shared OpenRouter object `oneOf` schema fix was therefore applied before the application freeze `0ea227b`. Both app comparison variants use this corrected adapter; First retains its baseline controller/tools/worker.
 
-### A. Kontrakty i bezpieczeństwo — przed płatnym wykonaniem
+Execution pilots covered context checks, confidence 0.35, occlusion, stale targets and pre-dispatch guards. Failures remain in the [full archive](research/ALL-RESULTS.md). A rejected action known not to have dispatched can get a fresh Jev decision at most twice consecutively; uncertainty after a mutation still requires inspection. Confidence is not proof of correctness.
 
-Testy routera/narzędzi: zadanie mechaniczne kontra analiza, wartości i wybór narzędzia, brak skryptów lub sekretów. Testy wykonania: nieaktualny ref, zmieniony cel, zmiana strony/karty, cykle A–B–A mimo zmiany ref/revision, brak postępu, częściowo wykonany batch, odmowa approval, Stop w trakcie inferencji i pomiędzy akcjami, takeover i pauza budżetu. Każda mutacja przechodzi normalną politykę. Porażka blokuje dalszy etap.
+## Freeze, interruption and resumption
 
-### B. Test decyzji Gemini i małe piloty
+The planned comparison was 8 local tasks × 3 engines × 3 repeats, 3 changed-data tasks × 3 engines × 3 repeats, and Flights × 4 engines × 5 repeats: 119 attempts. Native Ultrafast was retained on Flights; its analytical limitations had already been measured in the earlier PoC.
 
-Najpierw płatne odpowiedzi na zróżnicowane polecenia bez wykonywania narzędzi: sprawdzić wybór fast/planned/read i brak utraty wartości. Oczekiwane kategorie opisane przed uruchomieniem. Niezgodne decyzje zachować, przeanalizować; nie udawać, że klasyfikacja dowodzi poprawności całego zadania.
+The first six local task groups completed 54/54. The original research/tabs block then produced four successes and 14 HTTP 402 credit failures. Runner fail-fast handling for 401/402 was added without modifying the frozen application logic. Repeated availability checks confirmed the credit blocker; exact private account totals were not exported.
 
-Następnie po jednym zadaniu search, formularz, analiza, karty i Flights z niezależnymi weryfikatorami. Zachować wszystkie piloty i poprawki. Nie osłabiać walidacji w celu uzyskania dobrego czasu. Jeżeli szybka ścieżka ciągle wraca do LLM, sprawdzić przyczynę w śladzie przed rozszerzeniem benchmarku.
+After credits were added, the complete 18-record research/tabs block was restarted, followed by all 27 changed-data and 20 Flights attempts. The selected comparison includes the 54 original completed records plus these 65 resumed records. All 18 records from the interrupted block remain separate, including its four successes. No selective success-only retry was used.
 
-### C. Zamrożone porównanie
+Final routing checks retained one valid but unexpected planned route and two HTTP 429 failures. Only those unavailable cases were retried; both then passed. Actual execution retained one rejected/corrected wait-argument error. These issues and the slow Flights attempt are visible in the report.
 
-Zamrozić kod i zestaw zadań przed serią. Porównać Auto z bazowym First + Gemini (wspólna poprawka adaptera OpenRouter: jawny typ obiektu dla `oneOf`; kontroler, narzędzia i worker First z 77846cb) oraz Ultrafast/Browser Use na wspólnej przeglądarce i zegarze. Co najmniej trzy powtórzenia lokalnych zadań różnych typów i pięć Flights na świeżych profilach; rotacja kolejności, sekwencyjne wykonanie. Dołączyć nowe warianty danych/zadań niewykorzystywane przy dostrajaniu. Jeśli koszt lub czas wymusi redukcję, jawnie opisać liczność i ograniczenia.
+## Completion evidence and limits
 
-Sukces = zakończenie + niezależnie poprawny wynik. Wszystkie błędy pozostają w danych. Osobno: setup, czas zadania z weryfikacją, model główny, Jev, reszta, liczby wywołań, tryby i przełączenia, koszt. Wybór trybu jest częścią odpowiedzi planisty: nie nazywać całego czasu tej odpowiedzi czystym narzutem routera. Mała próbka nie dowodzi równej niezawodności.
+The frozen application passed 452 tests with 12 skipped, four container checks, and the final desktop smoke 4/4. Stop closed the benchmark browser in about 130 ms; UI Stop response was a separate 27 ms measurement. Earlier schema-related desktop failures and an unrelated timing-sensitive terminal failure remain documented. The worker image functioned, although the developer host exceeded the build script's global storage ceiling.
 
-Cel praktyczny: wyraźny zysk (~30% mediany) na mechanicznych lub długich zadaniach, zachowana obserwowana poprawność analizy. Jeśli hipoteza zawiedzie, nie promować Auto jako domyślnego i zapisać ograniczenia; nie porzucać naprawialnej implementacji bez diagnostyki.
+Task time includes retries, recovery and verification; setup and final screenshots/cleanup are separate. There is no isolated measurement of pure routing overhead: tool selection is part of ordinary planner inference. Three or five repeats do not establish general reliability; changed-data tasks remain variants of known fixtures.
 
-### D. Gotowość aplikacji i przekazanie
+The initial experiment allowed up to $15 of returned usage across new output files, $1 per attempt and 240 seconds per task. Known Auto-stage runner/routing plus desktop cost was $4.885782663; missing interrupted usage and infrastructure are excluded. Credentials remained host-side.
 
-Typecheck/build, pełna suite, headful, realny desktop/container smoke z nowym wyborem, Stop i Classic po Stop. Potwierdzić izolację kluczy i brak pozostawionych procesów. Raport porównań, instrukcja uruchomienia, rewizje i osobne źródła wszystkich prób. Nowy tryb eksperymentalny, bez automatycznego przestawiania preferencji użytkownika na nieudowodniony wariant.
-
-## Granice i koszt
-
-Gemini `google/gemini-3.8-flash / low`, OpenRouter `google-ai-studio`; Jev `jev-1.13.0`. Bez Mercury i eskalacji modelu. Zachowane klucze pobierane z OS keyring tylko do pamięci hosta, nigdy do repo, argumentów komend lub środowiska Chrome. Dedykowane profile i dozwolone domeny. Początkowy limit wykonawczy nowych eksperymentów: $15 raportowanego usage, $1 na próbę, 240 s na zadanie; koszty przerwanych zapytań mogą nie wrócić w usage. To nie budżet tokenów celu.
-
-## Przed zamrożeniem serii końcowej
-
-- Kontrakty batch/Stop/policy/cycle sprawdzone jednostkowo; pełna suite przed ostatnią poprawką: 451 PASS, 12 skip. Test kontenera: 4 PASS.
-- Routing: piloty 12/16 → 15/16 → 16/16, następnie 6/6 nowych poleceń bez wykonania. To test wyboru narzędzia, nie dowód poprawności zadania.
-- Piloty wykonania i ich niepowodzenia zachowane w `experiments/browser-auto/artifacts/`; osobna seria końcowa nie miesza ich z finalnym wynikiem.
-- Dwa testy desktopu wykazały zły format argumentów Classic. Konwerter schematu uwzględniał `anyOf`, a rzeczywiste narzędzie używa `oneOf`. Poprawka zachowuje ograniczenia i runtime validation, dodaje typ `object`. Regresja korzysta z rzeczywistego schematu. Po poprawce cały desktop 4/4 PASS, Stop 27 ms. W porównaniu oba warianty aplikacji używają tego samego poprawionego adaptera; repo baseline pozostaje nietknięte.
-- Końcowa próba: lokalne 8 × 3 silniki × 3 powtórzenia, nowe 3 × 3 × 3, Flights 5 × 4 = 119. Ultrafast pozostaje dodatkowym odniesieniem Flights; jego ograniczenia analityczne już zmierzono w poprzednim PoC.
-
-## Stan realizacji i wznowienie po limicie dostawcy
-
-A i B wykonane; aplikacja oraz główne kontrole D gotowe (452 testy, 4 kontenerowe, 4/4 desktop po naprawie schematu). C pozostaje otwarte. Sześć lokalnych grup: 54/54 poprawne; dalsza część serii ma 4 sukcesy research i 14 błędów kredytów OpenRouter. Runner zatrzymuje teraz kolejne serie na 401/402. Pełny zapis: [wyniki](jev-auto-results.md).
-
-Po doładowaniu tego samego konta: zachować wszystkie oryginały, uruchomić osobno `research-offers,tabs` (3 silniki × 3), `holdout` (3 × 3), `google-flights` (4 × 5). Nie zmieniać modelu, providerów, promptów, progu ani kodu aplikacji. W podsumowaniu rozdzielić niedokończoną część pierwotnej serii od wznowienia, aby nie mieszać liczności. Dodatkowy retest decyzji i opcjonalny smoke runnera z widocznym oknem wykonać po seriach czasowych. Nie zamykać celu jako osiągniętego, dopóki te wymagane pomiary pozostają niewykonane, chyba że użytkownik jawnie ograniczy zakres.
-
-
-## Status celu po ponownej weryfikacji
-
-18 września 2026, 07:22:58 UTC: bezpłatny odczyt API konta potwierdził działający klucz oraz brak dodatniego salda na płatne zapytania. Nie wywoływano modelu i nie zmieniano konfiguracji benchmarku. Po utrzymaniu się tej samej blokady przez trzy kolejne tury cel oznaczono **blocked**, nie complete. Implementacja i zachowane wyniki pozostają gotowe; brakujące porównania wymagają doładowania konta. Dokładne saldo konta nie jest publikowane w repozytorium.
-
-
-## Zamknięcie zakresu po wznowieniu
-
-- Zamrożony kod aplikacji pozostał bez zmian. 18 prób research/kart po wznowieniu, 27 nowych wariantów i 20 Flights zakończone. Główna próbka 119/119; pierwotny przerwany blok 18 (4 sukcesy, 14 błędów kredytów) zachowany w całości osobno.
-- Końcowy routing: 13/16 w pierwszym reteście, w tym 2 błędy HTTP 429 oraz jedna dozwolona, lecz inna od oczekiwanej ścieżka dla nowej karty. Nowe polecenia 6/6. Powtórzono wyłącznie 2 przypadki bez odpowiedzi: 2/2; wszystkie 20 zwróconych wywołań z tych końcowych kontroli mają poprawny schemat. Odchylenia nie usunięto z wyników.
-- Widoczna przeglądarka PASS. Stop na żywym Flights: stan stopped, zamknięcie przeglądarki 129,9 ms, cleanup 139,1 ms. Kontrole desktopu/containera i 452 testy dotyczą niezmienionej aplikacji.
-- Raport z czasami modeli, pozostałym czasem, kosztami, routingiem, wszystkimi próbami i wykresami PNG/SVG oraz zbiorczy plik MD uaktualnione. Zachowano błędy argumentów, providerów i niestabilny wcześniejszy test terminala; nie są maskowane dodatkowymi sukcesami.
-- Wyniki uzasadniają opcjonalne Auto dla długich formularzy i analiz; prostsze zadania bywają szybsze w First, a native Ultrafast wygrywa Flights. Browser Use pozostaje punktem odniesienia, domyślny Classic i main bez zmian. Nie jest to gwarancja niezawodności na dowolnej witrynie.
+Auto substantially improved long forms and offer comparisons; First still won some simple interactions, and native Ultrafast remained fastest on Flights. The release keeps Classic as the default and Auto explicitly experimental. [Complete results](jev-auto-results.md) · [Cost ledger](research/COSTS.md) · [Current release checks](RELEASE-READINESS.md).

@@ -1,6 +1,6 @@
 import http from 'node:http';
-import { scenarios } from '/home/bartek/linux-agent-jev/scripts/jev-fixtures.mjs';
-import { flights } from '/home/bartek/linux-agent-jev/scripts/jev-flights.mjs';
+import { scenarios } from '../../scripts/jev-fixtures.mjs';
+import { flights } from '../../scripts/jev-flights.mjs';
 
 const shell = body => `<!doctype html><html lang="en"><meta charset="utf-8"><title>Browser PoC</title><style>body{font:18px system-ui;max-width:850px;margin:24px auto}label,input,select,button{display:block;margin:10px 0;padding:6px}article{padding:12px;border:1px solid #aaa;margin:10px 0}a{display:block;margin:12px 0}</style><body>${body}</body></html>`;
 const cities = ['Basel','Bern','Lucerne','Lausanne','Lugano','Chur','St Gallen','Winterthur','Baden','Thun'];

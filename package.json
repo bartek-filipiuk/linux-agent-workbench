@@ -24,11 +24,14 @@
     "bench:jev": "pnpm build && node scripts/bench-jev.mjs",
     "dev:auto": "LAW_INSTANCE=jev-auto pnpm dev",
     "images:build:auto": "LAW_INSTANCE=jev-auto bash scripts/build-image.sh browser",
-    "bench:auto": "node experiments/browser-auto/run.mjs"
+    "bench:auto": "node experiments/browser-auto/run.mjs",
+    "bench:setup": "node experiments/browser-auto/setup.mjs",
+    "test:bench": "node --test tests/bench/*.test.mjs"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
     "typescript": "~5.9.3",
     "vitest": "^4.1.11"
-  }
+  },
+  "license": "MIT"
 }
