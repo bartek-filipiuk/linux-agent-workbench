@@ -1,0 +1,17 @@
+[
+  "website/docs/install/docker-monitoring.md",
+  "website/docs/monitor",
+  "website/docs/monitor/_category_.json",
+  "website/docs/monitor/custom-script.md",
+  "website/docs/monitor/push-monitor.md",
+  "website/docs/notification",
+  "website/docs/notification/_category_.json",
+  "website/docs/notification/webhook.md",
+  "website/docs/server-status",
+  "website/docs/server-status/_category_.json",
+  "website/docs/server-status/kubernetes",
+  "website/docs/server-status/kubernetes/_category_.json",
+  "website/docs/server-status/kubernetes/reporter-daemonset.md",
+  "website/docs/server-status/server-status-page.md",
+  "website/docs/server-status/server-status-reporter.md"
+]

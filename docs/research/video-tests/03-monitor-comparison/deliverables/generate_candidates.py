@@ -1,0 +1,60 @@
+import csv
+
+data = [
+    {
+        "product": "Uptime Kuma",
+        "docker": "yes",
+        "http": "yes",
+        "tcp": "yes",
+        "slack": "yes",
+        "status_page": "yes",
+        "config_as_code": "unknown",
+        "license": "MIT",
+        "latest_release": "2.5.5",
+        "release_date": "2026-09-16",
+        "score": "80",
+        "source_urls": "https://github.com/louislam/uptime-kuma;https://github.com/louislam/uptime-kuma/releases;https://github.com/louislam/uptime-kuma/releases/tag/2.5.5;https://api.github.com/repos/louislam/uptime-kuma/releases/latest;https://github.com/louislam/uptime-kuma/wiki/Status-Page"
+    },
+    {
+        "product": "Gatus",
+        "docker": "yes",
+        "http": "yes",
+        "tcp": "yes",
+        "slack": "yes",
+        "status_page": "yes",
+        "config_as_code": "yes",
+        "license": "Apache-2.0",
+        "latest_release": "v5.36.0",
+        "release_date": "2026-05-19",
+        "score": "100",
+        "source_urls": "https://github.com/TwiN/gatus;https://github.com/TwiN/gatus/releases;https://github.com/TwiN/gatus/releases/tag/v5.36.0;https://api.github.com/repos/TwiN/gatus/releases/latest;https://raw.githubusercontent.com/TwiN/gatus/master/README.md"
+    },
+    {
+        "product": "Tianji",
+        "docker": "yes",
+        "http": "yes",
+        "tcp": "yes",
+        "slack": "yes",
+        "status_page": "yes",
+        "config_as_code": "unknown",
+        "license": "Apache-2.0",
+        "latest_release": "v1.33.2",
+        "release_date": "2026-09-17",
+        "score": "80",
+        "source_urls": "https://github.com/msgbyte/tianji;https://github.com/msgbyte/tianji/releases;https://api.github.com/repos/msgbyte/tianji/releases/latest;https://tianji.dev/docs/intro;https://raw.githubusercontent.com/msgbyte/tianji/master/Dockerfile;https://raw.githubusercontent.com/msgbyte/tianji/master/src/server/model/notification/provider/apprise.ts;https://raw.githubusercontent.com/msgbyte/tianji/master/src/server/model/page/manager.ts"
+    }
+]
+
+fields = [
+    "product", "docker", "http", "tcp", "slack", "status_page",
+    "config_as_code", "license", "latest_release", "release_date",
+    "score", "source_urls"
+]
+
+with open('/workspace/candidates.csv', 'w', newline='', encoding='utf-8') as f:
+    writer = csv.DictWriter(f, fieldnames=fields)
+    writer.writeheader()
+    for row in data:
+        writer.writerow(row)
+
+print("candidates.csv written successfully.")

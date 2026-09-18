@@ -1,0 +1,79 @@
+{
+  "checks": {
+    "columns": true,
+    "threeDistinctProducts": true,
+    "Uptime Kuma_values": true,
+    "Uptime Kuma_arithmetic": true,
+    "Uptime Kuma_release": true,
+    "Uptime Kuma_UTC_date": true,
+    "Uptime Kuma_license": true,
+    "Gatus_values": true,
+    "Gatus_arithmetic": true,
+    "Gatus_release": true,
+    "Gatus_UTC_date": true,
+    "Gatus_license": true,
+    "Tianji_values": true,
+    "Tianji_arithmetic": true,
+    "Tianji_release": true,
+    "Tianji_UTC_date": true,
+    "Tianji_license": true,
+    "under650Words": true,
+    "fiveChecklistSteps": true,
+    "agentValidatorTrue": true,
+    "decisionLinks": true
+  },
+  "allStructuralChecksPassed": true,
+  "rows": [
+    {
+      "product": "Uptime Kuma",
+      "score": 80,
+      "csvScore": 80,
+      "eligible": true,
+      "features": {
+        "docker": "yes",
+        "http": "yes",
+        "tcp": "yes",
+        "slack": "yes",
+        "status_page": "yes",
+        "config_as_code": "unknown"
+      },
+      "release": "2.5.5",
+      "releaseDate": "2026-09-16"
+    },
+    {
+      "product": "Gatus",
+      "score": 100,
+      "csvScore": 100,
+      "eligible": true,
+      "features": {
+        "docker": "yes",
+        "http": "yes",
+        "tcp": "yes",
+        "slack": "yes",
+        "status_page": "yes",
+        "config_as_code": "yes"
+      },
+      "release": "v5.36.0",
+      "releaseDate": "2026-05-19"
+    },
+    {
+      "product": "Tianji",
+      "score": 80,
+      "csvScore": 80,
+      "eligible": true,
+      "features": {
+        "docker": "yes",
+        "http": "yes",
+        "tcp": "yes",
+        "slack": "yes",
+        "status_page": "yes",
+        "config_as_code": "unknown"
+      },
+      "release": "v1.33.2",
+      "releaseDate": "2026-09-17"
+    }
+  ],
+  "winnerByGivenRules": "Gatus",
+  "wordCount": 644,
+  "limits": "Schema, arithmetic, latest release/license/UTC-date metadata and report format are checked. Feature evidence and recommendation prose also require human/assistant source review; this is not a deployment or alert-delivery test."
+}

@@ -22,3 +22,9 @@ The app's Jev HTTP client and guarded orchestration are in this repository; it d
 The inventory is scoped to the installed Linux pnpm workspace. It does not certify every platform's optional packages, the Python benchmark environment, container OS packages, Chromium or external Codex CLI. The lockfiles and downloaded packages remain the source for dependency-specific license texts. Electron, Playwright, React, xterm and other components retain their upstream notices.
 
 This release publishes source. A future binary/container distribution must collect its actual bundled dependencies and notices, review source-distribution obligations and preserve the notices supplied by Chromium/Electron and the base OS. A source-level dependency inventory alone is not a binary distribution audit.
+
+## Recorded demonstrations
+
+The [demo gallery](docs/demos/README.md) shows original application recordings and editorial video work. Recorded website content and product names retain their owners' rights; they are not relicensed by the project's MIT license and do not imply endorsement. Film descriptions and the test ledger identify the official sources used.
+
+The films and After Dark demo use Outfit and DM Sans. Their SIL Open Font License notices are retained with the [bundled landing-page fonts](docs/research/video-tests/04-research-landing/landing/assets/fonts/). The soundtrack is original synthesized audio; no sampled music is included. The finished MP4 assets live in the separately identified media release, outside application dependencies and Git history.

@@ -1,0 +1,43 @@
+1
+00:00:00,000 --> 00:00:04,500
+Read. Compare. Save something useful.
+Two official sources → one Markdown file.
+
+2
+00:00:04,500 --> 00:00:12,333
+Compare uv and pipx using their official guides.
+Ask for a short table saved to python-cli-tools.md.
+
+3
+00:00:12,333 --> 00:00:13,856
+Auto chooses a planned approach.
+
+4
+00:00:13,856 --> 00:00:16,213
+Gemini reads the uv documentation.
+
+5
+00:00:16,213 --> 00:00:19,514
+Gemini reads the pipx documentation.
+
+6
+00:00:19,514 --> 00:00:21,536
+Gemini writes the note, then displays the saved file.
+
+7
+00:00:21,536 --> 00:00:23,067
+The comparison is saved in the workspace.
+
+8
+00:00:23,067 --> 00:00:29,067
+The actual saved Markdown: isolation, one-off commands, and both source links.
+
+9
+00:00:29,067 --> 00:00:36,067
+112 words. Completed in 9.2 seconds.
+Auto chose Gemini directly: zero Jev calls.
+
+10
+00:00:36,067 --> 00:00:40,067
+From browser tabs to work you can keep.
+github.com/bartek-filipiuk/linux-agent-workbench

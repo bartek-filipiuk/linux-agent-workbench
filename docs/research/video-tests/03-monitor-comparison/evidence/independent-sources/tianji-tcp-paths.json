@@ -1,0 +1,10 @@
+[
+  "src/client/components/monitor/StatusPage/schema.ts",
+  "src/client/components/monitor/provider/tcp.tsx",
+  "src/client/components/monitor/provider/types.ts",
+  "src/server/model/_schema/monitor.ts",
+  "src/server/model/monitor/provider/tcp.ts",
+  "src/server/model/monitor/provider/type.ts",
+  "src/server/model/monitor/types.ts",
+  "src/types/monitor.ts"
+]

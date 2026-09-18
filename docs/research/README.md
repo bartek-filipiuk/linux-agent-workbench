@@ -6,6 +6,7 @@ Evidence collected on September 17–18, 2026; consolidated on September 18. Thi
 
 | Material | Purpose |
 | --- | --- |
+| [Recorded application tests](VIDEO-TESTS.md) | Film tasks, all takes, failures, prompted corrections, costs and retained evidence; separate from benchmark rankings |
 | [All results, English archive](ALL-RESULTS.md) | Every retained runner attempt, stage-by-stage interpretation, failures, timing breakdowns and original provenance |
 | [Test catalog and methodology](TEST-CATALOG.md) | Exact tasks, success criteria, conditions, limits and what was not tested |
 | [Cost ledger](COSTS.md) | Disjoint costs, unknowns and each canonical source |

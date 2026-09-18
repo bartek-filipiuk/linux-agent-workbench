@@ -7,6 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 files = [ROOT / name for name in ['README.md','CONTRIBUTING.md','ROADMAP.md','SECURITY.md','THIRD_PARTY_NOTICES.md']]
 files += list((ROOT/'docs').glob('*.md')) + list((ROOT/'docs/research').glob('*.md'))
 files += list((ROOT/'docs/benchmarks/browser-poc').glob('*.md'))
+files += list((ROOT/'docs/demos').glob('*.md'))
 count=0
 for file in files:
     source=re.sub(r'```.*?```','',file.read_text(),flags=re.S)

@@ -1,0 +1,40 @@
+{
+  "video": {
+    "programs": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 1920,
+        "height": 1080,
+        "r_frame_rate": "30/1",
+        "side_data_list": [
+          {}
+        ]
+      },
+      {
+        "codec_name": "aac",
+        "sample_rate": "48000",
+        "channels": 2,
+        "r_frame_rate": "0/0"
+      }
+    ],
+    "format": {
+      "duration": "41.344000",
+      "size": "5871862"
+    }
+  },
+  "decodeCheck": "ffmpeg complete decode: exit 0",
+  "typecheck": "passed",
+  "visualReview": "intro, prompt, live task, result and end card inspected",
+  "source": "second take; continuous 1x task footage",
+  "secretPatternScan": {
+    "files": 33,
+    "matches": 0
+  },
+  "sha256": {
+    "linux-agent-first-tutorial.mp4": "ee7d6f33729e1faa66347fe847fd4b34a4086ad77132abc03dc62960565414eb",
+    "linux-agent-first-tutorial-silent.mp4": "0a7efe456164c65e206d3a5e794828f8d1ff92eda15f37a55d696cfa32c3b776",
+    "thumbnail.png": "4a7c30948de879854512098dbae72a30c14089a82d2279bff88cc8d1bfd85c10",
+    "english.srt": "b722db2aa5bf86f62f12e27aeba68138bd9f49e2707c6cbe37a08d12def47c96"
+  }
+}

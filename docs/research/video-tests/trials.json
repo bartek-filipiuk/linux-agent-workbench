@@ -1,0 +1,102 @@
+[
+  {
+    "film": "01-release",
+    "phase": "first-take",
+    "runId": "2b5499ad-0f20-49c1-ae7e-24ded2cecfdb",
+    "taskSeconds": 31.125,
+    "completionPollSeconds": 31.328,
+    "primaryModel": "google/gemini-3.8-flash",
+    "turns": 7,
+    "toolCalls": 21,
+    "jev": {
+      "decisions": 1,
+      "elapsedMs": 1096.803323,
+      "costUsd": 0.000403494,
+      "fallbacks": 0
+    },
+    "costUsd": 0.06186569399999999,
+    "uiCumulativeCostUsd": 0.06186569399999999,
+    "prompt": "Open the Playwright repository on GitHub. Find the latest stable release and report its version, release date, and source link. Use only the browser.",
+    "runEvidence": "01-release/evidence/take-1/run.json"
+  },
+  {
+    "film": "01-release",
+    "phase": "selected",
+    "runId": "add2195d-4d0e-4e42-b8b4-b8328e5305d4",
+    "taskSeconds": 15.677,
+    "completionPollSeconds": 15.698,
+    "primaryModel": "google/gemini-3.8-flash",
+    "turns": 6,
+    "toolCalls": 15,
+    "jev": {
+      "decisions": 2,
+      "elapsedMs": 1668.7777179999975,
+      "costUsd": 0.000807492,
+      "fallbacks": 1
+    },
+    "costUsd": 0.032173242,
+    "uiCumulativeCostUsd": 0.032173242,
+    "prompt": "Open https://github.com/microsoft/playwright/releases. Find the latest stable release, report its version, release date and source link. Leave its release page visible. Use only the browser.",
+    "runEvidence": "01-release/evidence/run.json"
+  },
+  {
+    "film": "02-research-file",
+    "phase": "selected",
+    "runId": "c635e2c1-4481-4908-b043-960803f381aa",
+    "taskSeconds": 9.203,
+    "completionPollSeconds": 9.369,
+    "primaryModel": "google/gemini-3.8-flash",
+    "turns": 4,
+    "toolCalls": 9,
+    "jev": {
+      "decisions": 0,
+      "elapsedMs": 0,
+      "costUsd": 0,
+      "fallbacks": 0
+    },
+    "costUsd": 0.03711825,
+    "uiCumulativeCostUsd": 0.03711825,
+    "prompt": "Compare uv and pipx for running Python command-line tools. Read https://docs.astral.sh/uv/guides/tools/ and https://pipx.pypa.io/stable/ in the browser. Save /workspace/python-cli-tools.md: a concise table covering dependency isolation and each command to run Ruff once, plus both source links. Keep it under 180 words. Use the terminal only to write and display the note; do not install or run either tool.",
+    "runEvidence": "02-research-file/evidence/run.json"
+  },
+  {
+    "film": "03-monitor-comparison",
+    "phase": "selected",
+    "runId": "cda6f686-c3cb-4cfa-823b-0e02d597be72",
+    "taskSeconds": 179.06,
+    "completionPollSeconds": 179.244,
+    "primaryModel": "google/gemini-3.8-flash",
+    "turns": 42,
+    "toolCalls": 110,
+    "jev": {
+      "decisions": 0,
+      "elapsedMs": 0,
+      "costUsd": 0,
+      "fallbacks": 0
+    },
+    "costUsd": 0.6547416749999999,
+    "uiCumulativeCostUsd": 0.6547416749999999,
+    "prompt": "Choose a self-hosted uptime monitor for a 3-person team: 12 HTTP services, 3 TCP endpoints, one Linux Docker host, Slack alerts and a public status page. The team prefers declarative monitor configuration in Git.\nCompare Uptime Kuma (https://github.com/louislam/uptime-kuma), Gatus (https://github.com/TwiN/gatus) and Tianji (https://github.com/msgbyte/tianji).\nUse the browser to research at least six distinct official pages, including official release information for all three. Follow official documentation links as needed. Verify Docker deployment, HTTP checks, TCP checks, Slack alerts, public status pages and officially documented declarative monitor configuration. Record the license and latest stable release version/date as observed today. Use yes/no/unknown; missing evidence means unknown, not no. Cite exact supporting URLs and distinguish documented facts from judgments.\nWrite /workspace/candidates.csv with exactly these columns: product,docker,http,tcp,slack,status_page,config_as_code,license,latest_release,release_date,score,source_urls. One row per product; source_urls separated by semicolons.\nScore yes as Docker=20, HTTP=20, TCP=15, Slack=15, status_page=10, config_as_code=20; no or unknown earns 0. Docker, HTTP, TCP and Slack must all be yes to qualify. Recommend the highest-scoring qualifying product, explaining tradeoffs and unresolved checks. If none qualifies, say so.\nSave /workspace/decision.md (under 650 words): recommendation, evidence-backed comparison, unknowns, score explanation, and a five-step proposed rollout checklist. Do not deploy anything.\nUse the terminal to create the files, then run a Python CSV check that independently recomputes the scores, validates all three rows and determines eligibility. Save its output to /workspace/score-check.json and display the result. Read the saved files before finishing. Terminal is only for local file work and verification; website research must use the browser. Do not install packages or change external state.",
+    "runEvidence": "03-monitor-comparison/evidence/run.json"
+  },
+  {
+    "film": "03-monitor-comparison",
+    "phase": "prompted-correction",
+    "runId": "65373c5a-f3e1-4459-98e2-b560471d1257",
+    "taskSeconds": 93.196,
+    "completionPollSeconds": 93.279,
+    "primaryModel": "google/gemini-3.8-flash",
+    "turns": 21,
+    "toolCalls": 41,
+    "jev": {
+      "decisions": 0,
+      "elapsedMs": 0,
+      "costUsd": 0,
+      "fallbacks": 0
+    },
+    "costUsd": 0.4885580250000001,
+    "uiCumulativeCostUsd": 1.1432997,
+    "prompt": "Review and correct the files from this task. Your score-check.json reports validation_passed=false: the CSV and decision.md disagree with the Python recomputation. Read that validator output first, fix the source data and all reports, then rerun the validator. Do not claim success while it fails.\nAlso correct evidence handling: missing official documentation must be unknown, not no. Slack alerts were required, not specifically a native Slack provider. Check Tianji's officially supported Apprise integration and any required extra service; do not reject a supported integration just because it is indirect. Where evidence is insufficient, say unknown. Review the config_as_code classifications the same way.\nNormalize release dates to UTC using official publication timestamps (GitHub release API may be opened in the browser). Add exact supporting source links in decision.md and distinguish documented features, assumptions and unresolved checks. Retain the original scoring weights, eligibility rules, exact CSV columns, under-650-word decision and five-step proposed checklist.\nFinally read all three saved artifacts, independently recompute the CSV scores again, confirm score-check.json is true and that decision.md agrees. Research via the browser only, terminal for local file work; do not deploy or install anything. Report any remaining uncertainty honestly.",
+    "runEvidence": "03-monitor-comparison/evidence/recovery.json"
+  }
+]

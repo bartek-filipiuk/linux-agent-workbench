@@ -1,0 +1,14 @@
+Research and build "After Dark", a beautiful educational landing page about beginner stargazing and protecting the night sky. Read /workspace/design-brief.md first.
+
+Use the browser to read at least FOUR substantive official pages from at least THREE publishers, starting with:
+https://science.nasa.gov/skywatching/faq/
+https://science.nasa.gov/moon/viewing-tips/
+https://www.nps.gov/subjects/nightskies/stargaze.htm
+https://darksky.org/resources/guides-and-how-tos/lighting-principles/
+If a page is unavailable, find another official page and record the substitution. Save /workspace/research.md with concise paraphrased findings, claim-to-source URLs, actual page titles, access date and limitations. Read real pages; do not treat snippets or prior knowledge as verification. Do not invent current forecasts, star counts or affiliations.
+
+Then use the TERMINAL to invoke the installed Claude Code with the explicit model claude-sonnet-5. Claude Code, not you, must implement the HTML/CSS/JS. Use a fresh noninteractive session, e.g. claude -p --model claude-sonnet-5 --effort medium --permission-mode acceptEdits --allowedTools 'Read,Write,Edit,Bash' --tools 'Read,Write,Edit,Bash' --max-turns 24 --max-budget-usd 4 --output-format json 'Read research.md and design-brief.md. Build the complete landing page in this workspace. Use the supplied local fonts. Do not spawn agents. Write build-notes.md with actual validation and limitations.' > claude-result.json 2> claude-stderr.log
+
+Record start/end timestamps and exit code around that invocation in build-timing.json (use a shell or Python wrapper); do not leak authentication. CLI is already authenticated. If the explicit model or authentication fails, preserve the failure and report it; do not silently substitute a model. Poll without interrupting the process. Save full JSON to retain total_cost_usd, usage, modelUsage and result. Note this is subscription authentication: CLI cost is an API-equivalent estimate, not a demonstrated extra charge. Do not read auth files.
+
+After Claude finishes, inspect the generated files and result JSON. Run available syntax/static checks; confirm research cites 4 pages/3 publishers, index.html exists and source links are present. Save checks.json with booleans and actual command outcomes. A false or failed check means NOT complete: give Claude a specific correction and preserve each invocation/result/timing separately. Do not implement the page yourself. No installs, external sends, deployment or commits. Browser/terminal are separate containers; the supervising recorder will open the local HTML afterward for a real browser/visual check. Finish with files, exact model identity from modelUsage, elapsed build time, CLI cost estimate and any untested limits. Leave terminal showing the result summary.

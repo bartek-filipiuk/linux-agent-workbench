@@ -1,0 +1,160 @@
+[
+  {
+    "film": "01-release",
+    "localPath": "/home/bartek/linux-agent-tutorials/public/capture.mp4",
+    "bytes": 1447066,
+    "sha256": "c6ad2b4fd7161924c8de3afcebc3b9ef7192e9cfc3b616d5b0c695daf4f4c8be",
+    "retention": "Local artifact, not embedded in Git repository"
+  },
+  {
+    "film": "01-release",
+    "localPath": "/home/bartek/linux-agent-tutorials/output/linux-agent-first-tutorial-silent.mp4",
+    "bytes": 4200551,
+    "sha256": "0a7efe456164c65e206d3a5e794828f8d1ff92eda15f37a55d696cfa32c3b776",
+    "retention": "Local artifact, not embedded in Git repository"
+  },
+  {
+    "film": "01-release",
+    "localPath": "/home/bartek/linux-agent-tutorials/output/linux-agent-first-tutorial.mp4",
+    "bytes": 5871862,
+    "sha256": "ee7d6f33729e1faa66347fe847fd4b34a4086ad77132abc03dc62960565414eb",
+    "retention": "Local artifact, not embedded in Git repository",
+    "publicUrl": "https://github.com/bartek-filipiuk/linux-agent-workbench/releases/download/demo-videos-2026-09-18/linux-agent-first-tutorial.mp4"
+  },
+  {
+    "film": "01-release",
+    "localPath": "/home/bartek/linux-agent-tutorials/output/remotion-source.zip",
+    "bytes": 10901199,
+    "sha256": "0e2409083628cd8f7ec885380cea82f0a7bc2b5cfe7df765e014dc7a8417c7b0",
+    "retention": "Local artifact, not embedded in Git repository"
+  },
+  {
+    "film": "02-research-file",
+    "localPath": "/home/bartek/linux-agent-tutorial-02/public/capture.mp4",
+    "bytes": 2144465,
+    "sha256": "263976e6b99234d666441a90b8a34dc0b2eaf1b98887ef191c475ccb6bc6cb10",
+    "retention": "Local artifact, not embedded in Git repository"
+  },
+  {
+    "film": "02-research-file",
+    "localPath": "/home/bartek/linux-agent-tutorial-02/output/linux-agent-research-to-file-silent.mp4",
+    "bytes": 4422295,
+    "sha256": "55cbfc4d3656415ff55d5f340a5a7f094fa9d4c0fa098ad40834041c4ea6b1ae",
+    "retention": "Local artifact, not embedded in Git repository"
+  },
+  {
+    "film": "02-research-file",
+    "localPath": "/home/bartek/linux-agent-tutorial-02/output/linux-agent-research-to-file.mp4",
+    "bytes": 6044457,
+    "sha256": "2b0cb5ff4804494f6075018ba09e67a8e9f9363dac0a806f9a138d27db56e2c7",
+    "retention": "Local artifact, not embedded in Git repository",
+    "publicUrl": "https://github.com/bartek-filipiuk/linux-agent-workbench/releases/download/demo-videos-2026-09-18/linux-agent-research-to-file.mp4"
+  },
+  {
+    "film": "02-research-file",
+    "localPath": "/home/bartek/linux-agent-tutorial-02/output/remotion-source.zip",
+    "bytes": 7655563,
+    "sha256": "0fb730e4404a9b23d2b1d9b7fe091f2d133574edbeba2db409b2f94e2b2474e1",
+    "retention": "Local artifact, not embedded in Git repository"
+  },
+  {
+    "film": "03-monitor-comparison",
+    "localPath": "/home/bartek/linux-agent-tutorial-03/public/capture.mp4",
+    "bytes": 12927288,
+    "sha256": "056bb00fc642ccc726ce97ef5ba65c3b8ec27a18bab4e0441ad9cdf781ad4a29",
+    "retention": "Local artifact, not embedded in Git repository"
+  },
+  {
+    "film": "03-monitor-comparison",
+    "localPath": "/home/bartek/linux-agent-tutorial-03/public/recovery.mp4",
+    "bytes": 10551884,
+    "sha256": "4204b65439416111030878332eb44641ca136ce2f34b06582afcb5b23b78b69b",
+    "retention": "Local artifact, not embedded in Git repository"
+  },
+  {
+    "film": "03-monitor-comparison",
+    "localPath": "/home/bartek/linux-agent-tutorial-03/output/linux-agent-long-test.mp4",
+    "bytes": 23918403,
+    "sha256": "6af05b343c1af746e05d6c8eae076a579021be02d5d70645ef325b4d90cc8dc7",
+    "retention": "Local artifact, not embedded in Git repository",
+    "publicUrl": "https://github.com/bartek-filipiuk/linux-agent-workbench/releases/download/demo-videos-2026-09-18/linux-agent-long-test.mp4"
+  },
+  {
+    "film": "03-monitor-comparison",
+    "localPath": "/home/bartek/linux-agent-tutorial-03/output/linux-agent-long-test-silent.mp4",
+    "bytes": 16312952,
+    "sha256": "fb36862f7f6962f5f8eec79964fffcaf223e1fe85b9c13ad960b8d6cb28cba74",
+    "retention": "Local artifact, not embedded in Git repository"
+  },
+  {
+    "film": "03-monitor-comparison",
+    "localPath": "/home/bartek/linux-agent-tutorial-03/output/remotion-source.zip",
+    "bytes": 28746081,
+    "sha256": "d9316fce4d6292a8df4169e60e152bb7a301e945a32a45365f8ee70aa12474e3",
+    "retention": "Local artifact, not embedded in Git repository"
+  },
+  {
+    "film": "04-research-landing",
+    "localPath": "/home/bartek/linux-agent-tutorial-04/public/final.mp4",
+    "bytes": 6007574,
+    "sha256": "61792e2fb3852d1e2bd2e58fdaf6104f16dc0e316d51639111b0892a4f98b213",
+    "retention": "Local artifact, not embedded in Git repository"
+  },
+  {
+    "film": "04-research-landing",
+    "localPath": "/home/bartek/linux-agent-tutorial-04/public/capture.mp4",
+    "bytes": 18592601,
+    "sha256": "d430d5afc16388d667f1ee95a3b82e14e4b9a2b6e59b5273872010bbc54c14bd",
+    "retention": "Local artifact, not embedded in Git repository"
+  },
+  {
+    "film": "04-research-landing",
+    "localPath": "/home/bartek/linux-agent-tutorial-04/public/collection.mp4",
+    "bytes": 3706143,
+    "sha256": "0742b5c563f6a1f00e3f98d479b6286cc73867582019e0094b1e264038fc603a",
+    "retention": "Local artifact, not embedded in Git repository"
+  },
+  {
+    "film": "04-research-landing",
+    "localPath": "/home/bartek/linux-agent-tutorial-04/public/recovery.mp4",
+    "bytes": 10444939,
+    "sha256": "cba70e211b4675cd12342096f46116fac3bfa4aa1c3538920375304d5aa94094",
+    "retention": "Local artifact, not embedded in Git repository"
+  },
+  {
+    "film": "04-research-landing",
+    "localPath": "/home/bartek/linux-agent-tutorial-04/public/landing-preview.webm",
+    "bytes": 2672125,
+    "sha256": "2ab593e86eb467b71a5fd321378e1701a3d47fd883ea82d2696be195b074a5c1",
+    "retention": "Local artifact, not embedded in Git repository"
+  },
+  {
+    "film": "04-research-landing",
+    "localPath": "/home/bartek/linux-agent-tutorial-04/output/linux-agent-research-to-landing.mp4",
+    "bytes": 14127352,
+    "sha256": "39a9264de54ec43a070deadf813aa7f3bd25896063193d3aacea5dbdf99d907b",
+    "retention": "Local artifact, not embedded in Git repository",
+    "publicUrl": "https://github.com/bartek-filipiuk/linux-agent-workbench/releases/download/demo-videos-2026-09-18/linux-agent-research-to-landing.mp4"
+  },
+  {
+    "film": "04-research-landing",
+    "localPath": "/home/bartek/linux-agent-tutorial-04/output/linux-agent-research-to-landing-silent.mp4",
+    "bytes": 9396276,
+    "sha256": "b9852cf34bf191b6d4303464f2073eea4b83e4a1194c4af7b9737ebd1f27b281",
+    "retention": "Local artifact, not embedded in Git repository"
+  },
+  {
+    "film": "04-research-landing",
+    "localPath": "/home/bartek/linux-agent-tutorial-04/output/remotion-source.zip",
+    "bytes": 48216117,
+    "sha256": "0c900ecd9895f4f2023c93a0aca13323a0eaaadafd639a979a91cc23997d2fb7",
+    "retention": "Local artifact, not embedded in Git repository"
+  },
+  {
+    "film": "04-research-landing",
+    "localPath": "/home/bartek/linux-agent-tutorial-04/output/after-dark-landing.zip",
+    "bytes": 187475,
+    "sha256": "0e6f97ff736898441e050b9f92cba880260eecaf669fda99cc6dec7dd9a3c866",
+    "retention": "Local artifact, not embedded in Git repository"
+  }
+]

@@ -1,0 +1,40 @@
+1
+00:00:00,000 --> 00:00:05,000
+Give it a task. Watch it work.
+Linux Agent Workbench
+
+2
+00:00:05,000 --> 00:00:12,100
+Select Browser → Jev Auto.
+Enter your task and press Start task.
+
+3
+00:00:12,100 --> 00:00:13,615
+Gemini plans the next step.
+
+4
+00:00:13,615 --> 00:00:18,530
+Gemini delegates the browser subtask to Jev.
+
+5
+00:00:18,530 --> 00:00:21,144
+Jev asks for help. Gemini takes over.
+
+6
+00:00:21,144 --> 00:00:27,777
+Gemini reads the page to check the answer.
+
+7
+00:00:27,777 --> 00:00:29,300
+Completed in 15.7 seconds.
+Real task execution shown at 1× speed.
+
+8
+00:00:29,300 --> 00:00:37,300
+Playwright v1.63.0 — September 4, 2026
+https://github.com/microsoft/playwright/releases/tag/v1.63.0
+
+9
+00:00:37,300 --> 00:00:41,300
+Linux Agent Workbench · Jev Auto
+github.com/bartek-filipiuk/linux-agent-workbench

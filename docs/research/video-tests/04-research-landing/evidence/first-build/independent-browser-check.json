@@ -1,0 +1,27 @@
+{
+  "checkedAt": "2026-09-18T11:01:03.491Z",
+  "elapsedSeconds": 1.168256573,
+  "checks": {
+    "oneH1": true,
+    "desktopNoOverflow": true,
+    "localFonts": true,
+    "fourSourcesThreePublishers": true,
+    "anchorsResolve": true,
+    "ctaNavigates": true,
+    "fiveChecklistItems": true,
+    "keyboardChecklist": true,
+    "reset": true,
+    "sliderDark": true,
+    "sliderBright": true,
+    "sliderActuallyChangesImage": true,
+    "visibleFocus": true,
+    "mobileNoOverflow": true,
+    "offlineContent": true,
+    "noRemoteAssets": true,
+    "contentWithoutJS": true,
+    "noBrowserErrors": true
+  },
+  "allPassed": true,
+  "errors": [],
+  "scope": "Independent host Chromium check of generated HTML, outside the app task clock. Not a full accessibility or factual audit."
+}

@@ -1,0 +1,10 @@
+[
+  "src/client/components/modals/NotificationInfo/strategies/apprise.tsx",
+  "src/client/routes/monitor/index.tsx",
+  "src/server/model/monitor/index.bench.ts",
+  "src/server/model/monitor/index.ts",
+  "src/server/model/monitor/types.ts",
+  "src/server/model/notification/provider/__tests__/apprise.spec.ts",
+  "src/server/model/notification/provider/apprise.ts",
+  "src/server/prisma/schema.prisma"
+]

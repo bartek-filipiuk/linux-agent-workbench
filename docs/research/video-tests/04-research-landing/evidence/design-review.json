@@ -1,0 +1,19 @@
+{
+  "ctaWidth": 683.984375,
+  "parentWidth": 755.984375,
+  "parentContentWidth": 684,
+  "display": "block",
+  "parentDisplay": "flex",
+  "parentDirection": "column",
+  "alignSelf": "auto",
+  "headlineFont": "Outfit, Georgia, serif",
+  "remainingEyebrows": 0,
+  "unsupportedTwentyMinutes": false,
+  "unsupportedInstantClaim": false,
+  "desktopContentWidthCtaAchieved": false,
+  "notes": [
+    "Functional checks are recorded separately.",
+    "The supplied font kit had two sans-serif fonts; Sonnet disclosed the display-font substitution. The supervisor supplied a brief requesting a serif without supplying one.",
+    "The desktop CTA remains stretched by its flex parent. Sonnet incorrectly reported it was already content-width. This optional visual refinement remains unmet."
+  ]
+}

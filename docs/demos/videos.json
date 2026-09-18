@@ -1,0 +1,46 @@
+[
+  {
+    "id": "research-to-file",
+    "title": "Research \u2192 a saved file",
+    "durationLabel": "40 s",
+    "file": "linux-agent-research-to-file.mp4",
+    "bytes": 6044457,
+    "sha256": "2b0cb5ff4804494f6075018ba09e67a8e9f9363dac0a806f9a138d27db56e2c7",
+    "url": "https://github.com/bartek-filipiuk/linux-agent-workbench/releases/download/demo-videos-2026-09-18/linux-agent-research-to-file.mp4",
+    "subtitles": "https://github.com/bartek-filipiuk/linux-agent-workbench/releases/download/demo-videos-2026-09-18/research-to-file.srt",
+    "thumbnail": "images/research-to-file.png"
+  },
+  {
+    "id": "monitor-comparison",
+    "title": "Compare three monitoring tools",
+    "durationLabel": "3:08",
+    "file": "linux-agent-long-test.mp4",
+    "bytes": 23918403,
+    "sha256": "6af05b343c1af746e05d6c8eae076a579021be02d5d70645ef325b4d90cc8dc7",
+    "url": "https://github.com/bartek-filipiuk/linux-agent-workbench/releases/download/demo-videos-2026-09-18/linux-agent-long-test.mp4",
+    "subtitles": "https://github.com/bartek-filipiuk/linux-agent-workbench/releases/download/demo-videos-2026-09-18/monitor-comparison.srt",
+    "thumbnail": "images/monitor-comparison.png"
+  },
+  {
+    "id": "research-to-landing",
+    "title": "Research \u2192 a working landing page",
+    "durationLabel": "1:57",
+    "file": "linux-agent-research-to-landing.mp4",
+    "bytes": 14127352,
+    "sha256": "39a9264de54ec43a070deadf813aa7f3bd25896063193d3aacea5dbdf99d907b",
+    "url": "https://github.com/bartek-filipiuk/linux-agent-workbench/releases/download/demo-videos-2026-09-18/linux-agent-research-to-landing.mp4",
+    "subtitles": "https://github.com/bartek-filipiuk/linux-agent-workbench/releases/download/demo-videos-2026-09-18/research-to-landing.srt",
+    "thumbnail": "images/research-to-landing.png"
+  },
+  {
+    "id": "release-lookup",
+    "title": "Find the latest release",
+    "durationLabel": "41 s",
+    "file": "linux-agent-first-tutorial.mp4",
+    "bytes": 5871862,
+    "sha256": "ee7d6f33729e1faa66347fe847fd4b34a4086ad77132abc03dc62960565414eb",
+    "url": "https://github.com/bartek-filipiuk/linux-agent-workbench/releases/download/demo-videos-2026-09-18/linux-agent-first-tutorial.mp4",
+    "subtitles": "https://github.com/bartek-filipiuk/linux-agent-workbench/releases/download/demo-videos-2026-09-18/release-lookup.srt",
+    "thumbnail": "images/release-lookup.png"
+  }
+]

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>After Dark — A Field Journal for Beginner Stargazing</title>
+<meta name="description" content="An original field-journal-style guide to beginner stargazing and responsible outdoor lighting, with source-linked preparation tips and an interactive sky comparison.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <p class="brand">After&nbsp;Dark <span class="brand-sub">— a field journal</span></p>
+    <nav aria-label="Primary">
+      <a href="#checklist">Checklist</a>
+      <a href="#tips">Tips</a>
+      <a href="#compare">Sky compare</a>
+      <a href="#lighting">Lighting</a>
+      <a href="#sources">Sources</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ===================== HERO ===================== -->
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="hero-copy wrap">
+      <h1 id="hero-heading">Look up. The dark isn&rsquo;t empty — it&rsquo;s waiting.</h1>
+      <p class="hero-lede">
+        A short, honest field journal for anyone starting to stargaze: what your own eyes can already
+        see, how to prepare, and why the kind of light we leave on at night matters more than we think.
+      </p>
+      <a class="btn btn-primary" href="#checklist">Start the observing checklist</a>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <svg viewBox="0 0 800 620" preserveAspectRatio="xMidYMax slice" role="img" aria-label="">
+        <defs>
+          <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#0a121b"/>
+            <stop offset="55%" stop-color="#101b25"/>
+            <stop offset="100%" stop-color="#1c2d3b"/>
+          </linearGradient>
+          <linearGradient id="glowGrad" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0%" stop-color="#c69263" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#c69263" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+
+        <rect x="0" y="0" width="800" height="620" fill="url(#skyGrad)"/>
+
+        <!-- milky way band, illustrative only -->
+        <g opacity="0.5">
+          <ellipse cx="560" cy="180" rx="360" ry="95" fill="#f5f0e3" opacity="0.06" transform="rotate(-18 560 180)"/>
+          <ellipse cx="560" cy="180" rx="280" ry="60" fill="#f5f0e3" opacity="0.07" transform="rotate(-18 560 180)"/>
+        </g>
+
+        <!-- stars, hand-placed, decorative -->
+        <g fill="#f5f0e3" class="stars">
+          <circle cx="62" cy="58" r="1.6"/><circle cx="120" cy="120" r="1.1"/><circle cx="190" cy="70" r="1.8"/>
+          <circle cx="240" cy="150" r="1.2"/><circle cx="300" cy="60" r="1.4"/><circle cx="340" cy="200" r="1.1"/>
+          <circle cx="410" cy="90" r="2"/><circle cx="470" cy="140" r="1.3"/><circle cx="520" cy="60" r="1.5"/>
+          <circle cx="580" cy="110" r="1.2"/><circle cx="630" cy="70" r="1.7"/><circle cx="690" cy="150" r="1.3"/>
+          <circle cx="740" cy="90" r="1.6"/><circle cx="30" cy="180" r="1.2"/><circle cx="100" cy="230" r="1.5"/>
+          <circle cx="170" cy="260" r="1.1"/><circle cx="260" cy="240" r="1.6"/><circle cx="360" cy="270" r="1.2"/>
+          <circle cx="440" cy="230" r="1.4"/><circle cx="510" cy="260" r="1.1"/><circle cx="600" cy="220" r="1.8"/>
+          <circle cx="670" cy="260" r="1.2"/><circle cx="730" cy="210" r="1.4"/><circle cx="20" cy="300" r="1.3"/>
+          <circle cx="220" cy="330" r="1.1"/><circle cx="400" cy="320" r="1.5"/><circle cx="560" cy="330" r="1.2"/>
+          <circle cx="760" cy="300" r="1.6"/>
+        </g>
+
+        <!-- Big Dipper asterism, simplified, decorative -->
+        <g stroke="#c69263" stroke-width="1" opacity="0.55" fill="#f5f0e3">
+          <polyline points="120,150 175,135 230,145 275,120 320,150 300,190 250,185" fill="none"/>
+          <circle cx="120" cy="150" r="2"/><circle cx="175" cy="135" r="2"/><circle cx="230" cy="145" r="2"/>
+          <circle cx="275" cy="120" r="2.4"/><circle cx="320" cy="150" r="2"/><circle cx="300" cy="190" r="2"/>
+          <circle cx="250" cy="185" r="2"/>
+        </g>
+
+        <!-- crescent moon -->
+        <g transform="translate(640,110)">
+          <mask id="moonMask">
+            <rect x="-60" y="-60" width="120" height="120" fill="white"/>
+            <circle cx="14" cy="-8" r="34" fill="black"/>
+          </mask>
+          <circle cx="0" cy="0" r="34" fill="#f5f0e3" mask="url(#moonMask)"/>
+        </g>
+
+        <!-- warm horizon glow -->
+        <rect x="0" y="380" width="800" height="240" fill="url(#glowGrad)"/>
+
+        <!-- topographic horizon, layered ridgelines -->
+        <path d="M0,470 C120,430 180,455 260,420 C340,390 380,440 460,410 C540,385 600,430 680,400 C740,380 780,400 800,395 L800,620 L0,620 Z" fill="#0d1a24"/>
+        <path d="M0,520 C90,495 170,515 250,485 C330,460 410,500 500,470 C580,445 650,485 720,460 C760,448 790,458 800,455 L800,620 L0,620 Z" fill="#0a141d"/>
+        <g stroke="#c69263" stroke-opacity="0.28" stroke-width="1" fill="none">
+          <path d="M0,470 C120,430 180,455 260,420 C340,390 380,440 460,410 C540,385 600,430 680,400 C740,380 780,400 800,395"/>
+          <path d="M0,520 C90,495 170,515 250,485 C330,460 410,500 500,470 C580,445 650,485 720,460 C760,448 790,458 800,455"/>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ===================== TIPS ===================== -->
+  <section id="tips" class="tips" aria-labelledby="tips-heading">
+    <div class="wrap">
+      <h2 id="tips-heading">Three things worth knowing first</h2>
+
+      <ol class="tip-list">
+        <li class="tip">
+          <h3>Your hand is a sky ruler</h3>
+          <p>
+            You don&rsquo;t need equipment to start. An outstretched pinky finger spans roughly one
+            degree of sky, three middle fingers together span about five degrees, and a closed fist
+            spans about ten — handy for estimating how far apart two stars or planets appear.
+          </p>
+          <p class="tip-source">Source: <a href="https://science.nasa.gov/skywatching/faq/" target="_blank" rel="noopener noreferrer">NASA Science, Skywatching FAQ</a></p>
+        </li>
+        <li class="tip">
+          <h3>Look along the terminator</h3>
+          <p>
+            The Moon shows the most texture away from full phase, along the terminator — the line
+            between lunar day and night — where low-angle sunlight throws long shadows across craters
+            and mountain ranges, making relief far easier to see.
+          </p>
+          <p class="tip-source">Source: <a href="https://science.nasa.gov/moon/viewing-tips/" target="_blank" rel="noopener noreferrer">NASA Science, Moon Viewing Tips</a></p>
+        </li>
+        <li class="tip">
+          <h3>Protect your night vision</h3>
+          <p>
+            Full dark adaptation takes time, and bright white light can quickly disrupt it. Use a red
+            flashlight or headlamp to read maps or find your footing, and give your eyes a while to
+            adjust before expecting to see faint stars or the Milky Way.
+          </p>
+          <p class="tip-source">Source: <a href="https://www.nps.gov/subjects/nightskies/stargaze.htm" target="_blank" rel="noopener noreferrer">National Park Service, Where to Stargaze</a></p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ===================== SKY COMPARE ===================== -->
+  <section id="compare" class="compare" aria-labelledby="compare-heading">
+    <div class="wrap">
+      <h2 id="compare-heading">A schematic look at light pollution</h2>
+      <p class="compare-note">
+        This is an illustrative comparison for teaching purposes, not a calibrated brightness
+        simulation or a real sky map. Drag the slider, or use the arrow keys once focused, to reveal
+        a schematic light-polluted sky next to a schematic dark sky.
+      </p>
+
+      <div class="compare-widget">
+        <div class="compare-frame">
+          <svg class="compare-layer compare-layer--dark" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Schematic illustration of a dark sky, showing many stars and the Milky Way band">
+            <rect width="800" height="400" fill="#0a121b"/>
+            <ellipse cx="420" cy="150" rx="320" ry="110" fill="#f5f0e3" opacity="0.08" transform="rotate(-12 420 150)"/>
+            <ellipse cx="420" cy="150" rx="220" ry="70" fill="#f5f0e3" opacity="0.09" transform="rotate(-12 420 150)"/>
+            <g fill="#f5f0e3">
+              <circle cx="40" cy="40" r="1.6"/><circle cx="90" cy="90" r="1.2"/><circle cx="140" cy="50" r="1.8"/>
+              <circle cx="190" cy="110" r="1.3"/><circle cx="240" cy="60" r="1.5"/><circle cx="290" cy="140" r="1.2"/>
+              <circle cx="340" cy="70" r="2"/><circle cx="390" cy="120" r="1.4"/><circle cx="440" cy="50" r="1.6"/>
+              <circle cx="490" cy="100" r="1.3"/><circle cx="540" cy="60" r="1.8"/><circle cx="590" cy="130" r="1.4"/>
+              <circle cx="640" cy="80" r="1.7"/><circle cx="690" cy="150" r="1.3"/><circle cx="740" cy="90" r="1.6"/>
+              <circle cx="70" cy="180" r="1.3"/><circle cx="160" cy="200" r="1.6"/><circle cx="230" cy="220" r="1.2"/>
+              <circle cx="310" cy="190" r="1.5"/><circle cx="380" cy="230" r="1.2"/><circle cx="450" cy="200" r="1.7"/>
+              <circle cx="520" cy="220" r="1.3"/><circle cx="600" cy="190" r="1.5"/><circle cx="670" cy="230" r="1.2"/>
+              <circle cx="730" cy="200" r="1.6"/><circle cx="20" cy="260" r="1.4"/><circle cx="120" cy="280" r="1.2"/>
+              <circle cx="260" cy="270" r="1.5"/><circle cx="420" cy="290" r="1.3"/><circle cx="560" cy="270" r="1.6"/>
+              <circle cx="700" cy="280" r="1.3"/><circle cx="360" cy="40" r="1.2"/><circle cx="620" cy="30" r="1.4"/>
+            </g>
+            <path d="M0,340 C150,320 260,350 400,330 C540,310 620,340 800,325 L800,400 L0,400 Z" fill="#0d1a24"/>
+          </svg>
+
+          <svg class="compare-layer compare-layer--bright" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Schematic illustration of a light-polluted sky, showing an orange skyglow with very few visible stars">
+            <rect width="800" height="400" fill="#1c2d3b"/>
+            <rect x="0" y="180" width="800" height="220" fill="url(#compareGlow)"/>
+            <defs>
+              <linearGradient id="compareGlow" x1="0" y1="1" x2="0" y2="0">
+                <stop offset="0%" stop-color="#c69263" stop-opacity="0.85"/>
+                <stop offset="100%" stop-color="#c69263" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <g fill="#f5f0e3">
+              <circle cx="140" cy="50" r="1.6"/><circle cx="340" cy="70" r="1.8"/><circle cx="490" cy="100" r="1.3"/>
+              <circle cx="640" cy="80" r="1.4"/><circle cx="230" cy="40" r="1.2"/>
+            </g>
+            <path d="M0,340 C150,320 260,350 400,330 C540,310 620,340 800,325 L800,400 L0,400 Z" fill="#111b24"/>
+          </svg>
+
+          <div class="compare-labels" aria-hidden="true">
+            <span class="compare-label compare-label--left">Dark sky</span>
+            <span class="compare-label compare-label--right">Light-polluted sky</span>
+          </div>
+        </div>
+
+        <label class="compare-slider-label" for="compareSlider">
+          Reveal light-polluted sky (drag to compare)
+        </label>
+        <input
+          type="range"
+          id="compareSlider"
+          min="0"
+          max="100"
+          value="50"
+          step="1"
+          aria-describedby="compareValue"
+        >
+        <p id="compareValue" class="compare-value" aria-live="polite">Split at the middle</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CHECKLIST ===================== -->
+  <section id="checklist" class="checklist-section" aria-labelledby="checklist-heading">
+    <div class="wrap">
+      <h2 id="checklist-heading">A practical observing checklist</h2>
+      <p class="checklist-intro">
+        Five simple, low-cost steps before your first session outside. Check them off as you go —
+        your progress is only kept in this page and resets whenever you like.
+      </p>
+
+      <div class="checklist-box">
+        <ul class="checklist" role="list">
+          <li>
+            <input type="checkbox" id="chk1" class="checklist-input">
+            <label for="chk1">Check the weather and Moon phase for a clear, dark evening</label>
+          </li>
+          <li>
+            <input type="checkbox" id="chk2" class="checklist-input">
+            <label for="chk2">Pick an open spot with a wide horizon, away from bright lights</label>
+          </li>
+          <li>
+            <input type="checkbox" id="chk3" class="checklist-input">
+            <label for="chk3">Bring a red flashlight or headlamp to protect your night vision</label>
+          </li>
+          <li>
+            <input type="checkbox" id="chk4" class="checklist-input">
+            <label for="chk4">Dress warmer than you think you need to, and bring a companion</label>
+          </li>
+          <li>
+            <input type="checkbox" id="chk5" class="checklist-input">
+            <label for="chk5">Give your eyes at least twenty minutes to adapt before judging the sky</label>
+          </li>
+        </ul>
+
+        <div class="checklist-footer">
+          <p class="checklist-progress" role="status" aria-live="polite">
+            <span id="progressCount">0</span> of 5 ready
+          </p>
+          <button type="button" id="resetChecklist" class="btn btn-ghost">Reset checklist</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== LIGHTING ===================== -->
+  <section id="lighting" class="lighting" aria-labelledby="lighting-heading">
+    <div class="wrap">
+      <h2 id="lighting-heading">Five principles of responsible outdoor lighting</h2>
+      <p class="lighting-intro">
+        The night sky isn&rsquo;t only lost at dark-sky parks — it&rsquo;s shaped by every porch light
+        and floodlight left on nearby. These five principles, paraphrased from DarkSky International
+        and the Illuminating Engineering Society, describe how outdoor lighting can stay useful without
+        washing out the stars.
+      </p>
+
+      <dl class="principle-list">
+        <div class="principle">
+          <dt>Useful</dt>
+          <dd>Only install a light if it serves a clear purpose, and weigh how it affects people, wildlife, and the surrounding dark.</dd>
+        </div>
+        <div class="principle">
+          <dt>Targeted</dt>
+          <dd>Shield fixtures and aim them downward so light lands on what it needs to, not on neighboring yards or the sky.</dd>
+        </div>
+        <div class="principle">
+          <dt>Low level</dt>
+          <dd>Use the least amount of light that does the job — bright, reflective surfaces need even less than you&rsquo;d expect.</dd>
+        </div>
+        <div class="principle">
+          <dt>Controlled</dt>
+          <dd>Let motion sensors, timers, and dimmers turn lights off or down when nothing needs them on.</dd>
+        </div>
+        <div class="principle">
+          <dt>Warm-colored</dt>
+          <dd>Favor warm-spectrum bulbs over harsh blue-white light, which scatters more and disrupts nocturnal life more.</dd>
+        </div>
+      </dl>
+
+      <p class="lighting-source">
+        Source: <a href="https://darksky.org/resources/guides-and-how-tos/lighting-principles/" target="_blank" rel="noopener noreferrer">DarkSky International &amp; Illuminating Engineering Society, Five Principles for Responsible Outdoor Lighting</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ===================== SOURCES ===================== -->
+  <section id="sources" class="sources" aria-labelledby="sources-heading">
+    <div class="wrap">
+      <h2 id="sources-heading">Where this came from</h2>
+      <p class="sources-intro">
+        Every claim on this page is paraphrased from one of the four public sources below, spanning
+        three publishers. This is an independent educational project with no affiliation to NASA, the
+        National Park Service, or DarkSky International.
+      </p>
+      <ol class="source-list">
+        <li>
+          <a href="https://science.nasa.gov/skywatching/faq/" target="_blank" rel="noopener noreferrer">Skywatching FAQ</a>
+          — NASA Science, National Aeronautics and Space Administration
+        </li>
+        <li>
+          <a href="https://science.nasa.gov/moon/viewing-tips/" target="_blank" rel="noopener noreferrer">Moon Viewing Tips</a>
+          — NASA Science, National Aeronautics and Space Administration
+        </li>
+        <li>
+          <a href="https://www.nps.gov/subjects/nightskies/stargaze.htm" target="_blank" rel="noopener noreferrer">Where to Stargaze</a>
+          — National Park Service, U.S. Department of the Interior
+        </li>
+        <li>
+          <a href="https://darksky.org/resources/guides-and-how-tos/lighting-principles/" target="_blank" rel="noopener noreferrer">Five Principles for Responsible Outdoor Lighting</a>
+          — DarkSky International, jointly with the Illuminating Engineering Society
+        </li>
+      </ol>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>
+      After Dark is an independent, non-commercial educational page. It is not affiliated with,
+      endorsed by, or sponsored by NASA, the National Park Service, or DarkSky International. The
+      night-sky illustrations are original artwork and are not astronomically accurate sky maps.
+    </p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

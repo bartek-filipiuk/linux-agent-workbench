@@ -1,0 +1,47 @@
+{
+  "capturedAt": "2026-09-18T11:10:25.724Z",
+  "durationMs": 31999,
+  "markers": [
+    {
+      "name": "hero",
+      "atMs": 37
+    },
+    {
+      "name": "tips",
+      "atMs": 3589
+    },
+    {
+      "name": "comparison",
+      "atMs": 6605
+    },
+    {
+      "name": "dark",
+      "atMs": 9116
+    },
+    {
+      "name": "bright",
+      "atMs": 11121
+    },
+    {
+      "name": "checklist",
+      "atMs": 14838
+    },
+    {
+      "name": "all_checked",
+      "atMs": 18684
+    },
+    {
+      "name": "lighting",
+      "atMs": 21521
+    },
+    {
+      "name": "sources",
+      "atMs": 23938
+    },
+    {
+      "name": "hero_end",
+      "atMs": 28740
+    }
+  ],
+  "scope": "Host Chromium replay of the generated local page, performed by reviewer after the app task. No live app actions are simulated."
+}

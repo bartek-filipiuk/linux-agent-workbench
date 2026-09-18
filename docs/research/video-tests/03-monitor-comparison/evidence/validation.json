@@ -1,0 +1,70 @@
+{
+  "video": {
+    "programs": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 1920,
+        "height": 1080,
+        "r_frame_rate": "30/1",
+        "side_data_list": [
+          {}
+        ]
+      },
+      {
+        "codec_name": "aac",
+        "sample_rate": "48000",
+        "channels": 2,
+        "r_frame_rate": "0/0"
+      }
+    ],
+    "format": {
+      "duration": "188.182000",
+      "size": "23918403"
+    }
+  },
+  "decodeCheck": "full ffmpeg decode: exit 0",
+  "typecheck": "passed",
+  "visualReview": "Rendered contact sheet and intro, audit and result previews inspected. Actual browser preview outages remain visible.",
+  "secretPatternScan": {
+    "files": 56,
+    "unresolvedMatches": 0,
+    "publicDocumentationPlaceholders": [
+      {
+        "file": "evidence/independent-sources/gatus-README.md",
+        "reason": "Truncated, nonfunctional private-key placeholder in official public README."
+      },
+      {
+        "file": "evidence/independent-sources/gatus-README.md",
+        "reason": "Truncated, nonfunctional private-key placeholder in official public README."
+      }
+    ]
+  },
+  "previousFilmsUnchanged": {
+    "linux-agent-tutorials": true,
+    "linux-agent-tutorial-02": true
+  },
+  "independentChecksPassed": true,
+  "outcome": "Initial autonomous attempt failed. Explicit corrective feedback was required; corrected files pass the documented checks.",
+  "taskSeconds": {
+    "initial": 179.06,
+    "correction": 93.196,
+    "total": 272.256
+  },
+  "costUsd": {
+    "initial": 0.654741675,
+    "additionalCorrection": 0.488558025,
+    "total": 1.1432997
+  },
+  "sha256": {
+    "output/linux-agent-long-test.mp4": "6af05b343c1af746e05d6c8eae076a579021be02d5d70645ef325b4d90cc8dc7",
+    "output/linux-agent-long-test-silent.mp4": "fb36862f7f6962f5f8eec79964fffcaf223e1fe85b9c13ad960b8d6cb28cba74",
+    "output/thumbnail.png": "f715b445af58e3b39b2959a8bdb53e60b5d8c48e8000ba1c7fb1a4bcb57be453",
+    "output/english.srt": "d619e2dad7c0312456aa5fb3e39a65e7748eafda5afe8a0e268d097058e22eaf",
+    "output/candidates.csv": "2c477dc8d5b84f540194fa0e4dce006f8e473b6e0626cdce63f3754604b0b1b6",
+    "output/decision.md": "b70717cda7522216b93f69ac833fd85c4a91600f51be7da5b9186dd6e024e2a4",
+    "output/score-check.json": "609a2e7c3049373c54d1c320cb805a7907b4b544afb88509a78cdc2364cecae8",
+    "public/capture.mp4": "056bb00fc642ccc726ce97ef5ba65c3b8ec27a18bab4e0441ad9cdf781ad4a29",
+    "public/recovery.mp4": "4204b65439416111030878332eb44641ca136ce2f34b06582afcb5b23b78b69b"
+  }
+}

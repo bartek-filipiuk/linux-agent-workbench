@@ -1,0 +1,43 @@
+[
+  {
+    "ts": 1789726168100,
+    "type": "browser.route",
+    "payload": {
+      "mode": "fast",
+      "tool": "browser_task",
+      "switched": false
+    }
+  },
+  {
+    "ts": 1789726173015,
+    "type": "browser.task",
+    "payload": {
+      "status": "needs_help",
+      "reason": "no_progress_cycle; plan a different approach rather than redelegating the same goal",
+      "actions": 1,
+      "elapsedMs": 4914.130877999996,
+      "verified": false,
+      "parentCallId": "call_400893"
+    }
+  },
+  {
+    "ts": 1789726175585,
+    "type": "browser.route",
+    "payload": {
+      "mode": "planned",
+      "tool": "browser_batch",
+      "previous": "fast",
+      "switched": true
+    }
+  },
+  {
+    "ts": 1789726180112,
+    "type": "browser.route",
+    "payload": {
+      "mode": "planned",
+      "tool": "browser_observe",
+      "previous": "planned",
+      "switched": false
+    }
+  }
+]

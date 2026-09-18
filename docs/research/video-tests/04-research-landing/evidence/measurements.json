@@ -1,0 +1,669 @@
+{
+  "appPhases": [
+    {
+      "name": "run",
+      "runId": "fba8242e-41b3-47d9-8398-bddf8c381aff",
+      "state": "failed",
+      "endReason": "OpenRouter failed after 2 attempts: HTTP 429",
+      "startEpochMs": 1789728979587,
+      "endEpochMs": 1789729246822,
+      "taskSeconds": 267.235,
+      "startCaptureMs": 5746,
+      "primaryTurns": 93,
+      "toolCalls": 105,
+      "costUsd": 0.8209746,
+      "cumulativeCostUsd": 0.8209746,
+      "jev": {
+        "decisions": 0,
+        "elapsedMs": 0,
+        "costUsd": 0,
+        "fallbacks": 0
+      },
+      "recordedModelTimingCount": 94,
+      "recordedModelElapsedSeconds": 201.09293729999996,
+      "terminalWaits": [
+        {
+          "input": {
+            "until": "DONE\\. Exit code:",
+            "timeoutMs": 180000,
+            "idleMs": 3000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "timeoutMs": 60000,
+            "idleMs": 5000
+          },
+          "elapsedMs": 3306
+        },
+        {
+          "input": {
+            "idleMs": 5000,
+            "timeoutMs": 60000
+          },
+          "elapsedMs": 1501
+        },
+        {
+          "input": {
+            "until": "ALL_COMPLETED",
+            "timeoutMs": 180000,
+            "idleMs": 3000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "idleMs": 10000,
+            "timeoutMs": 120000
+          },
+          "elapsedMs": 6747
+        },
+        {
+          "input": {
+            "idleMs": 10000,
+            "timeoutMs": 120000
+          },
+          "elapsedMs": 3
+        },
+        {
+          "input": {
+            "idleMs": 10000,
+            "timeoutMs": 120000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "idleMs": 10000,
+            "timeoutMs": 120000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "idleMs": 1500,
+            "timeoutMs": 25000
+          },
+          "elapsedMs": 3
+        },
+        {
+          "input": {
+            "idleMs": 3000,
+            "until": "Runner PID 127 has exited\\.",
+            "timeoutMs": 180000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "idleMs": 10000,
+            "timeoutMs": 120000
+          },
+          "elapsedMs": 6061
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "idleMs": 10000,
+            "timeoutMs": 120000
+          },
+          "elapsedMs": 3
+        },
+        {
+          "input": {
+            "idleMs": 10000,
+            "timeoutMs": 120000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 4
+        },
+        {
+          "input": {
+            "idleMs": 10000,
+            "timeoutMs": 120000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "idleMs": 10000,
+            "timeoutMs": 120000
+          },
+          "elapsedMs": 1
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "idleMs": 10000,
+            "timeoutMs": 120000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "idleMs": 10000,
+            "timeoutMs": 120000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "idleMs": 10000,
+            "timeoutMs": 120000
+          },
+          "elapsedMs": 3
+        },
+        {
+          "input": {
+            "idleMs": 10000,
+            "timeoutMs": 120000
+          },
+          "elapsedMs": 3
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "idleMs": 10000,
+            "timeoutMs": 120000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "idleMs": 10000,
+            "timeoutMs": 120000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "idleMs": 10000,
+            "timeoutMs": 120000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 3
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "idleMs": 10000,
+            "timeoutMs": 120000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "idleMs": 10000,
+            "timeoutMs": 120000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "idleMs": 10000,
+            "timeoutMs": 120000
+          },
+          "elapsedMs": 3
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "idleMs": 10000,
+            "timeoutMs": 120000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "idleMs": 10000,
+            "timeoutMs": 120000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "idleMs": 10000,
+            "timeoutMs": 120000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "idleMs": 10000,
+            "timeoutMs": 120000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "timeoutMs": 120000,
+            "idleMs": 10000
+          },
+          "elapsedMs": 2
+        },
+        {
+          "input": {
+            "idleMs": 10000,
+            "timeoutMs": 120000
+          },
+          "elapsedMs": 2
+        }
+      ]
+    },
+    {
+      "name": "recovery",
+      "runId": "80b77c48-b092-4d42-9d06-e56b8b08dcde",
+      "state": "failed",
+      "endReason": "OpenRouter failed after 2 attempts: HTTP 429",
+      "startEpochMs": 1789729476393,
+      "endEpochMs": 1789729606328,
+      "taskSeconds": 129.935,
+      "startCaptureMs": 5737,
+      "primaryTurns": 19,
+      "toolCalls": 19,
+      "costUsd": 0.31898902500000004,
+      "cumulativeCostUsd": 1.139963625,
+      "jev": {
+        "decisions": 0,
+        "elapsedMs": 0,
+        "costUsd": 0,
+        "fallbacks": 0
+      },
+      "recordedModelTimingCount": 20,
+      "recordedModelElapsedSeconds": 49.397019188999984,
+      "terminalWaits": []
+    },
+    {
+      "name": "final",
+      "runId": "6d5271aa-6a66-48ee-af77-1240531b7cea",
+      "state": "completed",
+      "endReason": "final_answer",
+      "startEpochMs": 1789729655870,
+      "endEpochMs": 1789729732822,
+      "taskSeconds": 76.952,
+      "startCaptureMs": 5734,
+      "primaryTurns": 9,
+      "toolCalls": 8,
+      "costUsd": 0.13569307499999983,
+      "cumulativeCostUsd": 1.2756566999999999,
+      "jev": {
+        "decisions": 0,
+        "elapsedMs": 0,
+        "costUsd": 0,
+        "fallbacks": 0
+      },
+      "recordedModelTimingCount": 9,
+      "recordedModelElapsedSeconds": 33.261534932999986,
+      "terminalWaits": []
+    }
+  ],
+  "claudeInvocations": [
+    {
+      "resultFile": "claude-result.json",
+      "timing": {
+        "start_time": "2026-09-18T10:57:34.356284+00:00",
+        "end_time": "2026-09-18T11:03:28.864716+00:00",
+        "elapsed_seconds": 354.50841458601644,
+        "exit_code": 1
+      },
+      "subtype": "error_max_turns",
+      "isError": true,
+      "costEstimateUsd": 0.6861316,
+      "durationApiMs": 352288,
+      "turns": 25,
+      "modelUsage": {
+        "claude-haiku-4-5-20251001": {
+          "inputTokens": 935,
+          "outputTokens": 12,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "webSearchRequests": 0,
+          "costUSD": 0.000995,
+          "contextWindow": 200000,
+          "maxOutputTokens": 32000,
+          "thinkingTokens": 0,
+          "canonicalModel": "claude-haiku-4-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        },
+        "claude-sonnet-5": {
+          "inputTokens": 50,
+          "outputTokens": 25935,
+          "cacheReadInputTokens": 1449253,
+          "cacheCreationInputTokens": 33959,
+          "webSearchRequests": 0,
+          "costUSD": 0.6851365999999999,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 64000,
+          "thinkingTokens": 5058,
+          "canonicalModel": "claude-sonnet-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      }
+    },
+    {
+      "resultFile": "claude-followup.json",
+      "timing": {
+        "start_time": "2026-09-18T11:05:01.623723+00:00",
+        "end_time": "2026-09-18T11:05:49.877052+00:00",
+        "elapsed_seconds": 48.2533135599806,
+        "exit_code": 1
+      },
+      "subtype": "error_max_turns",
+      "isError": true,
+      "costEstimateUsd": 0.44396299999999994,
+      "durationApiMs": 47796,
+      "turns": 17,
+      "modelUsage": {
+        "claude-haiku-4-5-20251001": {
+          "inputTokens": 1072,
+          "outputTokens": 18,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "webSearchRequests": 0,
+          "costUSD": 0.001162,
+          "contextWindow": 200000,
+          "maxOutputTokens": 32000,
+          "thinkingTokens": 0,
+          "canonicalModel": "claude-haiku-4-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        },
+        "claude-sonnet-5": {
+          "inputTokens": 32,
+          "outputTokens": 3570,
+          "cacheReadInputTokens": 751765,
+          "cacheCreationInputTokens": 64171,
+          "webSearchRequests": 0,
+          "costUSD": 0.44280099999999994,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 64000,
+          "thinkingTokens": 1394,
+          "canonicalModel": "claude-sonnet-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      }
+    },
+    {
+      "resultFile": "claude-final.json",
+      "timing": {
+        "start_time": "2026-09-18T11:07:39.365849+00:00",
+        "end_time": "2026-09-18T11:08:10.237268+00:00",
+        "elapsed_seconds": 30.87140383501537,
+        "exit_code": 0
+      },
+      "subtype": "success",
+      "isError": false,
+      "costEstimateUsd": 0.20034580000000002,
+      "durationApiMs": 30541,
+      "turns": 12,
+      "modelUsage": {
+        "claude-haiku-4-5-20251001": {
+          "inputTokens": 1050,
+          "outputTokens": 17,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "webSearchRequests": 0,
+          "costUSD": 0.001135,
+          "contextWindow": 200000,
+          "maxOutputTokens": 32000,
+          "thinkingTokens": 0,
+          "canonicalModel": "claude-haiku-4-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        },
+        "claude-sonnet-5": {
+          "inputTokens": 20,
+          "outputTokens": 2360,
+          "cacheReadInputTokens": 479674,
+          "cacheCreationInputTokens": 19909,
+          "webSearchRequests": 0,
+          "costUSD": 0.19921080000000002,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 64000,
+          "thinkingTokens": 420,
+          "canonicalModel": "claude-sonnet-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      }
+    }
+  ],
+  "researchSavedAndDisplayedSeconds": 26.136,
+  "totalAppActiveSeconds": 474.122,
+  "wallThroughFinalAppSeconds": 753.235,
+  "plannerCostUsd": 1.2756566999999999,
+  "claudeApiEquivalentEstimateUsd": 1.5597564,
+  "combinedMixedBasisEstimateUsd": 2.8354130999999994,
+  "accounting": "Claude Code used Max subscription authentication. CLI amounts are list-price API-equivalent estimates, not a confirmed marginal bill. Planner cost is reported OpenRouter usage. Intervals overlap; do not add app and Claude durations. Wall time includes external reviews and gaps, excludes initial setup and subsequent browser review/video production.",
+  "abortedLaunch": {
+    "source": "aborted-claude-result.json",
+    "durationMs": 12184,
+    "costEstimateUsd": 0.22931600000000002,
+    "reason": "aborted_streaming",
+    "subtype": "error_during_execution",
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "inputTokens": 935,
+        "outputTokens": 15,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.00101,
+        "contextWindow": 200000,
+        "maxOutputTokens": 32000,
+        "thinkingTokens": 0,
+        "canonicalModel": "claude-haiku-4-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      },
+      "claude-sonnet-5": {
+        "inputTokens": 4,
+        "outputTokens": 271,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 56397,
+        "webSearchRequests": 0,
+        "costUSD": 0.228306,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000,
+        "thinkingTokens": 59,
+        "canonicalModel": "claude-sonnet-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "interruptedBy": "Outer Gemini agent sent CTRL_C and restarted with overwritten result path."
+  }
+}

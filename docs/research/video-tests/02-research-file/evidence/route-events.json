@@ -1,0 +1,21 @@
+[
+  {
+    "ts": 1789726758635,
+    "type": "browser.route",
+    "payload": {
+      "mode": "planned",
+      "tool": "browser_batch",
+      "switched": false
+    }
+  },
+  {
+    "ts": 1789726760992,
+    "type": "browser.route",
+    "payload": {
+      "mode": "planned",
+      "tool": "browser_batch",
+      "previous": "planned",
+      "switched": false
+    }
+  }
+]

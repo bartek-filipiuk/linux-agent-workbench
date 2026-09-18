@@ -1,0 +1,44 @@
+{
+  "video": {
+    "programs": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 1920,
+        "height": 1080,
+        "r_frame_rate": "30/1",
+        "side_data_list": [
+          {}
+        ]
+      },
+      {
+        "codec_name": "aac",
+        "sample_rate": "48000",
+        "channels": 2,
+        "r_frame_rate": "0/0"
+      }
+    ],
+    "format": {
+      "duration": "40.128000",
+      "size": "6044457"
+    }
+  },
+  "decodeCheck": "full ffmpeg decode: exit 0",
+  "typecheck": "passed",
+  "visualReview": "intro, prompt, both source pages, terminal, document and end card inspected",
+  "secretPatternScan": {
+    "files": 28,
+    "matches": 0
+  },
+  "firstFilmUnchanged": true,
+  "documentMatchesSavedFile": true,
+  "taskSeconds": 9.203,
+  "costUsd": 0.03711825,
+  "sha256": {
+    "linux-agent-research-to-file.mp4": "2b0cb5ff4804494f6075018ba09e67a8e9f9363dac0a806f9a138d27db56e2c7",
+    "linux-agent-research-to-file-silent.mp4": "55cbfc4d3656415ff55d5f340a5a7f094fa9d4c0fa098ad40834041c4ea6b1ae",
+    "thumbnail.png": "c88889f9a5395c0dcd0f1d61c524722f36c40a07cfffc1f26712a540cb012efc",
+    "english.srt": "2aeddce022b726080d15543461e1b17c696a6d8f41fd2bc2f4f754a1f02b17ec",
+    "python-cli-tools.md": "99a90a0de017d1c259d4466b6eaa5d1697501c4725bc160f1e1b3b958667efa1"
+  }
+}

@@ -8,6 +8,17 @@ Codex subscription sign-in is the default provider. OpenRouter and the OpenAI Re
 
 **MIT-licensed, Linux source release.** No installer or clean-machine compatibility guarantee is claimed. The owner-run [clean installation check](docs/CLEAN-INSTALL-CHECK.md) is pending. Read the [security model](SECURITY.md) before connecting accounts or opening a workspace containing sensitive data. This project is not affiliated with OpenAI, Google, Browser Use or TypeSafe.
 
+## Watch it work
+
+Three real desktop tasks, from a short research note to a page built with Claude Code. The longer tests include failures and prompted corrections; these films are demonstrations, not additional matched benchmarks.
+
+| Research → a saved file | Compare monitoring tools | Research → a landing page |
+| --- | --- | --- |
+| [![Research to a saved Markdown file](docs/demos/images/research-to-file.png)](https://github.com/bartek-filipiuk/linux-agent-workbench/releases/download/demo-videos-2026-09-18/linux-agent-research-to-file.mp4) | [![Monitoring comparison and prompted correction](docs/demos/images/monitor-comparison.png)](https://github.com/bartek-filipiuk/linux-agent-workbench/releases/download/demo-videos-2026-09-18/linux-agent-long-test.mp4) | [![Gemini research and Claude Sonnet 5 landing page](docs/demos/images/research-to-landing.png)](https://github.com/bartek-filipiuk/linux-agent-workbench/releases/download/demo-videos-2026-09-18/linux-agent-research-to-landing.mp4) |
+| **40 s film.** Read uv/pipx docs and save a sourced Markdown comparison. **9.203 s task; $0.0371.** | **3:08 film.** Research three products, score them and check a report. **179 s + 93 s prompted correction; $1.1433.** | **1:57 film.** Gemini researches; **Claude Sonnet 5** builds HTML. **12:33 including review and recovery; $1.2757 OpenRouter + $1.5598 Claude API-equivalent estimate.** |
+
+Click a thumbnail to watch or download the MP4. Claude used a Max subscription; its estimate is not a confirmed extra charge. [Film descriptions, subtitles and bonus release-lookup demo](docs/demos/README.md) · [Full tasks, outcomes and costs](docs/research/VIDEO-TESTS.md)
+
 ## Measured browser performance
 
 **119/119 tasks completed in the latest selected comparison.** On a ten-stage form, Auto took **64.9% less time than Jev First** and **35.0% less than Browser Use**. Auto combines short delegated subgoals with guarded action batches. These are whole-configuration comparisons, not an isolated test of batching.
@@ -116,6 +127,7 @@ The app uses a dedicated Codex home, separate from your usual coding-agent login
 
 | Document | What it covers |
 | --- | --- |
+| [Video demonstrations](docs/demos/README.md) | Recorded tasks, failures, corrections, subtitles and output files |
 | [Current application](docs/APPLICATION.md) | Shared runtime, browser modes, Auto routing, recovery, security boundaries and Gemini/Jev setup |
 | [Research and publication kit](docs/research/README.md) | All retained experiments, methodology, per-trial CSV, costs and shareable charts |
 | [Release readiness](docs/RELEASE-READINESS.md) | One-app integration, license, clean installation and reproducible benchmark work |

@@ -1,0 +1,52 @@
+{
+  "startedAt": "2026-09-18T11:02:10.505Z",
+  "reason": "Original app run failed with OpenRouter 429 while nested Claude process continued. Reopen app to restore its egress proxy; no new model task submitted.",
+  "events": [],
+  "captureStartMs": 1789729335127,
+  "finishedAt": "2026-09-18T11:03:29.204Z",
+  "nestedResultAvailable": true,
+  "nestedTiming": {
+    "start_time": "2026-09-18T10:57:34.356284+00:00",
+    "end_time": "2026-09-18T11:03:28.864716+00:00",
+    "elapsed_seconds": 354.50841458601644,
+    "exit_code": 1
+  },
+  "nestedResult": {
+    "subtype": "error_max_turns",
+    "is_error": true,
+    "duration_ms": 353715,
+    "duration_api_ms": 352288,
+    "num_turns": 25,
+    "total_cost_usd": 0.6861316,
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "inputTokens": 935,
+        "outputTokens": 12,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.000995,
+        "contextWindow": 200000,
+        "maxOutputTokens": 32000,
+        "thinkingTokens": 0,
+        "canonicalModel": "claude-haiku-4-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      },
+      "claude-sonnet-5": {
+        "inputTokens": 50,
+        "outputTokens": 25935,
+        "cacheReadInputTokens": 1449253,
+        "cacheCreationInputTokens": 33959,
+        "webSearchRequests": 0,
+        "costUSD": 0.6851365999999999,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000,
+        "thinkingTokens": 5058,
+        "canonicalModel": "claude-sonnet-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    }
+  }
+}

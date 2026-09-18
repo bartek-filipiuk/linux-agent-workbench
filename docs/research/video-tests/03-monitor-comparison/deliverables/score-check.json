@@ -1,0 +1,61 @@
+{
+  "validation_passed": true,
+  "products": {
+    "Uptime Kuma": {
+      "csv_score": 80,
+      "recomputed_score": 80,
+      "score_matches": true,
+      "qualifying": true,
+      "license": "MIT",
+      "latest_release": "2.5.5",
+      "release_date": "2026-09-16",
+      "sources": [
+        "https://github.com/louislam/uptime-kuma",
+        "https://github.com/louislam/uptime-kuma/releases",
+        "https://github.com/louislam/uptime-kuma/releases/tag/2.5.5",
+        "https://api.github.com/repos/louislam/uptime-kuma/releases/latest",
+        "https://github.com/louislam/uptime-kuma/wiki/Status-Page"
+      ]
+    },
+    "Gatus": {
+      "csv_score": 100,
+      "recomputed_score": 100,
+      "score_matches": true,
+      "qualifying": true,
+      "license": "Apache-2.0",
+      "latest_release": "v5.36.0",
+      "release_date": "2026-05-19",
+      "sources": [
+        "https://github.com/TwiN/gatus",
+        "https://github.com/TwiN/gatus/releases",
+        "https://github.com/TwiN/gatus/releases/tag/v5.36.0",
+        "https://api.github.com/repos/TwiN/gatus/releases/latest",
+        "https://raw.githubusercontent.com/TwiN/gatus/master/README.md"
+      ]
+    },
+    "Tianji": {
+      "csv_score": 80,
+      "recomputed_score": 80,
+      "score_matches": true,
+      "qualifying": true,
+      "license": "Apache-2.0",
+      "latest_release": "v1.33.2",
+      "release_date": "2026-09-17",
+      "sources": [
+        "https://github.com/msgbyte/tianji",
+        "https://github.com/msgbyte/tianji/releases",
+        "https://api.github.com/repos/msgbyte/tianji/releases/latest",
+        "https://tianji.dev/docs/intro",
+        "https://raw.githubusercontent.com/msgbyte/tianji/master/Dockerfile",
+        "https://raw.githubusercontent.com/msgbyte/tianji/master/src/server/model/notification/provider/apprise.ts",
+        "https://raw.githubusercontent.com/msgbyte/tianji/master/src/server/model/page/manager.ts"
+      ]
+    }
+  },
+  "qualifying_products": [
+    "Uptime Kuma",
+    "Gatus",
+    "Tianji"
+  ],
+  "recommended_product": "Gatus"
+}

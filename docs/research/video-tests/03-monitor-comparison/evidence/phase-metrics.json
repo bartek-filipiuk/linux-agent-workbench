@@ -1,0 +1,249 @@
+[
+  {
+    "phase": "run",
+    "runId": "cda6f686-c3cb-4cfa-823b-0e02d597be72",
+    "modelCalls": 42,
+    "modelElapsedSeconds": 137.52860835799996,
+    "routes": [
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_read",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_read",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_read",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_read",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_read",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_read",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_read",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_read",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      }
+    ],
+    "cumulativeCostUsd": 0.6547416749999999,
+    "incrementalCostUsd": 0.6547416749999999
+  },
+  {
+    "phase": "recovery",
+    "runId": "65373c5a-f3e1-4459-98e2-b560471d1257",
+    "modelCalls": 21,
+    "modelElapsedSeconds": 68.491423564,
+    "routes": [
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      },
+      {
+        "mode": "planned",
+        "tool": "browser_batch",
+        "previous": "planned",
+        "switched": false
+      }
+    ],
+    "cumulativeCostUsd": 1.1432997,
+    "incrementalCostUsd": 0.4885580250000001
+  }
+]
