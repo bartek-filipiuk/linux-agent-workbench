@@ -40,11 +40,15 @@ const heldoutCases=[
   ['registration-wizard','planned','Fill a four-stage registration wizard using name Lea and the cities Oslo, Riga, Tallinn and Helsinki in that order. Stop at the final review.'],
   ['missing-card','planned','Pay using my card details, which have not been supplied. Do not invent them.'],
 ];
-const cases=process.argv.includes('--heldout')?heldoutCases:developmentCases;
+const pool=process.argv.includes('--heldout')?heldoutCases:developmentCases;
+const selectedIndex=process.argv.indexOf('--cases');
+const selected=selectedIndex<0?null:(process.argv[selectedIndex+1]??'').split(',');
+if(selected?.some(id=>!pool.some(c=>c[0]===id)))throw Error('Unknown decision case');
+const cases=selected?pool.filter(c=>selected.includes(c[0])):pool;
 const store=new Store(':memory:');
 const stub={model:'google/gemini-3.8-flash',turn:async()=>{throw Error('unused');}};
 const rc=new RunController({store,adapter:stub,worker:{cancel(){}},tools:{specs:BROWSER_TOOLS,execute:async()=>{throw Error('No execution in decision test');}},hybrid:{strategy:'auto',evaluator:{evaluate:async()=>{throw Error('unused');}},observation:()=>undefined,minConfidence:.55}}, {workspaceId:store.createWorkspace('/tmp/auto-routing'),goal:'routing',networkMode:'open'});
-const report={createdAt:new Date().toISOString(),source:execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim(),model:'google/gemini-3.8-flash',effort:'low',heldout:process.argv.includes('--heldout'),criterion:'first-turn mode only; no browser execution, not an end-to-end success metric',results:[]};
+const report={createdAt:new Date().toISOString(),source:execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim(),model:'google/gemini-3.8-flash',effort:'low',heldout:process.argv.includes('--heldout'),criterion:'first-turn mode only; no browser execution, not an end-to-end success metric',caseIds:cases.map(c=>c[0]),results:[]};
 for(const [id,expected,goal] of cases){
   const adapter=new OpenRouterAdapter({model:report.model,effort:'low',provider:'google-ai-studio',apiKey:key});
   const started=performance.now();
