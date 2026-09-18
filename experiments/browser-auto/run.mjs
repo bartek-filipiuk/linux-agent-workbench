@@ -92,6 +92,7 @@ async function appDriver(browser,task,goal,workDir,engine){
       const decisions=events.filter(e=>e.type==='jev.decision').map(e=>e.payload);
       const errors=events.filter(e=>e.type==='jev.error').map(e=>e.payload);
       return {completed:outcome.state==='completed',state:outcome.state,endReason:outcome.endReason,
+        ...(/^OpenRouter HTTP (401|402)$/.test(outcome.endReason??'')?{providerFailure:outcome.endReason}:{}),
         primaryCalls:primary.length,primaryMs:primary.reduce((n,e)=>n+e.elapsedMs,0),jevCalls:decisions.length,
         jevMs:[...decisions,...errors].reduce((n,e)=>n+(e.elapsedMs??0),0),costUsd:store.getRun(rc.runId).cost_usd,
         jevErrors:errors,
@@ -143,7 +144,8 @@ async function pythonDriver(browser,task,goal,workDir,engine,profile){
     // Task ended at result message. Reap transport/process after timing/verification in cleanup.
     result??={completed:false,state:'stopped',error:'Driver exited without result'};
     const primary=metrics.filter(m=>m.provider==='openrouter'),jev=metrics.filter(m=>m.provider==='jev');
-    return {...result,metrics,primaryCalls:primary.length,primaryMs:primary.reduce((s,m)=>s+m.elapsedMs,0),
+    const fatalStatus=logs.match(/Error code: (401|402)\b/);
+    return {...result,...(fatalStatus?{providerFailure:`OpenRouter HTTP ${fatalStatus[1]}`} : {}),metrics,primaryCalls:primary.length,primaryMs:primary.reduce((s,m)=>s+m.elapsedMs,0),
       jevCalls:jev.length,jevMs:jev.reduce((s,m)=>s+m.elapsedMs,0),
       costUsd:primary.reduce((s,m)=>s+(m.usage?.cost??0),0)+jev.reduce((s,m)=>s+jevCost(m.usage),0)};
   },cleanup:async()=>{
@@ -224,6 +226,7 @@ try{
     if(stopAt){record.stopMs=performance.now()-stopAt;record.browserStopMs=browserStopMs;}
     report.results.push(record);save();
     console.log(`${runId}: ${record.success?'PASS':'FAIL'} ${Math.round(record.taskMs??0)}ms setup=${Math.round(record.setupMs??0)}ms LLM=${record.primaryCalls??0} Jev=${record.jevCalls??0} $${(record.costUsd??0).toFixed(4)}${record.error?' '+record.error:''}`);
+    if(record.providerFailure){report.stoppedReason='provider_unavailable';save();break outer;}
   }
 }finally{await site.close();fs.rmSync(temp,{recursive:true,force:true});save();}
 console.log(`Report: ${output}; reported total $${reportedCost().toFixed(4)}`);
