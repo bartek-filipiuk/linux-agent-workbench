@@ -1,0 +1,1972 @@
+{
+  "createdAt": "2026-09-18T07:32:51.126Z",
+  "model": "google/gemini-3.8-flash",
+  "effort": "low",
+  "upstream": "google-ai-studio",
+  "jev": "jev-1.13.0",
+  "engines": [
+    "app-auto",
+    "app-first",
+    "browser-use"
+  ],
+  "repeats": 3,
+  "source": {
+    "app": "77846cb0d97af218dd8a2832dab9f488c703b210",
+    "poc": "ac1c0f517a8429df36c6313195165902cbc8319d",
+    "hashes": {
+      "run.mjs": "05af657595b3ea928a18b34b592cbe592684bb08f2b8515a74486d2c3e18505e",
+      "tasks.mjs": "c194830be3e27755b0dfdd228477b9af34238f0338ef7d383b09c34863a336c9"
+    },
+    "candidate": "ac1c0f517a8429df36c6313195165902cbc8319d",
+    "candidateHashes": {
+      "services/agentd/dist/provider/openrouter.js": "d1556c37fd28c92de25c33a606c7b3f36b39d6b71a742d6d73363bf4865f05e6",
+      "services/agentd/dist/orchestrator/browser-auto.js": "c294a9c1adbb9606f812b353eecb2cd694e8fb4310e80715fc2b1721b9faca36",
+      "services/agentd/dist/orchestrator/jev-browser.js": "65263e7fc27598036610ef2917296bd2855341aed7b6d6e204a5638e11aab8aa",
+      "services/agentd/dist/orchestrator/run-controller.js": "35ec88ea5830c313213893e6493f648b66c9b4740fdc788fc971d83d055810a9",
+      "services/browser-worker/dist/browser-session.js": "839ef80647ad8956d89048e251a0c43c05f256ea3e84d1e28937f459528af77e"
+    },
+    "sharedWorker": "same Chrome build/settings; app-first uses unchanged baseline controller, tools and worker; app-auto uses candidate; both app engines share candidate OpenRouter schema adapter (explicit object oneOf); Python engines use pinned native drivers",
+    "upstreamDriverHash": "261a9cd28020b8b55a6652f3f928039188f025409c81283c352451af7f01f76e",
+    "dirty": false
+  },
+  "clock": "setup includes driver/browser startup, navigation, consent, first observation; task includes independent final verification; screenshots and cleanup outside task",
+  "settings": {
+    "autoConfidence": 0.35,
+    "timeoutMs": 240000,
+    "viewport": {
+      "width": 1120,
+      "height": 780
+    },
+    "channel": "chromium",
+    "warmAfter": null,
+    "priorReportedCostUsd": 3.0665517840000005
+  },
+  "results": [
+    {
+      "task": "wizard-4-new",
+      "category": "long-ui",
+      "repeat": 1,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/wizard-4-new"
+      ],
+      "setupMs": 440.0212530000001,
+      "agentMs": 10285.337831,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 6,
+      "primaryMs": 9704.252626000001,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.01776975,
+      "jevErrors": [],
+      "actions": 16,
+      "fallbacks": [],
+      "routes": [
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        }
+      ],
+      "batches": [
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 0,
+          "requested": 0,
+          "verified": false,
+          "elapsedMs": 24.1167889999997,
+          "parentCallId": "call_292559"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 173.74147900000025,
+          "parentCallId": "call_344699"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 115.33529400000043,
+          "parentCallId": "call_393441"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 127.74638700000014,
+          "parentCallId": "call_417919"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 128.60452799999985,
+          "parentCallId": "call_508222"
+        }
+      ],
+      "verificationMs": 2.42656899999929,
+      "taskMs": 10287.7644,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Oslo",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Riga",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Tallinn",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Helsinki",
+            "person": "Lea",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "wizard-4-new",
+      "category": "long-ui",
+      "repeat": 1,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/wizard-4-new"
+      ],
+      "setupMs": 422.20122400000037,
+      "agentMs": 14160.95679,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 6866.260690999998,
+      "jevCalls": 17,
+      "jevMs": 6804.006805999999,
+      "costUsd": 0.006948078,
+      "jevErrors": [],
+      "actions": 17,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 16,
+          "elapsedMs": 7287.957800999999,
+          "verified": false,
+          "parentCallId": "call_506353"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 2.0367850000002363,
+      "taskMs": 14162.993575,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Oslo",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Riga",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Tallinn",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Helsinki",
+            "person": "Lea",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "wizard-4-new",
+      "category": "long-ui",
+      "repeat": 1,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/wizard-4-new"
+      ],
+      "setupMs": 2117.2938049999975,
+      "agentMs": 15004.951162000001,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 17,
+      "final": "Successfully prepared all 4 trip segments in order (Oslo, Riga, Tallinn, Helsinki) with Traveler set to Lea and Transport set to Train for every segment, stopping at the completed review showing all 4 segments recorded.",
+      "errors": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "primaryCalls": 5,
+      "primaryMs": 8707.222802040633,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.00762225,
+      "verificationMs": 1.9625430000014603,
+      "taskMs": 15006.913705000003,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Oslo",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Riga",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Tallinn",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Helsinki",
+            "person": "Lea",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "wizard-4-new",
+      "category": "long-ui",
+      "repeat": 2,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/wizard-4-new"
+      ],
+      "setupMs": 400.95792000000074,
+      "agentMs": 21819.951989,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 9,
+      "primaryMs": 16551.034359000005,
+      "jevCalls": 10,
+      "jevMs": 4808.383677999991,
+      "costUsd": 0.032372964,
+      "jevErrors": [],
+      "actions": 16,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_target",
+          "actions": 9,
+          "elapsedMs": 5082.607215000004,
+          "verified": false,
+          "parentCallId": "call_385105"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 2.0280539999948815,
+      "taskMs": 21821.980042999996,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Oslo",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Riga",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Tallinn",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Helsinki",
+            "person": "Lea",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "wizard-4-new",
+      "category": "long-ui",
+      "repeat": 2,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/wizard-4-new"
+      ],
+      "setupMs": 2114.4014650000026,
+      "agentMs": 17316.805125,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 17,
+      "final": "All 4 trip segments were successfully prepared in the specified order (Oslo, Riga, Tallinn, Helsinki) with Traveler set to Lea and Transport set to Train for every segment. The final review has been completed and shows all 4 segments recorded correctly.",
+      "errors": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "primaryCalls": 5,
+      "primaryMs": 11093.201518058777,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.00805125,
+      "verificationMs": 2.0495649999938905,
+      "taskMs": 17318.854689999993,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Oslo",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Riga",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Tallinn",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Helsinki",
+            "person": "Lea",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "wizard-4-new",
+      "category": "long-ui",
+      "repeat": 2,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/wizard-4-new"
+      ],
+      "setupMs": 389.02475199999753,
+      "agentMs": 8940.38945799999,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 6,
+      "primaryMs": 8380.21895499999,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.01792575,
+      "jevErrors": [],
+      "actions": 16,
+      "fallbacks": [],
+      "routes": [
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        }
+      ],
+      "batches": [
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 0,
+          "requested": 0,
+          "verified": false,
+          "elapsedMs": 15.48558100000082,
+          "parentCallId": "call_437376"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 169.16393400001107,
+          "parentCallId": "call_274503"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 127.1813000000111,
+          "parentCallId": "call_313454"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 117.58732900000177,
+          "parentCallId": "call_319768"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 124.73364000000583,
+          "parentCallId": "call_241599"
+        }
+      ],
+      "verificationMs": 2.0242830000061076,
+      "taskMs": 8942.413740999997,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Oslo",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Riga",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Tallinn",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Helsinki",
+            "person": "Lea",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "wizard-4-new",
+      "category": "long-ui",
+      "repeat": 3,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/wizard-4-new"
+      ],
+      "setupMs": 2128.9027720000013,
+      "agentMs": 14783.435957000009,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 17,
+      "final": "All 4 trip segments (Oslo, Riga, Tallinn, Helsinki) have been successfully configured with Traveler set to Lea and Transport set to Train. The final review page is reached with all 4 segments recorded.",
+      "errors": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "primaryCalls": 5,
+      "primaryMs": 8603.608087985776,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.00749775,
+      "verificationMs": 2.464493000006769,
+      "taskMs": 14785.900450000016,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Oslo",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Riga",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Tallinn",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Helsinki",
+            "person": "Lea",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "wizard-4-new",
+      "category": "long-ui",
+      "repeat": 3,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/wizard-4-new"
+      ],
+      "setupMs": 402.03676099999575,
+      "agentMs": 13428.003052,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 6,
+      "primaryMs": 12897.087775999986,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.01792725,
+      "jevErrors": [],
+      "actions": 16,
+      "fallbacks": [],
+      "routes": [
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        }
+      ],
+      "batches": [
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 0,
+          "requested": 0,
+          "verified": false,
+          "elapsedMs": 14.742817999998806,
+          "parentCallId": "call_328972"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 150.46516100000008,
+          "parentCallId": "call_357943"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 111.25523000000976,
+          "parentCallId": "call_25672"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 127.27852000000712,
+          "parentCallId": "call_454621"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 121.89346900000237,
+          "parentCallId": "call_318651"
+        }
+      ],
+      "verificationMs": 2.0151330000080634,
+      "taskMs": 13430.018185000008,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Oslo",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Riga",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Tallinn",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Helsinki",
+            "person": "Lea",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "wizard-4-new",
+      "category": "long-ui",
+      "repeat": 3,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/wizard-4-new"
+      ],
+      "setupMs": 399.1234669999976,
+      "agentMs": 14763.26548999999,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 6,
+      "primaryMs": 9138.27769100001,
+      "jevCalls": 13,
+      "jevMs": 5105.215784999964,
+      "costUsd": 0.01915377,
+      "jevErrors": [],
+      "actions": 17,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_target",
+          "actions": 12,
+          "elapsedMs": 5507.144499999995,
+          "verified": false,
+          "parentCallId": "call_372842"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 1.850867000001017,
+      "taskMs": 14765.116356999992,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Oslo",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Riga",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Tallinn",
+            "person": "Lea",
+            "mode": "Train"
+          },
+          {
+            "city": "Helsinki",
+            "person": "Lea",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "compare-new",
+      "category": "reasoning",
+      "repeat": 1,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected hotel Choose Alba Bello Cielo Doria",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "Total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/compare-new"
+      ],
+      "setupMs": 384.7295069999818,
+      "agentMs": 8263.762499999983,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 5,
+      "primaryMs": 6580.687663999968,
+      "jevCalls": 1,
+      "jevMs": 1515.5729169999831,
+      "costUsd": 0.014829810000000002,
+      "jevErrors": [],
+      "actions": 4,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_target",
+          "actions": 0,
+          "elapsedMs": 1570.2931519999984,
+          "verified": false,
+          "parentCallId": "call_275791"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 2.599356999999145,
+      "taskMs": 8266.361856999982,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "hotel": "Doria",
+          "total": "392"
+        }
+      }
+    },
+    {
+      "task": "compare-new",
+      "category": "reasoning",
+      "repeat": 1,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected hotel Choose Alba Bello Cielo Doria",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "Total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/compare-new"
+      ],
+      "setupMs": 2131.030002000014,
+      "agentMs": 13417.422016000026,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 5,
+      "final": "The cheapest eligible hotel meeting the criteria (free cancellation and breakfast included) for a four-night stay is Doria at 392 EUR total (87 EUR/night room + 11 EUR/night breakfast = 98 EUR/night × 4 nights). Doria was selected, 392 was entered as the total in EUR, and the comparison was successfully saved.",
+      "errors": [
+        null,
+        null,
+        null
+      ],
+      "primaryCalls": 3,
+      "primaryMs": 11403.096339956392,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.02488275,
+      "verificationMs": 2.0520800000231247,
+      "taskMs": 13419.474096000049,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "hotel": "Doria",
+          "total": "392"
+        }
+      }
+    },
+    {
+      "task": "compare-new",
+      "category": "reasoning",
+      "repeat": 1,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected hotel Choose Alba Bello Cielo Doria",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "Total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/compare-new"
+      ],
+      "setupMs": 432.81578899998567,
+      "agentMs": 6220.051479999995,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 4,
+      "primaryMs": 6049.4774479999905,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.00909975,
+      "jevErrors": [],
+      "actions": 3,
+      "fallbacks": [],
+      "routes": [
+        {
+          "mode": "planned",
+          "tool": "browser_read",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_observe",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        }
+      ],
+      "batches": [
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 3,
+          "requested": 3,
+          "verified": false,
+          "elapsedMs": 151.67900399997598,
+          "parentCallId": "call_459060"
+        }
+      ],
+      "verificationMs": 1.8840410000120755,
+      "taskMs": 6221.935521000007,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "hotel": "Doria",
+          "total": "392"
+        }
+      }
+    },
+    {
+      "task": "compare-new",
+      "category": "reasoning",
+      "repeat": 2,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected hotel Choose Alba Bello Cielo Doria",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "Total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/compare-new"
+      ],
+      "setupMs": 2508.0122140000167,
+      "agentMs": 12927.547984000004,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 5,
+      "final": "Selected the cheapest eligible hotel (Doria) with free cancellation and breakfast for a 4-night stay, entered the total cost of 392 EUR (4 nights x (87 EUR room + 11 EUR breakfast)), and saved the comparison.",
+      "errors": [
+        null,
+        null,
+        null
+      ],
+      "primaryCalls": 3,
+      "primaryMs": 11014.325183059555,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.02295675,
+      "verificationMs": 1.8492600000172388,
+      "taskMs": 12929.397244000022,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "hotel": "Doria",
+          "total": "392"
+        }
+      }
+    },
+    {
+      "task": "compare-new",
+      "category": "reasoning",
+      "repeat": 2,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected hotel Choose Alba Bello Cielo Doria",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "Total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/compare-new"
+      ],
+      "setupMs": 412.8562390000152,
+      "agentMs": 3990.4685110000137,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 3,
+      "primaryMs": 3820.187812999997,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.00756075,
+      "jevErrors": [],
+      "actions": 3,
+      "fallbacks": [],
+      "routes": [
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        }
+      ],
+      "batches": [
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 0,
+          "requested": 0,
+          "verified": false,
+          "elapsedMs": 15.089371000009123,
+          "parentCallId": "call_242528"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 3,
+          "requested": 3,
+          "verified": false,
+          "elapsedMs": 152.85932399999,
+          "parentCallId": "call_345090"
+        }
+      ],
+      "verificationMs": 1.85533600000781,
+      "taskMs": 3992.3238470000215,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "hotel": "Doria",
+          "total": "392"
+        }
+      }
+    },
+    {
+      "task": "compare-new",
+      "category": "reasoning",
+      "repeat": 2,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected hotel Choose Alba Bello Cielo Doria",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "Total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/compare-new"
+      ],
+      "setupMs": 412.2518310000014,
+      "agentMs": 11404.198139999993,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 4,
+      "primaryMs": 9913.329453999962,
+      "jevCalls": 3,
+      "jevMs": 1287.7485060000326,
+      "costUsd": 0.010892442,
+      "jevErrors": [],
+      "actions": 5,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_target",
+          "actions": 2,
+          "elapsedMs": 1423.2923329999903,
+          "verified": false,
+          "parentCallId": "call_383856"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 1.9107810000132304,
+      "taskMs": 11406.108921000006,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "hotel": "Doria",
+          "total": "392"
+        }
+      }
+    },
+    {
+      "task": "compare-new",
+      "category": "reasoning",
+      "repeat": 3,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected hotel Choose Alba Bello Cielo Doria",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "Total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/compare-new"
+      ],
+      "setupMs": 390.54386299999896,
+      "agentMs": 3868.809118999983,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 3,
+      "primaryMs": 3714.092188999988,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.00734475,
+      "jevErrors": [],
+      "actions": 3,
+      "fallbacks": [],
+      "routes": [
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        }
+      ],
+      "batches": [
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 0,
+          "requested": 0,
+          "verified": false,
+          "elapsedMs": 16.08466700001736,
+          "parentCallId": "call_259430"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 3,
+          "requested": 3,
+          "verified": false,
+          "elapsedMs": 135.83582999999635,
+          "parentCallId": "call_523758"
+        }
+      ],
+      "verificationMs": 1.9466089999768883,
+      "taskMs": 3870.75572799996,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "hotel": "Doria",
+          "total": "392"
+        }
+      }
+    },
+    {
+      "task": "compare-new",
+      "category": "reasoning",
+      "repeat": 3,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected hotel Choose Alba Bello Cielo Doria",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "Total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/compare-new"
+      ],
+      "setupMs": 397.1875069999951,
+      "agentMs": 7966.6269929999835,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 5,
+      "primaryMs": 7143.381291000027,
+      "jevCalls": 0,
+      "jevMs": 645.1430540000147,
+      "costUsd": 0.01428675,
+      "jevErrors": [
+        {
+          "reason": "invalid_response",
+          "elapsedMs": 645.1430540000147,
+          "parentCallId": "call_285116"
+        }
+      ],
+      "actions": 4,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "jev_invalid_response; inspect attached evidence and use fallback instead of immediately repeating the same delegation",
+          "actions": 0,
+          "elapsedMs": 701.9006900000095,
+          "verified": false,
+          "parentCallId": "call_285116"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 1.846317999996245,
+      "taskMs": 7968.47331099998,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "hotel": "Doria",
+          "total": "392"
+        }
+      }
+    },
+    {
+      "task": "compare-new",
+      "category": "reasoning",
+      "repeat": 3,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected hotel Choose Alba Bello Cielo Doria",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "Total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/compare-new"
+      ],
+      "setupMs": 1979.355039999995,
+      "agentMs": 12496.154053000006,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 5,
+      "final": "Selected the cheapest eligible hotel (Doria) with free cancellation and breakfast for a four-night stay at a numeric total of 392 EUR ((87 + 11) * 4), and saved the comparison.",
+      "errors": [
+        null,
+        null,
+        null
+      ],
+      "primaryCalls": 3,
+      "primaryMs": 10577.873623988125,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.0226875,
+      "verificationMs": 1.9244000000180677,
+      "taskMs": 12498.078453000024,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "hotel": "Doria",
+          "total": "392"
+        }
+      }
+    },
+    {
+      "task": "autocomplete-new",
+      "category": "short-ui",
+      "repeat": 1,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/autocomplete-new"
+      ],
+      "setupMs": 2097.5574830000114,
+      "agentMs": 20144.279234000016,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 4,
+      "final": "Successfully selected 'Rome, Italy' as the destination using the autocomplete suggestion. The page confirms 'Selected destination: Rome, Italy'.",
+      "errors": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "primaryCalls": 4,
+      "primaryMs": 17439.44945198018,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.0048165,
+      "verificationMs": 4.91031499998644,
+      "taskMs": 20149.189549000002,
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Rome, Italy"
+      }
+    },
+    {
+      "task": "autocomplete-new",
+      "category": "short-ui",
+      "repeat": 1,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/autocomplete-new"
+      ],
+      "setupMs": 378.92751099998713,
+      "agentMs": 4754.817894000007,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 2258.7449099999794,
+      "jevCalls": 4,
+      "jevMs": 1853.8500739999872,
+      "costUsd": 0.003954336,
+      "jevErrors": [],
+      "actions": 5,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 3,
+          "elapsedMs": 2493.2347829999926,
+          "verified": false,
+          "parentCallId": "call_415130"
+        }
+      ],
+      "routes": [
+        {
+          "mode": "fast",
+          "tool": "browser_task",
+          "switched": false
+        }
+      ],
+      "batches": [],
+      "verificationMs": 3.684533999999985,
+      "taskMs": 4758.502428000007,
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Rome, Italy"
+      }
+    },
+    {
+      "task": "autocomplete-new",
+      "category": "short-ui",
+      "repeat": 1,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/autocomplete-new"
+      ],
+      "setupMs": 391.7084400000167,
+      "agentMs": 4904.714677000011,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 2931.460695000016,
+      "jevCalls": 4,
+      "jevMs": 1517.705709999951,
+      "costUsd": 0.004054686,
+      "jevErrors": [],
+      "actions": 4,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 3,
+          "elapsedMs": 1971.6745269999956,
+          "verified": false,
+          "parentCallId": "call_513970"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 4.047987000027206,
+      "taskMs": 4908.762664000038,
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Rome, Italy"
+      }
+    },
+    {
+      "task": "autocomplete-new",
+      "category": "short-ui",
+      "repeat": 2,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/autocomplete-new"
+      ],
+      "setupMs": 413.6365249999799,
+      "agentMs": 8389.340343000018,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 5568.228502000042,
+      "jevCalls": 4,
+      "jevMs": 2177.2918109999737,
+      "costUsd": 0.00396159,
+      "jevErrors": [],
+      "actions": 5,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 3,
+          "elapsedMs": 2819.3853699999745,
+          "verified": false,
+          "parentCallId": "call_492016"
+        }
+      ],
+      "routes": [
+        {
+          "mode": "fast",
+          "tool": "browser_task",
+          "switched": false
+        }
+      ],
+      "batches": [],
+      "verificationMs": 3.491563999967184,
+      "taskMs": 8392.831906999985,
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Rome, Italy"
+      }
+    },
+    {
+      "task": "autocomplete-new",
+      "category": "short-ui",
+      "repeat": 2,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/autocomplete-new"
+      ],
+      "setupMs": 379.5928080000449,
+      "agentMs": 5052.0412639999995,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 2422.488830999995,
+      "jevCalls": 4,
+      "jevMs": 2154.9625009999727,
+      "costUsd": 0.0041312580000000005,
+      "jevErrors": [],
+      "actions": 4,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 3,
+          "elapsedMs": 2627.8929399999906,
+          "verified": false,
+          "parentCallId": "call_395795"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 3.805011000018567,
+      "taskMs": 5055.846275000018,
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Rome, Italy"
+      }
+    },
+    {
+      "task": "autocomplete-new",
+      "category": "short-ui",
+      "repeat": 2,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/autocomplete-new"
+      ],
+      "setupMs": 2013.8257800000138,
+      "agentMs": 8259.109597000002,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 4,
+      "final": "Successfully selected 'Rome, Italy' as the destination using the autocomplete suggestion.",
+      "errors": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "primaryCalls": 4,
+      "primaryMs": 6487.795535998885,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.00522375,
+      "verificationMs": 4.6035050000064075,
+      "taskMs": 8263.713102000009,
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Rome, Italy"
+      }
+    },
+    {
+      "task": "autocomplete-new",
+      "category": "short-ui",
+      "repeat": 3,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/autocomplete-new"
+      ],
+      "setupMs": 385.6521269999794,
+      "agentMs": 4619.492035999952,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 3,
+      "primaryMs": 3471.530956999981,
+      "jevCalls": 2,
+      "jevMs": 1003.695894000004,
+      "costUsd": 0.0062846280000000004,
+      "jevErrors": [],
+      "actions": 3,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_operation",
+          "actions": 1,
+          "elapsedMs": 1110.4615219999687,
+          "verified": false,
+          "parentCallId": "call_396027"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 3.322130999993533,
+      "taskMs": 4622.814166999946,
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Rome, Italy"
+      }
+    },
+    {
+      "task": "autocomplete-new",
+      "category": "short-ui",
+      "repeat": 3,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/autocomplete-new"
+      ],
+      "setupMs": 1993.2216519999783,
+      "agentMs": 12839.720173999958,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 4,
+      "final": "Successfully selected 'Rome, Italy' as destination using the autocomplete suggestion. The page confirms: 'Selected destination: Rome, Italy'.",
+      "errors": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "primaryCalls": 4,
+      "primaryMs": 10068.13768594293,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.0050115,
+      "verificationMs": 4.895230999973137,
+      "taskMs": 12844.615404999931,
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Rome, Italy"
+      }
+    },
+    {
+      "task": "autocomplete-new",
+      "category": "short-ui",
+      "repeat": 3,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:37593/autocomplete-new"
+      ],
+      "setupMs": 382.2780239999993,
+      "agentMs": 4689.525676999998,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 2388.899363000004,
+      "jevCalls": 4,
+      "jevMs": 1669.2633430000278,
+      "costUsd": 0.003951336,
+      "jevErrors": [],
+      "actions": 5,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 3,
+          "elapsedMs": 2298.046454999945,
+          "verified": false,
+          "parentCallId": "call_511793"
+        }
+      ],
+      "routes": [
+        {
+          "mode": "fast",
+          "tool": "browser_task",
+          "switched": false
+        }
+      ],
+      "batches": [],
+      "verificationMs": 3.470264000003226,
+      "taskMs": 4692.995941000001,
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Rome, Italy"
+      }
+    }
+  ]
+}

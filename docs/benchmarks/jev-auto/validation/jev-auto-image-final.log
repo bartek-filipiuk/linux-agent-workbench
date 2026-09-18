@@ -1,0 +1,49 @@
+Free-space check passed for the workspace and Podman storage filesystems
+
+> @law/protocol@0.0.1 build /home/bartek/linux-agent-auto/packages/protocol
+> tsc -p tsconfig.json
+
+
+> @law/browser-worker@0.0.1 build /home/bartek/linux-agent-auto/services/browser-worker
+> tsc -p tsconfig.json
+
+STEP 1/14: FROM mcr.microsoft.com/playwright:v1.62.1-noble
+STEP 2/14: ENV DEBIAN_FRONTEND=noninteractive
+--> Using cache ddaad8ebe4e4ecff4f6b7496dfd9ccc19cd5114a2a26cd0e61cc40ddc49f12ef
+--> ddaad8ebe4e
+STEP 3/14: RUN apt-get update && apt-get install -y --no-install-recommends xvfb openbox ffmpeg xdotool python3-minimal && rm -rf /var/lib/apt/lists/*
+--> Using cache 53cac6b1c63ca2fcb989de85d01bfbcd5af522dda8fc23dd92ee0c28d85a61fb
+--> 53cac6b1c63
+STEP 4/14: RUN userdel -r pwuser 2>/dev/null || true  && usermod -l agent ubuntu && usermod -d /home/agent agent && groupmod -n agent ubuntu  && mkdir -p /home/agent /profile /downloads && chown agent:agent /home/agent /profile /downloads  && for g in adm dialout cdrom floppy sudo audio dip video plugdev; do gpasswd -d agent "$g" >/dev/null 2>&1 || true; done
+--> Using cache 6c0dc6850616c10aa53b3bced39983b776dd3d5f472fc5f77fbef48bd548e5f3
+--> 6c0dc685061
+STEP 5/14: COPY images/browser/opt-package.json /opt/law/package.json
+--> Using cache 08e4d13dd377b2066c10c333a8bc0f7ab809f89f2dedcf4b2cb8f13e03cbf7ee
+--> 08e4d13dd37
+STEP 6/14: RUN cd /opt/law && npm install --omit=dev --no-audit --no-fund
+--> Using cache e1509be2d0e4ed3cf905e27905efc3cce1524d7e3768c9075c9ae3432870c106
+--> e1509be2d0e
+STEP 7/14: COPY packages/protocol/package.json /opt/law/node_modules/@law/protocol/package.json
+--> Using cache 99399d239f90c4f8d0c67e7037683a31775c53885b5137c71e8d31fc23fa4ff1
+--> 99399d239f9
+STEP 8/14: COPY packages/protocol/dist /opt/law/node_modules/@law/protocol/dist
+--> Using cache 27208af0bb1573c9d08d99a4f609b7f233aae383372b317b13704ab8b9bf0719
+--> 27208af0bb1
+STEP 9/14: COPY services/browser-worker/dist /opt/law/worker
+--> d86ba18fe73
+STEP 10/14: RUN chown -R root:root /opt/law
+--> 63f4d56fe07
+STEP 11/14: USER agent
+--> d86eadea524
+STEP 12/14: WORKDIR /home/agent
+--> 2d4ab6c7578
+STEP 13/14: ENV LAW_BROWSER_MANUAL=1 HOME=/home/agent LAW_BROWSER_SOCKET=/run/law/browser.sock LAW_BROWSER_PROFILE=/profile/user-data LAW_BROWSER_DOWNLOADS=/downloads LAW_BROWSER_CHANNEL=chromium PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+--> ec73d487c97
+STEP 14/14: CMD ["bash", "-c", "while true; do node /opt/law/worker/main.js; echo 'browser-worker exited, restarting in 1s'; sleep 1; done"]
+COMMIT localhost/law-browser-jev-auto:8f78896
+--> acdd06112e9
+Successfully tagged localhost/law-browser-jev-auto:8f78896
+Successfully tagged localhost/law-browser-jev-auto:latest
+acdd06112e93b62d8909c13ddde4a42af8c029f4f31f0bfc3094d9c86829f044
+image localhost/law-browser-jev-auto:8f78896 id=acdd06112e93b62d8909c13ddde4a42af8c029f4f31f0bfc3094d9c86829f044
+Allocated Podman storage is 22.40 GB (limit 14 GB); inspect unused images and orphaned storage before rebuilding

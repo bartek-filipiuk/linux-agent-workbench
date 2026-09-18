@@ -5,7 +5,9 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 NAME="${1:-terminal}"            # terminal | browser
-IMAGE="localhost/law-${NAME}"
+INSTANCE="${LAW_INSTANCE:-}"
+if [[ -n "$INSTANCE" && ! "$INSTANCE" =~ ^[a-z][a-z0-9-]{0,23}$ ]]; then echo "invalid LAW_INSTANCE" >&2; exit 2; fi
+IMAGE="localhost/law-${NAME}${INSTANCE:+-$INSTANCE}"
 case "$NAME" in terminal|browser) ;; *) echo "expected terminal or browser" >&2; exit 2 ;; esac
 node scripts/check-storage.mjs before-build
 
@@ -17,5 +19,5 @@ ID="$(podman image inspect "${IMAGE}:${SHA}" --format '{{.Id}}')"
 printf '{ "tag": "%s", "id": "%s" }\n' "$SHA" "$ID" > "images/${NAME}/image.json"
 echo "image ${IMAGE}:${SHA} id=${ID}"
 
-bash scripts/prune-images.sh
+if [ -z "$INSTANCE" ]; then bash scripts/prune-images.sh; fi
 node scripts/check-storage.mjs after-build

@@ -1,0 +1,9 @@
+{
+  "filesChecked": 702,
+  "credentialMatches": [],
+  "passed": true,
+  "browserEnvironmentAudit": {
+    "checkedDuringFinalRuns": true,
+    "sensitiveEnvironmentVariablesFound": 0
+  }
+}

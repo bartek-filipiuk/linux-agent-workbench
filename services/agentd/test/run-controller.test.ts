@@ -30,6 +30,23 @@ const input = (workspaceId: string) => ({ workspaceId, goal: "list files", netwo
 const toolResultsOf = (i: unknown) => (i as { toolResults: { callId: string; output: string }[] }).toolResults;
 
 describe("RunController", () => {
+  it("persists adapter context and accounts for billed API cost without a static price table", async () => {
+    const { ws, store, worker } = await setup();
+    const context = { version: 1, model: "router", responseId: "r", messages: [] };
+    const adapter = Object.assign(new FakeModelAdapter([{ text: "done" }]), {
+      exportContext: () => context, restoreContext: vi.fn(),
+      turn: async () => ({ responseId: "r", text: "done", toolCalls: [], usage: { inputTokens: 10, outputTokens: 5, costUsd: 0.025 } }),
+    });
+    const rc = new RunController({ store, worker, adapter, provider: "openrouter", continuation: {
+      provider: "openrouter", responseId: "parent", modelContext: context, pending: [], results: [],
+    } }, input(ws));
+    expect((await rc.start()).state).toBe("completed");
+    expect(adapter.restoreContext).toHaveBeenCalledWith(context);
+    expect(rc.stats.costUsd).toBeCloseTo(0.025);
+    const saved = JSON.parse(store.getRun(rc.runId)!.continuation_json!);
+    expect(saved.modelContext).toEqual(context);
+  });
+
   it("continues an API response with completed and uncertain tool results, without replay or budget reset", async () => {
     const { ws, store, worker, fw } = await setup();
     const adapter = new FakeModelAdapter([{ text: "Updated the existing file" }]);

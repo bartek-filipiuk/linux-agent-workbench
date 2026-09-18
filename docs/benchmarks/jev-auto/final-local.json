@@ -1,0 +1,5442 @@
+{
+  "createdAt": "2026-09-18T06:53:05.664Z",
+  "model": "google/gemini-3.8-flash",
+  "effort": "low",
+  "upstream": "google-ai-studio",
+  "jev": "jev-1.13.0",
+  "engines": [
+    "app-auto",
+    "app-first",
+    "browser-use"
+  ],
+  "repeats": 3,
+  "source": {
+    "app": "77846cb0d97af218dd8a2832dab9f488c703b210",
+    "poc": "0ea227b271dbc71b5dc7d503a4a4438e3141c361",
+    "hashes": {
+      "run.mjs": "6a88d4042ed53322bc052d357780e50895494abe236836c7a75a0359cc96c952",
+      "tasks.mjs": "c194830be3e27755b0dfdd228477b9af34238f0338ef7d383b09c34863a336c9"
+    },
+    "candidate": "0ea227b271dbc71b5dc7d503a4a4438e3141c361",
+    "candidateHashes": {
+      "services/agentd/dist/provider/openrouter.js": "d1556c37fd28c92de25c33a606c7b3f36b39d6b71a742d6d73363bf4865f05e6",
+      "services/agentd/dist/orchestrator/browser-auto.js": "c294a9c1adbb9606f812b353eecb2cd694e8fb4310e80715fc2b1721b9faca36",
+      "services/agentd/dist/orchestrator/jev-browser.js": "65263e7fc27598036610ef2917296bd2855341aed7b6d6e204a5638e11aab8aa",
+      "services/agentd/dist/orchestrator/run-controller.js": "35ec88ea5830c313213893e6493f648b66c9b4740fdc788fc971d83d055810a9",
+      "services/browser-worker/dist/browser-session.js": "839ef80647ad8956d89048e251a0c43c05f256ea3e84d1e28937f459528af77e"
+    },
+    "sharedWorker": "same Chrome build/settings; app-first uses unchanged baseline controller, tools and worker; app-auto uses candidate; both app engines share candidate OpenRouter schema adapter (explicit object oneOf); Python engines use pinned native drivers",
+    "upstreamDriverHash": "261a9cd28020b8b55a6652f3f928039188f025409c81283c352451af7f01f76e",
+    "dirty": false
+  },
+  "clock": "setup includes driver/browser startup, navigation, consent, first observation; task includes independent final verification; screenshots and cleanup outside task",
+  "settings": {
+    "autoConfidence": 0.35,
+    "timeoutMs": 240000,
+    "viewport": {
+      "width": 1120,
+      "height": 780
+    },
+    "channel": "chromium",
+    "warmAfter": null,
+    "priorReportedCostUsd": 0.8679915599999998
+  },
+  "results": [
+    {
+      "task": "search",
+      "category": "short-ui",
+      "repeat": 1,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Search catalog",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/search"
+      ],
+      "setupMs": 446.71358699999996,
+      "agentMs": 4160.739991,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 2156.8289159999995,
+      "jevCalls": 3,
+      "jevMs": 1644.869811,
+      "costUsd": 0.003937734,
+      "jevErrors": [],
+      "actions": 4,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 2,
+          "elapsedMs": 1997.994959,
+          "verified": false,
+          "parentCallId": "call_447262"
+        }
+      ],
+      "routes": [
+        {
+          "mode": "fast",
+          "tool": "browser_task",
+          "switched": false
+        }
+      ],
+      "batches": [],
+      "verificationMs": 3.7208640000008018,
+      "taskMs": 4164.460855000001,
+      "verification": {
+        "passed": true,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      }
+    },
+    {
+      "task": "search",
+      "category": "short-ui",
+      "repeat": 1,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Search catalog",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/search"
+      ],
+      "setupMs": 413.17189099999996,
+      "agentMs": 5936.991734,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 3914.0096590000003,
+      "jevCalls": 3,
+      "jevMs": 1849.9046149999995,
+      "costUsd": 0.003989148,
+      "jevErrors": [],
+      "actions": 3,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 2,
+          "elapsedMs": 2017.1510960000005,
+          "verified": false,
+          "parentCallId": "call_291014"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 3.794965000000957,
+      "taskMs": 5940.786699000001,
+      "verification": {
+        "passed": true,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      }
+    },
+    {
+      "task": "search",
+      "category": "short-ui",
+      "repeat": 1,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Search catalog",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/search"
+      ],
+      "setupMs": 2113.5223609999994,
+      "agentMs": 4847.435286000002,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 3,
+      "final": "The catalog was searched for 'blue notebook', and the search results ('Search results for blue notebook: Blue Notebook, 12 EUR') are visible on the page.",
+      "errors": [
+        null,
+        null
+      ],
+      "primaryCalls": 2,
+      "primaryMs": 3076.8473919597454,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.0025770000000000003,
+      "verificationMs": 4.7538170000007085,
+      "taskMs": 4852.189103000002,
+      "verification": {
+        "passed": true,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      }
+    },
+    {
+      "task": "search",
+      "category": "short-ui",
+      "repeat": 2,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Search catalog",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/search"
+      ],
+      "setupMs": 387.30302799999845,
+      "agentMs": 4378.594862000002,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 2312.0468409999994,
+      "jevCalls": 3,
+      "jevMs": 1907.5979869999974,
+      "costUsd": 0.0042666660000000006,
+      "jevErrors": [],
+      "actions": 3,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 2,
+          "elapsedMs": 2064.667125,
+          "verified": false,
+          "parentCallId": "call_278454"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 3.523353999997198,
+      "taskMs": 4382.118215999999,
+      "verification": {
+        "passed": true,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      }
+    },
+    {
+      "task": "search",
+      "category": "short-ui",
+      "repeat": 2,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Search catalog",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/search"
+      ],
+      "setupMs": 1994.468742000001,
+      "agentMs": 7333.674321999999,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 3,
+      "final": "Successfully searched the catalog for 'blue notebook'. The search results ('Blue Notebook, 12 EUR') are visible on the page.",
+      "errors": [
+        null,
+        null,
+        null
+      ],
+      "primaryCalls": 3,
+      "primaryMs": 5594.987901044078,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.004484999999999999,
+      "verificationMs": 4.929677000000083,
+      "taskMs": 7338.603998999999,
+      "verification": {
+        "passed": true,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      }
+    },
+    {
+      "task": "search",
+      "category": "short-ui",
+      "repeat": 2,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Search catalog",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/search"
+      ],
+      "setupMs": 405.3796289999955,
+      "agentMs": 4634.695309000002,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 2858.368837000002,
+      "jevCalls": 3,
+      "jevMs": 1442.755557000004,
+      "costUsd": 0.003938484,
+      "jevErrors": [],
+      "actions": 4,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 2,
+          "elapsedMs": 1774.4506760000004,
+          "verified": false,
+          "parentCallId": "call_621609"
+        }
+      ],
+      "routes": [
+        {
+          "mode": "fast",
+          "tool": "browser_task",
+          "switched": false
+        }
+      ],
+      "batches": [],
+      "verificationMs": 3.3781530000051134,
+      "taskMs": 4638.073462000008,
+      "verification": {
+        "passed": true,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      }
+    },
+    {
+      "task": "search",
+      "category": "short-ui",
+      "repeat": 3,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Search catalog",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/search"
+      ],
+      "setupMs": 2034.5695820000037,
+      "agentMs": 6679.118379,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 3,
+      "final": "Successfully searched the catalog for 'blue notebook'. The search results ('Search results for blue notebook: Blue Notebook, 12 EUR') are displayed and visible.",
+      "errors": [
+        null,
+        null
+      ],
+      "primaryCalls": 2,
+      "primaryMs": 4736.891686974559,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.00305775,
+      "verificationMs": 4.352787999996508,
+      "taskMs": 6683.471166999996,
+      "verification": {
+        "passed": true,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      }
+    },
+    {
+      "task": "search",
+      "category": "short-ui",
+      "repeat": 3,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Search catalog",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/search"
+      ],
+      "setupMs": 418.693263000001,
+      "agentMs": 4721.096798999999,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 2156.780375000002,
+      "jevCalls": 3,
+      "jevMs": 2232.867355999995,
+      "costUsd": 0.003943734,
+      "jevErrors": [],
+      "actions": 4,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 2,
+          "elapsedMs": 2562.7161510000005,
+          "verified": false,
+          "parentCallId": "call_481663"
+        }
+      ],
+      "routes": [
+        {
+          "mode": "fast",
+          "tool": "browser_task",
+          "switched": false
+        }
+      ],
+      "batches": [],
+      "verificationMs": 3.4432449999949313,
+      "taskMs": 4724.540043999994,
+      "verification": {
+        "passed": true,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      }
+    },
+    {
+      "task": "search",
+      "category": "short-ui",
+      "repeat": 3,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Search catalog",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/search"
+      ],
+      "setupMs": 382.7474910000019,
+      "agentMs": 5222.427458999999,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 3220.917669000002,
+      "jevCalls": 3,
+      "jevMs": 1851.3953790000014,
+      "costUsd": 0.004898316,
+      "jevErrors": [],
+      "actions": 3,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 2,
+          "elapsedMs": 1999.6188379999949,
+          "verified": false,
+          "parentCallId": "call_306129"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 3.5803429999941727,
+      "taskMs": 5226.007801999993,
+      "verification": {
+        "passed": true,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      }
+    },
+    {
+      "task": "filters",
+      "category": "short-ui",
+      "repeat": 1,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Category All Books Music",
+          "value": "All"
+        },
+        {
+          "role": "checkbox",
+          "name": "In stock",
+          "value": "on"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/filters"
+      ],
+      "setupMs": 384.8959479999976,
+      "agentMs": 3683.422649,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 2156.5402609999946,
+      "jevCalls": 4,
+      "jevMs": 1334.5723149999976,
+      "costUsd": 0.004091622,
+      "jevErrors": [],
+      "actions": 4,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 3,
+          "elapsedMs": 1525.1260890000049,
+          "verified": false,
+          "parentCallId": "call_316593"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 3.266686999995727,
+      "taskMs": 3686.689335999996,
+      "verification": {
+        "passed": true,
+        "expected": "Applied: Books, in stock: yes"
+      }
+    },
+    {
+      "task": "filters",
+      "category": "short-ui",
+      "repeat": 1,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Category All Books Music",
+          "value": "All"
+        },
+        {
+          "role": "checkbox",
+          "name": "In stock",
+          "value": "on"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/filters"
+      ],
+      "setupMs": 2019.0690769999928,
+      "agentMs": 6061.771844999996,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 4,
+      "final": "Filtered the catalog to Books with In stock enabled, applied the filters, and verified the results showing 'Applied: Books, in stock: yes'.",
+      "errors": [
+        null,
+        null
+      ],
+      "primaryCalls": 2,
+      "primaryMs": 3570.596428005956,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.00298275,
+      "verificationMs": 4.237689999994473,
+      "taskMs": 6066.00953499999,
+      "verification": {
+        "passed": true,
+        "expected": "Applied: Books, in stock: yes"
+      }
+    },
+    {
+      "task": "filters",
+      "category": "short-ui",
+      "repeat": 1,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Category All Books Music",
+          "value": "All"
+        },
+        {
+          "role": "checkbox",
+          "name": "In stock",
+          "value": "on"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/filters"
+      ],
+      "setupMs": 391.4819819999975,
+      "agentMs": 5504.462698999996,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 3222.66251200001,
+      "jevCalls": 4,
+      "jevMs": 1754.9322699999757,
+      "costUsd": 0.004055922,
+      "jevErrors": [],
+      "actions": 5,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 3,
+          "elapsedMs": 2280.071404000002,
+          "verified": false,
+          "parentCallId": "call_433511"
+        }
+      ],
+      "routes": [
+        {
+          "mode": "fast",
+          "tool": "browser_task",
+          "switched": false
+        }
+      ],
+      "batches": [],
+      "verificationMs": 3.3449780000082683,
+      "taskMs": 5507.807677000004,
+      "verification": {
+        "passed": true,
+        "expected": "Applied: Books, in stock: yes"
+      }
+    },
+    {
+      "task": "filters",
+      "category": "short-ui",
+      "repeat": 2,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Category All Books Music",
+          "value": "All"
+        },
+        {
+          "role": "checkbox",
+          "name": "In stock",
+          "value": "on"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/filters"
+      ],
+      "setupMs": 1996.6126590000058,
+      "agentMs": 5442.275529000006,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 4,
+      "final": "Catalog filters successfully set to Category: Books and In stock: yes. Applied filters and left results visible.",
+      "errors": [
+        null,
+        null
+      ],
+      "primaryCalls": 2,
+      "primaryMs": 3003.4754179650918,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.002469,
+      "verificationMs": 4.453499999988708,
+      "taskMs": 5446.729028999995,
+      "verification": {
+        "passed": true,
+        "expected": "Applied: Books, in stock: yes"
+      }
+    },
+    {
+      "task": "filters",
+      "category": "short-ui",
+      "repeat": 2,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Category All Books Music",
+          "value": "All"
+        },
+        {
+          "role": "checkbox",
+          "name": "In stock",
+          "value": "on"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/filters"
+      ],
+      "setupMs": 415.76013900000544,
+      "agentMs": 4793.7906800000055,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 2766.9467330000043,
+      "jevCalls": 4,
+      "jevMs": 1765.0127419999917,
+      "costUsd": 0.004062672,
+      "jevErrors": [],
+      "actions": 5,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 3,
+          "elapsedMs": 2024.963889000006,
+          "verified": false,
+          "parentCallId": "call_284166"
+        }
+      ],
+      "routes": [
+        {
+          "mode": "fast",
+          "tool": "browser_task",
+          "switched": false
+        }
+      ],
+      "batches": [],
+      "verificationMs": 3.310197999991942,
+      "taskMs": 4797.1008779999975,
+      "verification": {
+        "passed": true,
+        "expected": "Applied: Books, in stock: yes"
+      }
+    },
+    {
+      "task": "filters",
+      "category": "short-ui",
+      "repeat": 2,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Category All Books Music",
+          "value": "All"
+        },
+        {
+          "role": "checkbox",
+          "name": "In stock",
+          "value": "on"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/filters"
+      ],
+      "setupMs": 397.3909730000014,
+      "agentMs": 4961.418074000001,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 3278.151272999996,
+      "jevCalls": 4,
+      "jevMs": 1485.1762460000027,
+      "costUsd": 0.004143372,
+      "jevErrors": [],
+      "actions": 4,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 3,
+          "elapsedMs": 1680.8718039999949,
+          "verified": false,
+          "parentCallId": "call_480042"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 3.7125530000048457,
+      "taskMs": 4965.130627000006,
+      "verification": {
+        "passed": true,
+        "expected": "Applied: Books, in stock: yes"
+      }
+    },
+    {
+      "task": "filters",
+      "category": "short-ui",
+      "repeat": 3,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Category All Books Music",
+          "value": "All"
+        },
+        {
+          "role": "checkbox",
+          "name": "In stock",
+          "value": "on"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/filters"
+      ],
+      "setupMs": 398.1560150000005,
+      "agentMs": 4979.714535000006,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 2846.4462979999953,
+      "jevCalls": 4,
+      "jevMs": 1871.3476350000128,
+      "costUsd": 0.00415218,
+      "jevErrors": [],
+      "actions": 5,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 3,
+          "elapsedMs": 2131.2307569999975,
+          "verified": false,
+          "parentCallId": "call_320138"
+        }
+      ],
+      "routes": [
+        {
+          "mode": "fast",
+          "tool": "browser_task",
+          "switched": false
+        }
+      ],
+      "batches": [],
+      "verificationMs": 3.5747560000017984,
+      "taskMs": 4983.289291000008,
+      "verification": {
+        "passed": true,
+        "expected": "Applied: Books, in stock: yes"
+      }
+    },
+    {
+      "task": "filters",
+      "category": "short-ui",
+      "repeat": 3,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Category All Books Music",
+          "value": "All"
+        },
+        {
+          "role": "checkbox",
+          "name": "In stock",
+          "value": "on"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/filters"
+      ],
+      "setupMs": 404.18771800000104,
+      "agentMs": 3837.5316319999984,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 2303.4632060000004,
+      "jevCalls": 4,
+      "jevMs": 1334.974740000005,
+      "costUsd": 0.004093872,
+      "jevErrors": [],
+      "actions": 4,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 3,
+          "elapsedMs": 1532.1094480000029,
+          "verified": false,
+          "parentCallId": "call_335574"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 3.5594609999971,
+      "taskMs": 3841.0910929999955,
+      "verification": {
+        "passed": true,
+        "expected": "Applied: Books, in stock: yes"
+      }
+    },
+    {
+      "task": "filters",
+      "category": "short-ui",
+      "repeat": 3,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Category All Books Music",
+          "value": "All"
+        },
+        {
+          "role": "checkbox",
+          "name": "In stock",
+          "value": "on"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/filters"
+      ],
+      "setupMs": 2023.3208040000027,
+      "agentMs": 9344.502397999997,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 4,
+      "final": "Catalog has been filtered to Books with In stock enabled. The filters were applied and results are visible: 'Applied: Books, in stock: yes'.",
+      "errors": [
+        null,
+        null
+      ],
+      "primaryCalls": 2,
+      "primaryMs": 6885.98700199509,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.00270525,
+      "verificationMs": 5.057627000001958,
+      "taskMs": 9349.560024999999,
+      "verification": {
+        "passed": true,
+        "expected": "Applied: Books, in stock: yes"
+      }
+    },
+    {
+      "task": "autocomplete",
+      "category": "short-ui",
+      "repeat": 1,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/autocomplete"
+      ],
+      "setupMs": 2075.0836719999934,
+      "agentMs": 9518.346015999996,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 4,
+      "final": "Successfully selected Paris, France as the destination using the autocomplete suggestion.",
+      "errors": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "primaryCalls": 4,
+      "primaryMs": 7793.1411290192045,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.0049305,
+      "verificationMs": 4.461042000009911,
+      "taskMs": 9522.807058000006,
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Paris, France"
+      }
+    },
+    {
+      "task": "autocomplete",
+      "category": "short-ui",
+      "repeat": 1,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/autocomplete"
+      ],
+      "setupMs": 404.567234999995,
+      "agentMs": 10601.422028,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 8167.958630000008,
+      "jevCalls": 4,
+      "jevMs": 1793.6744189999881,
+      "costUsd": 0.003946422,
+      "jevErrors": [],
+      "actions": 5,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 3,
+          "elapsedMs": 2431.2522929999977,
+          "verified": false,
+          "parentCallId": "call_327157"
+        }
+      ],
+      "routes": [
+        {
+          "mode": "fast",
+          "tool": "browser_task",
+          "switched": false
+        }
+      ],
+      "batches": [],
+      "verificationMs": 4.500712000008207,
+      "taskMs": 10605.922740000009,
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Paris, France"
+      }
+    },
+    {
+      "task": "autocomplete",
+      "category": "short-ui",
+      "repeat": 1,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/autocomplete"
+      ],
+      "setupMs": 407.9803780000075,
+      "agentMs": 6043.345964000007,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 3,
+      "primaryMs": 4644.928728000057,
+      "jevCalls": 2,
+      "jevMs": 1218.6179019999981,
+      "costUsd": 0.006302592,
+      "jevErrors": [],
+      "actions": 3,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_operation",
+          "actions": 1,
+          "elapsedMs": 1335.5701370000024,
+          "verified": false,
+          "parentCallId": "call_214714"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 3.6481600000115577,
+      "taskMs": 6046.994124000019,
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Paris, France"
+      }
+    },
+    {
+      "task": "autocomplete",
+      "category": "short-ui",
+      "repeat": 2,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/autocomplete"
+      ],
+      "setupMs": 404.2093679999816,
+      "agentMs": 4513.176636999997,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 2273.4614140000194,
+      "jevCalls": 4,
+      "jevMs": 1603.2312720000045,
+      "costUsd": 0.003942918,
+      "jevErrors": [],
+      "actions": 5,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 3,
+          "elapsedMs": 2237.980505000014,
+          "verified": false,
+          "parentCallId": "call_264978"
+        }
+      ],
+      "routes": [
+        {
+          "mode": "fast",
+          "tool": "browser_task",
+          "switched": false
+        }
+      ],
+      "batches": [],
+      "verificationMs": 3.6393589999934193,
+      "taskMs": 4516.81599599999,
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Paris, France"
+      }
+    },
+    {
+      "task": "autocomplete",
+      "category": "short-ui",
+      "repeat": 2,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/autocomplete"
+      ],
+      "setupMs": 379.57173799999873,
+      "agentMs": 4193.15101999999,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 2384.0816279999854,
+      "jevCalls": 4,
+      "jevMs": 1329.278065999999,
+      "costUsd": 0.0040743,
+      "jevErrors": [],
+      "actions": 4,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 3,
+          "elapsedMs": 1806.956204999995,
+          "verified": false,
+          "parentCallId": "call_305072"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 3.2293209999916144,
+      "taskMs": 4196.380340999982,
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Paris, France"
+      }
+    },
+    {
+      "task": "autocomplete",
+      "category": "short-ui",
+      "repeat": 2,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/autocomplete"
+      ],
+      "setupMs": 2028.5903270000126,
+      "agentMs": 8089.25273800001,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 4,
+      "final": "Successfully selected 'Paris, France' as the destination using the autocomplete suggestion.",
+      "errors": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "primaryCalls": 4,
+      "primaryMs": 6363.6466130265035,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.004545,
+      "verificationMs": 4.826521999988472,
+      "taskMs": 8094.079259999999,
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Paris, France"
+      }
+    },
+    {
+      "task": "autocomplete",
+      "category": "short-ui",
+      "repeat": 3,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/autocomplete"
+      ],
+      "setupMs": 398.7410749999981,
+      "agentMs": 4609.137443999993,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 2308.3190579999937,
+      "jevCalls": 4,
+      "jevMs": 1849.1434109999973,
+      "costUsd": 0.004015002,
+      "jevErrors": [],
+      "actions": 4,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 3,
+          "elapsedMs": 2299.1601430000155,
+          "verified": false,
+          "parentCallId": "call_503714"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 3.469576000003144,
+      "taskMs": 4612.607019999996,
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Paris, France"
+      }
+    },
+    {
+      "task": "autocomplete",
+      "category": "short-ui",
+      "repeat": 3,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/autocomplete"
+      ],
+      "setupMs": 2033.6637379999738,
+      "agentMs": 9427.272346999991,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 4,
+      "final": "Successfully selected Paris, France as the destination using the autocomplete suggestion.",
+      "errors": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "primaryCalls": 4,
+      "primaryMs": 7616.320663015358,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.004641,
+      "verificationMs": 4.880299000011291,
+      "taskMs": 9432.152646000002,
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Paris, France"
+      }
+    },
+    {
+      "task": "autocomplete",
+      "category": "short-ui",
+      "repeat": 3,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/autocomplete"
+      ],
+      "setupMs": 392.9188949999807,
+      "agentMs": 8718.055611999996,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 6517.752945000015,
+      "jevCalls": 4,
+      "jevMs": 1552.0311149999907,
+      "costUsd": 0.003964433999999999,
+      "jevErrors": [],
+      "actions": 5,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 3,
+          "elapsedMs": 2198.697924999986,
+          "verified": false,
+          "parentCallId": "call_366102"
+        }
+      ],
+      "routes": [
+        {
+          "mode": "fast",
+          "tool": "browser_task",
+          "switched": false
+        }
+      ],
+      "batches": [],
+      "verificationMs": 4.0044899999920744,
+      "taskMs": 8722.060101999989,
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Paris, France"
+      }
+    },
+    {
+      "task": "wizard-6",
+      "category": "long-ui",
+      "repeat": 1,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/wizard-6"
+      ],
+      "setupMs": 400.5642109999899,
+      "agentMs": 13346.238283999992,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 8,
+      "primaryMs": 12552.15007199996,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.02775975,
+      "jevErrors": [],
+      "actions": 24,
+      "fallbacks": [],
+      "routes": [
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        }
+      ],
+      "batches": [
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 0,
+          "requested": 0,
+          "verified": false,
+          "elapsedMs": 15.883933999983128,
+          "parentCallId": "call_378113"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 173.26987099999678,
+          "parentCallId": "call_217675"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 111.53841700000339,
+          "parentCallId": "call_232886"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 124.26720099998056,
+          "parentCallId": "call_222085"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 117.47730100000626,
+          "parentCallId": "call_347351"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 119.22417100000894,
+          "parentCallId": "call_347381"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 123.77251500001876,
+          "parentCallId": "call_230059"
+        }
+      ],
+      "verificationMs": 2.289537000004202,
+      "taskMs": 13348.527820999996,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Basel",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Bern",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lucerne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lausanne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lugano",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Chur",
+            "person": "Ada",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "wizard-6",
+      "category": "long-ui",
+      "repeat": 1,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/wizard-6"
+      ],
+      "setupMs": 392.4818990000058,
+      "agentMs": 24506.702000999998,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 13,
+      "primaryMs": 18545.379459999996,
+      "jevCalls": 14,
+      "jevMs": 5246.681166000053,
+      "costUsd": 0.05473074000000001,
+      "jevErrors": [],
+      "actions": 25,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_target",
+          "actions": 13,
+          "elapsedMs": 5666.3802109999815,
+          "verified": false,
+          "parentCallId": "call_398669"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 2.294006999989506,
+      "taskMs": 24508.996007999987,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Basel",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Bern",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lucerne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lausanne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lugano",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Chur",
+            "person": "Ada",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "wizard-6",
+      "category": "long-ui",
+      "repeat": 1,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/wizard-6"
+      ],
+      "setupMs": 2111.7749970000004,
+      "agentMs": 24280.77584700001,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 25,
+      "final": "Successfully prepared all 6 trip segments in order (Basel, Bern, Lucerne, Lausanne, Lugano, Chur) with Destination set to each corresponding city, Traveler set to Ada, and Transport set to Train. Advanced through the wizard to the completed review screen.",
+      "errors": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "primaryCalls": 7,
+      "primaryMs": 15349.925227987114,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.011786249999999998,
+      "verificationMs": 2.591251000005286,
+      "taskMs": 24283.367098000017,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Basel",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Bern",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lucerne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lausanne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lugano",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Chur",
+            "person": "Ada",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "wizard-6",
+      "category": "long-ui",
+      "repeat": 2,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/wizard-6"
+      ],
+      "setupMs": 404.4987900000124,
+      "agentMs": 30075.633704000007,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 14,
+      "primaryMs": 23362.786537999957,
+      "jevCalls": 13,
+      "jevMs": 6016.408732000156,
+      "costUsd": 0.061246086000000005,
+      "jevErrors": [],
+      "actions": 25,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_target",
+          "actions": 12,
+          "elapsedMs": 6400.1786999999895,
+          "verified": false,
+          "parentCallId": "call_285800"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 2.0686290000448935,
+      "taskMs": 30077.702333000052,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Basel",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Bern",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lucerne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lausanne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lugano",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Chur",
+            "person": "Ada",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "wizard-6",
+      "category": "long-ui",
+      "repeat": 2,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/wizard-6"
+      ],
+      "setupMs": 2102.9389569999767,
+      "agentMs": 26616.647559999954,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 25,
+      "final": "Prepared all 6 trip segments in the specified order (Basel, Bern, Lucerne, Lausanne, Lugano, Chur) with Traveler set to Ada and Transport set to Train. Reached the completed review showing all 6 recorded segments.",
+      "errors": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "primaryCalls": 7,
+      "primaryMs": 17723.354933958035,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.01175775,
+      "verificationMs": 2.2904449999914505,
+      "taskMs": 26618.938004999945,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Basel",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Bern",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lucerne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lausanne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lugano",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Chur",
+            "person": "Ada",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "wizard-6",
+      "category": "long-ui",
+      "repeat": 2,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/wizard-6"
+      ],
+      "setupMs": 382.0125499999849,
+      "agentMs": 21556.381446000014,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 8,
+      "primaryMs": 20793.49489599996,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.027564,
+      "jevErrors": [],
+      "actions": 24,
+      "fallbacks": [],
+      "routes": [
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        }
+      ],
+      "batches": [
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 0,
+          "requested": 0,
+          "verified": false,
+          "elapsedMs": 16.540302000008523,
+          "parentCallId": "call_219667"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 155.2573160000029,
+          "parentCallId": "call_312445"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 115.37340199999744,
+          "parentCallId": "call_269430"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 129.03310000000056,
+          "parentCallId": "call_330157"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 116.59639299998526,
+          "parentCallId": "call_298277"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 107.81475900002988,
+          "parentCallId": "call_455515"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 114.73840500001097,
+          "parentCallId": "call_262236"
+        }
+      ],
+      "verificationMs": 2.3472949999850243,
+      "taskMs": 21558.728741,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Basel",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Bern",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lucerne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lausanne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lugano",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Chur",
+            "person": "Ada",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "wizard-6",
+      "category": "long-ui",
+      "repeat": 3,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/wizard-6"
+      ],
+      "setupMs": 2031.5115759999608,
+      "agentMs": 21406.077201000007,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 25,
+      "final": "Prepared all 6 trip segments in order (Basel, Bern, Lucerne, Lausanne, Lugano, Chur) with Traveler set to Ada and Transport set to Train. Reached the completed review showing all 6 segments recorded.",
+      "errors": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "primaryCalls": 7,
+      "primaryMs": 12447.831624944229,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.011227499999999998,
+      "verificationMs": 2.399187000002712,
+      "taskMs": 21408.47638800001,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Basel",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Bern",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lucerne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lausanne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lugano",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Chur",
+            "person": "Ada",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "wizard-6",
+      "category": "long-ui",
+      "repeat": 3,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/wizard-6"
+      ],
+      "setupMs": 404.3269100000034,
+      "agentMs": 11268.419966000016,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 8,
+      "primaryMs": 10488.450659999915,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.02757675,
+      "jevErrors": [],
+      "actions": 24,
+      "fallbacks": [],
+      "routes": [
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        }
+      ],
+      "batches": [
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 0,
+          "requested": 0,
+          "verified": false,
+          "elapsedMs": 15.796142999955919,
+          "parentCallId": "call_326981"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 163.15622399997665,
+          "parentCallId": "call_296390"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 111.03982000000542,
+          "parentCallId": "call_484329"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 125.9409469999955,
+          "parentCallId": "call_325142"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 119.89779000001727,
+          "parentCallId": "call_276511"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 120.30035500001395,
+          "parentCallId": "call_310251"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 116.73369999998249,
+          "parentCallId": "call_384972"
+        }
+      ],
+      "verificationMs": 2.072818999993615,
+      "taskMs": 11270.49278500001,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Basel",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Bern",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lucerne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lausanne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lugano",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Chur",
+            "person": "Ada",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "wizard-6",
+      "category": "long-ui",
+      "repeat": 3,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/wizard-6"
+      ],
+      "setupMs": 399.29519500001334,
+      "agentMs": 44815.859637000016,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 26,
+      "primaryMs": 43059.04878199997,
+      "jevCalls": 1,
+      "jevMs": 1024.9431299999706,
+      "costUsd": 0.17276089500000003,
+      "jevErrors": [],
+      "actions": 25,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_target",
+          "actions": 0,
+          "elapsedMs": 1084.6525379999657,
+          "verified": false,
+          "parentCallId": "call_293569"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 2.1211500000208616,
+      "taskMs": 44817.98078700004,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Basel",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Bern",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lucerne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lausanne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lugano",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Chur",
+            "person": "Ada",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "wizard-10",
+      "category": "long-ui",
+      "repeat": 1,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/wizard-10"
+      ],
+      "setupMs": 398.53350600000704,
+      "agentMs": 60360.49528199999,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 42,
+      "primaryMs": 58197.611969000194,
+      "jevCalls": 1,
+      "jevMs": 1022.761566000001,
+      "costUsd": 0.25696599900000006,
+      "jevErrors": [],
+      "actions": 41,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_target",
+          "actions": 0,
+          "elapsedMs": 1073.3951720000478,
+          "verified": false,
+          "parentCallId": "call_156692"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 2.9280259999795817,
+      "taskMs": 60363.42330799997,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Basel",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Bern",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lucerne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lausanne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lugano",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Chur",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "St Gallen",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Winterthur",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Baden",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Thun",
+            "person": "Ada",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "wizard-10",
+      "category": "long-ui",
+      "repeat": 1,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/wizard-10"
+      ],
+      "setupMs": 2116.5022719999542,
+      "agentMs": 40211.036835000035,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 41,
+      "final": "All 10 trip segments have been successfully prepared in the specified order (Basel, Bern, Lucerne, Lausanne, Lugano, Chur, St Gallen, Winterthur, Baden, Thun) with Destination set to the respective city, Traveler set to Ada, and Transport set to Train. The wizard has navigated to the completed review showing all 10 recorded segments.",
+      "errors": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "primaryCalls": 11,
+      "primaryMs": 25653.866431151982,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.0207105,
+      "verificationMs": 2.868730999995023,
+      "taskMs": 40213.90556600003,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Basel",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Bern",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lucerne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lausanne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lugano",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Chur",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "St Gallen",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Winterthur",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Baden",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Thun",
+            "person": "Ada",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "wizard-10",
+      "category": "long-ui",
+      "repeat": 1,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/wizard-10"
+      ],
+      "setupMs": 394.62819099996705,
+      "agentMs": 26136.624889000086,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 12,
+      "primaryMs": 24895.036401999998,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.05179125,
+      "jevErrors": [],
+      "actions": 40,
+      "fallbacks": [],
+      "routes": [
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        }
+      ],
+      "batches": [
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 0,
+          "requested": 0,
+          "verified": false,
+          "elapsedMs": 15.505742999957874,
+          "parentCallId": "call_279703"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 161.77301800006535,
+          "parentCallId": "call_503045"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 111.81862000003457,
+          "parentCallId": "call_268343"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 119.69916099996772,
+          "parentCallId": "call_282023"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 119.88053900003433,
+          "parentCallId": "call_359826"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 114.79832900001202,
+          "parentCallId": "call_324643"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 118.16076700005215,
+          "parentCallId": "call_314496"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 110.20975599996746,
+          "parentCallId": "call_373157"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 116.50874100008514,
+          "parentCallId": "call_263310"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 119.2447740000207,
+          "parentCallId": "call_360590"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 122.54463599994779,
+          "parentCallId": "call_335111"
+        }
+      ],
+      "verificationMs": 2.5938350000651553,
+      "taskMs": 26139.21872400015,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Basel",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Bern",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lucerne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lausanne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lugano",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Chur",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "St Gallen",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Winterthur",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Baden",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Thun",
+            "person": "Ada",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "wizard-10",
+      "category": "long-ui",
+      "repeat": 2,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/wizard-10"
+      ],
+      "setupMs": 2114.607476999983,
+      "agentMs": 47794.672876999946,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 41,
+      "final": "Prepared all 10 trip segments in the specified order (Basel, Bern, Lucerne, Lausanne, Lugano, Chur, St Gallen, Winterthur, Baden, Thun) with Traveler 'Ada' and Transport 'Train'. Progressed through each step using 'Next segment' and finished at the final 'Review' page where all 10 segments are recorded.",
+      "errors": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "primaryCalls": 11,
+      "primaryMs": 33272.72715698928,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.020475749999999997,
+      "verificationMs": 2.7041840000310913,
+      "taskMs": 47797.37706099998,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Basel",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Bern",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lucerne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lausanne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lugano",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Chur",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "St Gallen",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Winterthur",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Baden",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Thun",
+            "person": "Ada",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "wizard-10",
+      "category": "long-ui",
+      "repeat": 2,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/wizard-10"
+      ],
+      "setupMs": 386.84696200001054,
+      "agentMs": 26784.340000999975,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 12,
+      "primaryMs": 25517.876390000107,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.052034250000000004,
+      "jevErrors": [],
+      "actions": 40,
+      "fallbacks": [],
+      "routes": [
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        }
+      ],
+      "batches": [
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 0,
+          "requested": 0,
+          "verified": false,
+          "elapsedMs": 16.351269999984652,
+          "parentCallId": "call_317459"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 159.19292200007476,
+          "parentCallId": "call_334389"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 115.70452999998815,
+          "parentCallId": "call_356527"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 118.18844399997033,
+          "parentCallId": "call_411298"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 114.29104099993128,
+          "parentCallId": "call_288597"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 122.08797999995295,
+          "parentCallId": "call_492404"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 120.45577900006901,
+          "parentCallId": "call_249210"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 125.82850599999074,
+          "parentCallId": "call_457657"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 121.32465900003444,
+          "parentCallId": "call_309505"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 119.67929300002288,
+          "parentCallId": "call_424788"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 121.43281899997965,
+          "parentCallId": "call_411574"
+        }
+      ],
+      "verificationMs": 2.703570000012405,
+      "taskMs": 26787.043570999987,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Basel",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Bern",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lucerne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lausanne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lugano",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Chur",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "St Gallen",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Winterthur",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Baden",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Thun",
+            "person": "Ada",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "wizard-10",
+      "category": "long-ui",
+      "repeat": 2,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/wizard-10"
+      ],
+      "setupMs": 397.27321199991275,
+      "agentMs": 74483.94697199995,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 42,
+      "primaryMs": 72068.79730899993,
+      "jevCalls": 1,
+      "jevMs": 1225.2231129999273,
+      "costUsd": 0.2619109559999999,
+      "jevErrors": [],
+      "actions": 41,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_target",
+          "actions": 0,
+          "elapsedMs": 1277.6858699999284,
+          "verified": false,
+          "parentCallId": "call_39910"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 2.2514049999881536,
+      "taskMs": 74486.19837699994,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Basel",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Bern",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lucerne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lausanne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lugano",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Chur",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "St Gallen",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Winterthur",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Baden",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Thun",
+            "person": "Ada",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "wizard-10",
+      "category": "long-ui",
+      "repeat": 3,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/wizard-10"
+      ],
+      "setupMs": 408.50485899997875,
+      "agentMs": 24792.61501900002,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 12,
+      "primaryMs": 23512.80400500004,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.0491829,
+      "jevErrors": [],
+      "actions": 40,
+      "fallbacks": [],
+      "routes": [
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        }
+      ],
+      "batches": [
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 0,
+          "requested": 0,
+          "verified": false,
+          "elapsedMs": 15.877514000050724,
+          "parentCallId": "call_330968"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 161.37148599990178,
+          "parentCallId": "call_223939"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 122.54194899997674,
+          "parentCallId": "call_459171"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 118.11917499999981,
+          "parentCallId": "call_484208"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 123.57601000007708,
+          "parentCallId": "call_501525"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 119.2594650000101,
+          "parentCallId": "call_289471"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 119.58834500005469,
+          "parentCallId": "call_279616"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 120.16160099999979,
+          "parentCallId": "call_324405"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 123.27149100007955,
+          "parentCallId": "call_326872"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 122.19439700001385,
+          "parentCallId": "call_316645"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 4,
+          "requested": 4,
+          "verified": false,
+          "elapsedMs": 121.91230599989649,
+          "parentCallId": "call_553063"
+        }
+      ],
+      "verificationMs": 2.7819880000315607,
+      "taskMs": 24795.39700700005,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Basel",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Bern",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lucerne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lausanne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lugano",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Chur",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "St Gallen",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Winterthur",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Baden",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Thun",
+            "person": "Ada",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "wizard-10",
+      "category": "long-ui",
+      "repeat": 3,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/wizard-10"
+      ],
+      "setupMs": 384.82453300000634,
+      "agentMs": 78161.39694899996,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 44,
+      "primaryMs": 76277.74800799962,
+      "jevCalls": 1,
+      "jevMs": 688.2801110000582,
+      "costUsd": 0.27440840099999997,
+      "jevErrors": [],
+      "actions": 41,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_target",
+          "actions": 0,
+          "elapsedMs": 746.8893150000367,
+          "verified": false,
+          "parentCallId": "call_348342"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 2.7864290000870824,
+      "taskMs": 78164.18337800005,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Basel",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Bern",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lucerne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lausanne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lugano",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Chur",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "St Gallen",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Winterthur",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Baden",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Thun",
+            "person": "Ada",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "wizard-10",
+      "category": "long-ui",
+      "repeat": 3,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Destination",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Traveler",
+          "value": ""
+        },
+        {
+          "role": "combobox",
+          "name": "Transport Choose Train Bus",
+          "value": "Choose"
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/wizard-10"
+      ],
+      "setupMs": 2128.6888150000013,
+      "agentMs": 36391.93050999998,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 41,
+      "final": "Successfully prepared all 10 trip segments in the specified order: Basel, Bern, Lucerne, Lausanne, Lugano, Chur, St Gallen, Winterthur, Baden, Thun. For every segment, Destination was set to the city, Traveler to Ada, and Transport to Train. Stopped at the completed review page showing all 10 segments recorded.",
+      "errors": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "primaryCalls": 11,
+      "primaryMs": 21729.737451067194,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.022101000000000003,
+      "verificationMs": 3.439714999985881,
+      "taskMs": 36395.37022499996,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "count": true,
+          "values": true
+        },
+        "records": [
+          {
+            "city": "Basel",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Bern",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lucerne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lausanne",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Lugano",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Chur",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "St Gallen",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Winterthur",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Baden",
+            "person": "Ada",
+            "mode": "Train"
+          },
+          {
+            "city": "Thun",
+            "person": "Ada",
+            "mode": "Train"
+          }
+        ]
+      }
+    },
+    {
+      "task": "compare-offers",
+      "category": "reasoning",
+      "repeat": 1,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected hotel Choose Alba Bello Cielo Doria",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "Total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/compare-offers"
+      ],
+      "setupMs": 2127.693178000045,
+      "agentMs": 13530.537427000003,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 4,
+      "final": "Selected the cheapest eligible hotel (Bello) with free cancellation and breakfast included, calculated the total as 327 EUR for 3 nights (109 EUR/night * 3), entered 327, and clicked Save comparison. The comparison was successfully saved.",
+      "errors": [
+        null,
+        null
+      ],
+      "primaryCalls": 2,
+      "primaryMs": 11711.892105988227,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.017121,
+      "verificationMs": 2.3044050000607967,
+      "taskMs": 13532.841832000064,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "hotel": "Bello",
+          "total": "327"
+        }
+      }
+    },
+    {
+      "task": "compare-offers",
+      "category": "reasoning",
+      "repeat": 1,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected hotel Choose Alba Bello Cielo Doria",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "Total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/compare-offers"
+      ],
+      "setupMs": 405.2396459999727,
+      "agentMs": 4711.675494000083,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 3,
+      "primaryMs": 4554.965390000027,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.00744675,
+      "jevErrors": [],
+      "actions": 3,
+      "fallbacks": [],
+      "routes": [
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        }
+      ],
+      "batches": [
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 0,
+          "requested": 0,
+          "verified": false,
+          "elapsedMs": 16.421301000053063,
+          "parentCallId": "call_389226"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 3,
+          "requested": 3,
+          "verified": false,
+          "elapsedMs": 137.68749000004027,
+          "parentCallId": "call_443796"
+        }
+      ],
+      "verificationMs": 1.8278449999634176,
+      "taskMs": 4713.503339000046,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "hotel": "Bello",
+          "total": "327"
+        }
+      }
+    },
+    {
+      "task": "compare-offers",
+      "category": "reasoning",
+      "repeat": 1,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected hotel Choose Alba Bello Cielo Doria",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "Total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/compare-offers"
+      ],
+      "setupMs": 399.30344699998386,
+      "agentMs": 14179.382436000044,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 5,
+      "primaryMs": 12241.4379149999,
+      "jevCalls": 4,
+      "jevMs": 1715.2125559998676,
+      "costUsd": 0.014436479999999998,
+      "jevErrors": [],
+      "actions": 7,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_target",
+          "actions": 3,
+          "elapsedMs": 1857.3288259999827,
+          "verified": false,
+          "parentCallId": "call_362369"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 1.8878960000583902,
+      "taskMs": 14181.270332000102,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "hotel": "Bello",
+          "total": "327"
+        }
+      }
+    },
+    {
+      "task": "compare-offers",
+      "category": "reasoning",
+      "repeat": 2,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected hotel Choose Alba Bello Cielo Doria",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "Total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/compare-offers"
+      ],
+      "setupMs": 417.0713749999413,
+      "agentMs": 4583.476206999971,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 3,
+      "primaryMs": 4427.060959000024,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.0073620000000000005,
+      "jevErrors": [],
+      "actions": 3,
+      "fallbacks": [],
+      "routes": [
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        }
+      ],
+      "batches": [
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 0,
+          "requested": 0,
+          "verified": false,
+          "elapsedMs": 15.550231000059284,
+          "parentCallId": "call_307771"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 3,
+          "requested": 3,
+          "verified": false,
+          "elapsedMs": 138.71213599992916,
+          "parentCallId": "call_312160"
+        }
+      ],
+      "verificationMs": 1.7783760000020266,
+      "taskMs": 4585.254582999973,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "hotel": "Bello",
+          "total": "327"
+        }
+      }
+    },
+    {
+      "task": "compare-offers",
+      "category": "reasoning",
+      "repeat": 2,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected hotel Choose Alba Bello Cielo Doria",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "Total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/compare-offers"
+      ],
+      "setupMs": 393.9675629999256,
+      "agentMs": 11500.299734999891,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 6,
+      "primaryMs": 10199.771761999931,
+      "jevCalls": 2,
+      "jevMs": 1112.3186070001684,
+      "costUsd": 0.01619973,
+      "jevErrors": [],
+      "actions": 4,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_target",
+          "actions": 1,
+          "elapsedMs": 1228.9239190000808,
+          "verified": false,
+          "parentCallId": "call_228145"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 2.219431999954395,
+      "taskMs": 11502.519166999846,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "hotel": "Bello",
+          "total": "327"
+        }
+      }
+    },
+    {
+      "task": "compare-offers",
+      "category": "reasoning",
+      "repeat": 2,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected hotel Choose Alba Bello Cielo Doria",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "Total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/compare-offers"
+      ],
+      "setupMs": 2020.1124690000433,
+      "agentMs": 8991.38390200003,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 4,
+      "final": "The cheapest eligible hotel for a 3-night stay for one adult with free cancellation and breakfast is Bello. Total cost is 327 EUR (109 EUR/night × 3 nights, breakfast included). Bello was selected, 327 was entered into the total field, and the comparison was successfully saved.",
+      "errors": [
+        null,
+        null
+      ],
+      "primaryCalls": 2,
+      "primaryMs": 7253.6034469958395,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.014877,
+      "verificationMs": 2.0348969999467954,
+      "taskMs": 8993.418798999977,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "hotel": "Bello",
+          "total": "327"
+        }
+      }
+    },
+    {
+      "task": "compare-offers",
+      "category": "reasoning",
+      "repeat": 3,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected hotel Choose Alba Bello Cielo Doria",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "Total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/compare-offers"
+      ],
+      "setupMs": 393.8303099999903,
+      "agentMs": 12260.088295999914,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 6,
+      "primaryMs": 11255.917740999954,
+      "jevCalls": 1,
+      "jevMs": 818.3518650000915,
+      "costUsd": 0.017059134,
+      "jevErrors": [],
+      "actions": 4,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_target",
+          "actions": 0,
+          "elapsedMs": 876.4639489999972,
+          "verified": false,
+          "parentCallId": "call_484039"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 1.956036000046879,
+      "taskMs": 12262.044331999961,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "hotel": "Bello",
+          "total": "327"
+        }
+      }
+    },
+    {
+      "task": "compare-offers",
+      "category": "reasoning",
+      "repeat": 3,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected hotel Choose Alba Bello Cielo Doria",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "Total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/compare-offers"
+      ],
+      "setupMs": 2033.8294679999817,
+      "agentMs": 8166.070272000041,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 4,
+      "final": "The cheapest eligible hotel is Bello at 327 EUR total for a three-night stay (109 EUR/night including breakfast with free cancellation). Bello was selected, the total of 327 EUR was entered, and the comparison was saved successfully.",
+      "errors": [
+        null,
+        null
+      ],
+      "primaryCalls": 2,
+      "primaryMs": 6360.7367550139315,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.015078749999999998,
+      "verificationMs": 2.1259599999757484,
+      "taskMs": 8168.196232000017,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "hotel": "Bello",
+          "total": "327"
+        }
+      }
+    },
+    {
+      "task": "compare-offers",
+      "category": "reasoning",
+      "repeat": 3,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected hotel Choose Alba Bello Cielo Doria",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "Total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/compare-offers"
+      ],
+      "setupMs": 376.61447700008284,
+      "agentMs": 6084.154128000024,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 3,
+      "primaryMs": 5929.340287000057,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.007407,
+      "jevErrors": [],
+      "actions": 3,
+      "fallbacks": [],
+      "routes": [
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        }
+      ],
+      "batches": [
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 0,
+          "requested": 0,
+          "verified": false,
+          "elapsedMs": 15.37542699999176,
+          "parentCallId": "call_348765"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 3,
+          "requested": 3,
+          "verified": false,
+          "elapsedMs": 136.8600809999043,
+          "parentCallId": "call_339820"
+        }
+      ],
+      "verificationMs": 1.9240400000708178,
+      "taskMs": 6086.078168000095,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "hotel": "Bello",
+          "total": "327"
+        }
+      }
+    },
+    {
+      "task": "research-offers",
+      "category": "reasoning",
+      "repeat": 1,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected provider Choose Atlas Boreal Cedar",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "First-year total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/research-offers"
+      ],
+      "setupMs": 404.8709619999863,
+      "agentMs": 17086.43415899994,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 9,
+      "primaryMs": 16250.255367000005,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.0333105,
+      "jevErrors": [],
+      "actions": 9,
+      "fallbacks": [],
+      "routes": [
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        },
+        {
+          "mode": "planned",
+          "tool": "browser_batch",
+          "previous": "planned",
+          "switched": false
+        }
+      ],
+      "batches": [
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 0,
+          "requested": 0,
+          "verified": false,
+          "elapsedMs": 16.821514999959618,
+          "parentCallId": "call_510844"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 135.52692500001285,
+          "parentCallId": "call_343665"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 104.91109199996572,
+          "parentCallId": "call_285831"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 107.38561600004323,
+          "parentCallId": "call_301714"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 103.10057400004007,
+          "parentCallId": "call_271565"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 111.80292600009125,
+          "parentCallId": "call_265854"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 1,
+          "requested": 1,
+          "verified": false,
+          "elapsedMs": 109.69916399999056,
+          "parentCallId": "call_347862"
+        },
+        {
+          "status": "completion_candidate",
+          "reason": "batch_executed",
+          "actions": 3,
+          "requested": 3,
+          "verified": false,
+          "elapsedMs": 139.3945610000519,
+          "parentCallId": "call_316064"
+        }
+      ],
+      "verificationMs": 3.135111999930814,
+      "taskMs": 17089.56927099987,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "provider": "Boreal",
+          "total": "744"
+        },
+        "visited": [
+          "atlas",
+          "boreal",
+          "cedar"
+        ]
+      }
+    },
+    {
+      "task": "research-offers",
+      "category": "reasoning",
+      "repeat": 1,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected provider Choose Atlas Boreal Cedar",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "First-year total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/research-offers"
+      ],
+      "setupMs": 394.7289190000156,
+      "agentMs": 14821.556404000032,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 9,
+      "primaryMs": 13085.83139800001,
+      "jevCalls": 2,
+      "jevMs": 1197.3342740000226,
+      "costUsd": 0.034102908,
+      "jevErrors": [],
+      "actions": 9,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_operation",
+          "actions": 1,
+          "elapsedMs": 1362.9085340000456,
+          "verified": false,
+          "parentCallId": "call_496674"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 2.529776999959722,
+      "taskMs": 14824.086180999991,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "provider": "Boreal",
+          "total": "744"
+        },
+        "visited": [
+          "atlas",
+          "boreal",
+          "cedar"
+        ]
+      }
+    },
+    {
+      "task": "research-offers",
+      "category": "reasoning",
+      "repeat": 1,
+      "engine": "browser-use",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected provider Choose Atlas Boreal Cedar",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "First-year total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/research-offers"
+      ],
+      "setupMs": 2003.8646090000402,
+      "agentMs": 31155.604980000062,
+      "kind": "result",
+      "state": "done",
+      "completed": true,
+      "error": null,
+      "actions": 10,
+      "final": "Visited all three offer pages (Atlas, Boreal, Cedar). Atlas qualifies (25 users, SSO, EU residency) at €250 setup + 12 × €49/mo = €838 first year. Boreal qualifies (20 users, SSO, EU residency) at €0 setup + 12 × €62/mo = €744 first year. Cedar fails qualification due to US data residency only. Selected Boreal as the qualifying winner, entered 744 as the numeric first-year total in EUR, and saved the comparison successfully.",
+      "errors": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "primaryCalls": 8,
+      "primaryMs": 24235.629368922673,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0.050450625000000006,
+      "verificationMs": 3.609957000007853,
+      "taskMs": 31159.21493700007,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "provider": "Boreal",
+          "total": "744"
+        },
+        "visited": [
+          "atlas",
+          "boreal",
+          "cedar"
+        ]
+      }
+    },
+    {
+      "task": "research-offers",
+      "category": "reasoning",
+      "repeat": 2,
+      "engine": "app-first",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected provider Choose Atlas Boreal Cedar",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "First-year total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/research-offers"
+      ],
+      "setupMs": 411.4596619999502,
+      "agentMs": 15804.94759799994,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 10,
+      "primaryMs": 13676.86806199979,
+      "jevCalls": 2,
+      "jevMs": 1388.7350849999348,
+      "costUsd": 0.039137808,
+      "jevErrors": [],
+      "actions": 10,
+      "fallbacks": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_operation",
+          "actions": 1,
+          "elapsedMs": 1548.4963829999324,
+          "verified": false,
+          "parentCallId": "call_289250"
+        }
+      ],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 2.2619909999193624,
+      "taskMs": 15807.20958899986,
+      "verification": {
+        "passed": true,
+        "saved": {
+          "provider": "Boreal",
+          "total": "744"
+        },
+        "visited": [
+          "atlas",
+          "boreal",
+          "cedar"
+        ]
+      }
+    },
+    {
+      "task": "research-offers",
+      "category": "reasoning",
+      "repeat": 2,
+      "engine": "browser-use",
+      "warm": false,
+      "success": false,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected provider Choose Atlas Boreal Cedar",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "First-year total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/research-offers"
+      ],
+      "setupMs": 1993.6777669999283,
+      "agentMs": 1496.9060390000232,
+      "kind": "result",
+      "state": "stopped",
+      "completed": false,
+      "error": null,
+      "actions": 0,
+      "final": null,
+      "errors": [
+        "Error code: 402 - {'error': {'message': 'This request requires more credits, or fewer max_tokens. You requested up to 4096 tokens, but can only afford 1867. To increase, visit https://openrouter.ai/settings/credits and add more credits', 'code': 402, 'metadata': {'limit_source': 'openrouter_credits', 'remedy_hint': 'Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.', 'provider_name': None}}, 'user_id': '[account-redacted]'}",
+        "Error code: 402 - {'error': {'message': 'This request requires more credits, or fewer max_tokens. You requested up to 4096 tokens, but can only afford 1867. To increase, visit https://openrouter.ai/settings/credits and add more credits', 'code': 402, 'metadata': {'limit_source': 'openrouter_credits', 'remedy_hint': 'Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.', 'provider_name': None}}, 'user_id': '[account-redacted]'}",
+        "Error code: 402 - {'error': {'message': 'This request requires more credits, or fewer max_tokens. You requested up to 4096 tokens, but can only afford 1867. To increase, visit https://openrouter.ai/settings/credits and add more credits', 'code': 402, 'metadata': {'limit_source': 'openrouter_credits', 'remedy_hint': 'Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.', 'provider_name': None}}, 'user_id': '[account-redacted]'}",
+        "Error code: 402 - {'error': {'message': 'This request requires more credits, or fewer max_tokens. You requested up to 4096 tokens, but can only afford 1867. To increase, visit https://openrouter.ai/settings/credits and add more credits', 'code': 402, 'metadata': {'limit_source': 'openrouter_credits', 'remedy_hint': 'Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.', 'provider_name': None}}, 'user_id': '[account-redacted]'}"
+      ],
+      "primaryCalls": 4,
+      "primaryMs": 599.9870430096053,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0,
+      "verificationMs": 2.8157020000508055,
+      "taskMs": 1499.721741000074,
+      "verification": {
+        "passed": false,
+        "visited": []
+      }
+    },
+    {
+      "task": "research-offers",
+      "category": "reasoning",
+      "repeat": 2,
+      "engine": "app-auto",
+      "warm": false,
+      "success": false,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected provider Choose Atlas Boreal Cedar",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "First-year total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/research-offers"
+      ],
+      "setupMs": 405.4161229999736,
+      "agentMs": 194.91317799990065,
+      "completed": false,
+      "state": "failed",
+      "endReason": "OpenRouter HTTP 402",
+      "primaryCalls": 1,
+      "primaryMs": 194.00662200001534,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0,
+      "jevErrors": [],
+      "actions": 0,
+      "fallbacks": [],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 3.0156620000489056,
+      "taskMs": 197.92883999994956,
+      "verification": {
+        "passed": false,
+        "visited": []
+      }
+    },
+    {
+      "task": "research-offers",
+      "category": "reasoning",
+      "repeat": 3,
+      "engine": "browser-use",
+      "warm": false,
+      "success": false,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected provider Choose Atlas Boreal Cedar",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "First-year total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/research-offers"
+      ],
+      "setupMs": 1997.8282520000357,
+      "agentMs": 1581.2489449999994,
+      "kind": "result",
+      "state": "stopped",
+      "completed": false,
+      "error": null,
+      "actions": 0,
+      "final": null,
+      "errors": [
+        "Error code: 402 - {'error': {'message': 'This request requires more credits, or fewer max_tokens. You requested up to 4096 tokens, but can only afford 120. To increase, visit https://openrouter.ai/settings/credits and add more credits', 'code': 402, 'metadata': {'limit_source': 'openrouter_credits', 'remedy_hint': 'Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.', 'provider_name': None}}, 'user_id': '[account-redacted]'}",
+        "Error code: 402 - {'error': {'message': 'This request requires more credits, or fewer max_tokens. You requested up to 4096 tokens, but can only afford 120. To increase, visit https://openrouter.ai/settings/credits and add more credits', 'code': 402, 'metadata': {'limit_source': 'openrouter_credits', 'remedy_hint': 'Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.', 'provider_name': None}}, 'user_id': '[account-redacted]'}",
+        "Error code: 402 - {'error': {'message': 'This request requires more credits, or fewer max_tokens. You requested up to 4096 tokens, but can only afford 120. To increase, visit https://openrouter.ai/settings/credits and add more credits', 'code': 402, 'metadata': {'limit_source': 'openrouter_credits', 'remedy_hint': 'Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.', 'provider_name': None}}, 'user_id': '[account-redacted]'}",
+        "Error code: 402 - {'error': {'message': 'This request requires more credits, or fewer max_tokens. You requested up to 4096 tokens, but can only afford 120. To increase, visit https://openrouter.ai/settings/credits and add more credits', 'code': 402, 'metadata': {'limit_source': 'openrouter_credits', 'remedy_hint': 'Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.', 'provider_name': None}}, 'user_id': '[account-redacted]'}"
+      ],
+      "primaryCalls": 4,
+      "primaryMs": 565.488321997691,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0,
+      "verificationMs": 3.1122539999196306,
+      "taskMs": 1584.361198999919,
+      "verification": {
+        "passed": false,
+        "visited": []
+      }
+    },
+    {
+      "task": "research-offers",
+      "category": "reasoning",
+      "repeat": 3,
+      "engine": "app-auto",
+      "warm": false,
+      "success": false,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected provider Choose Atlas Boreal Cedar",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "First-year total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/research-offers"
+      ],
+      "setupMs": 388.8764100000262,
+      "agentMs": 161.03454300004523,
+      "completed": false,
+      "state": "failed",
+      "endReason": "OpenRouter HTTP 402",
+      "primaryCalls": 1,
+      "primaryMs": 160.35532400000375,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0,
+      "jevErrors": [],
+      "actions": 0,
+      "fallbacks": [],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 3.0653889999957755,
+      "taskMs": 164.099932000041,
+      "verification": {
+        "passed": false,
+        "visited": []
+      }
+    },
+    {
+      "task": "research-offers",
+      "category": "reasoning",
+      "repeat": 3,
+      "engine": "app-first",
+      "warm": false,
+      "success": false,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Selected provider Choose Atlas Boreal Cedar",
+          "value": "Choose"
+        },
+        {
+          "role": "textbox",
+          "name": "First-year total EUR",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:36867/research-offers"
+      ],
+      "setupMs": 396.77650299994275,
+      "agentMs": 134.95114299992565,
+      "completed": false,
+      "state": "failed",
+      "endReason": "OpenRouter HTTP 402",
+      "primaryCalls": 1,
+      "primaryMs": 134.25837499997579,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0,
+      "jevErrors": [],
+      "actions": 0,
+      "fallbacks": [],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 3.378074000007473,
+      "taskMs": 138.32921699993312,
+      "verification": {
+        "passed": false,
+        "visited": []
+      }
+    },
+    {
+      "task": "tabs",
+      "category": "capability",
+      "repeat": 1,
+      "engine": "app-first",
+      "warm": false,
+      "success": false,
+      "initialControls": [],
+      "initialPages": [
+        "http://127.0.0.1:36867/tabs"
+      ],
+      "setupMs": 395.3350100000389,
+      "agentMs": 83.05485700001009,
+      "completed": false,
+      "state": "failed",
+      "endReason": "OpenRouter HTTP 402",
+      "primaryCalls": 1,
+      "primaryMs": 82.46657299995422,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0,
+      "jevErrors": [],
+      "actions": 0,
+      "fallbacks": [],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 4.442543999990448,
+      "taskMs": 87.49740100000054,
+      "verification": {
+        "passed": false,
+        "expected": "Reference article: the orbit period is 42 days."
+      }
+    },
+    {
+      "task": "tabs",
+      "category": "capability",
+      "repeat": 1,
+      "engine": "browser-use",
+      "warm": false,
+      "success": false,
+      "initialControls": [],
+      "initialPages": [
+        "http://127.0.0.1:36867/tabs"
+      ],
+      "setupMs": 1971.9017280000262,
+      "agentMs": 1415.4744260000298,
+      "kind": "result",
+      "state": "stopped",
+      "completed": false,
+      "error": null,
+      "actions": 0,
+      "final": null,
+      "errors": [
+        "Error code: 402 - {'error': {'message': 'This request requires more credits, or fewer max_tokens. You requested up to 4096 tokens, but can only afford 120. To increase, visit https://openrouter.ai/settings/credits and add more credits', 'code': 402, 'metadata': {'limit_source': 'openrouter_credits', 'remedy_hint': 'Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.', 'provider_name': None}}, 'user_id': '[account-redacted]'}",
+        "Error code: 402 - {'error': {'message': 'This request requires more credits, or fewer max_tokens. You requested up to 4096 tokens, but can only afford 120. To increase, visit https://openrouter.ai/settings/credits and add more credits', 'code': 402, 'metadata': {'limit_source': 'openrouter_credits', 'remedy_hint': 'Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.', 'provider_name': None}}, 'user_id': '[account-redacted]'}",
+        "Error code: 402 - {'error': {'message': 'This request requires more credits, or fewer max_tokens. You requested up to 4096 tokens, but can only afford 120. To increase, visit https://openrouter.ai/settings/credits and add more credits', 'code': 402, 'metadata': {'limit_source': 'openrouter_credits', 'remedy_hint': 'Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.', 'provider_name': None}}, 'user_id': '[account-redacted]'}",
+        "Error code: 402 - {'error': {'message': 'This request requires more credits, or fewer max_tokens. You requested up to 4096 tokens, but can only afford 120. To increase, visit https://openrouter.ai/settings/credits and add more credits', 'code': 402, 'metadata': {'limit_source': 'openrouter_credits', 'remedy_hint': 'Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.', 'provider_name': None}}, 'user_id': '[account-redacted]'}"
+      ],
+      "primaryCalls": 4,
+      "primaryMs": 449.06389398965985,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0,
+      "verificationMs": 4.298387999995612,
+      "taskMs": 1419.7728140000254,
+      "verification": {
+        "passed": false,
+        "expected": "Reference article: the orbit period is 42 days."
+      }
+    },
+    {
+      "task": "tabs",
+      "category": "capability",
+      "repeat": 1,
+      "engine": "app-auto",
+      "warm": false,
+      "success": false,
+      "initialControls": [],
+      "initialPages": [
+        "http://127.0.0.1:36867/tabs"
+      ],
+      "setupMs": 392.9730620000046,
+      "agentMs": 160.51487399998587,
+      "completed": false,
+      "state": "failed",
+      "endReason": "OpenRouter HTTP 402",
+      "primaryCalls": 1,
+      "primaryMs": 159.92246999999043,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0,
+      "jevErrors": [],
+      "actions": 0,
+      "fallbacks": [],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 5.347772000008263,
+      "taskMs": 165.86264599999413,
+      "verification": {
+        "passed": false,
+        "expected": "Reference article: the orbit period is 42 days."
+      }
+    },
+    {
+      "task": "tabs",
+      "category": "capability",
+      "repeat": 2,
+      "engine": "browser-use",
+      "warm": false,
+      "success": false,
+      "initialControls": [],
+      "initialPages": [
+        "http://127.0.0.1:36867/tabs"
+      ],
+      "setupMs": 1997.569034999935,
+      "agentMs": 1210.3685769999865,
+      "kind": "result",
+      "state": "stopped",
+      "completed": false,
+      "error": null,
+      "actions": 0,
+      "final": null,
+      "errors": [
+        "Error code: 402 - {'error': {'message': 'This request requires more credits, or fewer max_tokens. You requested up to 4096 tokens, but can only afford 120. To increase, visit https://openrouter.ai/settings/credits and add more credits', 'code': 402, 'metadata': {'limit_source': 'openrouter_credits', 'remedy_hint': 'Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.', 'provider_name': None}}, 'user_id': '[account-redacted]'}",
+        "Error code: 402 - {'error': {'message': 'This request requires more credits, or fewer max_tokens. You requested up to 4096 tokens, but can only afford 120. To increase, visit https://openrouter.ai/settings/credits and add more credits', 'code': 402, 'metadata': {'limit_source': 'openrouter_credits', 'remedy_hint': 'Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.', 'provider_name': None}}, 'user_id': '[account-redacted]'}",
+        "Error code: 402 - {'error': {'message': 'This request requires more credits, or fewer max_tokens. You requested up to 4096 tokens, but can only afford 120. To increase, visit https://openrouter.ai/settings/credits and add more credits', 'code': 402, 'metadata': {'limit_source': 'openrouter_credits', 'remedy_hint': 'Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.', 'provider_name': None}}, 'user_id': '[account-redacted]'}",
+        "Error code: 402 - {'error': {'message': 'This request requires more credits, or fewer max_tokens. You requested up to 4096 tokens, but can only afford 120. To increase, visit https://openrouter.ai/settings/credits and add more credits', 'code': 402, 'metadata': {'limit_source': 'openrouter_credits', 'remedy_hint': 'Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.', 'provider_name': None}}, 'user_id': '[account-redacted]'}"
+      ],
+      "primaryCalls": 4,
+      "primaryMs": 402.60108310030773,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0,
+      "verificationMs": 5.0806240000529215,
+      "taskMs": 1215.4492010000395,
+      "verification": {
+        "passed": false,
+        "expected": "Reference article: the orbit period is 42 days."
+      }
+    },
+    {
+      "task": "tabs",
+      "category": "capability",
+      "repeat": 2,
+      "engine": "app-auto",
+      "warm": false,
+      "success": false,
+      "initialControls": [],
+      "initialPages": [
+        "http://127.0.0.1:36867/tabs"
+      ],
+      "setupMs": 382.97245900006965,
+      "agentMs": 154.0164919999661,
+      "completed": false,
+      "state": "failed",
+      "endReason": "OpenRouter HTTP 402",
+      "primaryCalls": 1,
+      "primaryMs": 153.433097000001,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0,
+      "jevErrors": [],
+      "actions": 0,
+      "fallbacks": [],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 5.620785999926738,
+      "taskMs": 159.63727799989283,
+      "verification": {
+        "passed": false,
+        "expected": "Reference article: the orbit period is 42 days."
+      }
+    },
+    {
+      "task": "tabs",
+      "category": "capability",
+      "repeat": 2,
+      "engine": "app-first",
+      "warm": false,
+      "success": false,
+      "initialControls": [],
+      "initialPages": [
+        "http://127.0.0.1:36867/tabs"
+      ],
+      "setupMs": 412.3677590000443,
+      "agentMs": 70.13158500008285,
+      "completed": false,
+      "state": "failed",
+      "endReason": "OpenRouter HTTP 402",
+      "primaryCalls": 1,
+      "primaryMs": 69.56935200002044,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0,
+      "jevErrors": [],
+      "actions": 0,
+      "fallbacks": [],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 4.755715999985114,
+      "taskMs": 74.88730100006796,
+      "verification": {
+        "passed": false,
+        "expected": "Reference article: the orbit period is 42 days."
+      }
+    },
+    {
+      "task": "tabs",
+      "category": "capability",
+      "repeat": 3,
+      "engine": "app-auto",
+      "warm": false,
+      "success": false,
+      "initialControls": [],
+      "initialPages": [
+        "http://127.0.0.1:36867/tabs"
+      ],
+      "setupMs": 381.34615500015207,
+      "agentMs": 183.0728470000904,
+      "completed": false,
+      "state": "failed",
+      "endReason": "OpenRouter HTTP 402",
+      "primaryCalls": 1,
+      "primaryMs": 182.38622500002384,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0,
+      "jevErrors": [],
+      "actions": 0,
+      "fallbacks": [],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 4.8765429998748,
+      "taskMs": 187.9493899999652,
+      "verification": {
+        "passed": false,
+        "expected": "Reference article: the orbit period is 42 days."
+      }
+    },
+    {
+      "task": "tabs",
+      "category": "capability",
+      "repeat": 3,
+      "engine": "app-first",
+      "warm": false,
+      "success": false,
+      "initialControls": [],
+      "initialPages": [
+        "http://127.0.0.1:36867/tabs"
+      ],
+      "setupMs": 390.14190299995244,
+      "agentMs": 159.56294799991883,
+      "completed": false,
+      "state": "failed",
+      "endReason": "OpenRouter HTTP 402",
+      "primaryCalls": 1,
+      "primaryMs": 159.03829099982977,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0,
+      "jevErrors": [],
+      "actions": 0,
+      "fallbacks": [],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 5.0191610001493245,
+      "taskMs": 164.58210900006816,
+      "verification": {
+        "passed": false,
+        "expected": "Reference article: the orbit period is 42 days."
+      }
+    },
+    {
+      "task": "tabs",
+      "category": "capability",
+      "repeat": 3,
+      "engine": "browser-use",
+      "warm": false,
+      "success": false,
+      "initialControls": [],
+      "initialPages": [
+        "http://127.0.0.1:36867/tabs"
+      ],
+      "setupMs": 2011.4238860001788,
+      "agentMs": 1506.6919579999521,
+      "kind": "result",
+      "state": "stopped",
+      "completed": false,
+      "error": null,
+      "actions": 0,
+      "final": null,
+      "errors": [
+        "Error code: 402 - {'error': {'message': 'Insufficient credits. Add more using https://openrouter.ai/settings/credits', 'code': 402, 'metadata': {'limit_source': 'openrouter_credits', 'remedy_hint': 'Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.'}}}",
+        "Error code: 402 - {'error': {'message': 'Insufficient credits. Add more using https://openrouter.ai/settings/credits', 'code': 402, 'metadata': {'limit_source': 'openrouter_credits', 'remedy_hint': 'Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.'}}}",
+        "Error code: 402 - {'error': {'message': 'Insufficient credits. Add more using https://openrouter.ai/settings/credits', 'code': 402, 'metadata': {'limit_source': 'openrouter_credits', 'remedy_hint': 'Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.'}}}",
+        "Error code: 402 - {'error': {'message': 'Insufficient credits. Add more using https://openrouter.ai/settings/credits', 'code': 402, 'metadata': {'limit_source': 'openrouter_credits', 'remedy_hint': 'Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.'}}}"
+      ],
+      "primaryCalls": 4,
+      "primaryMs": 604.6451171278022,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0,
+      "verificationMs": 4.560156000079587,
+      "taskMs": 1511.2521140000317,
+      "verification": {
+        "passed": false,
+        "expected": "Reference article: the orbit period is 42 days."
+      }
+    }
+  ]
+}

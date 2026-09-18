@@ -1,11 +1,14 @@
 # Configuration reference
 
+For the consolidated Jev Auto branch, see [current application configuration](APPLICATION.md#configure-and-run-the-measured-setup), [OpenRouter](openrouter.md), and [browser modes](APPLICATION.md#browser-modes-in-the-same-app). These extend the core configuration documented below; Classic remains the fresh-install default.
+
 ## Current provider support
 
 | Provider | Authentication | Configuration today |
 | --- | --- | --- |
 | Codex App Server — default | ChatGPT subscription sign-in in the setup panel or `pnpm codex:login` | Model/effort in New task; optional `.env` overrides |
 | OpenAI Responses API | Separately billed API key | `.env` and OS-backed encrypted saved key |
+| OpenRouter | Separately billed API key; configured model/upstream | Private `.env` and OS-backed encrypted key; see [OpenRouter](openrouter.md) |
 | Other operator providers | Not implemented | Planned in [ROADMAP.md](../ROADMAP.md) |
 
 A Claude/Codex process inside the sandbox is a nested terminal application, not another operator adapter. Its credentials and quota are separate. Provider/account selection in Settings is a roadmap item, not an existing feature.
@@ -18,6 +21,8 @@ The desktop reads the first existing file:
 2. The repository-root `.env`.
 
 Files are not merged. For provider settings, ordinary exported environment variables are not a replacement for these parsed files. Process variables such as PATH and XDG paths still affect runtime behavior. The CLI helper follows the same normal Linux app-config path before the repository file.
+
+With `LAW_INSTANCE=jev-auto`, Electron instead uses `~/.config/linux-agent-workbench-jev-auto/.env`; `LAW_INSTANCE=jev` uses the corresponding `-jev` directory. These instance names also separate app data, runtime paths and browser profile volumes. A normal source-build profile remains under `@law/desktop` for Electron settings; it is not automatically migrated to an experiment profile.
 
 For private configuration outside the project:
 
@@ -33,7 +38,7 @@ Do not overwrite an existing configuration without preserving it first. Edit thi
 
 | Variable | Meaning / default |
 | --- | --- |
-| `LAW_PROVIDER` | `codex` by default; `openai` explicitly selects API billing. Unknown values are rejected |
+| `LAW_PROVIDER` | `codex` by default; `openai` or `openrouter` explicitly selects API billing. Unknown values are rejected |
 | `LAW_CODEX_MODEL` | Optional Codex model ID; absent means the dedicated Codex configuration/default |
 | `LAW_CODEX_BIN` | Optional absolute path to the Codex executable; otherwise PATH/nvm discovery |
 | `LAW_CODEX_HOME` | Optional dedicated private directory; default is `<XDG_DATA_HOME>/linux-agent-workbench/codex` |
@@ -44,6 +49,13 @@ Do not overwrite an existing configuration without preserving it first. Edit thi
 | `LAW_RESEARCH_MODEL` | API-only override for the research profile |
 | `LAW_RESEARCH_PRICE_INPUT_PER_MTOK` | Optional input estimate for that research model |
 | `LAW_RESEARCH_PRICE_OUTPUT_PER_MTOK` | Optional output estimate for that research model |
+| `OPENROUTER_API_KEY` | Host-side OpenRouter key |
+| `OPENROUTER_MODEL` | Configured model ID; branch default `google/gemini-3.8-flash` |
+| `OPENROUTER_EFFORT` | `low` (default), `medium` or `high` |
+| `OPENROUTER_PROVIDER` | Optional pinned upstream, disabling upstream failover; omit for latency-sorted routing |
+| `TYPESAFE_API_KEY` | Host-side Jev key, required for Hybrid/First/Auto |
+| `TYPESAFE_MODEL` | Jev model ID; default `jev-1.13.0` |
+| `TYPESAFE_PRICE_INPUT_PER_MTOK` | Nonnegative Jev cost estimate; default historical assumption `0.042` USD/M input tokens |
 
 No generic third-party base-URL control is exposed by the app. There is no `LAW_CODEX_EFFORT` setting: select effort in the task UI or use the dedicated Codex configuration. An explicit task selection overrides the configured model/effort for that run. Codex profile names do not change the chosen model.
 
@@ -55,7 +67,7 @@ Codex sign-in is forced to the ChatGPT authentication path. LAW does not copy an
 
 For the API provider, a decryptable saved key takes precedence over `.env`. A strong Electron `safeStorage` backend encrypts a newly supplied key into `settings.json`, and LAW removes that key's line from the source `.env`. With `basic_text` or no suitable backend, the key remains in `.env` and the UI reports the weaker storage mode.
 
-There is no key-management UI yet. To replace a saved API key, stop the app, preserve the settings file privately, remove only its `openaiKeyEncrypted` property, and supply the replacement key in the selected private `.env`. Restart with the OS keyring available. Never paste encrypted blobs or keys into an issue. Revocation happens in the provider's account controls, not by deleting a local file.
+There is no key-management UI yet. To replace a saved API key, stop the app, preserve the settings file privately, remove only the matching `openaiKeyEncrypted`, `openrouterKeyEncrypted` or `jevKeyEncrypted` property, and supply the replacement key in the selected private `.env`. Restart with the OS keyring available. Never paste encrypted blobs or keys into an issue. Revocation happens in the provider's account controls, not by deleting a local file.
 
 ## Settings and task preferences
 
@@ -64,7 +76,7 @@ Settings stores the last workspace, selected network mode, nested-agent autonomy
 Renderer localStorage contains:
 
 - `law.goal:<workspace>`: the task draft for a workspace.
-- `law.task-preferences`: working style, step and time preferences.
+- `law.task-preferences`: working style, browser engine, step and time preferences.
 - `law.codex-model-selection`: model/effort selection.
 - `law.drawer-width`: the panel-width preference.
 

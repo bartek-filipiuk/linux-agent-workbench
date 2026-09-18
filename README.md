@@ -2,9 +2,43 @@
 
 A Linux desktop workspace where an AI agent operates a containerized terminal and browser while you watch, review approvals, and take control.
 
-**The primary provider is Codex with ChatGPT subscription sign-in.** The separately billed OpenAI Responses API is also supported. Switching providers currently uses configuration files; a unified provider setup in Settings is the first major [roadmap](ROADMAP.md) item.
+**One application, several ways to execute browser work.** Jev Auto lets the primary planner choose fast Jev subgoals, grouped form actions or reading and reasoning per subtask. It uses the same conversation, browser session, permission checks and Stop control. Classic remains the default; Auto is explicitly experimental.
 
-This is an early source-build project. It is not affiliated with or endorsed by OpenAI. Read the [security model](SECURITY.md) before connecting accounts or opening a workspace containing sensitive data. Release packaging and license selection are tracked in the [publication checklist](CONTRIBUTING.md#before-publishing).
+Codex subscription sign-in is the default provider. OpenRouter and the OpenAI Responses API are explicit, separately billed alternatives. The Auto benchmarks below use Gemini through OpenRouter plus Jev. Provider keys are configured privately on the host; a unified Settings setup remains on the roadmap.
+
+**MIT-licensed, Linux source release.** No installer or clean-machine compatibility guarantee is claimed. The owner-run [clean installation check](docs/CLEAN-INSTALL-CHECK.md) is pending. Read the [security model](SECURITY.md) before connecting accounts or opening a workspace containing sensitive data. This project is not affiliated with OpenAI, Google, Browser Use or TypeSafe.
+
+## Measured browser performance
+
+**119/119 tasks completed in the latest selected comparison.** On a ten-stage form, Auto took **64.9% less time than Jev First** and **35.0% less than Browser Use**. Auto combines short delegated subgoals with guarded action batches. These are whole-configuration comparisons, not an isolated test of batching.
+
+Successful task-time medians, in seconds; September 18, 2026:
+
+| Task | Jev Auto | Jev First | Browser Use | Native Ultrafast |
+| --- | ---: | ---: | ---: | ---: |
+| Ten-stage form | **26.14** | 74.49 | 40.21 | — |
+| Compare hotel offers | **4.71** | 12.26 | 8.99 | — |
+| Research three hosting offers | **13.72** | 18.97 | 29.03 | — |
+| Apply catalog filters | 4.98 | **3.84** | 6.07 | — |
+| Google Flights: Zurich → London | 21.79 | 36.82 | 35.45 | **13.32** |
+
+Same Gemini model/upstream, sequential rotating engine order, independent final verification. Local cells have **3 attempts**; Flights has **5**. Time includes recovery and verification, excludes setup. Auto does not win every task: First was faster on some simple interactions, and native Ultrafast remained fastest on Flights. Auto's Flights range was **17.83–64.02 s**. Most tasks are synthetic, and these small samples do not prove general web reliability. Browser Use here means its pinned open-source agent with Gemini, not its hosted models or cloud.
+
+[![Medians, min–max ranges and success counts for all twelve tasks](docs/benchmarks/jev-auto/comparison.png)](docs/benchmarks/jev-auto/comparison.svg)
+
+We publish the unsuccessful runs too: **606 retained historical runner records**, **78 routing checks**, **8 direct-driver checks**, and **24 desktop checks**, plus source hashes and traces. The credit-interrupted block remains separate from the declared 119-record comparison. Known retained experiment cost was about **$11.05**, excluding subscription allocation, missing usage and development work.
+
+[All results](docs/research/ALL-RESULTS.md) · [Methodology](docs/research/TEST-CATALOG.md) · [CSV](docs/research/trials.csv) · [Costs](docs/research/COSTS.md) · [Reproduce the benchmarks](docs/BENCHMARKS.md)
+
+## How Auto chooses execution
+
+- **Mechanical UI work:** the planner delegates a short outcome and known text values to Jev.
+- **Several known form fields:** the planner groups up to eight actions, with freshness and permission checks on every action.
+- **Research, comparisons and calculations:** the primary model reads and reasons, then executes a concrete result.
+
+Tool selection is part of the normal planner response; there is no extra classifier request. Jev chooses actions within a subgoal, not the application's overall architecture. Lack of progress or uncertainty returns control to the planner with fresh evidence; uncertain mutations are not blindly replayed. Native Browser Use and Ultrafast are research references, not extra app runtimes.
+
+[Architecture and setup](docs/APPLICATION.md) · [Security boundaries](SECURITY.md) · [Release status](docs/RELEASE-READINESS.md)
 
 ## What works today
 
@@ -78,6 +112,11 @@ The app uses a dedicated Codex home, separate from your usual coding-agent login
 
 | Document | What it covers |
 | --- | --- |
+| [Current application](docs/APPLICATION.md) | Shared runtime, browser modes, Auto routing, recovery, security boundaries and Gemini/Jev setup |
+| [Research and publication kit](docs/research/README.md) | All retained experiments, methodology, per-trial CSV, costs and shareable charts |
+| [Release readiness](docs/RELEASE-READINESS.md) | One-app integration, license, clean installation and reproducible benchmark work |
+| [Benchmark guide](docs/BENCHMARKS.md) | Pinned reference setup, portable paths, date verification and explicit paid runs |
+| [Clean installation checklist](docs/CLEAN-INSTALL-CHECK.md) | Owner-run validation on a fresh Linux user/machine; currently pending |
 | [User guide](docs/USER_GUIDE.md) | Installation details, daily workflow, browser login, approvals, limits, history, troubleshooting |
 | [Configuration](docs/CONFIGURATION.md) | Current Settings controls, environment variables, providers, credentials and local data |
 | [Codex integration](docs/codex-integration.md) | Dedicated sign-in, App Server, model/effort selection and tool boundary |
@@ -111,4 +150,4 @@ Worker browser tests need a local Playwright Chromium installation; see [Contrib
 
 ## License
 
-A license has not yet been selected. Public source availability alone does not grant an open-source license; selecting and adding `LICENSE` is a prerequisite before publishing this project as open source.
+[MIT](LICENSE), copyright 2026 Bartek Filipiuk and contributors. Dependencies and upstream research projects retain their own licenses; see [third-party notices](THIRD_PARTY_NOTICES.md).

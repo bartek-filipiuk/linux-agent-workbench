@@ -1,0 +1,41 @@
+{
+  "date": "2026-09-18",
+  "scope": "Developer-environment source release and portable harness; not a clean desktop installation",
+  "applicationSuite": {
+    "passed": 452,
+    "skipped": 12
+  },
+  "benchmarkContractsPassed": 5,
+  "nativeContractsPassed": 31,
+  "typecheck": "passed",
+  "build": "passed during benchmark setup",
+  "fixtureNegativePositiveChecks": "passed",
+  "renderedFollowupUi": "passed",
+  "dependencyAudit": "No known vulnerabilities found",
+  "portableSmoke": {
+    "attempts": 4,
+    "passed": 4,
+    "knownCostUsd": 0.010907334,
+    "historicalBenchmarkArchive": "Excluded from frozen 606-record archive; this is a separate portability smoke",
+    "sourceHashes": {
+      "run.mjs": "37dff3b2274d3d4e56c14f3d85764761bfdb32ec2e4c8b2982cb3ca7cdab21a1",
+      "tasks.mjs": "ecec06cc9466bfd102dded02beeb412bb4f9db0b6dd1b66480dbe3da8c2eda7c"
+    },
+    "dirtyAtSmoke": true
+  },
+  "cleanInstall": {
+    "status": "pending",
+    "owner": "repository owner",
+    "checklist": "docs/CLEAN-INSTALL-CHECK.md"
+  },
+  "logs": {
+    "typecheck.log": "ae2f054412037b42b5482a332508138c51573488861cd64cded73176662d44eb",
+    "tests.log": "a085e0783aa26e7971467478f8ba1ab21e4be4e6c2c6c3a5a4c478ee157c06ec",
+    "bench-tests.log": "76027a5a8fc211212c5499c15095490b27fb5302a88952c821bab97afe0fd6fa",
+    "native-tests.log": "4e4e6607f243dfddcf7537a3ea38dc0d7ffb010913a0df0054683122576d135f",
+    "ui.log": "5ad559effcb3ca6e7e2d62f82fa35c26136d8779470e4173239c9a02c717134c",
+    "dependency-audit.log": "15950a68a7ed99c59779717acefdceb3f69cfd31bde67d2c954f2a3cea4d7955",
+    "fixture-check.json": "571b545e79c2e2f0d35e4e4f89cbb532d5b9b2140c6d526c9ae9c1a29e8e7adf"
+  },
+  "hostedCi": "See integration PR / repository Checks for final candidate status"
+}

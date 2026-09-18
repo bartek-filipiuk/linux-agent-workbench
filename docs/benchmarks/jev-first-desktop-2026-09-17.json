@@ -1,0 +1,37 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "check": "first_luna_navigation",
+      "passed": true,
+      "elapsedMs": 11465,
+      "state": "completed",
+      "engine": "jev-first",
+      "jev": {
+        "decisions": 1,
+        "elapsedMs": 735.832453,
+        "costUsd": 3.7758e-05,
+        "fallbacks": 1
+      },
+      "browser": {
+        "url": "https://www.iana.org/help/example-domains",
+        "title": "Example Domains"
+      },
+      "final": "Title: **Example Domains**  \nURL: **https://www.iana.org/help/example-domains**"
+    },
+    {
+      "check": "stop",
+      "passed": true,
+      "elapsedMs": 22
+    },
+    {
+      "check": "classic_after_stop",
+      "passed": true,
+      "state": "completed",
+      "browser": {
+        "url": "https://example.com/",
+        "title": "Example Domain"
+      }
+    }
+  ]
+}

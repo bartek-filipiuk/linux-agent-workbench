@@ -1,0 +1,755 @@
+{
+  "mode": "Real Jev driver, scripted dispatch, no primary-model fallback; one attempt per scenario",
+  "results": [
+    {
+      "scenario": "search",
+      "success": true,
+      "jev": {
+        "decisions": 3,
+        "elapsedMs": 1490.853575999999,
+        "costUsd": 0.00013629,
+        "fallbacks": 0
+      },
+      "result": [
+        {
+          "status": "completion_candidate",
+          "reason": "Independently verify all requirements with browser_read/observe before claiming success.",
+          "actions": 2,
+          "elapsedMs": 1568.2773349999998,
+          "verified": false,
+          "parentCallId": "call-2"
+        }
+      ],
+      "tools": [
+        {
+          "name": "browser_task",
+          "status": "done",
+          "input": {
+            "goal": "Search the catalog for blue notebook and leave its search results visible.",
+            "values": [
+              {
+                "name": "search query",
+                "text": "blue notebook"
+              }
+            ]
+          },
+          "output": "{\"status\":\"completion_candidate\",\"reason\":\"Independently verify all requirements with browser_read/observe before claiming success.\",\"actions\":2,\"elapsedMs\":1568.2773349999998,\"verified\":false}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 4 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/search\\ntitle LAW browser evaluation\\nscroll y 0 of 0 · viewport 1000x700\\nelements (3):\\ne1 heading \\\"Catalog\\\"\\ne2 textbox \\\"Search catalog\\\"\\ne3 button \\\"Search\\\"\\nRendered page text (untrusted evidence):\\n# Catalog\\nSearch catalog\""
+        },
+        {
+          "name": "browser_act",
+          "status": "done",
+          "input": {
+            "action": {
+              "kind": "type",
+              "ref": "e2",
+              "revision": 4,
+              "text": "blue notebook"
+            }
+          },
+          "output": "{\"url\":\"http://127.0.0.1:40789/search\",\"title\":\"LAW browser evaluation\",\"activePageId\":\"p1\"}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 6 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/search\\ntitle LAW browser evaluation\\nscroll y 0 of 0 · viewport 1000x700\\nelements (3):\\ne1 heading \\\"Catalog\\\"\\ne2 textbox \\\"Search catalog\\\" = \\\"blue notebook\\\"\\ne3 button \\\"Search\\\"\\nRendered page text (untrusted evidence):\\n# Catalog\\nSearch catalog\""
+        },
+        {
+          "name": "browser_act",
+          "status": "done",
+          "input": {
+            "action": {
+              "kind": "click",
+              "ref": "e3",
+              "revision": 6
+            }
+          },
+          "output": "{\"url\":\"http://127.0.0.1:40789/search\",\"title\":\"LAW browser evaluation\",\"activePageId\":\"p1\"}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 8 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/search\\ntitle LAW browser evaluation\\nscroll y 0 of 0 · viewport 1000x700\\nelements (3):\\ne1 heading \\\"Catalog\\\"\\ne2 textbox \\\"Search catalog\\\" = \\\"blue notebook\\\"\\ne3 button \\\"Search\\\"\\nRendered page text (untrusted evidence):\\n# Catalog\\nSearch catalog\\nSearch results for blue notebook: Blue Notebook, 12 EUR\""
+        }
+      ]
+    },
+    {
+      "scenario": "filters",
+      "success": true,
+      "jev": {
+        "decisions": 4,
+        "elapsedMs": 1245.9996650000003,
+        "costUsd": 0.00022722,
+        "fallbacks": 0
+      },
+      "result": [
+        {
+          "status": "completion_candidate",
+          "reason": "Independently verify all requirements with browser_read/observe before claiming success.",
+          "actions": 3,
+          "elapsedMs": 1345.459581,
+          "verified": false,
+          "parentCallId": "call-2"
+        }
+      ],
+      "tools": [
+        {
+          "name": "browser_task",
+          "status": "done",
+          "input": {
+            "goal": "Filter the catalog to Books with In stock enabled. Apply the filters and leave the results visible.",
+            "values": []
+          },
+          "output": "{\"status\":\"completion_candidate\",\"reason\":\"Independently verify all requirements with browser_read/observe before claiming success.\",\"actions\":3,\"elapsedMs\":1345.459581,\"verified\":false}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 4 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/filters\\ntitle LAW browser evaluation\\nscroll y 0 of 0 · viewport 1000x700\\nelements (4):\\ne1 heading \\\"Catalog filters\\\"\\ne2 combobox \\\"Category All Books Music\\\" — All Books Music = \\\"All\\\" options: \\\"All\\\"=\\\"All\\\", \\\"Books\\\"=\\\"Books\\\", \\\"Music\\\"=\\\"Music\\\"\\ne3 checkbox \\\"In stock\\\" = \\\"on\\\" [unchecked]\\ne4 button \\\"Apply filters\\\"\\nRendered page text (untrusted evidence):\\n# Catalog filters\\nCategoryIn stock\""
+        },
+        {
+          "name": "browser_act",
+          "status": "done",
+          "input": {
+            "action": {
+              "kind": "select",
+              "ref": "e2",
+              "revision": 4,
+              "values": [
+                "Books"
+              ]
+            }
+          },
+          "output": "{\"url\":\"http://127.0.0.1:40789/filters\",\"title\":\"LAW browser evaluation\",\"activePageId\":\"p1\"}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 6 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/filters\\ntitle LAW browser evaluation\\nscroll y 0 of 0 · viewport 1000x700\\nelements (4):\\ne1 heading \\\"Catalog filters\\\"\\ne2 combobox \\\"Category All Books Music\\\" — All Books Music = \\\"Books\\\" options: \\\"All\\\"=\\\"All\\\", \\\"Books\\\"=\\\"Books\\\", \\\"Music\\\"=\\\"Music\\\"\\ne3 checkbox \\\"In stock\\\" = \\\"on\\\" [unchecked]\\ne4 button \\\"Apply filters\\\"\\nRendered page text (untrusted evidence):\\n# Catalog filters\\nCategoryIn stock\""
+        },
+        {
+          "name": "browser_act",
+          "status": "done",
+          "input": {
+            "action": {
+              "kind": "click",
+              "ref": "e3",
+              "revision": 6
+            }
+          },
+          "output": "{\"url\":\"http://127.0.0.1:40789/filters\",\"title\":\"LAW browser evaluation\",\"activePageId\":\"p1\"}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 8 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/filters\\ntitle LAW browser evaluation\\nscroll y 0 of 0 · viewport 1000x700\\nelements (4):\\ne1 heading \\\"Catalog filters\\\"\\ne2 combobox \\\"Category All Books Music\\\" — All Books Music = \\\"Books\\\" options: \\\"All\\\"=\\\"All\\\", \\\"Books\\\"=\\\"Books\\\", \\\"Music\\\"=\\\"Music\\\"\\ne3 checkbox \\\"In stock\\\" = \\\"on\\\" [checked]\\ne4 button \\\"Apply filters\\\"\\nRendered page text (untrusted evidence):\\n# Catalog filters\\nCategoryIn stock\""
+        },
+        {
+          "name": "browser_act",
+          "status": "done",
+          "input": {
+            "action": {
+              "kind": "click",
+              "ref": "e4",
+              "revision": 8
+            }
+          },
+          "output": "{\"url\":\"http://127.0.0.1:40789/filters\",\"title\":\"LAW browser evaluation\",\"activePageId\":\"p1\"}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 10 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/filters\\ntitle LAW browser evaluation\\nscroll y 0 of 0 · viewport 1000x700\\nelements (4):\\ne1 heading \\\"Catalog filters\\\"\\ne2 combobox \\\"Category All Books Music\\\" — All Books Music = \\\"Books\\\" options: \\\"All\\\"=\\\"All\\\", \\\"Books\\\"=\\\"Books\\\", \\\"Music\\\"=\\\"Music\\\"\\ne3 checkbox \\\"In stock\\\" = \\\"on\\\" [checked]\\ne4 button \\\"Apply filters\\\"\\nRendered page text (untrusted evidence):\\n# Catalog filters\\nCategoryIn stock\\nApplied: Books, in stock: yes\""
+        }
+      ]
+    },
+    {
+      "scenario": "autocomplete",
+      "success": true,
+      "jev": {
+        "decisions": 4,
+        "elapsedMs": 1171.5045650000002,
+        "costUsd": 0.00016905000000000002,
+        "fallbacks": 0
+      },
+      "result": [
+        {
+          "status": "completion_candidate",
+          "reason": "Independently verify all requirements with browser_read/observe before claiming success.",
+          "actions": 3,
+          "elapsedMs": 1554.2393479999992,
+          "verified": false,
+          "parentCallId": "call-2"
+        }
+      ],
+      "tools": [
+        {
+          "name": "browser_task",
+          "status": "done",
+          "input": {
+            "goal": "Choose Paris, France as the destination using the autocomplete suggestion.",
+            "values": [
+              {
+                "name": "destination",
+                "text": "Paris"
+              }
+            ]
+          },
+          "output": "{\"status\":\"completion_candidate\",\"reason\":\"Independently verify all requirements with browser_read/observe before claiming success.\",\"actions\":3,\"elapsedMs\":1554.2393479999992,\"verified\":false}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 4 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/autocomplete\\ntitle LAW browser evaluation\\nscroll y 0 of 0 · viewport 1000x700\\nelements (2):\\ne1 heading \\\"Destination\\\"\\ne2 textbox \\\"Destination\\\"\\nRendered page text (untrusted evidence):\\n# Destination\\nDestination\""
+        },
+        {
+          "name": "browser_act",
+          "status": "done",
+          "input": {
+            "action": {
+              "kind": "type",
+              "ref": "e2",
+              "revision": 4,
+              "text": "Paris"
+            }
+          },
+          "output": "{\"url\":\"http://127.0.0.1:40789/autocomplete\",\"title\":\"LAW browser evaluation\",\"activePageId\":\"p1\"}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 6 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/autocomplete\\ntitle LAW browser evaluation\\nscroll y 0 of 0 · viewport 1000x700\\nelements (2):\\ne1 heading \\\"Destination\\\"\\ne2 textbox \\\"Destination\\\" = \\\"Paris\\\"\\nRendered page text (untrusted evidence):\\n# Destination\\nDestination\""
+        },
+        {
+          "name": "browser_act",
+          "status": "done",
+          "input": {
+            "action": {
+              "kind": "wait",
+              "ms": 300
+            }
+          },
+          "output": "{\"url\":\"http://127.0.0.1:40789/autocomplete\",\"title\":\"LAW browser evaluation\",\"activePageId\":\"p1\"}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 8 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/autocomplete\\ntitle LAW browser evaluation\\nscroll y 0 of 0 · viewport 1000x700\\nelements (3):\\ne1 heading \\\"Destination\\\"\\ne2 textbox \\\"Destination\\\" = \\\"Paris\\\"\\ne3 button \\\"Paris, France\\\"\\nRendered page text (untrusted evidence):\\n# Destination\\nDestination\""
+        },
+        {
+          "name": "browser_act",
+          "status": "done",
+          "input": {
+            "action": {
+              "kind": "click",
+              "ref": "e3",
+              "revision": 8
+            }
+          },
+          "output": "{\"url\":\"http://127.0.0.1:40789/autocomplete\",\"title\":\"LAW browser evaluation\",\"activePageId\":\"p1\"}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 10 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/autocomplete\\ntitle LAW browser evaluation\\nscroll y 0 of 0 · viewport 1000x700\\nelements (2):\\ne1 heading \\\"Destination\\\"\\ne2 textbox \\\"Destination\\\" = \\\"Paris\\\"\\nRendered page text (untrusted evidence):\\n# Destination\\nDestination\\n\\nSelected destination: Paris, France\""
+        }
+      ]
+    },
+    {
+      "scenario": "form",
+      "success": true,
+      "jev": {
+        "decisions": 4,
+        "elapsedMs": 1388.0085830000007,
+        "costUsd": 0.00025342800000000004,
+        "fallbacks": 0
+      },
+      "result": [
+        {
+          "status": "completion_candidate",
+          "reason": "Independently verify all requirements with browser_read/observe before claiming success.",
+          "actions": 3,
+          "elapsedMs": 1474.4958740000002,
+          "verified": false,
+          "parentCallId": "call-2"
+        }
+      ],
+      "tools": [
+        {
+          "name": "browser_task",
+          "status": "done",
+          "input": {
+            "goal": "Prepare a contact preview for Ada in the Research department. Stop at the preview; do not send anything.",
+            "values": [
+              {
+                "name": "contact name",
+                "text": "Ada"
+              }
+            ]
+          },
+          "output": "{\"status\":\"completion_candidate\",\"reason\":\"Independently verify all requirements with browser_read/observe before claiming success.\",\"actions\":3,\"elapsedMs\":1474.4958740000002,\"verified\":false}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 4 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/form\\ntitle LAW browser evaluation\\nscroll y 0 of 0 · viewport 1000x700\\nelements (4):\\ne1 heading \\\"Contact preview\\\"\\ne2 textbox \\\"Name\\\"\\ne3 combobox \\\"Department Choose Research Support\\\" — Choose Research Support = \\\"Choose\\\" options: \\\"Choose\\\"=\\\"Choose\\\", \\\"Research\\\"=\\\"Research\\\", \\\"Support\\\"=\\\"Support\\\"\\ne4 button \\\"Preview\\\"\\nRendered page text (untrusted evidence):\\n# Contact preview\\nNameDepartment\""
+        },
+        {
+          "name": "browser_act",
+          "status": "done",
+          "input": {
+            "action": {
+              "kind": "type",
+              "ref": "e2",
+              "revision": 4,
+              "text": "Ada"
+            }
+          },
+          "output": "{\"url\":\"http://127.0.0.1:40789/form\",\"title\":\"LAW browser evaluation\",\"activePageId\":\"p1\"}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 6 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/form\\ntitle LAW browser evaluation\\nscroll y 0 of 0 · viewport 1000x700\\nelements (4):\\ne1 heading \\\"Contact preview\\\"\\ne2 textbox \\\"Name\\\" = \\\"Ada\\\"\\ne3 combobox \\\"Department Choose Research Support\\\" — Choose Research Support = \\\"Choose\\\" options: \\\"Choose\\\"=\\\"Choose\\\", \\\"Research\\\"=\\\"Research\\\", \\\"Support\\\"=\\\"Support\\\"\\ne4 button \\\"Preview\\\"\\nRendered page text (untrusted evidence):\\n# Contact preview\\nNameDepartment\""
+        },
+        {
+          "name": "browser_act",
+          "status": "done",
+          "input": {
+            "action": {
+              "kind": "select",
+              "ref": "e3",
+              "revision": 6,
+              "values": [
+                "Research"
+              ]
+            }
+          },
+          "output": "{\"url\":\"http://127.0.0.1:40789/form\",\"title\":\"LAW browser evaluation\",\"activePageId\":\"p1\"}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 8 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/form\\ntitle LAW browser evaluation\\nscroll y 0 of 0 · viewport 1000x700\\nelements (4):\\ne1 heading \\\"Contact preview\\\"\\ne2 textbox \\\"Name\\\" = \\\"Ada\\\"\\ne3 combobox \\\"Department Choose Research Support\\\" — Choose Research Support = \\\"Research\\\" options: \\\"Choose\\\"=\\\"Choose\\\", \\\"Research\\\"=\\\"Research\\\", \\\"Support\\\"=\\\"Support\\\"\\ne4 button \\\"Preview\\\"\\nRendered page text (untrusted evidence):\\n# Contact preview\\nNameDepartment\""
+        },
+        {
+          "name": "browser_act",
+          "status": "done",
+          "input": {
+            "action": {
+              "kind": "click",
+              "ref": "e4",
+              "revision": 8
+            }
+          },
+          "output": "{\"url\":\"http://127.0.0.1:40789/form\",\"title\":\"LAW browser evaluation\",\"activePageId\":\"p1\"}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 10 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/form\\ntitle LAW browser evaluation\\nscroll y 0 of 0 · viewport 1000x700\\nelements (4):\\ne1 heading \\\"Contact preview\\\"\\ne2 textbox \\\"Name\\\" = \\\"Ada\\\"\\ne3 combobox \\\"Department Choose Research Support\\\" — Choose Research Support = \\\"Research\\\" options: \\\"Choose\\\"=\\\"Choose\\\", \\\"Research\\\"=\\\"Research\\\", \\\"Support\\\"=\\\"Support\\\"\\ne4 button \\\"Preview\\\"\\nRendered page text (untrusted evidence):\\n# Contact preview\\nNameDepartment\\nPreview: Ada — Research\""
+        }
+      ]
+    },
+    {
+      "scenario": "navigation",
+      "success": false,
+      "jev": {
+        "decisions": 2,
+        "elapsedMs": 648.1826939999992,
+        "costUsd": 0.000075474,
+        "fallbacks": 1
+      },
+      "result": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_operation",
+          "actions": 1,
+          "elapsedMs": 714.4749869999996,
+          "verified": false,
+          "parentCallId": "call-2"
+        }
+      ],
+      "tools": [
+        {
+          "name": "browser_task",
+          "status": "done",
+          "input": {
+            "goal": "Open the documentation, then open the Installation guide.",
+            "values": []
+          },
+          "output": "{\"status\":\"needs_help\",\"reason\":\"uncertain_operation\",\"actions\":1,\"elapsedMs\":714.4749869999996,\"verified\":false}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 4 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/navigation\\ntitle LAW browser evaluation\\nscroll y 0 of 0 · viewport 1000x700\\nelements (3):\\ne1 heading \\\"Project\\\"\\ne2 link \\\"Documentation\\\" → /docs\\ne3 link \\\"Pricing\\\" → /pricing\\nRendered page text (untrusted evidence):\\n# Project\\n[Documentation](http://127.0.0.1:40789/docs)[Pricing](http://127.0.0.1:40789/pricing)\""
+        },
+        {
+          "name": "browser_act",
+          "status": "done",
+          "input": {
+            "action": {
+              "kind": "click",
+              "ref": "e2",
+              "revision": 4
+            }
+          },
+          "output": "{\"url\":\"http://127.0.0.1:40789/docs\",\"title\":\"LAW browser evaluation\",\"activePageId\":\"p1\"}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 7 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/docs\\ntitle LAW browser evaluation\\nscroll y 0 of 0 · viewport 1000x700\\nelements (2):\\ne1 heading \\\"Documentation\\\"\\ne2 link \\\"Installation guide\\\" → /installation\\nRendered page text (untrusted evidence):\\n# Documentation\\n[Installation guide](http://127.0.0.1:40789/installation)\""
+        }
+      ]
+    },
+    {
+      "scenario": "tabs",
+      "success": true,
+      "jev": {
+        "decisions": 2,
+        "elapsedMs": 957.4505119999994,
+        "costUsd": 0.000070644,
+        "fallbacks": 1
+      },
+      "result": [
+        {
+          "status": "needs_help",
+          "reason": "uncertain_operation",
+          "actions": 1,
+          "elapsedMs": 1028.7905960000007,
+          "verified": false,
+          "parentCallId": "call-2"
+        }
+      ],
+      "tools": [
+        {
+          "name": "browser_task",
+          "status": "done",
+          "input": {
+            "goal": "Open the reference in its new tab and leave the Reference article visible.",
+            "values": []
+          },
+          "output": "{\"status\":\"needs_help\",\"reason\":\"uncertain_operation\",\"actions\":1,\"elapsedMs\":1028.7905960000007,\"verified\":false}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 4 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/tabs\\ntitle LAW browser evaluation\\nscroll y 0 of 0 · viewport 1000x700\\nelements (2):\\ne1 heading \\\"Research\\\"\\ne2 link \\\"Open reference\\\" → /reference\\nRendered page text (untrusted evidence):\\n# Research\\n[Open reference](http://127.0.0.1:40789/reference)\""
+        },
+        {
+          "name": "browser_act",
+          "status": "done",
+          "input": {
+            "action": {
+              "kind": "click",
+              "ref": "e2",
+              "revision": 4
+            }
+          },
+          "output": "{\"url\":\"http://127.0.0.1:40789/tabs\",\"title\":\"LAW browser evaluation\",\"activePageId\":\"p1\"}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 6 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/tabs\\ntitle LAW browser evaluation\\nscroll y 0 of 0 · viewport 1000x700\\nelements (2):\\ne1 heading \\\"Research\\\"\\ne2 link \\\"Open reference\\\" → /reference\\nRendered page text (untrusted evidence):\\n# Research\\n[Open reference](http://127.0.0.1:40789/reference)\""
+        }
+      ]
+    },
+    {
+      "scenario": "scroll",
+      "success": true,
+      "jev": {
+        "decisions": 6,
+        "elapsedMs": 1594.5787040000032,
+        "costUsd": 0.000196056,
+        "fallbacks": 0
+      },
+      "result": [
+        {
+          "status": "completion_candidate",
+          "reason": "Independently verify all requirements with browser_read/observe before claiming success.",
+          "actions": 5,
+          "elapsedMs": 1716.965327,
+          "verified": false,
+          "parentCallId": "call-2"
+        }
+      ],
+      "tools": [
+        {
+          "name": "browser_task",
+          "status": "done",
+          "input": {
+            "goal": "Find the More details button near the bottom of the page and open the details.",
+            "values": []
+          },
+          "output": "{\"status\":\"completion_candidate\",\"reason\":\"Independently verify all requirements with browser_read/observe before claiming success.\",\"actions\":5,\"elapsedMs\":1716.965327,\"verified\":false}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 4 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/scroll\\ntitle LAW browser evaluation\\nscroll y 0 of 1293 · viewport 1000x700\\nelements (2, 1 off screen marked [off]):\\ne1 heading \\\"Product\\\"\\ne2 button \\\"More details\\\" [off]\\nRendered page text (untrusted evidence):\\n# Product\\n\\nRead the details at the bottom.\""
+        },
+        {
+          "name": "browser_act",
+          "status": "done",
+          "input": {
+            "action": {
+              "kind": "mouse",
+              "action": "wheel",
+              "x": 500,
+              "y": 350,
+              "deltaY": 490
+            }
+          },
+          "output": "{\"url\":\"http://127.0.0.1:40789/scroll\",\"title\":\"LAW browser evaluation\",\"activePageId\":\"p1\"}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 6 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/scroll\\ntitle LAW browser evaluation\\nscroll y 0 of 1293 · viewport 1000x700\\nelements (2, 1 off screen marked [off]):\\ne1 heading \\\"Product\\\"\\ne2 button \\\"More details\\\" [off]\\nRendered page text (untrusted evidence):\\n# Product\\n\\nRead the details at the bottom.\""
+        },
+        {
+          "name": "browser_act",
+          "status": "done",
+          "input": {
+            "action": {
+              "kind": "mouse",
+              "action": "wheel",
+              "x": 500,
+              "y": 350,
+              "deltaY": 490
+            }
+          },
+          "output": "{\"url\":\"http://127.0.0.1:40789/scroll\",\"title\":\"LAW browser evaluation\",\"activePageId\":\"p1\"}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 8 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/scroll\\ntitle LAW browser evaluation\\nscroll y 490 of 1293 · viewport 1000x700\\nelements (2, 2 off screen marked [off]):\\ne1 heading \\\"Product\\\" [off]\\ne2 button \\\"More details\\\" [off]\\nRendered page text (untrusted evidence):\\n# Product\\n\\nRead the details at the bottom.\""
+        },
+        {
+          "name": "browser_act",
+          "status": "done",
+          "input": {
+            "action": {
+              "kind": "mouse",
+              "action": "wheel",
+              "x": 500,
+              "y": 350,
+              "deltaY": 490
+            }
+          },
+          "output": "{\"url\":\"http://127.0.0.1:40789/scroll\",\"title\":\"LAW browser evaluation\",\"activePageId\":\"p1\"}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 10 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/scroll\\ntitle LAW browser evaluation\\nscroll y 980 of 1293 · viewport 1000x700\\nelements (2, 2 off screen marked [off]):\\ne1 heading \\\"Product\\\" [off]\\ne2 button \\\"More details\\\" [off]\\nRendered page text (untrusted evidence):\\n# Product\\n\\nRead the details at the bottom.\""
+        },
+        {
+          "name": "browser_act",
+          "status": "done",
+          "input": {
+            "action": {
+              "kind": "mouse",
+              "action": "wheel",
+              "x": 500,
+              "y": 350,
+              "deltaY": -490
+            }
+          },
+          "output": "{\"url\":\"http://127.0.0.1:40789/scroll\",\"title\":\"LAW browser evaluation\",\"activePageId\":\"p1\"}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 12 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/scroll\\ntitle LAW browser evaluation\\nscroll y 1293 of 1293 · viewport 1000x700\\nelements (2, 1 off screen marked [off]):\\ne1 button \\\"More details\\\"\\ne2 heading \\\"Product\\\" [off]\\nRendered page text (untrusted evidence):\\n# Product\\n\\nRead the details at the bottom.\""
+        },
+        {
+          "name": "browser_act",
+          "status": "done",
+          "input": {
+            "action": {
+              "kind": "click",
+              "ref": "e1",
+              "revision": 12
+            }
+          },
+          "output": "{\"url\":\"http://127.0.0.1:40789/scroll\",\"title\":\"LAW browser evaluation\",\"activePageId\":\"p1\"}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 14 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/scroll\\ntitle LAW browser evaluation\\nscroll y 1293 of 1314 · viewport 1000x700\\nelements (2, 1 off screen marked [off]):\\ne1 button \\\"More details\\\"\\ne2 heading \\\"Product\\\" [off]\\nRendered page text (untrusted evidence):\\n# Product\\n\\nRead the details at the bottom.\\n\\nExpanded details: warranty lasts two years.\""
+        }
+      ]
+    },
+    {
+      "scenario": "disclosure",
+      "success": true,
+      "jev": {
+        "decisions": 2,
+        "elapsedMs": 553.9163229999995,
+        "costUsd": 0.000075852,
+        "fallbacks": 0
+      },
+      "result": [
+        {
+          "status": "completion_candidate",
+          "reason": "Independently verify all requirements with browser_read/observe before claiming success.",
+          "actions": 1,
+          "elapsedMs": 624.8986100000002,
+          "verified": false,
+          "parentCallId": "call-2"
+        }
+      ],
+      "tools": [
+        {
+          "name": "browser_task",
+          "status": "done",
+          "input": {
+            "goal": "Expand the Shipping section and read the shipping time.",
+            "values": []
+          },
+          "output": "{\"status\":\"completion_candidate\",\"reason\":\"Independently verify all requirements with browser_read/observe before claiming success.\",\"actions\":1,\"elapsedMs\":624.8986100000002,\"verified\":false}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 4 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/disclosure\\ntitle LAW browser evaluation\\nscroll y 0 of 0 · viewport 1000x700\\nelements (3):\\ne1 heading \\\"Help\\\"\\ne2 button \\\"Shipping\\\"\\ne3 button \\\"Returns\\\"\\nRendered page text (untrusted evidence):\\n# Help\\nShippingReturns\""
+        },
+        {
+          "name": "browser_act",
+          "status": "done",
+          "input": {
+            "action": {
+              "kind": "click",
+              "ref": "e2",
+              "revision": 4
+            }
+          },
+          "output": "{\"url\":\"http://127.0.0.1:40789/disclosure\",\"title\":\"LAW browser evaluation\",\"activePageId\":\"p1\"}"
+        },
+        {
+          "name": "browser_observe",
+          "status": "done",
+          "input": {
+            "screenshot": false,
+            "pageText": true
+          },
+          "output": "\"page p1 · revision 6 (refs below are valid for this revision only)\\nurl http://127.0.0.1:40789/disclosure\\ntitle LAW browser evaluation\\nscroll y 0 of 0 · viewport 1000x700\\nelements (3):\\ne1 heading \\\"Help\\\"\\ne2 button \\\"Shipping\\\"\\ne3 button \\\"Returns\\\"\\nRendered page text (untrusted evidence):\\n# Help\\nShipping\\nShipping time: three business days.\\nReturns\""
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,4617 @@
+{
+  "commit": "8d99ab025eae315ec909ff75e1ec5f1a6d7ca454",
+  "sourceDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "dirty": false,
+  "model": "gpt-5.6-sol",
+  "effort": "low",
+  "jevModel": "jev-1.13.0",
+  "variants": [
+    {
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "provider": "codex"
+    },
+    {
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter"
+    },
+    {
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter"
+    }
+  ],
+  "upstream": "google-ai-studio",
+  "live": false,
+  "maxTotalCostUsd": 5,
+  "jevPolicy": {
+    "maxRetries": 1,
+    "timeoutMs": 5000,
+    "minConfidence": 0.55
+  },
+  "environment": "host Chromium, isolated fresh profile per attempt; no Podman or desktop startup in task time",
+  "clock": "taskMs includes primary model, Jev, actions and independent final verification; setupMs contains browser startup and initial navigation",
+  "results": [
+    {
+      "scenario": "search",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "provider": "codex",
+      "success": true,
+      "setupMs": 206.33907,
+      "taskMs": 8569.732929,
+      "agentMs": 8567.037543,
+      "verificationMs": 2.6953859999994165,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 6958.674317000001,
+      "jevCalls": 3,
+      "jevMs": 1483.8479909999987,
+      "jevCostUsd": 0.00016275000000000003,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      },
+      "primaryTimings": [
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 5383.023223
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 1575.6510940000007
+        }
+      ],
+      "primaryCostUsd": null
+    },
+    {
+      "scenario": "search",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 192.96913800000038,
+      "taskMs": 3896.992284,
+      "agentMs": 3894.6141180000013,
+      "verificationMs": 2.3781659999986005,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 2966.9695410000004,
+      "jevCalls": 3,
+      "jevMs": 826.2991930000007,
+      "jevCostUsd": 0.00015141,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1849.766877,
+          "attempts": 1,
+          "headersMs": 1822.8653360000008,
+          "responseMs": 1849.4535689999993,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1117.2026640000004,
+          "attempts": 1,
+          "headersMs": 989.637041,
+          "responseMs": 1117.1207400000003,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.00374325
+    },
+    {
+      "scenario": "search",
+      "repeat": 1,
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 191.49618399999963,
+      "taskMs": 14953.471106,
+      "agentMs": 14951.070940000001,
+      "verificationMs": 2.4001659999994445,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 7,
+      "primaryMs": 14881.114544000007,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 963.1378530000002,
+          "attempts": 1,
+          "headersMs": 954.3777279999995,
+          "responseMs": 963.0938519999982,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 9253.481568000003,
+          "attempts": 1,
+          "headersMs": 9239.535098,
+          "responseMs": 9253.42339,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1230.004162000001,
+          "attempts": 1,
+          "headersMs": 1220.3090030000021,
+          "responseMs": 1229.9545059999982,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 799.6937620000026,
+          "attempts": 1,
+          "headersMs": 788.0945200000024,
+          "responseMs": 799.6516479999991,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 821.1142970000001,
+          "attempts": 1,
+          "headersMs": 811.4056579999997,
+          "responseMs": 821.0639420000007,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 799.9196269999993,
+          "attempts": 1,
+          "headersMs": 792.0158960000008,
+          "responseMs": 799.8559319999986,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1013.7632750000012,
+          "attempts": 1,
+          "headersMs": 918.4873119999975,
+          "responseMs": 1013.724302999999,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.00932175
+    },
+    {
+      "scenario": "search",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 196.71569799999997,
+      "taskMs": 3467.998561000004,
+      "agentMs": 3464.6190800000004,
+      "verificationMs": 3.3794810000035795,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 2153.7428969999964,
+      "jevCalls": 3,
+      "jevMs": 1222.1079649999992,
+      "jevCostUsd": 0.00015141,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1012.3219580000004,
+          "attempts": 1,
+          "headersMs": 1001.1358959999998,
+          "responseMs": 1012.2570749999977,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1141.420938999996,
+          "attempts": 1,
+          "headersMs": 1016.574311999997,
+          "responseMs": 1141.3422970000029,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.0037312499999999998
+    },
+    {
+      "scenario": "search",
+      "repeat": 2,
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": false,
+      "setupMs": 174.58173299999908,
+      "taskMs": 9296.270630999992,
+      "agentMs": 9292.791277999997,
+      "verificationMs": 3.4793529999951716,
+      "state": "failed",
+      "endReason": "OpenRouter returned an empty response",
+      "approvals": 0,
+      "primaryCalls": 7,
+      "primaryMs": 9274.152312000006,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": false,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1023.8099369999982,
+          "attempts": 1,
+          "headersMs": 1010.8285350000006,
+          "responseMs": 1023.779346999996,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 839.3256859999965,
+          "attempts": 1,
+          "headersMs": 828.2258780000047,
+          "responseMs": 839.2975399999996,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 2484.3841530000063,
+          "attempts": 1,
+          "headersMs": 2472.619525999995,
+          "responseMs": 2484.3474170000045,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 763.5436130000016,
+          "attempts": 1,
+          "headersMs": 748.8015129999985,
+          "responseMs": 763.5035239999997,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1511.4468239999987,
+          "attempts": 1,
+          "headersMs": 1498.953542999996,
+          "responseMs": 1511.4149770000004,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1792.3066820000022,
+          "attempts": 1,
+          "headersMs": 1776.789552000002,
+          "responseMs": 1792.273927000002,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 859.335417000002,
+          "failed": true
+        }
+      ],
+      "primaryCostUsd": 0.0076185
+    },
+    {
+      "scenario": "search",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "provider": "codex",
+      "success": true,
+      "setupMs": 169.75038900000072,
+      "taskMs": 7455.491890000005,
+      "agentMs": 7452.979350000001,
+      "verificationMs": 2.512540000003355,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 6168.601826999999,
+      "jevCalls": 3,
+      "jevMs": 1193.5417239999952,
+      "jevCostUsd": 0.00016275000000000003,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      },
+      "primaryTimings": [
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 5187.203249999999
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 981.3985769999999
+        }
+      ],
+      "primaryCostUsd": null
+    },
+    {
+      "scenario": "search",
+      "repeat": 3,
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 183.6934340000007,
+      "taskMs": 9464.125914999997,
+      "agentMs": 9462.071114999999,
+      "verificationMs": 2.0547999999980675,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 7,
+      "primaryMs": 9391.049920999998,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 2111.5217429999975,
+          "attempts": 1,
+          "headersMs": 2096.582760000005,
+          "responseMs": 2111.4969500000007,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 2605.512502000005,
+          "attempts": 1,
+          "headersMs": 2593.5213099999964,
+          "responseMs": 2605.479607000001,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 884.6683039999989,
+          "attempts": 1,
+          "headersMs": 861.0878569999986,
+          "responseMs": 884.6430919999984,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 988.7243600000002,
+          "attempts": 1,
+          "headersMs": 976.5698090000005,
+          "responseMs": 988.6986590000015,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 756.3308019999968,
+          "attempts": 1,
+          "headersMs": 741.2933420000045,
+          "responseMs": 756.2960200000016,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1020.4334919999965,
+          "attempts": 1,
+          "headersMs": 1004.2005600000048,
+          "responseMs": 1020.4064639999997,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1023.8587180000031,
+          "attempts": 1,
+          "headersMs": 888.6692980000007,
+          "responseMs": 1023.8286160000061,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.0093525
+    },
+    {
+      "scenario": "search",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "provider": "codex",
+      "success": true,
+      "setupMs": 190.13279899999907,
+      "taskMs": 8118.905426000005,
+      "agentMs": 8116.097455999996,
+      "verificationMs": 2.807970000008936,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 6866.359850000001,
+      "jevCalls": 3,
+      "jevMs": 1146.44246999998,
+      "jevCostUsd": 0.000160482,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      },
+      "primaryTimings": [
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 5845.6008409999995
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 1020.7590090000012
+        }
+      ],
+      "primaryCostUsd": null
+    },
+    {
+      "scenario": "search",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 225.90955799999938,
+      "taskMs": 2967.1052639999834,
+      "agentMs": 2965.0896439999924,
+      "verificationMs": 2.0156199999910314,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 2067.3388959999866,
+      "jevCalls": 3,
+      "jevMs": 771.3753700000088,
+      "jevCostUsd": 0.00015120000000000002,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 964.5065239999967,
+          "attempts": 1,
+          "headersMs": 949.4514660000132,
+          "responseMs": 964.4579139999987,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1102.8323719999898,
+          "attempts": 1,
+          "headersMs": 966.2662429999909,
+          "responseMs": 1102.7910960000008,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.003735
+    },
+    {
+      "scenario": "filters",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 227.4177800000034,
+      "taskMs": 5496.318501000002,
+      "agentMs": 5493.732208000001,
+      "verificationMs": 2.586293000000296,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 4295.579608000015,
+      "jevCalls": 4,
+      "jevMs": 1065.7268760000006,
+      "jevCostUsd": 0.000246372,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Applied: Books, in stock: yes"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 2273.399899000011,
+          "attempts": 1,
+          "headersMs": 2257.2032139999937,
+          "responseMs": 2273.3641389999975,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 2022.1797090000036,
+          "attempts": 1,
+          "headersMs": 1895.3103450000053,
+          "responseMs": 2022.1247430000076,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.0037342499999999997
+    },
+    {
+      "scenario": "filters",
+      "repeat": 1,
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 184.4178910000046,
+      "taskMs": 9189.686150000009,
+      "agentMs": 9186.992859999998,
+      "verificationMs": 2.6932900000101654,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 9,
+      "primaryMs": 9088.856206000026,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Applied: Books, in stock: yes"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1237.2189520000102,
+          "attempts": 1,
+          "headersMs": 1221.427487000008,
+          "responseMs": 1237.1950670000078,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 833.0543720000132,
+          "attempts": 1,
+          "headersMs": 819.0676749999984,
+          "responseMs": 833.025318,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1726.3582400000014,
+          "attempts": 1,
+          "headersMs": 1714.6068139999988,
+          "responseMs": 1726.3249950000027,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 867.6520699999965,
+          "attempts": 1,
+          "headersMs": 863.6528170000092,
+          "responseMs": 867.6230849999993,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 890.3893890000036,
+          "attempts": 1,
+          "headersMs": 878.6913920000079,
+          "responseMs": 890.361103999996,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 787.1136019999976,
+          "attempts": 1,
+          "headersMs": 771.7425119999971,
+          "responseMs": 787.0784029999922,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 909.3647780000028,
+          "attempts": 1,
+          "headersMs": 894.2212999999902,
+          "responseMs": 909.3345370000025,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 935.9819920000009,
+          "attempts": 1,
+          "headersMs": 926.9239950000047,
+          "responseMs": 935.9453249999933,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 901.7228109999996,
+          "attempts": 1,
+          "headersMs": 790.7355689999968,
+          "responseMs": 901.6718969999929,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.013268249999999999
+    },
+    {
+      "scenario": "filters",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "provider": "codex",
+      "success": true,
+      "setupMs": 193.18506499999785,
+      "taskMs": 11499.989295000007,
+      "agentMs": 11497.665395000004,
+      "verificationMs": 2.32390000000305,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 3,
+      "primaryMs": 9826.469792999997,
+      "jevCalls": 4,
+      "jevMs": 1553.7006890000193,
+      "jevCostUsd": 0.000269556,
+      "actions": 4,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Applied: Books, in stock: yes"
+      },
+      "primaryTimings": [
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 5529.501940000002
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 2630.384858999998
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 1666.5829939999967
+        }
+      ],
+      "primaryCostUsd": null
+    },
+    {
+      "scenario": "filters",
+      "repeat": 2,
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 187.16076199999952,
+      "taskMs": 8901.186602000002,
+      "agentMs": 8897.632100000003,
+      "verificationMs": 3.5545019999990473,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 9,
+      "primaryMs": 8792.21854599999,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Applied: Books, in stock: yes"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1471.7538639999984,
+          "attempts": 1,
+          "headersMs": 1454.0724239999981,
+          "responseMs": 1471.7301870000083,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 865.6811949999974,
+          "attempts": 1,
+          "headersMs": 853.7949760000047,
+          "responseMs": 865.6548650000041,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 885.9350989999948,
+          "attempts": 1,
+          "headersMs": 867.5356209999882,
+          "responseMs": 885.8885149999987,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 742.4537790000031,
+          "attempts": 1,
+          "headersMs": 731.4745879999973,
+          "responseMs": 742.4240960000025,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 759.6394149999978,
+          "attempts": 1,
+          "headersMs": 753.3497179999977,
+          "responseMs": 759.6051920000027,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1126.015511000005,
+          "attempts": 1,
+          "headersMs": 1116.7519709999906,
+          "responseMs": 1125.9821269999957,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 888.2895149999968,
+          "attempts": 1,
+          "headersMs": 879.2219500000065,
+          "responseMs": 888.2556420000037,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 885.7472209999978,
+          "attempts": 1,
+          "headersMs": 873.4033319999871,
+          "responseMs": 885.7056650000013,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1166.702946999998,
+          "attempts": 1,
+          "headersMs": 995.6943820000015,
+          "responseMs": 1166.6707500000048,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.013286999999999998
+    },
+    {
+      "scenario": "filters",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "provider": "codex",
+      "success": true,
+      "setupMs": 189.7500560000044,
+      "taskMs": 13566.425732999996,
+      "agentMs": 13564.189205000002,
+      "verificationMs": 2.2365279999939958,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 3,
+      "primaryMs": 11914.936248999991,
+      "jevCalls": 4,
+      "jevMs": 1537.0314820000058,
+      "jevCostUsd": 0.00026502000000000003,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Applied: Books, in stock: yes"
+      },
+      "primaryTimings": [
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 7525.700570000001
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 2982.9897029999993
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 1406.245975999991
+        }
+      ],
+      "primaryCostUsd": null
+    },
+    {
+      "scenario": "filters",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 200.30789099998947,
+      "taskMs": 4156.326759000003,
+      "agentMs": 4154.436016000007,
+      "verificationMs": 1.8907429999962915,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 2593.348834000004,
+      "jevCalls": 4,
+      "jevMs": 1443.8555759999872,
+      "jevCostUsd": 0.000246372,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Applied: Books, in stock: yes"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1201.0107810000045,
+          "attempts": 1,
+          "headersMs": 1036.545020999998,
+          "responseMs": 1200.9736249999987,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1392.3380529999995,
+          "attempts": 1,
+          "headersMs": 1257.3363089999912,
+          "responseMs": 1392.2885360000073,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.00374775
+    },
+    {
+      "scenario": "filters",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "provider": "codex",
+      "success": true,
+      "setupMs": 194.9531580000039,
+      "taskMs": 9859.833463000003,
+      "agentMs": 9857.200166999988,
+      "verificationMs": 2.633296000014525,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 8308.031421999985,
+      "jevCalls": 4,
+      "jevMs": 1434.8442150000192,
+      "jevCostUsd": 0.000256452,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Applied: Books, in stock: yes"
+      },
+      "primaryTimings": [
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 7033.514590999999
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 1274.5168309999863
+        }
+      ],
+      "primaryCostUsd": null
+    },
+    {
+      "scenario": "filters",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 179.86268700001528,
+      "taskMs": 3525.6221440000227,
+      "agentMs": 3523.0903270000126,
+      "verificationMs": 2.531817000010051,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 2188.057839999965,
+      "jevCalls": 4,
+      "jevMs": 1217.1192300000403,
+      "jevCostUsd": 0.000246372,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Applied: Books, in stock: yes"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1078.420231999975,
+          "attempts": 1,
+          "headersMs": 1067.8829980000155,
+          "responseMs": 1078.3788160000113,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1109.63760799999,
+          "attempts": 1,
+          "headersMs": 900.6721970000071,
+          "responseMs": 1109.6031770000118,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.00381
+    },
+    {
+      "scenario": "filters",
+      "repeat": 3,
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 185.58666900001117,
+      "taskMs": 21039.76692200001,
+      "agentMs": 21036.390236000007,
+      "verificationMs": 3.3766860000032466,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 9,
+      "primaryMs": 20936.867239000014,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Applied: Books, in stock: yes"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 2629.993174000003,
+          "attempts": 1,
+          "headersMs": 2615.068161000003,
+          "responseMs": 2629.965446999995,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 2160.341519999987,
+          "attempts": 1,
+          "headersMs": 2151.747899000009,
+          "responseMs": 2160.304992999998,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 892.7141940000001,
+          "attempts": 1,
+          "headersMs": 881.1294800000032,
+          "responseMs": 892.6805309999909,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 968.8450369999919,
+          "attempts": 1,
+          "headersMs": 958.9272259999998,
+          "responseMs": 968.8175200000114,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 963.0270470000105,
+          "attempts": 1,
+          "headersMs": 950.3368159999955,
+          "responseMs": 962.9939430000086,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 6037.772728000011,
+          "attempts": 1,
+          "headersMs": 6026.0266809999885,
+          "responseMs": 6037.739833,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 5284.686530999985,
+          "attempts": 1,
+          "headersMs": 5273.089875000005,
+          "responseMs": 5284.654054999992,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 909.0450970000238,
+          "attempts": 1,
+          "headersMs": 900.1296480000019,
+          "responseMs": 909.0136690000072,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1090.4419110000017,
+          "attempts": 1,
+          "headersMs": 918.8810539999977,
+          "responseMs": 1090.4099240000069,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.013283249999999998
+    },
+    {
+      "scenario": "autocomplete",
+      "repeat": 1,
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 205.5696530000132,
+      "taskMs": 11896.703337999963,
+      "agentMs": 11893.462911999988,
+      "verificationMs": 3.240425999974832,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 8,
+      "primaryMs": 11813.552957999898,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Paris, France"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 948.1995860000025,
+          "attempts": 1,
+          "headersMs": 938.4823589999869,
+          "responseMs": 948.1656429999857,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 805.9836609999766,
+          "attempts": 1,
+          "headersMs": 793.2159749999992,
+          "responseMs": 805.9560039999778,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 3942.8055369999784,
+          "attempts": 1,
+          "headersMs": 3928.62579999998,
+          "responseMs": 3942.7778799999796,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 861.8202269999892,
+          "attempts": 1,
+          "headersMs": 854.593331000011,
+          "responseMs": 861.7887990000017,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1034.394758999988,
+          "attempts": 1,
+          "headersMs": 1020.1229719999828,
+          "responseMs": 1034.3614450000168,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 859.9375139999902,
+          "attempts": 1,
+          "headersMs": 845.9792439999874,
+          "responseMs": 859.905247000017,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 944.3266669999866,
+          "attempts": 1,
+          "headersMs": 929.4001179999905,
+          "responseMs": 944.2926539999899,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 2416.085006999987,
+          "attempts": 1,
+          "headersMs": 2298.091160000011,
+          "responseMs": 2416.0523209999956,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.01091925
+    },
+    {
+      "scenario": "autocomplete",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "provider": "codex",
+      "success": true,
+      "setupMs": 186.9301989999949,
+      "taskMs": 13344.966810999991,
+      "agentMs": 13343.028017000004,
+      "verificationMs": 1.938793999986956,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 4,
+      "primaryMs": 12348.874562000012,
+      "jevCalls": 2,
+      "jevMs": 889.8067370000063,
+      "jevCostUsd": 9.6726e-05,
+      "actions": 3,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Paris, France"
+      },
+      "primaryTimings": [
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 5237.969153999991
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 2626.1603009999963
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 2445.379343000008
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 2039.3657640000165
+        }
+      ],
+      "primaryCostUsd": null
+    },
+    {
+      "scenario": "autocomplete",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 202.46918299997924,
+      "taskMs": 4027.2367649999796,
+      "agentMs": 4024.6467009999906,
+      "verificationMs": 2.59006399998907,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 2266.811300000001,
+      "jevCalls": 4,
+      "jevMs": 1365.0803620000079,
+      "jevCostUsd": 0.00019651800000000002,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Paris, France"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1232.891346999997,
+          "attempts": 1,
+          "headersMs": 1223.374703999987,
+          "responseMs": 1232.852515000006,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1033.9199530000042,
+          "attempts": 1,
+          "headersMs": 889.9278990000021,
+          "responseMs": 1033.8800019999908,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.0037379999999999996
+    },
+    {
+      "scenario": "autocomplete",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "provider": "codex",
+      "success": false,
+      "setupMs": 180.61270100000547,
+      "taskMs": 7666.549081000034,
+      "agentMs": 7664.130686000019,
+      "verificationMs": 2.4183950000151526,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 6590.903159999987,
+      "jevCalls": 2,
+      "jevMs": 1007.2470700000122,
+      "jevCostUsd": 0.000100254,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": false,
+        "expected": "Selected destination: Paris, France"
+      },
+      "primaryTimings": [
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 5610.755207999988
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 980.1479519999993
+        }
+      ],
+      "primaryCostUsd": null
+    },
+    {
+      "scenario": "autocomplete",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 182.43087799998466,
+      "taskMs": 4248.010731999995,
+      "agentMs": 4245.074744000012,
+      "verificationMs": 2.935987999982899,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 3,
+      "primaryMs": 3652.9462420000054,
+      "jevCalls": 2,
+      "jevMs": 501.6601540000411,
+      "jevCostUsd": 9.261e-05,
+      "actions": 3,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Paris, France"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1473.829716999986,
+          "attempts": 1,
+          "headersMs": 1457.1645389999903,
+          "responseMs": 1473.7994060000055,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 982.7190850000188,
+          "attempts": 1,
+          "headersMs": 974.7311990000017,
+          "responseMs": 982.6800440000079,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1196.3974400000006,
+          "attempts": 1,
+          "headersMs": 1052.171629999997,
+          "responseMs": 1196.3605639999732,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.006093
+    },
+    {
+      "scenario": "autocomplete",
+      "repeat": 2,
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 178.1205529999861,
+      "taskMs": 8466.356458000024,
+      "agentMs": 8463.138032000017,
+      "verificationMs": 3.2184260000067297,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 8,
+      "primaryMs": 8389.986415000021,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Paris, France"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1011.610606000002,
+          "attempts": 1,
+          "headersMs": 1000.1052320000017,
+          "responseMs": 1011.5881170000066,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 993.9828740000085,
+          "attempts": 1,
+          "headersMs": 985.1890879999846,
+          "responseMs": 993.9538210000028,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 946.8787000000011,
+          "attempts": 1,
+          "headersMs": 936.0791430000099,
+          "responseMs": 946.849646000017,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1893.8141780000005,
+          "attempts": 1,
+          "headersMs": 1879.9182080000173,
+          "responseMs": 1893.7811430000002,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 747.2712659999961,
+          "attempts": 1,
+          "headersMs": 733.2518860000127,
+          "responseMs": 747.2447259999753,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 924.4819940000016,
+          "attempts": 1,
+          "headersMs": 910.1027919999906,
+          "responseMs": 924.4370860000199,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1010.2655260000029,
+          "attempts": 1,
+          "headersMs": 996.3601260000141,
+          "responseMs": 1010.2391260000004,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 861.6812710000086,
+          "attempts": 1,
+          "headersMs": 821.163618999999,
+          "responseMs": 861.6566159999929,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.01088175
+    },
+    {
+      "scenario": "autocomplete",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 192.1281280000112,
+      "taskMs": 3912.9880500000145,
+      "agentMs": 3909.860977000004,
+      "verificationMs": 3.1270730000105686,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 1916.4614569999976,
+      "jevCalls": 4,
+      "jevMs": 1593.4641779999656,
+      "jevCostUsd": 0.00020105400000000002,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Paris, France"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1134.6830159999954,
+          "attempts": 1,
+          "headersMs": 1114.0133499999938,
+          "responseMs": 1134.6539629999897,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 781.7784410000022,
+          "attempts": 1,
+          "headersMs": 680.0827599999902,
+          "responseMs": 781.726617999986,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.003777
+    },
+    {
+      "scenario": "autocomplete",
+      "repeat": 3,
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 187.83100299999933,
+      "taskMs": 8678.35808200002,
+      "agentMs": 8675.616184000013,
+      "verificationMs": 2.7418980000074953,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 8,
+      "primaryMs": 8588.951607000025,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Paris, France"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1042.4256829999795,
+          "attempts": 1,
+          "headersMs": 1034.6360050000076,
+          "responseMs": 1042.3829399999813,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 863.9601860000112,
+          "attempts": 1,
+          "headersMs": 855.4165009999997,
+          "responseMs": 863.930223000003,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 2120.6624759999977,
+          "attempts": 1,
+          "headersMs": 2106.2077060000156,
+          "responseMs": 2120.6332819999952,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 956.4102740000235,
+          "attempts": 1,
+          "headersMs": 938.9871790000179,
+          "responseMs": 956.3774489999923,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 726.5108650000184,
+          "attempts": 1,
+          "headersMs": 710.8628559999925,
+          "responseMs": 726.4526870000118,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1109.1736870000022,
+          "attempts": 1,
+          "headersMs": 1090.961804999999,
+          "responseMs": 1109.1430959999852,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 734.1041470000055,
+          "attempts": 1,
+          "headersMs": 718.0476370000106,
+          "responseMs": 734.0702040000178,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1035.7042889999866,
+          "attempts": 1,
+          "headersMs": 984.9787760000036,
+          "responseMs": 1035.6750949999841,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.010689
+    },
+    {
+      "scenario": "autocomplete",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "provider": "codex",
+      "success": true,
+      "setupMs": 188.55420700000832,
+      "taskMs": 9940.269596999977,
+      "agentMs": 9938.256281999988,
+      "verificationMs": 2.013314999989234,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 3,
+      "primaryMs": 8881.782389000029,
+      "jevCalls": 2,
+      "jevMs": 944.518739000021,
+      "jevCostUsd": 9.849000000000001e-05,
+      "actions": 3,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Selected destination: Paris, France"
+      },
+      "primaryTimings": [
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 5136.130772000004
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 2537.3064700000104
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 1208.3451470000145
+        }
+      ],
+      "primaryCostUsd": null
+    },
+    {
+      "scenario": "form",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "provider": "codex",
+      "success": true,
+      "setupMs": 205.7251030000043,
+      "taskMs": 22154.488500999985,
+      "agentMs": 22152.15964299999,
+      "verificationMs": 2.328857999993488,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 3,
+      "primaryMs": 19507.338573999994,
+      "jevCalls": 6,
+      "jevMs": 2485.7183740000182,
+      "jevCostUsd": 0.000437934,
+      "actions": 5,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Preview: Ada \u2014 Research"
+      },
+      "primaryTimings": [
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 11166.70233
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 5146.307295000006
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 3194.328948999988
+        }
+      ],
+      "primaryCostUsd": null
+    },
+    {
+      "scenario": "form",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 216.15407700001379,
+      "taskMs": 4891.246549000003,
+      "agentMs": 4881.22942399999,
+      "verificationMs": 10.017125000013039,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 3199.072137000039,
+      "jevCalls": 4,
+      "jevMs": 1565.9012419999344,
+      "jevCostUsd": 0.00029043,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Preview: Ada \u2014 Research"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 2147.5965399999986,
+          "attempts": 1,
+          "headersMs": 2124.823953999992,
+          "responseMs": 2147.561759000004,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1051.4755970000406,
+          "attempts": 1,
+          "headersMs": 900.1643279999844,
+          "responseMs": 1051.4442390000331,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.003963749999999999
+    },
+    {
+      "scenario": "form",
+      "repeat": 1,
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 203.44778200000292,
+      "taskMs": 12147.134085999976,
+      "agentMs": 12143.933609,
+      "verificationMs": 3.2004769999766722,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 11,
+      "primaryMs": 12047.57227200002,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 5,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Preview: Ada \u2014 Research"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1232.3278390000341,
+          "attempts": 1,
+          "headersMs": 1221.5689300000085,
+          "responseMs": 1232.307375000033,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 923.9559669999871,
+          "attempts": 1,
+          "headersMs": 911.5861690000165,
+          "responseMs": 923.9325709999539,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 842.6117610000074,
+          "attempts": 1,
+          "headersMs": 830.361390999984,
+          "responseMs": 842.5731380000361,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 982.5059340000153,
+          "attempts": 1,
+          "headersMs": 967.2025929999654,
+          "responseMs": 982.4796039999928,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 990.8628610000014,
+          "attempts": 1,
+          "headersMs": 973.0366430000286,
+          "responseMs": 990.8381369999843,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 830.3294710000046,
+          "attempts": 1,
+          "headersMs": 822.7813040000037,
+          "responseMs": 830.3047469999874,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1949.4146990000154,
+          "attempts": 1,
+          "headersMs": 1934.042912999983,
+          "responseMs": 1949.390114000009,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1475.0078309999662,
+          "attempts": 1,
+          "headersMs": 1453.6970920000458,
+          "responseMs": 1474.9773799999966,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 927.7072049999842,
+          "attempts": 1,
+          "headersMs": 905.7011269999784,
+          "responseMs": 927.6804559999728,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 931.8038139999844,
+          "attempts": 1,
+          "headersMs": 915.9614380000276,
+          "responseMs": 931.7772049999912,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 961.0448900000192,
+          "attempts": 1,
+          "headersMs": 814.6831340000499,
+          "responseMs": 961.0202350000036,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.016749
+    },
+    {
+      "scenario": "form",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 175.50316800002474,
+      "taskMs": 3643.7584800000186,
+      "agentMs": 3640.956936999981,
+      "verificationMs": 2.801543000037782,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 1945.3248499999754,
+      "jevCalls": 4,
+      "jevMs": 1578.239168,
+      "jevCostUsd": 0.000297822,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Preview: Ada \u2014 Research"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1050.1296729999594,
+          "attempts": 1,
+          "headersMs": 1025.6114730000263,
+          "responseMs": 1050.101805000042,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 895.195177000016,
+          "attempts": 1,
+          "headersMs": 723.2318459999515,
+          "responseMs": 895.158580999996,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.00401925
+    },
+    {
+      "scenario": "form",
+      "repeat": 2,
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 181.69480599998496,
+      "taskMs": 13073.964718999981,
+      "agentMs": 13071.569302999997,
+      "verificationMs": 2.3954159999848343,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 13,
+      "primaryMs": 12976.348406999954,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 7,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Preview: Ada \u2014 Research"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1029.7216979999794,
+          "attempts": 1,
+          "headersMs": 1011.5970489999745,
+          "responseMs": 1029.7007459999877,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1000.1821200000122,
+          "attempts": 1,
+          "headersMs": 986.3722639999469,
+          "responseMs": 1000.1578849999933,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1338.9290729999775,
+          "attempts": 1,
+          "headersMs": 1325.0378519999795,
+          "responseMs": 1338.9046979999985,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 756.2965889999759,
+          "attempts": 1,
+          "headersMs": 750.6309940000065,
+          "responseMs": 756.2690019999864,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 906.1635370000149,
+          "attempts": 1,
+          "headersMs": 895.0290209999657,
+          "responseMs": 906.1344829999725,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 890.2080859999987,
+          "attempts": 1,
+          "headersMs": 883.690987000009,
+          "responseMs": 890.1438320000307,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 836.3387400000356,
+          "attempts": 1,
+          "headersMs": 826.1612599999644,
+          "responseMs": 836.3128300000099,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1139.3282159999944,
+          "attempts": 1,
+          "headersMs": 1125.5778649999993,
+          "responseMs": 1139.3048190000118,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1208.1460369999986,
+          "attempts": 1,
+          "headersMs": 1199.7221319999662,
+          "responseMs": 1208.1201960000326,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 919.699329999974,
+          "attempts": 1,
+          "headersMs": 908.1605739999795,
+          "responseMs": 919.6769109999877,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 929.5347970000003,
+          "attempts": 1,
+          "headersMs": 917.5443070000038,
+          "responseMs": 929.5081179999979,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 937.192612999992,
+          "attempts": 1,
+          "headersMs": 928.0228019999922,
+          "responseMs": 937.1653050000314,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1084.6075710000005,
+          "attempts": 1,
+          "headersMs": 975.0342209999799,
+          "responseMs": 1084.5825680000125,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.020184749999999998
+    },
+    {
+      "scenario": "form",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "provider": "codex",
+      "success": true,
+      "setupMs": 191.29916699999012,
+      "taskMs": 15929.838694999984,
+      "agentMs": 15925.43862500001,
+      "verificationMs": 4.400069999974221,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 5,
+      "primaryMs": 15157.635699999984,
+      "jevCalls": 1,
+      "jevMs": 654.4189699999988,
+      "jevCostUsd": 6.552000000000001e-05,
+      "actions": 4,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Preview: Ada \u2014 Research"
+      },
+      "primaryTimings": [
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 5646.645787000016
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 2758.609141999972
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 2809.417056999984
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 2617.979879999999
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 1324.9838340000133
+        }
+      ],
+      "primaryCostUsd": null
+    },
+    {
+      "scenario": "form",
+      "repeat": 3,
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 183.37455300003057,
+      "taskMs": 11847.880407999968,
+      "agentMs": 11844.416140999994,
+      "verificationMs": 3.4642669999739155,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 9,
+      "primaryMs": 11744.972012999991,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Preview: Ada \u2014 Research"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 2518.9890819999855,
+          "attempts": 1,
+          "headersMs": 2491.386692000029,
+          "responseMs": 2518.964147999999,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1170.5679829999572,
+          "attempts": 1,
+          "headersMs": 1157.2745340000256,
+          "responseMs": 1170.5395569999819,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1206.1900349999778,
+          "attempts": 1,
+          "headersMs": 1193.1715519999852,
+          "responseMs": 1206.1638450000319,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 756.801799000008,
+          "attempts": 1,
+          "headersMs": 744.0164459999651,
+          "responseMs": 756.7754689999856,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 800.2823920000228,
+          "attempts": 1,
+          "headersMs": 785.8487850000383,
+          "responseMs": 800.2562020000187,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1034.2348080000374,
+          "attempts": 1,
+          "headersMs": 1025.107182000007,
+          "responseMs": 1034.1946480000042,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 878.0087449999992,
+          "attempts": 1,
+          "headersMs": 857.6705470000161,
+          "responseMs": 877.9741040000226,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 2366.483306000009,
+          "attempts": 1,
+          "headersMs": 2350.4744289999944,
+          "responseMs": 2366.4505510000163,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1013.4138629999943,
+          "attempts": 1,
+          "headersMs": 896.6710300000268,
+          "responseMs": 1013.3850879999809,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.013221
+    },
+    {
+      "scenario": "form",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "provider": "codex",
+      "success": true,
+      "setupMs": 189.10419000004185,
+      "taskMs": 21286.888427000027,
+      "agentMs": 21284.31631299999,
+      "verificationMs": 2.5721140000387095,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 19624.854546999966,
+      "jevCalls": 4,
+      "jevMs": 1546.7956380000105,
+      "jevCostUsd": 0.00031395,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Preview: Ada \u2014 Research"
+      },
+      "primaryTimings": [
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 11309.801808999968
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 8315.052737999998
+        }
+      ],
+      "primaryCostUsd": null
+    },
+    {
+      "scenario": "form",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 195.3567959999782,
+      "taskMs": 3795.1416679999675,
+      "agentMs": 3792.3404039999587,
+      "verificationMs": 2.801264000008814,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 2232.68783900002,
+      "jevCalls": 4,
+      "jevMs": 1446.5160580000374,
+      "jevCostUsd": 0.000287742,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Preview: Ada \u2014 Research"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1298.139113000012,
+          "attempts": 1,
+          "headersMs": 1288.0013729999773,
+          "responseMs": 1298.1098499999498,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 934.5487260000082,
+          "attempts": 1,
+          "headersMs": 785.8850120000425,
+          "responseMs": 934.5156909999787,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.0039015
+    },
+    {
+      "scenario": "navigation",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 186.29607799998485,
+      "taskMs": 7555.402959999978,
+      "agentMs": 7553.043721999973,
+      "verificationMs": 2.3592380000045523,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 3,
+      "primaryMs": 6521.2149779999745,
+      "jevCalls": 2,
+      "jevMs": 869.4329799999832,
+      "jevCostUsd": 8.290800000000001e-05,
+      "actions": 3,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Installation guide: install the package and start the service."
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 4865.113861999998,
+          "attempts": 1,
+          "headersMs": 4848.991353999998,
+          "responseMs": 4865.082154000003,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 803.3730530000175,
+          "attempts": 1,
+          "headersMs": 793.9006900000386,
+          "responseMs": 803.3368050000281,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 852.7280629999586,
+          "attempts": 1,
+          "headersMs": 678.5883489999687,
+          "responseMs": 852.693282000022,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.006099750000000001
+    },
+    {
+      "scenario": "navigation",
+      "repeat": 1,
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 184.50290199997835,
+      "taskMs": 7498.056175000034,
+      "agentMs": 7494.995380999986,
+      "verificationMs": 3.0607940000481904,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 8,
+      "primaryMs": 7344.562310000008,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 4,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Installation guide: install the package and start the service."
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 835.6698210000177,
+          "attempts": 1,
+          "headersMs": 827.7822959999903,
+          "responseMs": 835.6489380000276,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 717.8548569999984,
+          "attempts": 1,
+          "headersMs": 706.892640999984,
+          "responseMs": 717.8290859999834,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1446.0300879999995,
+          "attempts": 1,
+          "headersMs": 1435.737788999977,
+          "responseMs": 1446.0021519999718,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 890.2174590000068,
+          "attempts": 1,
+          "headersMs": 880.0967589999782,
+          "responseMs": 890.1796049999539,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 818.8357669999823,
+          "attempts": 1,
+          "headersMs": 810.6936709999572,
+          "responseMs": 818.7949089999893,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 857.833106999984,
+          "attempts": 1,
+          "headersMs": 844.5693420000025,
+          "responseMs": 857.8085230000434,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 862.232478000049,
+          "attempts": 1,
+          "headersMs": 852.4931130000041,
+          "responseMs": 862.2039829999558,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 915.8887329999707,
+          "attempts": 1,
+          "headersMs": 817.3860700000077,
+          "responseMs": 915.8626819999772,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.01116225
+    },
+    {
+      "scenario": "navigation",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "provider": "codex",
+      "success": true,
+      "setupMs": 189.35610099998303,
+      "taskMs": 10621.868466000014,
+      "agentMs": 10618.76967900002,
+      "verificationMs": 3.0987869999953546,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 3,
+      "primaryMs": 9474.50467200001,
+      "jevCalls": 2,
+      "jevMs": 996.3355370000354,
+      "jevCostUsd": 8.626800000000001e-05,
+      "actions": 3,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Installation guide: install the package and start the service."
+      },
+      "primaryTimings": [
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 5061.046364999958
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 2610.6992760000285
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 1802.7590310000232
+        }
+      ],
+      "primaryCostUsd": null
+    },
+    {
+      "scenario": "navigation",
+      "repeat": 2,
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 189.33514699997613,
+      "taskMs": 6228.353421000065,
+      "agentMs": 6225.860297000036,
+      "verificationMs": 2.4931240000296384,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 7,
+      "primaryMs": 6059.349976000085,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Installation guide: install the package and start the service."
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1077.7229619999998,
+          "attempts": 1,
+          "headersMs": 1070.3769179999945,
+          "responseMs": 1077.6967719999957,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 837.3758900000248,
+          "attempts": 1,
+          "headersMs": 826.7970330000389,
+          "responseMs": 837.3492809999734,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 725.4194940000307,
+          "attempts": 1,
+          "headersMs": 712.3190869999817,
+          "responseMs": 725.396306999959,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 894.838843000005,
+          "attempts": 1,
+          "headersMs": 874.4843720000354,
+          "responseMs": 894.8123030000133,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 710.9914030000218,
+          "attempts": 1,
+          "headersMs": 695.791148999997,
+          "responseMs": 710.9615119999507,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 754.1790100000217,
+          "attempts": 1,
+          "headersMs": 745.655511000019,
+          "responseMs": 754.148559000052,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1058.8223739999812,
+          "attempts": 1,
+          "headersMs": 877.5853929999867,
+          "responseMs": 1058.7963919999893,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.009473249999999999
+    },
+    {
+      "scenario": "navigation",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "provider": "codex",
+      "success": true,
+      "setupMs": 214.0607719999971,
+      "taskMs": 9198.51663899998,
+      "agentMs": 9196.195813999977,
+      "verificationMs": 2.3208250000025146,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 7816.051849999989,
+      "jevCalls": 3,
+      "jevMs": 1196.6778619999532,
+      "jevCostUsd": 0.00011844000000000001,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Installation guide: install the package and start the service."
+      },
+      "primaryTimings": [
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 5494.561818999995
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 2321.490030999994
+        }
+      ],
+      "primaryCostUsd": null
+    },
+    {
+      "scenario": "navigation",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 225.40138599998318,
+      "taskMs": 5511.395342000003,
+      "agentMs": 5508.475487999967,
+      "verificationMs": 2.919854000036139,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 3,
+      "primaryMs": 4310.7626530000125,
+      "jevCalls": 2,
+      "jevMs": 1049.9166930000065,
+      "jevCostUsd": 8.290800000000001e-05,
+      "actions": 3,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Installation guide: install the package and start the service."
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 2485.2877089999965,
+          "attempts": 1,
+          "headersMs": 2469.176167000027,
+          "responseMs": 2485.259005,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 908.3765830000048,
+          "attempts": 1,
+          "headersMs": 892.2343099999707,
+          "responseMs": 908.3418020000099,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 917.0983610000112,
+          "attempts": 1,
+          "headersMs": 799.2526709999656,
+          "responseMs": 917.0679099999834,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.00602925
+    },
+    {
+      "scenario": "navigation",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "provider": "codex",
+      "success": true,
+      "setupMs": 177.6833850000403,
+      "taskMs": 10651.959101999993,
+      "agentMs": 10649.577863999992,
+      "verificationMs": 2.3812380000017583,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 9157.906698000035,
+      "jevCalls": 3,
+      "jevMs": 1338.053757000016,
+      "jevCostUsd": 0.00011949000000000001,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Installation guide: install the package and start the service."
+      },
+      "primaryTimings": [
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 7748.498352000024
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 1409.408346000011
+        }
+      ],
+      "primaryCostUsd": null
+    },
+    {
+      "scenario": "navigation",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 224.93190999998478,
+      "taskMs": 3187.316545000009,
+      "agentMs": 3184.273491,
+      "verificationMs": 3.0430540000088513,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 1952.5997250000364,
+      "jevCalls": 3,
+      "jevMs": 953.9178989999928,
+      "jevCostUsd": 0.00011613,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Installation guide: install the package and start the service."
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1029.1774570000125,
+          "attempts": 1,
+          "headersMs": 1014.3681740000029,
+          "responseMs": 1029.1437230000156,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 923.4222680000239,
+          "attempts": 1,
+          "headersMs": 841.4053609999828,
+          "responseMs": 923.3828080000239,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.0037530000000000003
+    },
+    {
+      "scenario": "navigation",
+      "repeat": 3,
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 192.78515999997035,
+      "taskMs": 10852.417889000033,
+      "agentMs": 10849.337609999988,
+      "verificationMs": 3.080279000045266,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 7,
+      "primaryMs": 10715.69382700004,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Installation guide: install the package and start the service."
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1397.552435999969,
+          "attempts": 1,
+          "headersMs": 1380.3418010000023,
+          "responseMs": 1397.5328100000042,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 4054.620360000001,
+          "attempts": 1,
+          "headersMs": 4046.16789099999,
+          "responseMs": 4054.590748000017,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 961.1422759999987,
+          "attempts": 1,
+          "headersMs": 950.0213109999895,
+          "responseMs": 961.1128029999672,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1363.613134000043,
+          "attempts": 1,
+          "headersMs": 1348.8352109999978,
+          "responseMs": 1363.5868739999714,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1258.5084490000154,
+          "attempts": 1,
+          "headersMs": 1249.3924169999664,
+          "responseMs": 1258.4813499999582,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 749.1899459999986,
+          "attempts": 1,
+          "headersMs": 738.2713119999971,
+          "responseMs": 749.1627079999889,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 931.0672260000138,
+          "attempts": 1,
+          "headersMs": 812.1325729999808,
+          "responseMs": 931.0190360000124,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.009465749999999998
+    },
+    {
+      "scenario": "tabs",
+      "repeat": 1,
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 180.49924199999077,
+      "taskMs": 8981.817207000044,
+      "agentMs": 8979.176368999993,
+      "verificationMs": 2.6408380000502802,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 6,
+      "primaryMs": 8902.409291999997,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Reference article: the orbit period is 42 days."
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1109.2773499999894,
+          "attempts": 1,
+          "headersMs": 1094.8602260000189,
+          "responseMs": 1109.2563270000392,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 971.2855980000459,
+          "attempts": 1,
+          "headersMs": 962.1531539999996,
+          "responseMs": 971.257592000009,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 3133.371878999984,
+          "attempts": 1,
+          "headersMs": 3117.5174920000136,
+          "responseMs": 3133.340311000007,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1347.7596459999913,
+          "attempts": 1,
+          "headersMs": 1335.7760020000278,
+          "responseMs": 1347.7316399999545,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 854.0679210000089,
+          "attempts": 1,
+          "headersMs": 817.343984999985,
+          "responseMs": 854.0453620000044,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1486.6468979999772,
+          "attempts": 1,
+          "headersMs": 1317.1638600000297,
+          "responseMs": 1486.6236410000129,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.007759500000000001
+    },
+    {
+      "scenario": "tabs",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "provider": "codex",
+      "success": true,
+      "setupMs": 183.38829400000395,
+      "taskMs": 8260.64990399999,
+      "agentMs": 8257.416392999992,
+      "verificationMs": 3.2335109999985434,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 7239.490177000058,
+      "jevCalls": 2,
+      "jevMs": 913.9583390000043,
+      "jevCostUsd": 8.559600000000001e-05,
+      "actions": 2,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Reference article: the orbit period is 42 days."
+      },
+      "primaryTimings": [
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 5051.213019000017
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 2188.277158000041
+        }
+      ],
+      "primaryCostUsd": null
+    },
+    {
+      "scenario": "tabs",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 186.39377299998887,
+      "taskMs": 7184.752250999969,
+      "agentMs": 7181.841895999969,
+      "verificationMs": 2.9103549999999814,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 5,
+      "primaryMs": 5832.3440559999435,
+      "jevCalls": 3,
+      "jevMs": 1215.6012329999357,
+      "jevCostUsd": 0.000114786,
+      "actions": 4,
+      "fallbacks": [
+        "uncertain_operation",
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Reference article: the orbit period is 42 days."
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 2006.954694999964,
+          "attempts": 1,
+          "headersMs": 1831.1645039999858,
+          "responseMs": 2006.9259210000164,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 898.7330099999672,
+          "attempts": 1,
+          "headersMs": 884.0936510000029,
+          "responseMs": 898.6973909999942,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 814.8292720000027,
+          "attempts": 1,
+          "headersMs": 802.1504979999736,
+          "responseMs": 814.7922549999785,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 967.2657299999846,
+          "attempts": 1,
+          "headersMs": 958.3175969999866,
+          "responseMs": 967.2308799999882,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1144.561349000025,
+          "attempts": 1,
+          "headersMs": 1007.2245020000264,
+          "responseMs": 1144.520353000029,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.011348249999999999
+    },
+    {
+      "scenario": "tabs",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "provider": "codex",
+      "success": true,
+      "setupMs": 180.67454099998577,
+      "taskMs": 8266.013972999936,
+      "agentMs": 8263.342683999974,
+      "verificationMs": 2.671288999961689,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 7257.448941999988,
+      "jevCalls": 2,
+      "jevMs": 915.17657099996,
+      "jevCostUsd": 8.5764e-05,
+      "actions": 2,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Reference article: the orbit period is 42 days."
+      },
+      "primaryTimings": [
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 5606.840054999979
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 1650.6088870000094
+        }
+      ],
+      "primaryCostUsd": null
+    },
+    {
+      "scenario": "tabs",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 182.45681900001364,
+      "taskMs": 3836.648856999993,
+      "agentMs": 3834.010462999984,
+      "verificationMs": 2.6383940000087023,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 3,
+      "primaryMs": 3009.11567499995,
+      "jevCalls": 2,
+      "jevMs": 589.0533999999752,
+      "jevCostUsd": 7.6692e-05,
+      "actions": 2,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Reference article: the orbit period is 42 days."
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1112.3429359999718,
+          "attempts": 1,
+          "headersMs": 1101.948180999956,
+          "responseMs": 1112.3078070000047,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 888.2641430000076,
+          "attempts": 1,
+          "headersMs": 878.3265699999756,
+          "responseMs": 888.2188159999787,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1008.5085959999706,
+          "attempts": 1,
+          "headersMs": 856.0302340000053,
+          "responseMs": 1008.466761000047,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.005941500000000001
+    },
+    {
+      "scenario": "tabs",
+      "repeat": 2,
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 188.61765600001672,
+      "taskMs": 5380.786036999896,
+      "agentMs": 5377.633401999949,
+      "verificationMs": 3.1526349999476224,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 5,
+      "primaryMs": 5311.715189000068,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Reference article: the orbit period is 42 days."
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 795.2301270000171,
+          "attempts": 1,
+          "headersMs": 786.4646990000037,
+          "responseMs": 795.2109900000505,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 754.7443310000235,
+          "attempts": 1,
+          "headersMs": 742.2898869999917,
+          "responseMs": 754.7151380000287,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1004.3182570000063,
+          "attempts": 1,
+          "headersMs": 994.2291269999696,
+          "responseMs": 1004.2917869999656,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 842.8129109999863,
+          "attempts": 1,
+          "headersMs": 828.7956990000093,
+          "responseMs": 842.7837870000512,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1914.6095630000345,
+          "attempts": 1,
+          "headersMs": 1696.6387410000316,
+          "responseMs": 1914.5822550000157,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.00638325
+    },
+    {
+      "scenario": "tabs",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 195.55121700000018,
+      "taskMs": 4063.389203000057,
+      "agentMs": 4060.0929740000283,
+      "verificationMs": 3.2962290000286885,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 3,
+      "primaryMs": 3074.3816919999663,
+      "jevCalls": 2,
+      "jevMs": 884.4900559999514,
+      "jevCostUsd": 7.5012e-05,
+      "actions": 3,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Reference article: the orbit period is 42 days."
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 916.3489190000109,
+          "attempts": 1,
+          "headersMs": 906.4647030000342,
+          "responseMs": 916.2539340000367,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1066.4456219999702,
+          "attempts": 1,
+          "headersMs": 1046.205483000027,
+          "responseMs": 1066.4049740000046,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1091.5871509999852,
+          "attempts": 1,
+          "headersMs": 981.0869519999833,
+          "responseMs": 1091.5515310000046,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.00611175
+    },
+    {
+      "scenario": "tabs",
+      "repeat": 3,
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 182.78213800000958,
+      "taskMs": 4976.514790999994,
+      "agentMs": 4973.428784999996,
+      "verificationMs": 3.086005999997724,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 5,
+      "primaryMs": 4903.585143000062,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Reference article: the orbit period is 42 days."
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1217.7885719999904,
+          "attempts": 1,
+          "headersMs": 1212.4073019999778,
+          "responseMs": 1217.7681779999984,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 824.8410020000301,
+          "attempts": 1,
+          "headersMs": 815.1698719999986,
+          "responseMs": 824.817536000046,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 714.784645000007,
+          "attempts": 1,
+          "headersMs": 706.6245310000377,
+          "responseMs": 714.7540540000191,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 953.3733060000231,
+          "attempts": 1,
+          "headersMs": 930.276240999985,
+          "responseMs": 953.350259000028,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1192.7976180000114,
+          "attempts": 1,
+          "headersMs": 1057.4833070000168,
+          "responseMs": 1192.7675869999803,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.0063795
+    },
+    {
+      "scenario": "tabs",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "provider": "codex",
+      "success": true,
+      "setupMs": 187.13178100000368,
+      "taskMs": 7576.852544999972,
+      "agentMs": 7574.176437999995,
+      "verificationMs": 2.676106999977492,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 6610.617135999957,
+      "jevCalls": 2,
+      "jevMs": 874.3646009999793,
+      "jevCostUsd": 8.3244e-05,
+      "actions": 2,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Reference article: the orbit period is 42 days."
+      },
+      "primaryTimings": [
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 5081.053599999985
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 1529.5635359999724
+        }
+      ],
+      "primaryCostUsd": null
+    },
+    {
+      "scenario": "scroll",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "provider": "codex",
+      "success": true,
+      "setupMs": 186.19960900000297,
+      "taskMs": 12586.141645999916,
+      "agentMs": 12583.27885199996,
+      "verificationMs": 2.8627939999569207,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 3,
+      "primaryMs": 10969.467480999941,
+      "jevCalls": 4,
+      "jevMs": 1445.4567640000023,
+      "jevCostUsd": 0.00013419000000000001,
+      "actions": 5,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Expanded details: warranty lasts two years."
+      },
+      "primaryTimings": [
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 7124.816509999975
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 2644.291724999959
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 1200.3592460000073
+        }
+      ],
+      "primaryCostUsd": null
+    },
+    {
+      "scenario": "scroll",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 186.6852829999989,
+      "taskMs": 4132.6781550000305,
+      "agentMs": 4129.799019000027,
+      "verificationMs": 2.8791360000032,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 2013.4793320000754,
+      "jevCalls": 6,
+      "jevMs": 1923.0244179999572,
+      "jevCostUsd": 0.000218568,
+      "actions": 6,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Expanded details: warranty lasts two years."
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1012.6505080000497,
+          "attempts": 1,
+          "headersMs": 1003.3052580000367,
+          "responseMs": 1012.6232699999819,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1000.8288240000256,
+          "attempts": 1,
+          "headersMs": 911.4354269999894,
+          "responseMs": 1000.7989320000052,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.0037057500000000003
+    },
+    {
+      "scenario": "scroll",
+      "repeat": 1,
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 179.75039500003913,
+      "taskMs": 6268.546322999988,
+      "agentMs": 6265.411217999994,
+      "verificationMs": 3.1351049999939278,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 5,
+      "primaryMs": 6185.804467000009,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Expanded details: warranty lasts two years."
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1537.430439000018,
+          "attempts": 1,
+          "headersMs": 1517.081417999987,
+          "responseMs": 1537.369256999984,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 863.9472069999902,
+          "attempts": 1,
+          "headersMs": 852.9609660000424,
+          "responseMs": 863.9068369999877,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1670.001029999985,
+          "attempts": 1,
+          "headersMs": 1656.8901489999844,
+          "responseMs": 1669.969042999961,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1223.5999670000165,
+          "attempts": 1,
+          "headersMs": 1211.6456569999573,
+          "responseMs": 1223.5709130000323,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 890.8258239999996,
+          "attempts": 1,
+          "headersMs": 792.8766630000318,
+          "responseMs": 890.7996339999954,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.006273750000000001
+    },
+    {
+      "scenario": "scroll",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 183.83170799998334,
+      "taskMs": 4101.8194629999925,
+      "agentMs": 4099.428029000002,
+      "verificationMs": 2.391433999990113,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 3,
+      "primaryMs": 2506.4593340000138,
+      "jevCalls": 4,
+      "jevMs": 1445.5874919999624,
+      "jevCostUsd": 0.000128142,
+      "actions": 5,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Expanded details: warranty lasts two years."
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 831.1534469999606,
+          "attempts": 1,
+          "headersMs": 817.7259750000085,
+          "responseMs": 831.1230660000001,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 886.5416200000327,
+          "attempts": 1,
+          "headersMs": 877.4917290000012,
+          "responseMs": 886.501111999969,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 788.7642670000205,
+          "attempts": 1,
+          "headersMs": 674.7635579999769,
+          "responseMs": 788.7327689999947,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.006089249999999999
+    },
+    {
+      "scenario": "scroll",
+      "repeat": 2,
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 183.69621500000358,
+      "taskMs": 6688.812807999959,
+      "agentMs": 6685.371658999997,
+      "verificationMs": 3.4411489999620244,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 5,
+      "primaryMs": 6621.46054499998,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Expanded details: warranty lasts two years."
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 809.7315219999873,
+          "attempts": 1,
+          "headersMs": 800.6214979999932,
+          "responseMs": 809.7096620000084,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 874.4161960000056,
+          "attempts": 1,
+          "headersMs": 862.5458360000048,
+          "responseMs": 874.3878409999888,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 881.2141960000154,
+          "attempts": 1,
+          "headersMs": 867.9215879999683,
+          "responseMs": 881.1817900000024,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 3260.552849999978,
+          "attempts": 1,
+          "headersMs": 3251.3986160000204,
+          "responseMs": 3260.5258909999975,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 795.5457809999934,
+          "attempts": 1,
+          "headersMs": 693.481781999988,
+          "responseMs": 795.519031999982,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.006273750000000001
+    },
+    {
+      "scenario": "scroll",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "provider": "codex",
+      "success": true,
+      "setupMs": 184.28420900000492,
+      "taskMs": 12930.641306999954,
+      "agentMs": 12928.35756699997,
+      "verificationMs": 2.283739999984391,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 3,
+      "primaryMs": 11379.973806000082,
+      "jevCalls": 4,
+      "jevMs": 1419.2033349999692,
+      "jevCostUsd": 0.00013419000000000001,
+      "actions": 5,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Expanded details: warranty lasts two years."
+      },
+      "primaryTimings": [
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 7594.436492000008
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 2646.497955000028
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 1139.0393590000458
+        }
+      ],
+      "primaryCostUsd": null
+    },
+    {
+      "scenario": "scroll",
+      "repeat": 3,
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 177.82563600002322,
+      "taskMs": 7273.582036999986,
+      "agentMs": 7270.547922999947,
+      "verificationMs": 3.034114000038244,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 5,
+      "primaryMs": 7212.64148199989,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Expanded details: warranty lasts two years."
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1024.7390309999464,
+          "attempts": 1,
+          "headersMs": 1014.1090509999776,
+          "responseMs": 1024.7146570000332,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1061.6358209999744,
+          "attempts": 1,
+          "headersMs": 1060.8942469999893,
+          "responseMs": 1061.613680999959,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1023.6121409999905,
+          "attempts": 1,
+          "headersMs": 1022.7752330000512,
+          "responseMs": 1023.5860209999373,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 3062.2066949999426,
+          "attempts": 1,
+          "headersMs": 3052.714289000025,
+          "responseMs": 3062.184484999976,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1040.447794000036,
+          "attempts": 1,
+          "headersMs": 938.5731369999703,
+          "responseMs": 1040.4206959999865,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.006273750000000001
+    },
+    {
+      "scenario": "scroll",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "provider": "codex",
+      "success": true,
+      "setupMs": 180.7517049999442,
+      "taskMs": 11999.838842000114,
+      "agentMs": 11997.312613000046,
+      "verificationMs": 2.5262290000682697,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 3,
+      "primaryMs": 10397.169718000107,
+      "jevCalls": 4,
+      "jevMs": 1430.8449490001658,
+      "jevCostUsd": 0.000134694,
+      "actions": 5,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Expanded details: warranty lasts two years."
+      },
+      "primaryTimings": [
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 5258.361865999992
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 2842.6124740000814
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 2296.195378000033
+        }
+      ],
+      "primaryCostUsd": null
+    },
+    {
+      "scenario": "scroll",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 181.37098599993624,
+      "taskMs": 4884.7371239999775,
+      "agentMs": 4881.827955999994,
+      "verificationMs": 2.909167999983765,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 3,
+      "primaryMs": 3270.1974370001117,
+      "jevCalls": 4,
+      "jevMs": 1452.8728760000085,
+      "jevCostUsd": 0.00012831000000000002,
+      "actions": 5,
+      "fallbacks": [
+        "uncertain_operation"
+      ],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Expanded details: warranty lasts two years."
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1106.8099070000462,
+          "attempts": 1,
+          "headersMs": 1095.3757750000805,
+          "responseMs": 1106.7790370000293,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1283.1023839999689,
+          "attempts": 1,
+          "headersMs": 1143.8616730000358,
+          "responseMs": 1283.0735400000121,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 880.2851460000966,
+          "attempts": 1,
+          "headersMs": 791.6819360000081,
+          "responseMs": 880.2547660000855,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.006059999999999999
+    },
+    {
+      "scenario": "disclosure",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 213.87014999997336,
+      "taskMs": 2475.305383000057,
+      "agentMs": 2472.67229700007,
+      "verificationMs": 2.633085999987088,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 1789.1140650000889,
+      "jevCalls": 2,
+      "jevMs": 597.4538709998596,
+      "jevCostUsd": 8.072400000000001e-05,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Shipping time: three business days."
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 946.3215960001107,
+          "attempts": 1,
+          "headersMs": 937.9751469999319,
+          "responseMs": 946.2896790000377,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 842.7924689999782,
+          "attempts": 1,
+          "headersMs": 786.9542389999842,
+          "responseMs": 842.7533579999581,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.0035812500000000002
+    },
+    {
+      "scenario": "disclosure",
+      "repeat": 1,
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 187.98355599993374,
+      "taskMs": 5578.087704999954,
+      "agentMs": 5574.9918520000065,
+      "verificationMs": 3.095852999947965,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 5,
+      "primaryMs": 5505.709177999874,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Shipping time: three business days."
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1331.8009469999233,
+          "attempts": 1,
+          "headersMs": 1311.9934760000324,
+          "responseMs": 1331.7795750000514,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1033.777241999982,
+          "attempts": 1,
+          "headersMs": 1023.1082210000604,
+          "responseMs": 1033.7518900000723,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1045.4785169999814,
+          "attempts": 1,
+          "headersMs": 1032.907229000004,
+          "responseMs": 1045.4479960000608,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1219.0128219999606,
+          "attempts": 1,
+          "headersMs": 1207.5077309999615,
+          "responseMs": 1218.9864929999458,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 875.6396500000264,
+          "attempts": 1,
+          "headersMs": 813.5587289999239,
+          "responseMs": 875.6129010000732,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.0061365000000000005
+    },
+    {
+      "scenario": "disclosure",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "provider": "codex",
+      "success": true,
+      "setupMs": 180.11845100007486,
+      "taskMs": 7598.274908999912,
+      "agentMs": 7595.798616999993,
+      "verificationMs": 2.47629199991934,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 6580.863505000016,
+      "jevCalls": 2,
+      "jevMs": 930.0045049999608,
+      "jevCostUsd": 8.6604e-05,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Shipping time: three business days."
+      },
+      "primaryTimings": [
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 4799.648081000079
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 1781.2154239999363
+        }
+      ],
+      "primaryCostUsd": null
+    },
+    {
+      "scenario": "disclosure",
+      "repeat": 2,
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 184.298519999953,
+      "taskMs": 4842.141648999997,
+      "agentMs": 4838.849123000051,
+      "verificationMs": 3.2925259999465197,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 5,
+      "primaryMs": 4767.836343000061,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Shipping time: three business days."
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1145.8198710000142,
+          "attempts": 1,
+          "headersMs": 1130.7859109999845,
+          "responseMs": 1145.7908170000883,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 984.8515450000996,
+          "attempts": 1,
+          "headersMs": 838.2897249999223,
+          "responseMs": 984.8175320000155,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 897.0510899999645,
+          "attempts": 1,
+          "headersMs": 896.4999729999108,
+          "responseMs": 897.0200819999445,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 941.4963240000652,
+          "attempts": 1,
+          "headersMs": 926.0057409999426,
+          "responseMs": 941.4688059999608,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 798.6175129999174,
+          "attempts": 1,
+          "headersMs": 741.1301920000697,
+          "responseMs": 798.5897859999677,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.0061365000000000005
+    },
+    {
+      "scenario": "disclosure",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "provider": "codex",
+      "success": true,
+      "setupMs": 203.58658100001048,
+      "taskMs": 6933.49736899999,
+      "agentMs": 6930.559705999913,
+      "verificationMs": 2.937663000077009,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 5932.096732999897,
+      "jevCalls": 2,
+      "jevMs": 919.3686529998668,
+      "jevCostUsd": 8.7612e-05,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Shipping time: three business days."
+      },
+      "primaryTimings": [
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 5015.978632999933
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 916.1180999999633
+        }
+      ],
+      "primaryCostUsd": null
+    },
+    {
+      "scenario": "disclosure",
+      "repeat": 2,
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 185.6478520000819,
+      "taskMs": 3867.403094999958,
+      "agentMs": 3865.076961999992,
+      "verificationMs": 2.326132999965921,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 2131.4904300000053,
+      "jevCalls": 2,
+      "jevMs": 529.9773559998721,
+      "jevCostUsd": 8.0052e-05,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Shipping time: three business days."
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1049.040896999999,
+          "attempts": 1,
+          "headersMs": 1048.347024000017,
+          "responseMs": 1049.0119820000837,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1082.4495330000063,
+          "attempts": 1,
+          "headersMs": 1043.6246360000223,
+          "responseMs": 1082.4123070000205,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.0035564999999999998
+    },
+    {
+      "scenario": "disclosure",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "provider": "codex",
+      "success": true,
+      "setupMs": 195.89978099998552,
+      "taskMs": 9489.594401999959,
+      "agentMs": 9487.213723000023,
+      "verificationMs": 2.380678999936208,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 8460.554579999996,
+      "jevCalls": 2,
+      "jevMs": 939.3206199998967,
+      "jevCostUsd": 8.5932e-05,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Shipping time: three business days."
+      },
+      "primaryTimings": [
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 5581.23179999995
+        },
+        {
+          "provider": "codex",
+          "model": "gpt-5.6-luna",
+          "elapsedMs": 2879.322780000046
+        }
+      ],
+      "primaryCostUsd": null
+    },
+    {
+      "scenario": "disclosure",
+      "repeat": 3,
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 187.64447300008032,
+      "taskMs": 4064.1953499999363,
+      "agentMs": 4061.135673999903,
+      "verificationMs": 3.0596760000335053,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 3060.0588279999793,
+      "jevCalls": 2,
+      "jevMs": 914.6415780000389,
+      "jevCostUsd": 8.0052e-05,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Shipping time: three business days."
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1156.330964999972,
+          "attempts": 1,
+          "headersMs": 1140.5891640000045,
+          "responseMs": 1156.3003759999992,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1903.7278630000073,
+          "attempts": 1,
+          "headersMs": 1846.1632289999397,
+          "responseMs": 1903.6825370000442,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.00355875
+    },
+    {
+      "scenario": "disclosure",
+      "repeat": 3,
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 191.64595799997915,
+      "taskMs": 7634.957204999984,
+      "agentMs": 7631.324620999978,
+      "verificationMs": 3.632584000006318,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 5,
+      "primaryMs": 7570.887204999919,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 2,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Shipping time: three business days."
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1039.7462029999588,
+          "attempts": 1,
+          "headersMs": 1024.463817999931,
+          "responseMs": 1039.7243419999722,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 741.4202319999458,
+          "attempts": 1,
+          "headersMs": 735.3929319999879,
+          "responseMs": 741.3927149999654,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 826.451478999923,
+          "attempts": 1,
+          "headersMs": 812.890820999979,
+          "responseMs": 826.42130799999,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 4056.291190000018,
+          "attempts": 1,
+          "headersMs": 4055.196568000014,
+          "responseMs": 4056.2657679999247,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 906.9781010000734,
+          "attempts": 1,
+          "headersMs": 826.7282579999883,
+          "responseMs": 906.944647999946,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.0061484999999999995
+    }
+  ]
+}

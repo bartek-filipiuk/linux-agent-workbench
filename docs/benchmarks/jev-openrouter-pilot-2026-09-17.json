@@ -1,0 +1,172 @@
+{
+  "commit": "f9f8ecdc007f135cffc4632ce75329b357964b23",
+  "sourceDiffSha256": "1a47665a88c3913a7b3999b2908763e4157f90e4bf7af63ad9750b497c22b22d",
+  "dirty": true,
+  "model": "gpt-5.6-sol",
+  "effort": "low",
+  "jevModel": "jev-1.13.0",
+  "variants": [
+    {
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter"
+    },
+    {
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter"
+    }
+  ],
+  "upstream": "google-ai-studio",
+  "live": false,
+  "jevPolicy": {
+    "maxRetries": 1,
+    "timeoutMs": 5000,
+    "minConfidence": 0.55
+  },
+  "environment": "host Chromium, isolated fresh profile per attempt; no Podman or desktop startup in task time",
+  "clock": "taskMs includes primary model, Jev, actions and independent final verification; setupMs contains browser startup and initial navigation",
+  "results": [
+    {
+      "scenario": "search",
+      "repeat": 1,
+      "engine": "classic",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 191.05259999999998,
+      "taskMs": 6682.64777,
+      "agentMs": 6679.600451,
+      "verificationMs": 3.0473189999993338,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 7,
+      "primaryMs": 6585.702680000002,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "jevCostUsd": 0,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1205.597671,
+          "attempts": 1,
+          "headersMs": 1196.6779469999997,
+          "responseMs": 1205.2520249999998,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 936.9225739999993,
+          "attempts": 1,
+          "headersMs": 927.2183919999998,
+          "responseMs": 936.8543390000004,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 883.8607110000003,
+          "attempts": 1,
+          "headersMs": 876.2949330000001,
+          "responseMs": 883.76908,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 881.4666150000003,
+          "attempts": 1,
+          "headersMs": 878.4426920000005,
+          "responseMs": 881.4161199999999,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 936.0515010000008,
+          "attempts": 1,
+          "headersMs": 922.9561000000003,
+          "responseMs": 936.0049869999993,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 776.1623410000011,
+          "attempts": 1,
+          "headersMs": 766.443072,
+          "responseMs": 776.1140800000012,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 965.6412670000009,
+          "attempts": 1,
+          "headersMs": 853.3849879999998,
+          "responseMs": 965.5744990000003,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.00914325
+    },
+    {
+      "scenario": "search",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "google/gemini-3.8-flash",
+      "provider": "openrouter",
+      "success": true,
+      "setupMs": 193.4961349999994,
+      "taskMs": 3743.5288249999994,
+      "agentMs": 3741.186694,
+      "verificationMs": 2.3421309999994264,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 2299.35859,
+      "jevCalls": 3,
+      "jevMs": 1332.0006299999986,
+      "jevCostUsd": 0.00015120000000000002,
+      "actions": 3,
+      "fallbacks": [],
+      "jevErrors": [],
+      "verification": {
+        "passed": true,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      },
+      "primaryTimings": [
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 1413.1497689999997,
+          "attempts": 1,
+          "headersMs": 1409.0613239999984,
+          "responseMs": 1412.4573610000007,
+          "upstream": "Google AI Studio"
+        },
+        {
+          "provider": "openrouter",
+          "model": "google/gemini-3.8-flash",
+          "elapsedMs": 886.2088210000002,
+          "attempts": 1,
+          "headersMs": 762.5337550000004,
+          "responseMs": 885.9613720000016,
+          "upstream": "Google AI Studio"
+        }
+      ],
+      "primaryCostUsd": 0.0034327499999999996
+    }
+  ]
+}

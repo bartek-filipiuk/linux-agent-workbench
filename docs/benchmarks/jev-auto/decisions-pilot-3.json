@@ -1,0 +1,356 @@
+{
+  "createdAt": "2026-09-18T05:16:13.835Z",
+  "source": "77846cb0d97af218dd8a2832dab9f488c703b210",
+  "model": "google/gemini-3.8-flash",
+  "effort": "low",
+  "criterion": "first-turn mode only; no browser execution, not an end-to-end success metric",
+  "results": [
+    {
+      "id": "search",
+      "expected": "fast",
+      "mode": "fast",
+      "passed": true,
+      "elapsedMs": 1152.6449819999998,
+      "costUsd": 0.0016185,
+      "toolCalls": [
+        {
+          "callId": "call_361099",
+          "name": "browser_task",
+          "args": {
+            "values": [
+              {
+                "name": "search_query",
+                "text": "blue notebook"
+              }
+            ],
+            "maxSteps": 10,
+            "goal": "Search for a blue notebook and leave results visible",
+            "url": "https://example.com/catalog"
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "filters",
+      "expected": "fast",
+      "mode": "fast",
+      "passed": true,
+      "elapsedMs": 1167.437787,
+      "costUsd": 0.001572,
+      "toolCalls": [
+        {
+          "callId": "call_175328",
+          "name": "browser_task",
+          "args": {
+            "values": [],
+            "goal": "Select the 'Books' category/filter, check/enable the 'In stock' filter, and apply the filters.",
+            "maxSteps": 10
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "autocomplete",
+      "expected": "fast",
+      "mode": "fast",
+      "passed": true,
+      "elapsedMs": 1153.2488280000002,
+      "costUsd": 0.00156225,
+      "toolCalls": [
+        {
+          "callId": "call_272771",
+          "name": "browser_task",
+          "args": {
+            "values": [
+              {
+                "name": "destination",
+                "text": "Paris, France"
+              }
+            ],
+            "goal": "Select Paris, France from the destination autocomplete dropdown",
+            "maxSteps": 10
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "flights",
+      "expected": "fast",
+      "mode": "fast",
+      "passed": true,
+      "elapsedMs": 2416.6276029999995,
+      "costUsd": 0.00200175,
+      "toolCalls": [
+        {
+          "callId": "call_404190",
+          "name": "browser_task",
+          "args": {
+            "values": [
+              {
+                "text": "One way",
+                "name": "trip_type"
+              },
+              {
+                "name": "origin",
+                "text": "Zurich"
+              },
+              {
+                "name": "destination",
+                "text": "London"
+              },
+              {
+                "name": "departure_date",
+                "text": "September 20, 2026"
+              },
+              {
+                "text": "1 adult",
+                "name": "passengers"
+              },
+              {
+                "text": "Economy",
+                "name": "cabin_class"
+              }
+            ],
+            "maxSteps": 20,
+            "goal": "Search for one-way flights from Zurich (ZRH) to London (any airport), on 20 September 2026, for 1 adult economy, and stop on the search results page."
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "polish-search",
+      "expected": "fast",
+      "mode": "fast",
+      "passed": true,
+      "elapsedMs": 1146.2714020000003,
+      "costUsd": 0.001716,
+      "toolCalls": [
+        {
+          "callId": "call_408504",
+          "name": "browser_task",
+          "args": {
+            "goal": "Otwórz stronę https://example.com/sklep i wyszukaj frazę \"zielony plecak\", pozostaw stronę z wynikami.",
+            "url": "https://example.com/sklep",
+            "maxSteps": 10,
+            "values": [
+              {
+                "name": "search_query",
+                "text": "zielony plecak"
+              }
+            ]
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "new-tab",
+      "expected": "fast",
+      "mode": "fast",
+      "passed": true,
+      "elapsedMs": 7577.673422999999,
+      "costUsd": 0.0015435,
+      "toolCalls": [
+        {
+          "callId": "call_275301",
+          "name": "browser_task",
+          "args": {
+            "maxSteps": 10,
+            "goal": "Open the Reference article link in its new tab and switch to it / make it visible",
+            "values": []
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "hotel",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 1017.6518759999999,
+      "costUsd": 0.00146175,
+      "toolCalls": [
+        {
+          "callId": "call_192920",
+          "name": "browser_read",
+          "args": {
+            "scope": "page"
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "research",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 1031.1839770000006,
+      "costUsd": 0.001461,
+      "toolCalls": [
+        {
+          "callId": "call_272501",
+          "name": "browser_observe",
+          "args": {
+            "pageText": true
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "polish-analysis",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 1078.8924259999985,
+      "costUsd": 0.0014655,
+      "toolCalls": [
+        {
+          "callId": "call_271296",
+          "name": "browser_read",
+          "args": {
+            "scope": "page"
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "missing-values",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 1164.8836139999985,
+      "costUsd": 0.0015015,
+      "toolCalls": [],
+      "text": "Please provide your passport number and home address so I can fill out and complete the application for you. (I cannot invent or guess personal details.)"
+    },
+    {
+      "id": "article",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 1173.9133950000032,
+      "costUsd": 0.00144675,
+      "toolCalls": [
+        {
+          "callId": "call_256156",
+          "name": "browser_read",
+          "args": {
+            "scope": "main"
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "mixed",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 1011.6299489999983,
+      "costUsd": 0.0015255,
+      "toolCalls": [
+        {
+          "callId": "call_288525",
+          "name": "browser_batch",
+          "args": {
+            "actions": [],
+            "reason": "Inspect the current open page to see what plans, links, or forms exist."
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "wizard",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 2344.725136000001,
+      "costUsd": 0.001533,
+      "toolCalls": [
+        {
+          "callId": "call_407380",
+          "name": "browser_batch",
+          "args": {
+            "reason": "Inspect open page to understand the multi-stage form or wizard.",
+            "actions": []
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "form",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 2359.0995900000016,
+      "costUsd": 0.001749,
+      "toolCalls": [
+        {
+          "callId": "call_295350",
+          "name": "browser_batch",
+          "args": {
+            "actions": [
+              "{\"kind\":\"type\",\"ref\":\"e1\",\"revision\":3,\"text\":\"Ada\"}",
+              "{\"kind\":\"select\",\"ref\":\"e2\",\"revision\":3,\"values\":[\"Research\"]}",
+              "{\"kind\":\"click\",\"ref\":\"e3\",\"revision\":3}"
+            ],
+            "reason": "Fill Name with Ada, select Department Research, and click Preview."
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "form-polish",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 1139.2861479999992,
+      "costUsd": 0.0018915,
+      "toolCalls": [
+        {
+          "callId": "call_399373",
+          "name": "browser_batch",
+          "args": {
+            "actions": [
+              "{\"kind\":\"type\",\"ref\":\"e1\",\"revision\":3,\"text\":\"Jan\"}",
+              "{\"kind\":\"type\",\"ref\":\"e2\",\"revision\":3,\"text\":\"Gdańsk\"}",
+              "{\"kind\":\"select\",\"ref\":\"e3\",\"revision\":3,\"values\":[\"Train\"]}",
+              "{\"kind\":\"click\",\"ref\":\"e4\",\"revision\":3}"
+            ],
+            "reason": "Wypełnienie pól Name, City, Transport oraz kliknięcie przycisku Review zgodnie z przekazaną obserwacją."
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "cycle-recovery",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 1293.0664849999994,
+      "costUsd": 0.0014595,
+      "toolCalls": [
+        {
+          "callId": "call_266300",
+          "name": "browser_observe",
+          "args": {
+            "pageText": true
+          }
+        }
+      ],
+      "text": ""
+    }
+  ]
+}

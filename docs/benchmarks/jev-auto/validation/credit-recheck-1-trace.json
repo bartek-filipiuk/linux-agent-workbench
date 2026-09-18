@@ -1,0 +1,12 @@
+{
+  "history": [],
+  "decisions": [],
+  "primary": [
+    {
+      "provider": "openrouter",
+      "model": "google/gemini-3.8-flash",
+      "elapsedMs": 448.83618799999977,
+      "failed": true
+    }
+  ]
+}

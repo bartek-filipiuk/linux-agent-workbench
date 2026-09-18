@@ -1,0 +1,1171 @@
+{
+  "criterion": "Runtime schema validation of actual model browser_batch/browser_task calls across all retained frozen comparison series (including interrupted block); generated child calls and native Python tools excluded.",
+  "calls": [
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-2",
+      "tool": "browser_batch",
+      "valid": false
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-3",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-4",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-4",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-4",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-4",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-auto-5",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-first-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-first-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-first-3",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-first-4",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-flights-traces",
+      "run": "google-flights-app-first-5",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "autocomplete-new-app-auto-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "autocomplete-new-app-auto-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "autocomplete-new-app-auto-3",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "autocomplete-new-app-first-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "autocomplete-new-app-first-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "autocomplete-new-app-first-3",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "compare-new-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "compare-new-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "compare-new-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "compare-new-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "compare-new-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "compare-new-app-first-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "compare-new-app-first-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "compare-new-app-first-3",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "wizard-4-new-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "wizard-4-new-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "wizard-4-new-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "wizard-4-new-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "wizard-4-new-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "wizard-4-new-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "wizard-4-new-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "wizard-4-new-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "wizard-4-new-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "wizard-4-new-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "wizard-4-new-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "wizard-4-new-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "wizard-4-new-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "wizard-4-new-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "wizard-4-new-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "wizard-4-new-app-first-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "wizard-4-new-app-first-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-holdout-traces",
+      "run": "wizard-4-new-app-first-3",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "autocomplete-app-auto-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "autocomplete-app-auto-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "autocomplete-app-auto-3",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "autocomplete-app-first-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "autocomplete-app-first-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "autocomplete-app-first-3",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "compare-offers-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "compare-offers-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "compare-offers-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "compare-offers-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "compare-offers-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "compare-offers-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "compare-offers-app-first-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "compare-offers-app-first-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "compare-offers-app-first-3",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "filters-app-auto-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "filters-app-auto-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "filters-app-auto-3",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "filters-app-first-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "filters-app-first-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "filters-app-first-3",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "research-offers-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "research-offers-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "research-offers-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "research-offers-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "research-offers-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "research-offers-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "research-offers-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "research-offers-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "research-offers-app-first-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "research-offers-app-first-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "search-app-auto-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "search-app-auto-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "search-app-auto-3",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "search-app-first-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "search-app-first-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "search-app-first-3",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-first-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-first-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-10-app-first-3",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-6-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-6-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-6-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-6-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-6-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-6-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-6-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-6-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-6-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-6-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-6-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-6-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-6-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-6-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-6-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-6-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-6-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-6-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-6-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-6-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-6-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-6-app-first-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-6-app-first-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-local-traces",
+      "run": "wizard-6-app-first-3",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "research-offers-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "research-offers-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "research-offers-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "research-offers-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "research-offers-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "research-offers-app-auto-1",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "research-offers-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "research-offers-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "research-offers-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "research-offers-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "research-offers-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "research-offers-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "research-offers-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "research-offers-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "research-offers-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "research-offers-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "research-offers-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "research-offers-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "research-offers-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "research-offers-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "research-offers-app-auto-3",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "research-offers-app-first-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "research-offers-app-first-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "research-offers-app-first-3",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "tabs-app-auto-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "tabs-app-auto-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "tabs-app-auto-2",
+      "tool": "browser_batch",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "tabs-app-auto-3",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "tabs-app-first-1",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "tabs-app-first-2",
+      "tool": "browser_task",
+      "valid": true
+    },
+    {
+      "series": "final-recovery-traces",
+      "run": "tabs-app-first-3",
+      "tool": "browser_task",
+      "valid": true
+    }
+  ],
+  "totalCalls": 194,
+  "invalidCalls": 1
+}

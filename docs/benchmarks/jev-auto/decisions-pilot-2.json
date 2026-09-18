@@ -1,0 +1,426 @@
+{
+  "createdAt": "2026-09-18T05:15:01.687Z",
+  "source": "77846cb0d97af218dd8a2832dab9f488c703b210",
+  "model": "google/gemini-3.8-flash",
+  "effort": "low",
+  "criterion": "first-turn mode only; no browser execution, not an end-to-end success metric",
+  "results": [
+    {
+      "id": "search",
+      "expected": "fast",
+      "mode": "fast",
+      "passed": true,
+      "elapsedMs": 1391.183723,
+      "costUsd": 0.0016365,
+      "toolCalls": [
+        {
+          "callId": "call_194643",
+          "name": "browser_task",
+          "args": {
+            "url": "https://example.com/catalog",
+            "maxSteps": 10,
+            "values": [
+              {
+                "name": "search_query",
+                "text": "blue notebook"
+              }
+            ],
+            "goal": "Navigate to https://example.com/catalog, search for a blue notebook, and keep the search results displayed."
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "filters",
+      "expected": "fast",
+      "mode": "fast",
+      "passed": true,
+      "elapsedMs": 973.1059169999999,
+      "costUsd": 0.00148875,
+      "toolCalls": [
+        {
+          "callId": "call_387645",
+          "name": "browser_task",
+          "args": {
+            "maxSteps": 10,
+            "values": [],
+            "goal": "Select Books, enable In stock, and apply the filters"
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "autocomplete",
+      "expected": "fast",
+      "mode": "fast",
+      "passed": true,
+      "elapsedMs": 1021.9320260000004,
+      "costUsd": 0.00152775,
+      "toolCalls": [
+        {
+          "callId": "call_470836",
+          "name": "browser_task",
+          "args": {
+            "values": [
+              {
+                "name": "destination",
+                "text": "Paris, France"
+              }
+            ],
+            "goal": "Select Paris, France from the destination autocomplete dropdown",
+            "maxSteps": 10
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "flights",
+      "expected": "fast",
+      "mode": "fast",
+      "passed": true,
+      "elapsedMs": 1311.40668,
+      "costUsd": 0.00198975,
+      "toolCalls": [
+        {
+          "callId": "call_46547",
+          "name": "browser_task",
+          "args": {
+            "values": [
+              {
+                "name": "trip_type",
+                "text": "One way"
+              },
+              {
+                "name": "origin",
+                "text": "Zurich"
+              },
+              {
+                "text": "London",
+                "name": "destination"
+              },
+              {
+                "text": "September 20, 2026",
+                "name": "departure_date"
+              },
+              {
+                "text": "1 adult",
+                "name": "passengers"
+              },
+              {
+                "name": "seat_class",
+                "text": "Economy"
+              }
+            ],
+            "maxSteps": 25,
+            "goal": "Find one-way flights from Zurich (ZRH) to London (any/LON) on 20 September 2026 for one adult in economy class on Google Flights. Stop at matching flight results list, do not book."
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "polish-search",
+      "expected": "fast",
+      "mode": "fast",
+      "passed": true,
+      "elapsedMs": 937.5708110000005,
+      "costUsd": 0.001674,
+      "toolCalls": [
+        {
+          "callId": "call_307108",
+          "name": "browser_task",
+          "args": {
+            "maxSteps": 10,
+            "values": [
+              {
+                "text": "zielony plecak",
+                "name": "zapytanie_wyszukiwania"
+              }
+            ],
+            "url": "https://example.com/sklep",
+            "goal": "Otwórz sklep i wyszukaj 'zielony plecak', pozostaw stronę z wynikami wyszukiwania."
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "new-tab",
+      "expected": "fast",
+      "mode": "fast",
+      "passed": true,
+      "elapsedMs": 1466.4483899999996,
+      "costUsd": 0.00149025,
+      "toolCalls": [
+        {
+          "callId": "call_347771",
+          "name": "browser_task",
+          "args": {
+            "maxSteps": 5,
+            "values": [],
+            "goal": "Open the Reference article link in its new tab and leave it visible"
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "hotel",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 913.3226169999998,
+      "costUsd": 0.00142725,
+      "toolCalls": [
+        {
+          "callId": "call_194681",
+          "name": "browser_read",
+          "args": {
+            "scope": "page"
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "research",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 2405.411558,
+      "costUsd": 0.0014265,
+      "toolCalls": [
+        {
+          "callId": "call_244524",
+          "name": "browser_observe",
+          "args": {
+            "pageText": true
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "polish-analysis",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 1051.558348999999,
+      "costUsd": 0.00142725,
+      "toolCalls": [
+        {
+          "callId": "call_247372",
+          "name": "browser_observe",
+          "args": {
+            "pageText": true
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "missing-values",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 1084.1854029999995,
+      "costUsd": 0.00156075,
+      "toolCalls": [],
+      "text": "I cannot complete the application because you have not provided your passport number or home address, and I cannot invent or assume your personal information. \n\nPlease provide the necessary details (passport number and home address), and I will be glad to help you fill out the application."
+    },
+    {
+      "id": "article",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 1059.2897089999988,
+      "costUsd": 0.00141225,
+      "toolCalls": [
+        {
+          "callId": "call_428798",
+          "name": "browser_read",
+          "args": {
+            "scope": "main"
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "mixed",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 1016.0870099999993,
+      "costUsd": 0.00141975,
+      "toolCalls": [
+        {
+          "callId": "call_192571",
+          "name": "browser_observe",
+          "args": {
+            "pageText": true
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "wizard",
+      "expected": "planned",
+      "mode": "fast",
+      "passed": false,
+      "elapsedMs": 1622.8424360000008,
+      "costUsd": 0.00229725,
+      "toolCalls": [
+        {
+          "callId": "call_280670",
+          "name": "browser_task",
+          "args": {
+            "values": [
+              {
+                "name": "traveler",
+                "text": "Ada"
+              },
+              {
+                "name": "transport",
+                "text": "Train"
+              },
+              {
+                "name": "segment 1",
+                "text": "Basel"
+              },
+              {
+                "name": "segment 2",
+                "text": "Bern"
+              },
+              {
+                "name": "segment 3",
+                "text": "Lucerne"
+              },
+              {
+                "name": "segment 4",
+                "text": "Lausanne"
+              },
+              {
+                "name": "segment 5",
+                "text": "Lugano"
+              },
+              {
+                "name": "segment 6",
+                "text": "Chur"
+              },
+              {
+                "name": "segment 7",
+                "text": "St Gallen"
+              },
+              {
+                "name": "segment 8",
+                "text": "Winterthur"
+              },
+              {
+                "name": "segment 9",
+                "text": "Baden"
+              },
+              {
+                "name": "segment 10",
+                "text": "Thun"
+              }
+            ],
+            "goal": "Prepare ten trip segments in order: Basel, Bern, Lucerne, Lausanne, Lugano, Chur, St Gallen, Winterthur, Baden, Thun. Every segment: traveler Ada, transport Train. Use Next then Review.",
+            "maxSteps": 40
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "form",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 980.3546730000016,
+      "costUsd": 0.00171825,
+      "toolCalls": [
+        {
+          "callId": "call_271904",
+          "name": "browser_batch",
+          "args": {
+            "reason": "Fill Name with Ada, select Department Research, and click Preview button.",
+            "actions": [
+              "{\"kind\":\"type\",\"ref\":\"e1\",\"revision\":3,\"text\":\"Ada\"}",
+              "{\"kind\":\"select\",\"ref\":\"e2\",\"revision\":3,\"values\":[\"Research\"]}",
+              "{\"kind\":\"click\",\"ref\":\"e3\",\"revision\":3}"
+            ]
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "form-polish",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 1082.7755859999997,
+      "costUsd": 0.00190575,
+      "toolCalls": [
+        {
+          "callId": "call_324903",
+          "name": "browser_batch",
+          "args": {
+            "actions": [
+              {
+                "revision": 3,
+                "text": "Jan",
+                "ref": "e1",
+                "kind": "type"
+              },
+              {
+                "kind": "type",
+                "ref": "e2",
+                "revision": 3,
+                "text": "Gdańsk"
+              },
+              {
+                "revision": 3,
+                "values": [
+                  "Train"
+                ],
+                "ref": "e3",
+                "kind": "select"
+              },
+              {
+                "ref": "e4",
+                "revision": 3,
+                "kind": "click"
+              }
+            ],
+            "reason": "Wypełnienie pól Name, City, Transport oraz kliknięcie przycisku Review na podstawie podanej obserwacji formularza (revision 3)."
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "cycle-recovery",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 947.1105720000014,
+      "costUsd": 0.001425,
+      "toolCalls": [
+        {
+          "callId": "call_228913",
+          "name": "browser_observe",
+          "args": {
+            "pageText": true
+          }
+        }
+      ],
+      "text": ""
+    }
+  ]
+}

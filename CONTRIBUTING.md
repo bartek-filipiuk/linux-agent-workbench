@@ -2,7 +2,7 @@
 
 All source comments, UI text, documentation, examples, issue descriptions and commit messages should be in English. Unicode regression tests remain important; use explicit escaped Unicode fixtures where a non-English character is the point of the test.
 
-The source is hosted on [GitHub](https://github.com/bartek-filipiuk/linux-agent-workbench). License selection remains pending; do not imply contributor terms that have not been selected. Discuss proposed contributions in an issue first. Use [private vulnerability reporting](https://github.com/bartek-filipiuk/linux-agent-workbench/security/advisories/new) for security-sensitive reports.
+The source is hosted on [GitHub](https://github.com/bartek-filipiuk/linux-agent-workbench) under the [MIT license](LICENSE). Submit contributions under the same license and preserve third-party notices; see [provenance](THIRD_PARTY_NOTICES.md). Discuss substantial changes in an issue first. Use [private vulnerability reporting](https://github.com/bartek-filipiuk/linux-agent-workbench/security/advisories/new) for security-sensitive reports.
 
 ## Development setup
 
@@ -52,13 +52,16 @@ Do not add integrations merely by copying credentials from another application. 
 
 ## Before publishing
 
-- [ ] Select the repository license, add its full text and review contributor/provenance requirements.
+See the current [release readiness review](docs/RELEASE-READINESS.md) for the consolidated Auto branch and concrete integration criteria.
+
+- [x] Add the MIT license, package metadata and third-party provenance notices; review bundled dependencies again before binary distribution.
 - [x] Enable GitHub private vulnerability reporting and verify the setting through its API. No test vulnerability report was submitted.
 - [x] Review publication files and reachable repository history with selected credential patterns; review staged filenames before pushing. Repeat for each publication. Ignore rules do not remove older commits.
 - [ ] Run the documented setup on a clean Linux user/machine with both worker images.
 - [x] Run typecheck, tests, build and dependency audit; separately record skipped container tests in [the security review](docs/security-review.md).
 - [ ] Review container OS/browser dependencies and the external Codex CLI version; npm audit does not cover them all.
 - [ ] Review shared credential/profile limitations, optional remote approvals and shell-gate limitations before choosing release positioning.
-- [ ] Add CI, choose a supported release policy and verify distribution/signing when binary releases are introduced.
+- [x] Add CI for typecheck, build, tests, UI fixtures and dependency auditing; require a green run on each release candidate.
+- [ ] Choose a supported release policy and verify distribution/signing when binary releases are introduced.
 
 GitHub issues and pull requests are enabled, with English templates. Secret scanning and push protection are enabled. These settings supplement local review; they do not prove that the repository contains no secrets. Source publication is separate from a packaged release or an open-source license grant.

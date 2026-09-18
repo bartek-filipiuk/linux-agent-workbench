@@ -1,0 +1,69 @@
+{
+  "commit": "025bbc36cf6920989891056239fdb99631468421",
+  "sourceDiffSha256": "31f725a54febe3f67dd98b3080b4f747ba5ecf628871796c413011fb4223b013",
+  "dirty": true,
+  "model": "gpt-5.6-sol",
+  "effort": "low",
+  "jevModel": "jev-1.13.0",
+  "variants": [
+    {
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol"
+    },
+    {
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna"
+    }
+  ],
+  "environment": "host Chromium, isolated fresh profile per attempt; no Podman or desktop startup in task time",
+  "clock": "taskMs includes primary model, Jev, actions and independent final verification; setupMs contains browser startup and initial navigation",
+  "results": [
+    {
+      "scenario": "search",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-sol",
+      "success": true,
+      "setupMs": 392.3815200000008,
+      "taskMs": 11388.124058,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 9762.666043,
+      "jevCalls": 3,
+      "jevMs": 1501.3648540000013,
+      "jevCostUsd": 0.00017203200000000002,
+      "actions": 3,
+      "fallbacks": [],
+      "verification": {
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR",
+        "matched": true
+      }
+    },
+    {
+      "scenario": "search",
+      "repeat": 1,
+      "engine": "jev-first",
+      "model": "gpt-5.6-luna",
+      "success": true,
+      "setupMs": 182.0471860000016,
+      "taskMs": 8308.416849000001,
+      "state": "completed",
+      "endReason": "final_answer",
+      "approvals": 0,
+      "primaryCalls": 2,
+      "primaryMs": 6856.601863999997,
+      "jevCalls": 3,
+      "jevMs": 1357.859840000001,
+      "jevCostUsd": 0.000169554,
+      "actions": 3,
+      "fallbacks": [],
+      "verification": {
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR",
+        "matched": true
+      }
+    }
+  ],
+  "traceFile": "jev-first-pilot-2026-09-17-traces.json.gz"
+}

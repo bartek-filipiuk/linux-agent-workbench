@@ -1,0 +1,38 @@
+{
+  "baseline": {
+    "head": "77846cb0d97af218dd8a2832dab9f488c703b210",
+    "dirty": false
+  },
+  "candidate": {
+    "head": "ac1c0f517a8429df36c6313195165902cbc8319d",
+    "dirty": false
+  },
+  "poc": {
+    "head": "12b094b35d366ce3fcc67b5e0599fbbb2848ab1a",
+    "dirty": false
+  },
+  "browser-use": {
+    "pinnedCommit": "d8110c5ff87ccba887aaa726cdb780f2f84bef8d",
+    "source": "PoC sources.json; downloaded vendor snapshot without nested .git",
+    "auditedFileHashesMatch": {
+      "browser_use/agent/service.py": true,
+      "browser_use/llm/openrouter/chat.py": true,
+      "browser_use/browser/session.py": true,
+      "browser_use/browser/profile.py": true,
+      "browser_use/tools/service.py": true,
+      "pyproject.toml": true
+    }
+  },
+  "jev-ultrafast": {
+    "pinnedCommit": "452c1ad2dd628008f1d5608f28158d76e49e6cc0",
+    "source": "PoC sources.json; downloaded vendor snapshot without nested .git",
+    "auditedFileHashesMatch": {
+      "jev_ultrafast/agent.py": true,
+      "jev_ultrafast/model.py": true,
+      "jev_ultrafast/browser.py": true,
+      "jev_ultrafast/snapshot.js": true,
+      "jev_ultrafast/questions.py": true,
+      "pyproject.toml": true
+    }
+  }
+}

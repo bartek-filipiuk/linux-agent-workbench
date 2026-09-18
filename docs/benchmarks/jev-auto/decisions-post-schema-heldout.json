@@ -1,0 +1,120 @@
+{
+  "createdAt": "2026-09-18T07:51:08.792Z",
+  "source": "ac1c0f517a8429df36c6313195165902cbc8319d",
+  "model": "google/gemini-3.8-flash",
+  "effort": "low",
+  "heldout": true,
+  "criterion": "first-turn mode only; no browser execution, not an end-to-end success metric",
+  "results": [
+    {
+      "id": "italian-city",
+      "expected": "fast",
+      "mode": "fast",
+      "passed": true,
+      "elapsedMs": 2995.627477,
+      "costUsd": 0.00162225,
+      "toolCalls": [
+        {
+          "callId": "call_504568",
+          "name": "browser_task",
+          "args": {
+            "values": [
+              {
+                "name": "destination",
+                "text": "Milan, Italy"
+              }
+            ],
+            "maxSteps": 10,
+            "goal": "In the open route planner, enter and select 'Milan, Italy' from the autocomplete suggestions."
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "inventory",
+      "expected": "fast",
+      "mode": "fast",
+      "passed": true,
+      "elapsedMs": 2047.778197,
+      "costUsd": 0.00159075,
+      "toolCalls": [
+        {
+          "callId": "call_292786",
+          "name": "browser_task",
+          "args": {
+            "values": [],
+            "goal": "Filter the catalog by category 'Music' and status 'Available', apply the filters, and show the resulting catalog items.",
+            "maxSteps": 20
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "lease-cost",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 4083.790183000001,
+      "costUsd": 0.001476,
+      "toolCalls": [
+        {
+          "callId": "call_305136",
+          "name": "browser_observe",
+          "args": {
+            "pageText": true
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "multi-page",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 1101.292985,
+      "costUsd": 0.001467,
+      "toolCalls": [
+        {
+          "callId": "call_356835",
+          "name": "browser_observe",
+          "args": {
+            "pageText": true
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "registration-wizard",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 879.176039,
+      "costUsd": 0.001533,
+      "toolCalls": [
+        {
+          "callId": "call_354674",
+          "name": "browser_batch",
+          "args": {
+            "actions": [],
+            "reason": "Inspect the current open page to see the registration wizard form."
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "missing-card",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 1095.5167649999985,
+      "costUsd": 0.001617,
+      "toolCalls": [],
+      "text": "I cannot proceed with payment because your card details (card number, expiration date, CVV/security code, and billing details) have not been provided, and I will not invent or guess them. \n\nPlease provide the necessary payment details or complete the payment step directly."
+    }
+  ]
+}

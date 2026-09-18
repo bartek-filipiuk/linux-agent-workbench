@@ -18,6 +18,14 @@ describe("handleConfigInit", () => {
     second.runtime?.store.close();
     expect(handleConfigInit({ ...config, provider: "openai" }, (p) => new Store(p)).reply).toMatchObject({ type: "agentd.error" });
   });
+  it("accepts OpenRouter only with a key and keeps its config off renderer replies", () => {
+    const config = { type: "config.init", provider: "openrouter", model: "google/gemini-3.8-flash", dbPath: ":memory:", imageId: "sha256:x", runtimeRoot: "/tmp", openrouter: { effort: "low", provider: "google-ai-studio" } };
+    expect(handleConfigInit(config, p => new Store(p)).reply.type).toBe("agentd.error");
+    const result = handleConfigInit({ ...config, apiKey: "sk-or-test-secret" }, p => new Store(p));
+    expect(result.runtime).toMatchObject({ provider: "openrouter", openrouter: config.openrouter });
+    expect(JSON.stringify(result.reply)).not.toContain("sk-or-test");
+    result.runtime?.store.close();
+  });
   it("opens the store, marks interrupted runs and never echoes the key", () => {
     const { reply } = handleConfigInit(
       { type: "config.init", apiKey: "sk-test-secret-value-1234567890", model: "gpt-5.6-sol", dbPath: ":memory:", imageId: "sha256:x", runtimeRoot: "/tmp" },

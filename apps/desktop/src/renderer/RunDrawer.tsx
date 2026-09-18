@@ -118,7 +118,7 @@ export function RunDrawer({ run, sandboxReady, activeGoal, workspace, surfaceWar
       {run.state === "budget_exceeded" && <p className="notice" role="status">Budget reached. Review the log and update your goal before starting another run.</p>}
       <div className="stats">
         <span>state <b>{label(STATE_LABEL, run.state) || "idle"}</b>{run.endReason ? ` · ${label(END_REASON_LABEL, run.endReason)}` : ""}</span>
-        <span>turns <b>{run.turns}</b></span>
+        <span>steps <b>{run.turns}</b></span>
         <span>tools <b>{run.toolCalls}</b></span>
         <span>cost <b>{run.costUsd === null ? "n/a" : `$${run.costUsd.toFixed(4)}`}</b></span>
         <span>snapshot <b>{run.state ? (run.snapshot ? "git" : "none") : "—"}</b></span>

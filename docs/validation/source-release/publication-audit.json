@@ -1,0 +1,11 @@
+{
+  "date": "2026-09-18",
+  "scope": "Current source candidate plus reachable history; selected patterns, not a comprehensive secrets audit",
+  "payloadsIncludingArchives": 2084,
+  "reachableHistoryBlobs": 1084,
+  "credentialPatternMatches": 0,
+  "historicalRawEvidenceFilesUnchanged": 79,
+  "productionSourceUnchangedSince": "55f53e5",
+  "license": "MIT with third-party notices",
+  "cleanInstall": "pending owner check"
+}

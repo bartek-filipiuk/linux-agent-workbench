@@ -1,0 +1,123 @@
+{
+  "sourceRepository": "linux-agent-browser-poc",
+  "sourceCommit": "c9ced3af96c2d127254c90e18345869714721f03",
+  "scope": "Research source and evidence snapshot; excludes vendors, environments, credentials and private artifacts. Code/data bytes preserved; Markdown rewritten in English with current links. Original document hashes retained.",
+  "files": [
+    {
+      "source": "PLAN.md",
+      "destination": "docs/benchmarks/browser-poc/PLAN.md",
+      "sourceSha256": "2da4941658d217dff54b00c83718d591425b10c6f69a22c0871dc1a52ef95444",
+      "sha256": "56a4bf27d4ff8a9d9f1aa06b9ce001101f563c02b957d1f6a3ba2e0997b7d977",
+      "transformation": "English publication documentation: translated/re-rendered narrative and repository-relative links. Source/data/trace measurements remain unchanged; sourceSha256 preserves the original document."
+    },
+    {
+      "source": "README.md",
+      "destination": "docs/benchmarks/browser-poc/README.md",
+      "sourceSha256": "70661b9e4e3d0e382954493b77b4723156ddd7c660549ba289c842b00db08746",
+      "sha256": "1489a09167d3d34544b59dde6f408c70be57dd7207c425a910fd6d2da74f09cb",
+      "transformation": "English publication documentation: translated/re-rendered narrative and repository-relative links. Source/data/trace measurements remain unchanged; sourceSha256 preserves the original document."
+    },
+    {
+      "source": "RESULTS.md",
+      "destination": "docs/benchmarks/browser-poc/RESULTS.md",
+      "sourceSha256": "7683528413e4a8b964b74ef52dccf151a9fb02345214f94304ed132e12259b23",
+      "sha256": "7d26d0f56fa8606279700961e0e0923117b6eb12af9b2bf7d908e14825f9d0f4",
+      "transformation": "English publication documentation: translated/re-rendered narrative and repository-relative links. Source/data/trace measurements remain unchanged; sourceSha256 preserves the original document."
+    },
+    {
+      "source": "bootstrap.py",
+      "destination": "docs/benchmarks/browser-poc/bootstrap.py",
+      "sha256": "41a7dc9f2f566a566c663fe5a3c8519d27cf63277374dd7cd953d7e947dde33c"
+    },
+    {
+      "source": "check_upstream.py",
+      "destination": "docs/benchmarks/browser-poc/check_upstream.py",
+      "sha256": "3232e33c14913ca14b1f17e0d164b5e8e7f86a6ca3d78908a94a3369a2a28cd9"
+    },
+    {
+      "source": "driver.py",
+      "destination": "docs/benchmarks/browser-poc/driver.py",
+      "sha256": "261a9cd28020b8b55a6652f3f928039188f025409c81283c352451af7f01f76e"
+    },
+    {
+      "source": "report.py",
+      "destination": "docs/benchmarks/browser-poc/report.py",
+      "sha256": "1fe0ccd651b5a67397a79b338c0be0148a3d3f361dd100e1585f1b41d09c7acc"
+    },
+    {
+      "source": "requirements.lock",
+      "destination": "docs/benchmarks/browser-poc/requirements.lock",
+      "sha256": "d8eb9b47177f76d0e53ca20f7c546a80795750c8d679667ad5b44421119026bc"
+    },
+    {
+      "source": "results/diagnostics.json.gz",
+      "destination": "docs/benchmarks/browser-poc/results/diagnostics.json.gz",
+      "sha256": "e17deac662515c2f5f678bee41d98873c43e2e0d430cd84c44dbe186457a024f"
+    },
+    {
+      "source": "results/final-flights.json",
+      "destination": "docs/benchmarks/browser-poc/results/final-flights.json",
+      "sha256": "028c411d90f4a63c65faf8cd67681b4f7c1bfb540bef5f61905448a20019a922"
+    },
+    {
+      "source": "results/final-local.json",
+      "destination": "docs/benchmarks/browser-poc/results/final-local.json",
+      "sha256": "fd571311b5d09fefbbb58b8d2cb29660cf1bd690863a3ca503dac3b670c2f112"
+    },
+    {
+      "source": "results/final-traces.json.gz",
+      "destination": "docs/benchmarks/browser-poc/results/final-traces.json.gz",
+      "sha256": "0298c3fcbcba70e7fcf129194485fabfb509bb5d5b3f4a7d3d5c7eecf943308c"
+    },
+    {
+      "source": "results/flights-ultrafast.png",
+      "destination": "docs/benchmarks/browser-poc/results/flights-ultrafast.png",
+      "sha256": "a30667f1bde2d03e8d1edd385a7157c25d6528c3a6e465e4c941ba0f4a2cfe4f"
+    },
+    {
+      "source": "results/security.json",
+      "destination": "docs/benchmarks/browser-poc/results/security.json",
+      "sha256": "eb7bc5efc161d9ae180f39d8c85b4b580feee1b50267e0868b02238b5e0f224b"
+    },
+    {
+      "source": "results/summary.json",
+      "destination": "docs/benchmarks/browser-poc/results/summary.json",
+      "sha256": "e38e00eb6ff2bb4c75689c00809bcc01835173cd33057bfb359f9366302c3b4b"
+    },
+    {
+      "source": "results/validation.json",
+      "destination": "docs/benchmarks/browser-poc/results/validation.json",
+      "sha256": "220b13b55a51c3ccf28600f9bcad7f4d9ad74a5c6d916a4e95c6af050b835599"
+    },
+    {
+      "source": "run.mjs",
+      "destination": "docs/benchmarks/browser-poc/run.mjs",
+      "sha256": "516c1bc4c03439f4b2f0e167139a450e925436ba31e772c51d02681c3a0fb7bb"
+    },
+    {
+      "source": "run.sh",
+      "destination": "docs/benchmarks/browser-poc/run.sh",
+      "sha256": "9fbd3d8f7eee2a116f0bafb921e16bdb60a24252f71f19455a8c82e3cf7f5719"
+    },
+    {
+      "source": "sources.json",
+      "destination": "docs/benchmarks/browser-poc/sources.json",
+      "sha256": "48370c92777310acbb02524ae96bbccec7fb4f1581478118078b2914a4ff8eda"
+    },
+    {
+      "source": "tasks.mjs",
+      "destination": "docs/benchmarks/browser-poc/tasks.mjs",
+      "sha256": "f95b4946e92195aee718221b842154ea7e3732deed21131f48ca361a610a7edd"
+    },
+    {
+      "source": "verify.test.mjs",
+      "destination": "docs/benchmarks/browser-poc/verify.test.mjs",
+      "sha256": "c14c152f97f22255116f4cd6023fb5dd2f2846d265b957bbb6c87d8329414578"
+    },
+    {
+      "source": ".gitignore",
+      "destination": "docs/benchmarks/browser-poc/.gitignore",
+      "sha256": "b074a3a0851eb8933c547787d4d08de460e2ff5e36037dc3e7fbec9efeb616bc"
+    }
+  ]
+}

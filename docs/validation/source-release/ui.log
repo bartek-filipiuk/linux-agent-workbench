@@ -1,0 +1,1 @@
+{"passed":true,"calls":[{"kind":"restart"},{"kind":"followup","id":"r1","message":"Make /workspace/research.md shorter."},{"kind":"pause","id":"r2"}],"artifacts":"/tmp/law-followup-ui-3jqJbt"}

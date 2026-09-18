@@ -14,13 +14,14 @@ export type ToolResult = { callId: string; output: string; imageJpegBase64?: str
 export type ModelTurnInput = { goal: string } | { toolResults: ToolResult[]; message?: string };
 
 /** cachedInputTokens: the part of inputTokens served from the provider's prompt cache (billed at a fraction). */
-export type ModelUsage = { inputTokens: number; outputTokens: number; cachedInputTokens?: number };
+export type ModelUsage = { inputTokens: number; outputTokens: number; cachedInputTokens?: number; costUsd?: number };
 
 export type ModelTurn = {
   responseId: string;
   text: string;
   toolCalls: ToolCall[];
   usage: ModelUsage;
+  timing?: { attempts: number; headersMs: number; responseMs: number; upstream?: string };
 };
 
 export type TurnContext = {
@@ -32,6 +33,8 @@ export type TurnContext = {
 };
 
 export interface ModelAdapter {
+  exportContext?(): unknown;
+  restoreContext?(context: unknown): void;
   restore?(checkpoint: { threadId: string; usage?: ModelUsage }): void;
   interrupt?(): Promise<void>;
   readonly model: string;

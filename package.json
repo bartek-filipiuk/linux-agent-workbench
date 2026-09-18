@@ -18,11 +18,20 @@
     "images:build": "bash scripts/build-image.sh",
     "test:container": "LAW_CONTAINER_TESTS=1 vitest run tests/container",
     "images:prune": "bash scripts/prune-images.sh",
-    "images:build:browser": "bash scripts/build-image.sh browser"
+    "images:build:browser": "bash scripts/build-image.sh browser",
+    "dev:jev": "LAW_INSTANCE=jev pnpm dev",
+    "images:build:jev": "LAW_INSTANCE=jev bash scripts/build-image.sh browser",
+    "bench:jev": "pnpm build && node scripts/bench-jev.mjs",
+    "dev:auto": "LAW_INSTANCE=jev-auto pnpm dev",
+    "images:build:auto": "LAW_INSTANCE=jev-auto bash scripts/build-image.sh browser",
+    "bench:auto": "node experiments/browser-auto/run.mjs",
+    "bench:setup": "node experiments/browser-auto/setup.mjs",
+    "test:bench": "node --test tests/bench/*.test.mjs"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
     "typescript": "~5.9.3",
     "vitest": "^4.1.11"
-  }
+  },
+  "license": "MIT"
 }

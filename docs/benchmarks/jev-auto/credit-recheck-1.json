@@ -1,0 +1,87 @@
+{
+  "createdAt": "2026-09-18T07:21:26.708Z",
+  "model": "google/gemini-3.8-flash",
+  "effort": "low",
+  "upstream": "google-ai-studio",
+  "jev": "jev-1.13.0",
+  "engines": [
+    "app-auto",
+    "app-first",
+    "browser-use"
+  ],
+  "repeats": 1,
+  "source": {
+    "app": "77846cb0d97af218dd8a2832dab9f488c703b210",
+    "poc": "2d1a66a85d70138e718c965a63f23c6720b5d527",
+    "hashes": {
+      "run.mjs": "05af657595b3ea928a18b34b592cbe592684bb08f2b8515a74486d2c3e18505e",
+      "tasks.mjs": "c194830be3e27755b0dfdd228477b9af34238f0338ef7d383b09c34863a336c9"
+    },
+    "candidate": "2d1a66a85d70138e718c965a63f23c6720b5d527",
+    "candidateHashes": {
+      "services/agentd/dist/provider/openrouter.js": "d1556c37fd28c92de25c33a606c7b3f36b39d6b71a742d6d73363bf4865f05e6",
+      "services/agentd/dist/orchestrator/browser-auto.js": "c294a9c1adbb9606f812b353eecb2cd694e8fb4310e80715fc2b1721b9faca36",
+      "services/agentd/dist/orchestrator/jev-browser.js": "65263e7fc27598036610ef2917296bd2855341aed7b6d6e204a5638e11aab8aa",
+      "services/agentd/dist/orchestrator/run-controller.js": "35ec88ea5830c313213893e6493f648b66c9b4740fdc788fc971d83d055810a9",
+      "services/browser-worker/dist/browser-session.js": "839ef80647ad8956d89048e251a0c43c05f256ea3e84d1e28937f459528af77e"
+    },
+    "sharedWorker": "same Chrome build/settings; app-first uses unchanged baseline controller, tools and worker; app-auto uses candidate; both app engines share candidate OpenRouter schema adapter (explicit object oneOf); Python engines use pinned native drivers",
+    "upstreamDriverHash": "261a9cd28020b8b55a6652f3f928039188f025409c81283c352451af7f01f76e",
+    "dirty": false
+  },
+  "clock": "setup includes driver/browser startup, navigation, consent, first observation; task includes independent final verification; screenshots and cleanup outside task",
+  "settings": {
+    "autoConfidence": 0.35,
+    "timeoutMs": 240000,
+    "viewport": {
+      "width": 1120,
+      "height": 780
+    },
+    "channel": "chromium",
+    "warmAfter": null,
+    "priorReportedCostUsd": 2.6661846120000003
+  },
+  "results": [
+    {
+      "task": "search",
+      "category": "short-ui",
+      "repeat": 1,
+      "engine": "app-auto",
+      "warm": false,
+      "success": false,
+      "initialControls": [
+        {
+          "role": "textbox",
+          "name": "Search catalog",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "http://127.0.0.1:44099/search"
+      ],
+      "setupMs": 426.4071299999998,
+      "agentMs": 450.8610980000001,
+      "completed": false,
+      "state": "failed",
+      "endReason": "OpenRouter HTTP 402",
+      "providerFailure": "OpenRouter HTTP 402",
+      "primaryCalls": 1,
+      "primaryMs": 448.83618799999977,
+      "jevCalls": 0,
+      "jevMs": 0,
+      "costUsd": 0,
+      "jevErrors": [],
+      "actions": 0,
+      "fallbacks": [],
+      "routes": [],
+      "batches": [],
+      "verificationMs": 8.588807999999972,
+      "taskMs": 459.44990600000006,
+      "verification": {
+        "passed": false,
+        "expected": "Search results for blue notebook: Blue Notebook, 12 EUR"
+      }
+    }
+  ],
+  "stoppedReason": "provider_unavailable"
+}

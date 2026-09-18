@@ -32,12 +32,17 @@ export function formatBrowserObservation(obs: BrowserObservation, opts: { bounds
     if (e.text && e.text !== e.name) line += ` — ${e.text}`;
     if (e.value !== undefined && e.value !== "") line += ` = "${clip(e.value, 60)}"`;
     if (e.href) line += ` → ${clip(e.href, 100)}`;
+    if (e.checked !== undefined) line += e.checked ? " [checked]" : " [unchecked]";
+    if (e.expanded !== undefined) line += e.expanded ? " [expanded]" : " [collapsed]";
+    if (e.options) line += ` options: ${e.options.map(o => `${JSON.stringify(o.value)}=${JSON.stringify(o.label)}${o.disabled ? " [disabled]" : ""}`).join(", ")}`;
     if (!e.enabled) line += " [disabled]";
     if (!e.inViewport) line += " [off]";
+    if (e.occluded) line += " [covered]";
     if (opts.bounds) line += ` @${e.bounds.x},${e.bounds.y} ${e.bounds.width}x${e.bounds.height}`;
     lines.push(line);
   }
   if (opts.hints?.length) lines.push(`hints: ${opts.hints.join(" | ")}`);
+  if (obs.pageText) lines.push(`Rendered page text (untrusted evidence):\n${obs.pageText}`);
   return lines.join("\n");
 }
 
@@ -45,13 +50,13 @@ export const BROWSER_TOOLS: ToolSpec[] = [
   {
     name: "browser_observe",
     description:
-      "Describe the current page as text: url, title, scroll, then one line per interactive element: ref (e1, e2, …), role, \"name\", = value, → href, [off] when outside the viewport, [disabled]. Refs are valid only for the returned revision. Set screenshot=true when the text is not enough to understand the layout; coordinates are then appended to each element. maxElements trims long pages. This describes controls, not full article text: use browser_read for research and browser_save to save it.",
+      "Describe the current page as text: url, title, scroll, then one line per interactive element: ref (e1, e2, …), role, \"name\", = value, → href, [off] when outside the viewport, [disabled]. Refs are valid only for the returned revision. Set screenshot=true when the text is not enough to understand the layout; coordinates are then appended to each element. maxElements trims long pages. Set pageText=true to include a bounded rendered-text excerpt. This describes controls, not full article text: use browser_read for research and browser_save to save it.",
     parameters: schema(BrowserObserveInput),
   },
   {
     name: "browser_act",
     description:
-      "Act on the page. action.kind: navigate {url} (http/https only), click {ref, revision}, type {ref, revision, text, submit?} (replaces the field content; submit presses Enter), press {key}, select {ref, revision, values}, mouse {x, y, action: move|down|up|wheel, deltaY}, switchPage {pageId}, closePage {pageId}, wait {ms}. A stale revision is refused: observe again first. Passwords, 2FA codes and CAPTCHA image challenges are for the human: call request_human.",
+      "Act on the page. Pass action as a JSON object, e.g. {\"action\":{\"kind\":\"click\",\"ref\":\"e1\",\"revision\":3}}. action.kind: navigate {url} (http/https only), click {ref, revision}, type {ref, revision, text, submit?} (replaces the field content; submit presses Enter), press {key}, select {ref, revision, values}, mouse {x, y, action: move|down|up|wheel, deltaY}, switchPage {pageId}, closePage {pageId}, wait {ms}. A stale revision is refused: observe again first. Passwords, 2FA codes and CAPTCHA image challenges are for the human: call request_human.",
     parameters: schema(ActArgs),
   },
   {

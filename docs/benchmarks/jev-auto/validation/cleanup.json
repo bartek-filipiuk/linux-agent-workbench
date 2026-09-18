@@ -1,0 +1,9 @@
+{
+  "scope": "Only the four container IDs created by this task\u2019s isolated desktop smoke tests; label checked before deletion. Images, profiles and other instances retained.",
+  "removed": [
+    "22f77b9fc36a",
+    "b17e48352fe0",
+    "b2c08e9d2db9",
+    "f955748c1527"
+  ]
+}

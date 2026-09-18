@@ -2,6 +2,8 @@
 
 This is a direction for future work, not a list of features already available or a delivery-date commitment. Current capabilities are documented in [README.md](README.md).
 
+September 18 branch update: OpenRouter is implemented behind host-side configuration, durable continuation is implemented, and CI exists. Jev Auto shares the existing app runtime. Unified provider setup in Settings remains planned. Use [the current application guide](docs/APPLICATION.md) and [release readiness](docs/RELEASE-READINESS.md) for the authoritative implemented/planned boundary; [research evidence](docs/research/README.md) explains the execution choice.
+
 ## 1. Make operator providers easy to configure in Settings
 
 **Highest product priority: one provider setup experience for both subscription access and API billing.** Codex with ChatGPT sign-in remains the primary, best-documented path; the existing OpenAI Responses API adapter remains an explicit alternative.
@@ -25,7 +27,7 @@ Acceptance criteria:
 4. Each integration has conformance tests for text, tool/image results, cancellation, paused continuation and failure behavior.
 5. Documentation states the supported authentication mechanism and billing relationship without claiming that every subscription can be reused.
 
-No new provider adapter or Settings feature is implemented by this documentation/security pass.
+The OpenRouter adapter is implemented on this branch; a unified provider Settings feature remains unimplemented.
 
 ## 2. Strengthen isolation and make its limits visible
 
@@ -42,14 +44,14 @@ No new provider adapter or Settings feature is implemented by this documentation
 - Preserve a safe in-memory browser transition URL so switching into manual mode does not break an in-progress OAuth query, without persisting credentials in a return marker.
 - Distinguish provider quotas, model context exhaustion, tool timeouts and application budgets in diagnostics.
 - Replace the fixed cached-input pricing assumption with provider/model-aware estimates and explicit “unknown” handling.
-- Evaluate durable, explicit continuation after an app restart. Do not imply it works until provider context, policy state and pending actions can be restored safely.
+- Extend the implemented durable continuation coverage across provider context limits and additional failure/recovery cases.
 - Add repeatable clean-machine install and browser-login compatibility checks.
 
 ## 4. Prepare dependable releases
 
-- Select a license and review provenance of source, images and dependencies.
+- Maintain the MIT license and third-party notices; review the actual bundled dependencies again before distributing images or binaries.
 - Maintain the enabled GitHub private vulnerability-reporting channel and define a sustainable triage process.
-- Set up CI for typecheck, unit/integration tests, dependency auditing and English documentation/link checks.
+- Maintain the existing CI for typecheck, tests, build, UI fixtures and dependency auditing; add documentation/link checks.
 - Add separately scheduled container tests and documented supported Linux environments.
 - Provide reproducible image builds and versioned release artifacts, then signed installers and update policy.
 - Publish a short demo using synthetic accounts and non-sensitive task data.

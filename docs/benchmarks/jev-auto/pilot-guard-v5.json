@@ -1,0 +1,1175 @@
+{
+  "createdAt": "2026-09-18T06:39:35.301Z",
+  "model": "google/gemini-3.8-flash",
+  "effort": "low",
+  "upstream": "google-ai-studio",
+  "jev": "jev-1.13.0",
+  "engines": [
+    "app-auto"
+  ],
+  "repeats": 2,
+  "source": {
+    "app": "77846cb0d97af218dd8a2832dab9f488c703b210",
+    "poc": "77846cb0d97af218dd8a2832dab9f488c703b210",
+    "hashes": {
+      "run.mjs": "e33c50e3dc6a7bbc90190580fc18cb06eb1e7a24c86c63700ac7112bdb160b17",
+      "tasks.mjs": "c194830be3e27755b0dfdd228477b9af34238f0338ef7d383b09c34863a336c9"
+    },
+    "candidate": "77846cb0d97af218dd8a2832dab9f488c703b210",
+    "candidateHashes": {
+      "services/agentd/dist/orchestrator/browser-auto.js": "c294a9c1adbb9606f812b353eecb2cd694e8fb4310e80715fc2b1721b9faca36",
+      "services/agentd/dist/orchestrator/jev-browser.js": "65263e7fc27598036610ef2917296bd2855341aed7b6d6e204a5638e11aab8aa",
+      "services/agentd/dist/orchestrator/run-controller.js": "35ec88ea5830c313213893e6493f648b66c9b4740fdc788fc971d83d055810a9",
+      "services/browser-worker/dist/browser-session.js": "839ef80647ad8956d89048e251a0c43c05f256ea3e84d1e28937f459528af77e"
+    },
+    "sharedWorker": "candidate BrowserSession for all variants; baseline controller unchanged",
+    "upstreamDriverHash": "261a9cd28020b8b55a6652f3f928039188f025409c81283c352451af7f01f76e",
+    "dirty": true
+  },
+  "clock": "setup includes driver/browser startup, navigation, consent, first observation; task includes independent final verification; screenshots and cleanup outside task",
+  "settings": {
+    "autoConfidence": 0.35,
+    "timeoutMs": 240000,
+    "viewport": {
+      "width": 1120,
+      "height": 780
+    },
+    "channel": "chromium",
+    "warmAfter": null,
+    "priorReportedCostUsd": 0.8108977259999998
+  },
+  "results": [
+    {
+      "task": "google-flights",
+      "category": "live",
+      "repeat": 1,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Where from?",
+          "value": "Wrocław"
+        },
+        {
+          "role": "combobox",
+          "name": "Where to?",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Departure",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Return",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "https://www.google.com/travel/flights?hl=en"
+      ],
+      "setupMs": 2672.905507,
+      "agentMs": 18637.162401,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 3973.319736000001,
+      "jevCalls": 19,
+      "jevMs": 10946.549073999999,
+      "costUsd": 0.018394752,
+      "jevErrors": [],
+      "actions": 31,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 14,
+          "elapsedMs": 14655.934675999999,
+          "verified": false,
+          "parentCallId": "call_414464"
+        }
+      ],
+      "routes": [
+        {
+          "mode": "fast",
+          "tool": "browser_task",
+          "switched": false
+        }
+      ],
+      "batches": [],
+      "verificationMs": 13.670803000000888,
+      "taskMs": 18650.833204000002,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "searchPage": true,
+          "origin": true,
+          "destination": true,
+          "oneWay": true,
+          "departure": true,
+          "year": true,
+          "passenger": true,
+          "economy": true,
+          "results": true
+        },
+        "url": "https://www.google.com/travel/flights/search?tfs=CBwQAhojEgoyMDI2LTA5LTIwagcIARIDWlJIcgwIAxIIL20vMDRqcGxAAUgBcAGCAQsI____________AZgBAg&hl=en",
+        "controls": [
+          {
+            "role": "button",
+            "label": "Main menu",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "link",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "link",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "link",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "link",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Change appearance",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Google apps",
+            "value": ""
+          },
+          {
+            "role": "combobox",
+            "label": "One way",
+            "value": "One way"
+          },
+          {
+            "role": "button",
+            "label": "1 passenger, change number of passengers.",
+            "value": ""
+          },
+          {
+            "role": "combobox",
+            "label": "Economy",
+            "value": "Economy"
+          },
+          {
+            "role": "combobox",
+            "label": "Where from? Zürich ZRH",
+            "value": "Zürich"
+          },
+          {
+            "role": "button",
+            "label": "Swap origin and destination.",
+            "value": ""
+          },
+          {
+            "role": "combobox",
+            "label": "Where to?",
+            "value": "London"
+          },
+          {
+            "role": "input",
+            "label": "Departure",
+            "value": "Sun, Sep 20"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Stops, Not selected",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Airlines, Not selected",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Bags, Not selected",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Price, Not selected",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Times, Not selected",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Emissions, Not selected",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Connecting airports, Not selected",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Duration, Not selected",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Previous",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Next",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Learn more about ranking",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Learn more about ranking",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Learn more about ranking",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "bag fees"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "Passenger assistance"
+          },
+          {
+            "role": "button",
+            "label": "Sorted by top flights, Change sort order.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 79 kilograms. Average emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "This price for this flight doesn't include overhead bin access. If you need a carry-on bag, use the Bags filter to update prices.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 4:45 PM on Sunday, September 20 and arrives at London Gatwick Airport at 5:35 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 82 kilograms. Average emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 7:40 AM on Sunday, September 20 and arrives at Heathrow Airport at 8:35 AM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 71 kilograms. -13% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 6:20 PM on Sunday, September 20 and arrives at Heathrow Airport at 7:05 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 100 kilograms. +22% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 8:25 PM on Sunday, September 20 and arrives at London City Airport at 9:00 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 82 kilograms. Average emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 1:20 PM on Sunday, September 20 and arrives at Heathrow Airport at 2:20 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Climate friendly",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "View price history",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "switch",
+            "label": "Track prices from Zürich to London departing 2026-09-20",
+            "value": ""
+          },
+          {
+            "role": "switch",
+            "label": "Track prices from Zürich to London - Any dates",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 143 kilograms. +74% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 11:20 AM on Sunday, September 20 and arrives at London Gatwick Airport at 6:45 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 93 kilograms. +13% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "This price for this flight doesn't include overhead bin access. If you need a carry-on bag, use the Bags filter to update prices.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 8:55 PM on Sunday, September 20 and arrives at London Luton Airport at 9:40 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 86 kilograms. Average emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "This price for this flight doesn't include overhead bin access. If you need a carry-on bag, use the Bags filter to update prices.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 8:40 PM on Sunday, September 20 and arrives at London Gatwick Airport at 9:20 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 71 kilograms. -13% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 7:45 PM on Sunday, September 20 and arrives at Heathrow Airport at 8:30 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 91 kilograms. +11% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 7:05 AM on Sunday, September 20 and arrives at Heathrow Airport at 7:55 AM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 96 kilograms. +17% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 7:35 AM on Sunday, September 20 and arrives at London Gatwick Airport at 8:20 AM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 89 kilograms. +9% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 12:05 PM on Sunday, September 20 and arrives at Heathrow Airport at 1:00 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 68 kilograms. -17% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 3:35 PM on Sunday, September 20 and arrives at Heathrow Airport at 4:25 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 68 kilograms. -17% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 5:00 PM on Sunday, September 20 and arrives at Heathrow Airport at 5:50 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 88 kilograms. +7% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 5:10 PM on Sunday, September 20 and arrives at London Gatwick Airport at 5:50 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 70 kilograms. -15% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 6:30 PM on Sunday, September 20 and arrives at Heathrow Airport at 7:20 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 89 kilograms. +9% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 8:55 PM on Sunday, September 20 and arrives at Heathrow Airport at 9:45 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 86 kilograms. Average emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 1:05 PM on Sunday, September 20 and arrives at London City Airport at 1:45 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 86 kilograms. Average emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 4:50 PM on Sunday, September 20 and arrives at London City Airport at 5:25 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 88 kilograms. +7% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 6:00 PM on Sunday, September 20 and arrives at London City Airport at 6:40 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 70 kilograms. -15% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 10:30 AM on Sunday, September 20 and arrives at Heathrow Airport at 11:20 AM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "View more flights",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Currency PLN",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "Report Illegal Content"
+          }
+        ],
+        "visibleFlights": [
+          "From 633 Polish zlotys.This price does not include overhead bin access. Nonstop flight with easyJet. Leaves Zurich Airport at 4:45 PM on Sunday, September 20 and arrives at London Gatwick Airport at 5:35 PM on Sunday, September 20. Total duration 1 hr 50 min.   Select flight",
+          "From 675 Polish zlotys. Nonstop flight with British Airways. Leaves Zurich Airport at 7:40 AM on Sunday, September 20 and arrives at Heathrow Airport at 8:35 AM on Sunday, September 20. Total duration 1 hr 55 min.   Select flight",
+          "From 868 Polish zlotys. Nonstop flight with British Airways. Leaves Zurich Airport at 6:20 PM on Sunday, September 20 and arrives at Heathrow Airport at 7:05 PM on Sunday, September 20. Total duration 1 hr 45 min.   Select flight",
+          "From 999 Polish zlotys. Nonstop flight with British Airways. Operated by BA Cityflyer. Leaves Zurich Airport at 8:25 PM on Sunday, September 20 and arrives at London City Airport at 9:00 PM on Sunday, September 20. Total duration 1 hr 35 min.   Select flight",
+          "From 1020 Polish zlotys. Nonstop flight with British Airways. Leaves Zurich Airport at 1:20 PM on Sunday, September 20 and arrives at Heathrow Airport at 2:20 PM on Sunday, September 20. Total duration 2 hr.   Select flight",
+          "From 511 Polish zlotys. 1 stop flight with Condor. Leaves Zurich Airport at 11:20 AM on Sunday, September 20 and arrives at London Gatwick Airport at 6:45 PM on Sunday, September 20. Total duration 8 hr 25 min.  Layover (1 of 1) is a 5 hr 50 min layover at Frankfurt Airport in Frankfurt am Main. Select flight",
+          "From 789 Polish zlotys.This price does not include overhead bin access. Nonstop flight with easyJet. Leaves Zurich Airport at 8:55 PM on Sunday, September 20 and arrives at London Luton Airport at 9:40 PM on Sunday, September 20. Total duration 1 hr 45 min.   Select flight",
+          "From 831 Polish zlotys.This price does not include overhead bin access. Nonstop flight with easyJet. Leaves Zurich Airport at 8:40 PM on Sunday, September 20 and arrives at London Gatwick Airport at 9:20 PM on Sunday, September 20. Total duration 1 hr 40 min.   Select flight",
+          "From 1439 Polish zlotys. Nonstop flight with British Airways. Leaves Zurich Airport at 7:45 PM on Sunday, September 20 and arrives at Heathrow Airport at 8:30 PM on Sunday, September 20. Total duration 1 hr 45 min.   Select flight",
+          "From 1477 Polish zlotys. Nonstop flight with SWISS. Leaves Zurich Airport at 7:05 AM on Sunday, September 20 and arrives at Heathrow Airport at 7:55 AM on Sunday, September 20. Total duration 1 hr 50 min.   Select flight",
+          "From 1477 Polish zlotys. Nonstop flight with SWISS. Operated by Helvetic. Leaves Zurich Airport at 7:35 AM on Sunday, September 20 and arrives at London Gatwick Airport at 8:20 AM on Sunday, September 20. Total duration 1 hr 45 min.   Select flight",
+          "From 1477 Polish zlotys. Nonstop flight with SWISS. Operated by Air Baltic. Leaves Zurich Airport at 12:05 PM on Sunday, September 20 and arrives at Heathrow Airport at 1:00 PM on Sunday, September 20. Total duration 1 hr 55 min.   Select flight",
+          "From 1477 Polish zlotys. Nonstop flight with SWISS. Leaves Zurich Airport at 3:35 PM on Sunday, September 20 and arrives at Heathrow Airport at 4:25 PM on Sunday, September 20. Total duration 1 hr 50 min.   Select flight",
+          "From 1477 Polish zlotys. Nonstop flight with SWISS. Leaves Zurich Airport at 5:00 PM on Sunday, September 20 and arrives at Heathrow Airport at 5:50 PM on Sunday, September 20. Total duration 1 hr 50 min.   Select flight",
+          "From 1477 Polish zlotys. Nonstop flight with SWISS. Leaves Zurich Airport at 5:10 PM on Sunday, September 20 and arrives at London Gatwick Airport at 5:50 PM on Sunday, September 20. Total duration 1 hr 40 min.   Select flight",
+          "From 1477 Polish zlotys. Nonstop flight with SWISS. Leaves Zurich Airport at 6:30 PM on Sunday, September 20 and arrives at Heathrow Airport at 7:20 PM on Sunday, September 20. Total duration 1 hr 50 min.   Select flight",
+          "From 1477 Polish zlotys. Nonstop flight with SWISS. Operated by Air Baltic. Leaves Zurich Airport at 8:55 PM on Sunday, September 20 and arrives at Heathrow Airport at 9:45 PM on Sunday, September 20. Total duration 1 hr 50 min.   Select flight",
+          "From 1508 Polish zlotys. Nonstop flight with SWISS. Operated by Helvetic. Leaves Zurich Airport at 1:05 PM on Sunday, September 20 and arrives at London City Airport at 1:45 PM on Sunday, September 20. Total duration 1 hr 40 min.   Select flight",
+          "From 1508 Polish zlotys. Nonstop flight with SWISS. Operated by Helvetic. Leaves Zurich Airport at 4:50 PM on Sunday, September 20 and arrives at London City Airport at 5:25 PM on Sunday, September 20. Total duration 1 hr 35 min.   Select flight",
+          "From 1508 Polish zlotys. Nonstop flight with SWISS. Operated by Helvetic. Leaves Zurich Airport at 6:00 PM on Sunday, September 20 and arrives at London City Airport at 6:40 PM on Sunday, September 20. Total duration 1 hr 40 min.   Select flight",
+          "From 1859 Polish zlotys. Nonstop flight with SWISS. Leaves Zurich Airport at 10:30 AM on Sunday, September 20 and arrives at Heathrow Airport at 11:20 AM on Sunday, September 20. Total duration 1 hr 50 min.   Select flight"
+        ],
+        "text": "Skip to main content\nAccessibility feedback\nExplore\nFlights\nHotels\nVacation rentals\nChange appearance\nSign in\nLoading results\nFlight search\nOne way\n1\nEconomy\nZürich ZRH\nLondon\nFilters\nAll filters\nStops\nAirlines\nBags\nPrice\nTimes\nEmissions\nConnecting airports\nDuration\nSearch results\n21 results returned.\nBest\nCheapest\nfrom PLN 511\nTop options\nRanked based on price and conveniencePrices include required taxes + fees for 1 adult. Optional charges and bag fees may apply. Passenger assistance info.\nSorted by top flights\n4:45 PM\n – \n5:35 PM\neasyJet\n1 hr 50 min\nZRH–LGW\nNonstop\n79 kg CO2e\nAvg emissions\nPLN 633\n7:40 AM\n – \n8:35 AM\nBritish Airways\n1 hr 55 min\nZRH–LHR\nNonstop\n82 kg CO2e\nAvg emissions\nPLN 675\n6:20 PM\n – \n7:05 PM\nBritish Airways\n1 hr 45 min\nZRH–LHR\nNonstop\n71 kg CO2e\n-13% emissions\nPLN 868\n8:25 PM\n – \n9:00 PM\nBritish AirwaysOperated by BA Cityflyer\n1 hr 35 min\nZRH–LCY\nNonstop\n100 kg CO2e\n+22% emissions\nPLN 999\n1:20 PM\n – \n2:20 PM\nBritish Airways\n2 hr\nZRH–LHR\nNonstop\n82 kg CO2e\nAvg emissions\nPLN 1,020\nTrains to considerTo arrive closer to your destination\n3:34 PM – 10:00 PM\nZürich HB – St Pancras International\n7 hr 26 min\n2 stops\nSee more train options\nPrice insights\nPrices are currently typical\nView price history\nTrack prices\nTrack prices from Zürich to London departing 2026-09-20\nSep 20\nTrack prices from Zürich to London - Any dates\nAny dates\nDate grid\nPrice graph\nOther flights\n11:20 AM\n – \n6:45 PM\nCondor\n8 hr 25 min\nZRH–LGW\n1 stop\n5 hr 50 min FRA\n143 kg CO2e\n+74% emissions\nPLN 511\n8:55 PM\n – \n9:40 PM\neasyJet\n1 hr 45 min\nZRH–LTN\nNonstop\n93 kg CO2e\n+13% emissions\nPLN 789\n8:40 PM\n – \n9:20 PM\neasyJet\n1 hr 40 min\nZRH–LGW\nNonstop\n86 kg CO2e\nAvg emissions\nPLN 831\n7:45 PM\n – \n8:30 PM\nBritish Airways\n1 hr 45 min\nZRH–LHR\nNonstop\n71 kg CO2e\n-13% emissions\nPLN 1,439\n7:05 AM\n – \n7:55 AM\nSWISS\n1 hr 50 min\nZRH–LHR\nNonstop\n91 kg CO2e\n+11% emissions\nPLN 1,477\n7:35 AM\n – \n8:20 AM\nSWISSOperated by Helvetic\n1 hr 45 min\nZRH–LGW\nNonstop\n96 kg CO2e\n+17% emissions\nPLN 1,477\n12:05 PM\n – \n1:00 PM\nSWISSOperated by Air Baltic\n1 hr 55 min\nZRH–LHR\nNonstop\n89 kg CO2e\n+9% emissions\nPLN 1,477\n3:35 PM\n – \n4:25 PM\nSWISS\n1 hr 50 min\nZRH–LHR\nNonstop\n68 kg CO2e\n-17% emissions\nPLN 1,477\n5:00 PM\n – \n5:50 PM\nSWISS\n1 hr 50 min\nZRH–LHR\nNonstop\n68 kg CO2e\n-17% emissions\nPLN 1,477\n5:10 PM\n – \n5:50 PM\nSWISS\n1 hr 40 min\nZRH–LGW\nNonstop\n88 kg CO2e\n+7% emissions\nPLN 1,477\n6:30 PM\n – \n7:20 PM\nSWISS\n1 hr 50 min\nZRH–LHR\nNonstop\n70 kg CO2e\n-15% emissions\nPLN 1,477\n8:55 PM\n – \n9:45 PM\nSWISSOperated by Air Baltic\n1 hr 50 min\nZRH–LHR\nNonstop\n89 kg CO2e\n+9% emissions\nPLN 1,477\n1:05 PM\n – \n1:45 PM\nSWISSOperated by Helvetic\n1 hr 40 min\nZRH–LCY\nNonstop\n86 kg CO2e\nAvg emissions\nPLN 1,508\n4:50 PM\n – \n5:25 PM\nSWISSOperated by Helvetic\n1 hr 35 min\nZRH–LCY\nNonstop\n86 kg CO2e\nAvg emissions\nPLN 1,508\n6:00 PM\n – \n6:40 PM\nSWISSOperated by Helvetic\n1 hr 40 min\nZRH–LCY\nNonstop\n88 kg CO2e\n+7% emissions\nPLN 1,508\n10:30 AM\n – \n11:20 AM\nSWISS\n1 hr 50 min\nZRH–LHR\nNonstop\n70 kg CO2e\n-15% emissions\nPLN 1,859\nView more flights\nLanguage​English (United States)\nLocation​Poland\nCurrencyPLN\nAbout\nPrivacy\nTerms\nJoin user studies\nReport Illegal Content\nFeedback\nHelp Center and Consumer Information\n\nDisplayed currencies may differ from the currencies used to purchase flights. Learn more\n\nPrices are final prices and include all taxes and fees, including payment fees for the cheapest common payment method (which may differ depending on the provider). Additional charges may apply for other types of payment, luggage, meals, WLAN or other additional services. Prices, availability and travel details are provided based on the latest information received from our partners. This information is reflected in the results within a period of less than 24 hours. Additional conditions may also be applied by our partners. You should then check prices and conditions with the services providers before booking.\n\nfrom PLN 511\nPage loaded."
+      }
+    },
+    {
+      "task": "google-flights",
+      "category": "live",
+      "repeat": 2,
+      "engine": "app-auto",
+      "warm": false,
+      "success": true,
+      "initialControls": [
+        {
+          "role": "combobox",
+          "name": "Where from?",
+          "value": "Wrocław"
+        },
+        {
+          "role": "combobox",
+          "name": "Where to?",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Departure",
+          "value": ""
+        },
+        {
+          "role": "textbox",
+          "name": "Return",
+          "value": ""
+        }
+      ],
+      "initialPages": [
+        "https://www.google.com/travel/flights?hl=en"
+      ],
+      "setupMs": 2686.0781290000014,
+      "agentMs": 18890.411353000003,
+      "completed": true,
+      "state": "completed",
+      "endReason": "final_answer",
+      "primaryCalls": 2,
+      "primaryMs": 3383.235381999999,
+      "jevCalls": 19,
+      "jevMs": 11853.761805999984,
+      "costUsd": 0.018152754,
+      "jevErrors": [],
+      "actions": 32,
+      "fallbacks": [
+        {
+          "status": "completion_candidate",
+          "reason": "Compare the attached fresh evidence against every user requirement. If it is sufficient, answer directly; read more only if evidence is missing or incomplete. Jev's DONE is not proof.",
+          "actions": 15,
+          "elapsedMs": 15503.870660999997,
+          "verified": false,
+          "parentCallId": "call_328047"
+        }
+      ],
+      "routes": [
+        {
+          "mode": "fast",
+          "tool": "browser_task",
+          "switched": false
+        }
+      ],
+      "batches": [],
+      "verificationMs": 13.325646999997844,
+      "taskMs": 18903.737,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "searchPage": true,
+          "origin": true,
+          "destination": true,
+          "oneWay": true,
+          "departure": true,
+          "year": true,
+          "passenger": true,
+          "economy": true,
+          "results": true
+        },
+        "url": "https://www.google.com/travel/flights/search?tfs=CBwQAhojEgoyMDI2LTA5LTIwagcIARIDWlJIcgwIAxIIL20vMDRqcGxAAUgBcAGCAQsI____________AZgBAg&hl=en",
+        "controls": [
+          {
+            "role": "button",
+            "label": "Main menu",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "link",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "link",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "link",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "link",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Change appearance",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Google apps",
+            "value": ""
+          },
+          {
+            "role": "combobox",
+            "label": "One way",
+            "value": "One way"
+          },
+          {
+            "role": "button",
+            "label": "1 passenger, change number of passengers.",
+            "value": ""
+          },
+          {
+            "role": "combobox",
+            "label": "Economy",
+            "value": "Economy"
+          },
+          {
+            "role": "combobox",
+            "label": "Where from? Zürich ZRH",
+            "value": "Zürich"
+          },
+          {
+            "role": "button",
+            "label": "Swap origin and destination.",
+            "value": ""
+          },
+          {
+            "role": "combobox",
+            "label": "Where to?",
+            "value": "London"
+          },
+          {
+            "role": "input",
+            "label": "Departure",
+            "value": "Sun, Sep 20"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Stops, Not selected",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Airlines, Not selected",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Bags, Not selected",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Price, Not selected",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Times, Not selected",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Emissions, Not selected",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Connecting airports, Not selected",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Duration, Not selected",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Previous",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Next",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Learn more about ranking",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Learn more about ranking",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Learn more about ranking",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "bag fees"
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "Passenger assistance"
+          },
+          {
+            "role": "button",
+            "label": "Sorted by top flights, Change sort order.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 79 kilograms. Average emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "This price for this flight doesn't include overhead bin access. If you need a carry-on bag, use the Bags filter to update prices.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 4:45 PM on Sunday, September 20 and arrives at London Gatwick Airport at 5:35 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 82 kilograms. Average emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 7:40 AM on Sunday, September 20 and arrives at Heathrow Airport at 8:35 AM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 71 kilograms. -13% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 6:20 PM on Sunday, September 20 and arrives at Heathrow Airport at 7:05 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 100 kilograms. +22% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 8:25 PM on Sunday, September 20 and arrives at London City Airport at 9:00 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 82 kilograms. Average emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 1:20 PM on Sunday, September 20 and arrives at Heathrow Airport at 2:20 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Climate friendly",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "View price history",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "switch",
+            "label": "Track prices from Zürich to London departing 2026-09-20",
+            "value": ""
+          },
+          {
+            "role": "switch",
+            "label": "Track prices from Zürich to London - Any dates",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 143 kilograms. +74% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 11:20 AM on Sunday, September 20 and arrives at London Gatwick Airport at 6:45 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 93 kilograms. +13% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "This price for this flight doesn't include overhead bin access. If you need a carry-on bag, use the Bags filter to update prices.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 8:55 PM on Sunday, September 20 and arrives at London Luton Airport at 9:40 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 86 kilograms. Average emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "This price for this flight doesn't include overhead bin access. If you need a carry-on bag, use the Bags filter to update prices.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 8:40 PM on Sunday, September 20 and arrives at London Gatwick Airport at 9:20 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 71 kilograms. -13% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 7:45 PM on Sunday, September 20 and arrives at Heathrow Airport at 8:30 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 91 kilograms. +11% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 7:05 AM on Sunday, September 20 and arrives at Heathrow Airport at 7:55 AM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 96 kilograms. +17% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 7:35 AM on Sunday, September 20 and arrives at London Gatwick Airport at 8:20 AM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 89 kilograms. +9% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 12:05 PM on Sunday, September 20 and arrives at Heathrow Airport at 1:00 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 68 kilograms. -17% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 3:35 PM on Sunday, September 20 and arrives at Heathrow Airport at 4:25 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 68 kilograms. -17% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 5:00 PM on Sunday, September 20 and arrives at Heathrow Airport at 5:50 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 88 kilograms. +7% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 5:10 PM on Sunday, September 20 and arrives at London Gatwick Airport at 5:50 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 70 kilograms. -15% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 6:30 PM on Sunday, September 20 and arrives at Heathrow Airport at 7:20 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 89 kilograms. +9% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 8:55 PM on Sunday, September 20 and arrives at Heathrow Airport at 9:45 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 86 kilograms. Average emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 1:05 PM on Sunday, September 20 and arrives at London City Airport at 1:45 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 86 kilograms. Average emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 4:50 PM on Sunday, September 20 and arrives at London City Airport at 5:25 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 88 kilograms. +7% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 6:00 PM on Sunday, September 20 and arrives at London City Airport at 6:40 PM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Carbon emissions estimate: 70 kilograms. -15% emissions. Learn more about this emissions estimate",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Flight details. Leaves Zurich Airport at 10:30 AM on Sunday, September 20 and arrives at Heathrow Airport at 11:20 AM on Sunday, September 20.",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "View more flights",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "Currency PLN",
+            "value": ""
+          },
+          {
+            "role": "button",
+            "label": "",
+            "value": "Report Illegal Content"
+          }
+        ],
+        "visibleFlights": [
+          "From 633 Polish zlotys.This price does not include overhead bin access. Nonstop flight with easyJet. Leaves Zurich Airport at 4:45 PM on Sunday, September 20 and arrives at London Gatwick Airport at 5:35 PM on Sunday, September 20. Total duration 1 hr 50 min.   Select flight",
+          "From 675 Polish zlotys. Nonstop flight with British Airways. Leaves Zurich Airport at 7:40 AM on Sunday, September 20 and arrives at Heathrow Airport at 8:35 AM on Sunday, September 20. Total duration 1 hr 55 min.   Select flight",
+          "From 868 Polish zlotys. Nonstop flight with British Airways. Leaves Zurich Airport at 6:20 PM on Sunday, September 20 and arrives at Heathrow Airport at 7:05 PM on Sunday, September 20. Total duration 1 hr 45 min.   Select flight",
+          "From 999 Polish zlotys. Nonstop flight with British Airways. Operated by BA Cityflyer. Leaves Zurich Airport at 8:25 PM on Sunday, September 20 and arrives at London City Airport at 9:00 PM on Sunday, September 20. Total duration 1 hr 35 min.   Select flight",
+          "From 1020 Polish zlotys. Nonstop flight with British Airways. Leaves Zurich Airport at 1:20 PM on Sunday, September 20 and arrives at Heathrow Airport at 2:20 PM on Sunday, September 20. Total duration 2 hr.   Select flight",
+          "From 511 Polish zlotys. 1 stop flight with Condor. Leaves Zurich Airport at 11:20 AM on Sunday, September 20 and arrives at London Gatwick Airport at 6:45 PM on Sunday, September 20. Total duration 8 hr 25 min.  Layover (1 of 1) is a 5 hr 50 min layover at Frankfurt Airport in Frankfurt am Main. Select flight",
+          "From 789 Polish zlotys.This price does not include overhead bin access. Nonstop flight with easyJet. Leaves Zurich Airport at 8:55 PM on Sunday, September 20 and arrives at London Luton Airport at 9:40 PM on Sunday, September 20. Total duration 1 hr 45 min.   Select flight",
+          "From 831 Polish zlotys.This price does not include overhead bin access. Nonstop flight with easyJet. Leaves Zurich Airport at 8:40 PM on Sunday, September 20 and arrives at London Gatwick Airport at 9:20 PM on Sunday, September 20. Total duration 1 hr 40 min.   Select flight",
+          "From 1439 Polish zlotys. Nonstop flight with British Airways. Leaves Zurich Airport at 7:45 PM on Sunday, September 20 and arrives at Heathrow Airport at 8:30 PM on Sunday, September 20. Total duration 1 hr 45 min.   Select flight",
+          "From 1477 Polish zlotys. Nonstop flight with SWISS. Leaves Zurich Airport at 7:05 AM on Sunday, September 20 and arrives at Heathrow Airport at 7:55 AM on Sunday, September 20. Total duration 1 hr 50 min.   Select flight",
+          "From 1477 Polish zlotys. Nonstop flight with SWISS. Operated by Helvetic. Leaves Zurich Airport at 7:35 AM on Sunday, September 20 and arrives at London Gatwick Airport at 8:20 AM on Sunday, September 20. Total duration 1 hr 45 min.   Select flight",
+          "From 1477 Polish zlotys. Nonstop flight with SWISS. Operated by Air Baltic. Leaves Zurich Airport at 12:05 PM on Sunday, September 20 and arrives at Heathrow Airport at 1:00 PM on Sunday, September 20. Total duration 1 hr 55 min.   Select flight",
+          "From 1477 Polish zlotys. Nonstop flight with SWISS. Leaves Zurich Airport at 3:35 PM on Sunday, September 20 and arrives at Heathrow Airport at 4:25 PM on Sunday, September 20. Total duration 1 hr 50 min.   Select flight",
+          "From 1477 Polish zlotys. Nonstop flight with SWISS. Leaves Zurich Airport at 5:00 PM on Sunday, September 20 and arrives at Heathrow Airport at 5:50 PM on Sunday, September 20. Total duration 1 hr 50 min.   Select flight",
+          "From 1477 Polish zlotys. Nonstop flight with SWISS. Leaves Zurich Airport at 5:10 PM on Sunday, September 20 and arrives at London Gatwick Airport at 5:50 PM on Sunday, September 20. Total duration 1 hr 40 min.   Select flight",
+          "From 1477 Polish zlotys. Nonstop flight with SWISS. Leaves Zurich Airport at 6:30 PM on Sunday, September 20 and arrives at Heathrow Airport at 7:20 PM on Sunday, September 20. Total duration 1 hr 50 min.   Select flight",
+          "From 1477 Polish zlotys. Nonstop flight with SWISS. Operated by Air Baltic. Leaves Zurich Airport at 8:55 PM on Sunday, September 20 and arrives at Heathrow Airport at 9:45 PM on Sunday, September 20. Total duration 1 hr 50 min.   Select flight",
+          "From 1508 Polish zlotys. Nonstop flight with SWISS. Operated by Helvetic. Leaves Zurich Airport at 1:05 PM on Sunday, September 20 and arrives at London City Airport at 1:45 PM on Sunday, September 20. Total duration 1 hr 40 min.   Select flight",
+          "From 1508 Polish zlotys. Nonstop flight with SWISS. Operated by Helvetic. Leaves Zurich Airport at 4:50 PM on Sunday, September 20 and arrives at London City Airport at 5:25 PM on Sunday, September 20. Total duration 1 hr 35 min.   Select flight",
+          "From 1508 Polish zlotys. Nonstop flight with SWISS. Operated by Helvetic. Leaves Zurich Airport at 6:00 PM on Sunday, September 20 and arrives at London City Airport at 6:40 PM on Sunday, September 20. Total duration 1 hr 40 min.   Select flight",
+          "From 1859 Polish zlotys. Nonstop flight with SWISS. Leaves Zurich Airport at 10:30 AM on Sunday, September 20 and arrives at Heathrow Airport at 11:20 AM on Sunday, September 20. Total duration 1 hr 50 min.   Select flight"
+        ],
+        "text": "Skip to main content\nAccessibility feedback\nExplore\nFlights\nHotels\nVacation rentals\nChange appearance\nSign in\nLoading results\nFlight search\nOne way\n1\nEconomy\nZürich ZRH\nLondon\nFilters\nAll filters\nStops\nAirlines\nBags\nPrice\nTimes\nEmissions\nConnecting airports\nDuration\nSearch results\n21 results returned.\nBest\nCheapest\nfrom PLN 511\nTop options\nRanked based on price and conveniencePrices include required taxes + fees for 1 adult. Optional charges and bag fees may apply. Passenger assistance info.\nSorted by top flights\n4:45 PM\n – \n5:35 PM\neasyJet\n1 hr 50 min\nZRH–LGW\nNonstop\n79 kg CO2e\nAvg emissions\nPLN 633\n7:40 AM\n – \n8:35 AM\nBritish Airways\n1 hr 55 min\nZRH–LHR\nNonstop\n82 kg CO2e\nAvg emissions\nPLN 675\n6:20 PM\n – \n7:05 PM\nBritish Airways\n1 hr 45 min\nZRH–LHR\nNonstop\n71 kg CO2e\n-13% emissions\nPLN 868\n8:25 PM\n – \n9:00 PM\nBritish AirwaysOperated by BA Cityflyer\n1 hr 35 min\nZRH–LCY\nNonstop\n100 kg CO2e\n+22% emissions\nPLN 999\n1:20 PM\n – \n2:20 PM\nBritish Airways\n2 hr\nZRH–LHR\nNonstop\n82 kg CO2e\nAvg emissions\nPLN 1,020\nTrains to considerTo arrive closer to your destination\n3:34 PM – 10:00 PM\nZürich HB – St Pancras International\n7 hr 26 min\n2 stops\nSee more train options\nPrice insights\nPrices are currently typical\nView price history\nTrack prices\nTrack prices from Zürich to London departing 2026-09-20\nSep 20\nTrack prices from Zürich to London - Any dates\nAny dates\nDate grid\nPrice graph\nOther flights\n11:20 AM\n – \n6:45 PM\nCondor\n8 hr 25 min\nZRH–LGW\n1 stop\n5 hr 50 min FRA\n143 kg CO2e\n+74% emissions\nPLN 511\n8:55 PM\n – \n9:40 PM\neasyJet\n1 hr 45 min\nZRH–LTN\nNonstop\n93 kg CO2e\n+13% emissions\nPLN 789\n8:40 PM\n – \n9:20 PM\neasyJet\n1 hr 40 min\nZRH–LGW\nNonstop\n86 kg CO2e\nAvg emissions\nPLN 831\n7:45 PM\n – \n8:30 PM\nBritish Airways\n1 hr 45 min\nZRH–LHR\nNonstop\n71 kg CO2e\n-13% emissions\nPLN 1,439\n7:05 AM\n – \n7:55 AM\nSWISS\n1 hr 50 min\nZRH–LHR\nNonstop\n91 kg CO2e\n+11% emissions\nPLN 1,477\n7:35 AM\n – \n8:20 AM\nSWISSOperated by Helvetic\n1 hr 45 min\nZRH–LGW\nNonstop\n96 kg CO2e\n+17% emissions\nPLN 1,477\n12:05 PM\n – \n1:00 PM\nSWISSOperated by Air Baltic\n1 hr 55 min\nZRH–LHR\nNonstop\n89 kg CO2e\n+9% emissions\nPLN 1,477\n3:35 PM\n – \n4:25 PM\nSWISS\n1 hr 50 min\nZRH–LHR\nNonstop\n68 kg CO2e\n-17% emissions\nPLN 1,477\n5:00 PM\n – \n5:50 PM\nSWISS\n1 hr 50 min\nZRH–LHR\nNonstop\n68 kg CO2e\n-17% emissions\nPLN 1,477\n5:10 PM\n – \n5:50 PM\nSWISS\n1 hr 40 min\nZRH–LGW\nNonstop\n88 kg CO2e\n+7% emissions\nPLN 1,477\n6:30 PM\n – \n7:20 PM\nSWISS\n1 hr 50 min\nZRH–LHR\nNonstop\n70 kg CO2e\n-15% emissions\nPLN 1,477\n8:55 PM\n – \n9:45 PM\nSWISSOperated by Air Baltic\n1 hr 50 min\nZRH–LHR\nNonstop\n89 kg CO2e\n+9% emissions\nPLN 1,477\n1:05 PM\n – \n1:45 PM\nSWISSOperated by Helvetic\n1 hr 40 min\nZRH–LCY\nNonstop\n86 kg CO2e\nAvg emissions\nPLN 1,508\n4:50 PM\n – \n5:25 PM\nSWISSOperated by Helvetic\n1 hr 35 min\nZRH–LCY\nNonstop\n86 kg CO2e\nAvg emissions\nPLN 1,508\n6:00 PM\n – \n6:40 PM\nSWISSOperated by Helvetic\n1 hr 40 min\nZRH–LCY\nNonstop\n88 kg CO2e\n+7% emissions\nPLN 1,508\n10:30 AM\n – \n11:20 AM\nSWISS\n1 hr 50 min\nZRH–LHR\nNonstop\n70 kg CO2e\n-15% emissions\nPLN 1,859\nView more flights\nLanguage​English (United States)\nLocation​Poland\nCurrencyPLN\nAbout\nPrivacy\nTerms\nJoin user studies\nReport Illegal Content\nFeedback\nHelp Center and Consumer Information\n\nDisplayed currencies may differ from the currencies used to purchase flights. Learn more\n\nPrices are final prices and include all taxes and fees, including payment fees for the cheapest common payment method (which may differ depending on the provider). Additional charges may apply for other types of payment, luggage, meals, WLAN or other additional services. Prices, availability and travel details are provided based on the latest information received from our partners. This information is reflected in the results within a period of less than 24 hours. Additional conditions may also be applied by our partners. You should then check prices and conditions with the services providers before booking.\n\nfrom PLN 511\nPage loaded."
+      }
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 # User guide
 
+The consolidated branch adds OpenRouter and multiple browser execution modes inside this same app. See [the current application guide](APPLICATION.md) for configuration, method selection, recovery and limits, and [the research kit](research/README.md) for measured results. The core workflows below continue to apply.
+
 This guide describes the current source-build application. Planned functionality is listed separately in [ROADMAP.md](../ROADMAP.md).
 
 ## Install and launch

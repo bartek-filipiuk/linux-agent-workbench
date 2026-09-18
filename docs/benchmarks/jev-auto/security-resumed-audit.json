@@ -1,0 +1,12 @@
+{
+  "createdAt": "2026-09-18T07:53:17.410Z",
+  "fileCount": 1062,
+  "leakCount": 0,
+  "liveChromeRequired": false,
+  "chromeProcesses": 0,
+  "chromeSensitiveEnvNames": 0,
+  "chromeKeyMatches": 0,
+  "containers": 0,
+  "containerKeyMatches": 0,
+  "passed": true
+}

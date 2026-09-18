@@ -1,0 +1,318 @@
+{
+  "createdAt": "2026-09-18T05:13:56.531Z",
+  "source": "77846cb0d97af218dd8a2832dab9f488c703b210",
+  "model": "google/gemini-3.8-flash",
+  "effort": "low",
+  "criterion": "first-turn mode only; no browser execution, not an end-to-end success metric",
+  "results": [
+    {
+      "id": "search",
+      "expected": "fast",
+      "mode": "fast",
+      "passed": true,
+      "elapsedMs": 1464.049343,
+      "costUsd": 0.00158625,
+      "toolCalls": [
+        {
+          "callId": "call_331721",
+          "name": "browser_task",
+          "args": {
+            "url": "https://example.com/catalog",
+            "values": [
+              {
+                "text": "blue notebook",
+                "name": "search_query"
+              }
+            ],
+            "maxSteps": 10,
+            "goal": "Navigate to https://example.com/catalog and search for 'blue notebook' so that results are visible"
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "filters",
+      "expected": "fast",
+      "mode": "planned",
+      "passed": false,
+      "elapsedMs": 1006.9518409999998,
+      "costUsd": 0.001371,
+      "toolCalls": [
+        {
+          "callId": "call_285430",
+          "name": "browser_observe",
+          "args": {
+            "pageText": true
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "autocomplete",
+      "expected": "fast",
+      "mode": "planned",
+      "passed": false,
+      "elapsedMs": 1092.6138490000003,
+      "costUsd": 0.00134625,
+      "toolCalls": [
+        {
+          "callId": "call_377940",
+          "name": "browser_observe",
+          "args": {}
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "flights",
+      "expected": "fast",
+      "mode": "planned",
+      "passed": false,
+      "elapsedMs": 2338.300513,
+      "costUsd": 0.00138825,
+      "toolCalls": [
+        {
+          "callId": "call_450313",
+          "name": "browser_observe",
+          "args": {
+            "pageText": true
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "polish-search",
+      "expected": "fast",
+      "mode": "fast",
+      "passed": true,
+      "elapsedMs": 1221.1677639999998,
+      "costUsd": 0.0016425,
+      "toolCalls": [
+        {
+          "callId": "call_484729",
+          "name": "browser_task",
+          "args": {
+            "maxSteps": 10,
+            "goal": "Wyszukaj 'zielony plecak' w sklepie i pozostaw otwartą stronę z wynikami wyszukiwania.",
+            "url": "https://example.com/sklep",
+            "values": [
+              {
+                "name": "zapytanie_wyszukiwania",
+                "text": "zielony plecak"
+              }
+            ]
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "new-tab",
+      "expected": "fast",
+      "mode": "planned",
+      "passed": false,
+      "elapsedMs": 888.2517620000008,
+      "costUsd": 0.00136875,
+      "toolCalls": [
+        {
+          "callId": "call_419981",
+          "name": "browser_observe",
+          "args": {
+            "pageText": true
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "hotel",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 787.2584750000005,
+      "costUsd": 0.0013845,
+      "toolCalls": [
+        {
+          "callId": "call_299599",
+          "name": "browser_read",
+          "args": {
+            "scope": "page"
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "research",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 1291.096067999999,
+      "costUsd": 0.00138375,
+      "toolCalls": [
+        {
+          "callId": "call_320919",
+          "name": "browser_observe",
+          "args": {
+            "pageText": true
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "polish-analysis",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 1057.045639,
+      "costUsd": 0.0013845,
+      "toolCalls": [
+        {
+          "callId": "call_387720",
+          "name": "browser_observe",
+          "args": {
+            "pageText": true
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "missing-values",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 1069.4064290000006,
+      "costUsd": 0.00173175,
+      "toolCalls": [
+        {
+          "callId": "call_235543",
+          "name": "browser_observe",
+          "args": {}
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "article",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 2495.7053020000003,
+      "costUsd": 0.001347,
+      "toolCalls": [
+        {
+          "callId": "call_423282",
+          "name": "browser_read",
+          "args": {}
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "mixed",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 1014.3184189999993,
+      "costUsd": 0.001377,
+      "toolCalls": [
+        {
+          "callId": "call_235786",
+          "name": "browser_observe",
+          "args": {
+            "pageText": true
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "wizard",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 813.5831900000012,
+      "costUsd": 0.00139575,
+      "toolCalls": [
+        {
+          "callId": "call_320960",
+          "name": "browser_observe",
+          "args": {
+            "pageText": true
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "form",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 907.0440950000011,
+      "costUsd": 0.00167175,
+      "toolCalls": [
+        {
+          "callId": "call_184724",
+          "name": "browser_batch",
+          "args": {
+            "actions": [
+              "{\"kind\":\"type\",\"ref\":\"e1\",\"revision\":3,\"text\":\"Ada\"}",
+              "{\"kind\":\"select\",\"ref\":\"e2\",\"revision\":3,\"values\":[\"Research\"]}",
+              "{\"kind\":\"click\",\"ref\":\"e3\",\"revision\":3}"
+            ],
+            "reason": "Fill Name with Ada, select Department Research, and click Preview."
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "form-polish",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 1129.0051380000004,
+      "costUsd": 0.0018705,
+      "toolCalls": [
+        {
+          "callId": "call_202119",
+          "name": "browser_batch",
+          "args": {
+            "reason": "Wypełnienie formularza (Name=Jan, City=Gdańsk, Transport=Train) i kliknięcie przycisku Review na podstawie przekazanej obserwacji (revision 3).",
+            "actions": [
+              "{\"kind\":\"type\",\"ref\":\"e1\",\"revision\":3,\"text\":\"Jan\"}",
+              "{\"kind\":\"type\",\"ref\":\"e2\",\"revision\":3,\"text\":\"Gdańsk\"}",
+              "{\"kind\":\"select\",\"ref\":\"e3\",\"revision\":3,\"values\":[\"Train\"]}",
+              "{\"kind\":\"click\",\"ref\":\"e4\",\"revision\":3}"
+            ]
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "id": "cycle-recovery",
+      "expected": "planned",
+      "mode": "planned",
+      "passed": true,
+      "elapsedMs": 785.6485629999988,
+      "costUsd": 0.00138225,
+      "toolCalls": [
+        {
+          "callId": "call_559895",
+          "name": "browser_observe",
+          "args": {
+            "pageText": true
+          }
+        }
+      ],
+      "text": ""
+    }
+  ]
+}

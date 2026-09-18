@@ -1,0 +1,35 @@
+
+> linux-agent-workbench@ build /home/bartek/linux-agent-auto
+> pnpm -r --if-present build
+
+Scope: 5 of 6 workspace projects
+packages/protocol build$ tsc -p tsconfig.json
+packages/protocol build: Done
+services/agentd build$ tsc -p tsconfig.json && mkdir -p dist/storage/migrations && cp src/storage/migrations/*.sql dist/storage/migrations/
+services/browser-worker build$ tsc -p tsconfig.json
+services/terminal-worker build$ tsc -p tsconfig.json
+services/terminal-worker build: Done
+services/browser-worker build: Done
+services/agentd build: Done
+apps/desktop build$ electron-vite build
+apps/desktop build: vite v8.2.2 building ssr environment for production...
+apps/desktop build: transforming...
+apps/desktop build: ✓ 162 modules transformed.
+apps/desktop build: rendering chunks...
+apps/desktop build: out/main/index.js  258.60 kB
+apps/desktop build: ✓ built in 169ms
+apps/desktop build: vite v8.2.2 building ssr environment for production...
+apps/desktop build: transforming...
+apps/desktop build: ✓ 3 modules transformed.
+apps/desktop build: rendering chunks...
+apps/desktop build: out/preload/index.js  5.08 kB
+apps/desktop build: ✓ built in 14ms
+apps/desktop build: vite v8.2.2 building client environment for production...
+apps/desktop build: transforming...
+apps/desktop build: ✓ 138 modules transformed.
+apps/desktop build: rendering chunks...
+apps/desktop build: out/renderer/index.html                     0.44 kB
+apps/desktop build: out/renderer/assets/index-CGp7Jx0f.css     28.98 kB
+apps/desktop build: out/renderer/assets/index-CgmCsf7l.js   1,196.33 kB
+apps/desktop build: ✓ built in 238ms
+apps/desktop build: Done

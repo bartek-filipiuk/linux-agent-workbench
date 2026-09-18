@@ -10,5 +10,6 @@
   "dependencies": {
     "@law/protocol": "workspace:*",
     "playwright": "1.62.1"
-  }
+  },
+  "license": "MIT"
 }

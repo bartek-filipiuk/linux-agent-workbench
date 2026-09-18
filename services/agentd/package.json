@@ -4,8 +4,14 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
-    "./codex-process": { "types": "./dist/provider/codex-process.d.ts", "import": "./dist/provider/codex-process.js" }
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./codex-process": {
+      "types": "./dist/provider/codex-process.d.ts",
+      "import": "./dist/provider/codex-process.js"
+    }
   },
   "scripts": {
     "build": "tsc -p tsconfig.json && mkdir -p dist/storage/migrations && cp src/storage/migrations/*.sql dist/storage/migrations/",
@@ -14,5 +20,6 @@
   "dependencies": {
     "@law/protocol": "workspace:*",
     "zod": "^4.5.4"
-  }
+  },
+  "license": "MIT"
 }

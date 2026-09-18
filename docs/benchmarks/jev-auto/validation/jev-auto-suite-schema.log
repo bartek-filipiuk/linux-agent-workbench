@@ -1,0 +1,60 @@
+
+> linux-agent-workbench@ test /home/bartek/linux-agent-auto
+> vitest run
+
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - ESM syntax in a file loaded as CommonJS (vitest.config.ts:1:1). Use a `.mjs` extension or set `"type": "module"` in the closest package.json
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+ RUN  v4.1.11 /home/bartek/linux-agent-auto
+
+browser-worker listening on /tmp/law-br-jPOSpV/rt/browser.sock
+browser-worker listening on /tmp/law-br-eQwzdI/rt/browser.sock
+node:internal/modules/cjs/loader:1568
+  throw err;
+  ^
+
+Error: Cannot find module '/tmp/law-br-tnoe9g/missing.js'
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+    at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+    at Module._load (node:internal/modules/cjs/loader:1341:5)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+
+Node.js v24.20.0
+browser-worker listening on /tmp/law-br-reset-NBYoYe/rt/browser.sock
+browser-worker listening on /tmp/law-br-reset-NBYoYe/rt/browser.sock
+ ❯ services/terminal-worker/test/terminal-session.test.ts (9 tests | 1 failed) 8058ms
+     × wait returns once the shell is quiet, with an idle_shell hint 477ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  services/terminal-worker/test/terminal-session.test.ts > TerminalSession > wait returns once the shell is quiet, with an idle_shell hint
+AssertionError: expected 'unknown' to be 'idle_shell' // Object.is equality
+
+Expected: "idle_shell"
+Received: "unknown"
+
+ ❯ services/terminal-worker/test/terminal-session.test.ts:112:27
+    110|     const r = await s.wait({ idleMs: 300, timeoutMs: 5000 });
+    111|     expect(r).toMatchObject({ timedOut: false, matched: false });
+    112|     expect(r.hint?.state).toBe("idle_shell");
+       |                           ^
+    113|   });
+    114|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 68 passed | 4 skipped (73)
+      Tests  1 failed | 451 passed | 12 skipped (464)
+   Start at  08:52:00
+   Duration  8.85s (transform 5.53s, setup 0ms, import 22.72s, tests 48.31s, environment 20ms)
+
+ ELIFECYCLE  Test failed. See above for more details.
