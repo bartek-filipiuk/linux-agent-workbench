@@ -75,4 +75,13 @@ describe("BrowserSession", { timeout: 30_000 }, () => {
     await expect(s.navigate("file:///etc/passwd")).rejects.toThrow(/http/);
     await expect(s.navigate("javascript:alert(1)")).rejects.toThrow(/http/);
   });
+
+  it("clears the site's cookies and reloads the page", async () => {
+    await s.navigate(`${site.url}/cookie.html?set=1`);
+    await s.navigate(`${site.url}/cookie.html`);
+    expect((await s.info()).title).toBe("cookie:datadome=blocked");
+    await s.control({ kind: "clearSiteData" });
+    await until(async () => (await s.info()).title === "cookie:");
+    expect((await s.info()).url).toBe(`${site.url}/cookie.html`);
+  });
 });

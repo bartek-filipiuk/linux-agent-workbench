@@ -211,12 +211,27 @@ export class BrowserSession {
     if (command.kind === "switch" || command.kind === "close") {
       await this.act({ kind: command.kind === "switch" ? "switchPage" : "closePage", pageId: command.pageId });
     } else if (command.kind === "refresh") { this.requirePage(); this.changedPage(); await this.castTransition; }
+    else if (command.kind === "clearSiteData") await this.clearSiteData();
     else if (command.kind === "dialog") {
       const d = this.pendingDialog; this.pendingDialog = undefined;
       if (d) { if (command.accept) await d.accept(); else await d.dismiss(); }
       this.publishState();
     } else throw new ProtocolError("INVALID_INPUT", "Manual login is not available in this worker yet");
     return this.info();
+  }
+
+  /** Cookies of the active page's host and its parent domains, then a fresh GET of the same address. */
+  private async clearSiteData(): Promise<void> {
+    if (this.manualMode) throw new ProtocolError("INVALID_INPUT", "Finish manual login before clearing site data");
+    const page = this.requirePage();
+    let host: string;
+    try { host = new URL(page.url()).hostname.replace(/^www\./, ""); } catch { host = ""; }
+    if (!host) throw new ProtocolError("INVALID_INPUT", "Open a site first");
+    // ".allegro.pl" and "allegro.pl" both hold the cookie; ".pl" must not match.
+    const suffixes = host.split(".").map((_, i, parts) => parts.slice(i).join(".")).filter(d => d.includes(".") || d === host);
+    await this.context!.clearCookies({ domain: new RegExp(`^\\.?(${suffixes.map(d => d.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})$`) });
+    const url = normaliseNavigableUrl(page.url());
+    if (url) await this.navigate(url);
   }
 
   /** A page that evaluates a constant within the input deadline is alive, whatever the screencast says. */

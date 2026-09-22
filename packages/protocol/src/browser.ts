@@ -12,6 +12,8 @@ export const BrowserControl = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("recover") }),
   z.object({ kind: z.literal("manual"), enabled: z.boolean() }),
   z.object({ kind: z.literal("dialog"), accept: z.boolean() }),
+  /** Drops the cookies of the active page's site (a bot-protection block cookie can otherwise persist for a year) and reloads. */
+  z.object({ kind: z.literal("clearSiteData") }),
 ]);
 export type BrowserControl = z.infer<typeof BrowserControl>;
 export const BrowserInfo = z.object({
