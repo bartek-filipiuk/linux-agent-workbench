@@ -1,0 +1,1 @@
+On allegro.pl find the 10 cheapest offers for a new RTX 5090 graphics card. Write them to /workspace/allegro.md as a Markdown list: title, price in zł, offer URL (a heredoc in the terminal is fine). Reply with the lowest price you found.

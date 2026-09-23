@@ -15,7 +15,7 @@ export { SYSTEM_PROMPT } from "./orchestrator/system-prompt.js";
 export { PLAYBOOK_SLUG, Playbooks } from "./orchestrator/playbooks.js";
 export { allowAllPolicy } from "./policy/types.js";
 export type { Policy, PolicyDecision, PolicyContext } from "./policy/types.js";
-export { PodmanRuntime, buildRunArgs, sessionIdFor, validateWorkspacePath, containerName } from "./runtime/podman.js";
+export { PodmanRuntime, buildRunArgs, sessionIdFor, validateWorkspacePath, containerName, hostLocale } from "./runtime/podman.js";
 export type { RunSpec, Exec } from "./runtime/podman.js";
 export { TerminalSessionManager } from "./session/terminal-session-manager.js";
 export type { SessionState, SessionStatus, ManagerDeps } from "./session/terminal-session-manager.js";

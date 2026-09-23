@@ -15,17 +15,20 @@ import { fileURLToPath } from "node:url";
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const agentd = await import(path.join(repo, "services/agentd/dist/index.js"));
-const { Daemon, Store, PodmanRuntime, TerminalSessionManager, OpenAIResponsesAdapter, BrowserSessionManager, podmanLauncher, dataDir, dbPath, containerName } = agentd;
+const { Daemon, Store, PodmanRuntime, TerminalSessionManager, OpenAIResponsesAdapter, CodexAppServerAdapter, BrowserSessionManager, podmanLauncher, dataDir, dbPath, containerName, hostLocale } = agentd;
 
 const argv = process.argv.slice(2);
 const flag = (name, dflt) => {
   const i = argv.indexOf(name);
   return i >= 0 ? argv[i + 1] : dflt;
 };
-const model = flag("--model", "gpt-6-astra");
+const provider = flag("--provider", "openai"); // "codex" uses a Codex subscription login (--codex-home, default the app's own) instead of an API key
+const codexHome = flag("--codex-home", "");
+const model = flag("--model", provider === "codex" ? "codex-default" : "gpt-6-astra");
 const runs = Number(flag("--runs", 3));
 const goal = fs.readFileSync(flag("--goal", path.join(repo, "scripts/bench-goals/search-summary.txt")), "utf8").trim();
 const workspace = flag("--workspace", path.join(os.homedir(), "law-demo-ws"));
+const playbook = flag("--playbook", ""); // a playbook slug from <dataDir>/playbooks; the bare run gets none and is distilled afterwards
 const reset = flag("--reset", "/workspace/search.txt /workspace/summary.md /workspace/facts.txt /workspace/bio.md").split(/\s+/).filter(Boolean);
 
 function envFile() {
@@ -36,8 +39,8 @@ function envFile() {
   }
   return {};
 }
-const apiKey = process.env.OPENAI_API_KEY ?? envFile().OPENAI_API_KEY;
-if (!apiKey) {
+const apiKey = provider === "codex" ? "" : process.env.OPENAI_API_KEY ?? envFile().OPENAI_API_KEY;
+if (!apiKey && provider !== "codex") {
   console.error("bench: OPENAI_API_KEY not found (env or .env / .env.bak)");
   process.exit(2);
 }
@@ -65,11 +68,12 @@ const waitFor = (pred, ms = 600_000) =>
 const daemon = new Daemon({
   openStore: (p) => new Store(p),
   makeManager: (imageId, root) => new TerminalSessionManager({ runtime: new PodmanRuntime(), runtimeRoot: root, imageId }),
-  makeAdapter: (m, key) => new OpenAIResponsesAdapter({ model: m, apiKey: key }),
+  makeAdapter: (m, key, config) => provider === "codex" ? new CodexAppServerAdapter({ model: m, ...config.codex, ...(config.effort ? { effort: config.effort } : {}) }) : new OpenAIResponsesAdapter({ model: m, apiKey: key }),
   makeBrowser: ({ runtimeRoot: root, sessionId, networkMode, browserImageId }) =>
     new BrowserSessionManager({
       socketDir: path.join(root, sessionId, "browser"),
-      launcher: podmanLauncher({ runtime: new PodmanRuntime(), sessionId, imageId: browserImageId, networkMode, downloadsDir: path.join(dataDir(), "downloads", sessionId) }),
+      // Same locale and time zone as the desktop app passes: an en-US/UTC browser on a Polish IP is hard-blocked by DataDome (allegro.pl).
+      launcher: podmanLauncher({ runtime: new PodmanRuntime(), sessionId, imageId: browserImageId, networkMode, downloadsDir: path.join(dataDir(), "downloads", sessionId), locale: hostLocale(process.env) ?? Intl.DateTimeFormat().resolvedOptions().locale, timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }),
     }),
   post,
 });
@@ -77,7 +81,7 @@ const send = (m) => daemon.handle(m).catch((e) => console.error("handle failed:"
 
 // Register each waiter before sending: the daemon answers synchronously inside handle() for some messages.
 const readyP = waitFor((m) => m.type === "agentd.ready" || m.type === "agentd.error");
-send({ type: "config.init", apiKey, model, dbPath: dbPath(), imageId: readId("terminal"), runtimeRoot, browserImageId: readId("browser") });
+send({ type: "config.init", provider, ...(provider === "codex" && codexHome ? { codex: { home: codexHome } } : {}), apiKey, model, dbPath: dbPath(), imageId: readId("terminal"), runtimeRoot, browserImageId: readId("browser"), playbooksDir: path.join(dataDir(), "playbooks"), playbooksSeed: path.join(repo, "playbooks") });
 await readyP;
 send({ type: "policy.set", nestedAutonomy: true, domainMode: "open" });
 const sessionP = waitFor((m) => m.type === "session.state" && (m.state === "ready" || m.state === "error"));
@@ -85,7 +89,7 @@ send({ type: "session.start", workspacePath: workspace, networkMode: "open" });
 const ready = await sessionP;
 if (ready.state !== "ready") { console.error("session failed:", ready.message); process.exit(1); }
 const container = containerName(ready.sessionId);
-console.log(`bench: model ${model}, ${runs} runs, sandbox ${container}`);
+console.log(`bench: model ${model}, ${runs} runs, sandbox ${container}${playbook ? `, playbook ${playbook}` : ""}`);
 
 const expectFile = flag("--expect", "/workspace/summary.md"); // the artefact a valid run must leave behind
 const minMarks = Number(flag("--min-marks", 4)); // sentence terminators the artefact must contain (0 = just non-empty)
@@ -106,7 +110,8 @@ for (let i = 1; i <= runs; i++) {
   watchers.push(autopilot);
   const t0 = Date.now();
   const endP = waitFor((m) => m.type === "run.state" && ["completed", "failed", "stopped", "budget_exceeded", "interrupted"].includes(m.state), 900_000);
-  send({ type: "run.start", goal });
+  const draftP = playbook ? null : waitFor((m) => m.type === "playbook.draft", 300_000).catch(() => null);
+  send({ type: "run.start", goal, ...(playbook ? { playbook } : {}) });
   const end = await endP;
   watchers.splice(watchers.indexOf(autopilot), 1);
   const wall = Date.now() - t0;
@@ -115,6 +120,7 @@ for (let i = 1; i <= runs; i++) {
   const valid = check !== "missing" && Number(check) >= minMarks;
   const claimed = /(\d+)\s*(?:words?|word count)|word count[^0-9]*(\d+)/i.exec(end.finalText ?? "");
   const actual = check === "missing" ? "-" : inSandbox(`wc -w < ${expectFile}`);
+  if (draftP && end.state === "completed") { const d = await draftP; console.log(d ? `run ${i}: playbook draft "${d.slug}" (${d.name})` : `run ${i}: no playbook draft within 5 min`); }
   summary.push({ i, state: end.state, wall, turns: end.turns, toolCalls: end.toolCalls, handoffs, approvals, valid });
   console.log(`run ${i}/${runs}: ${end.state} in ${(wall / 1000).toFixed(1)}s, ${end.turns} turns, ${end.toolCalls} tool calls, handoffs ${handoffs}, approvals ${approvals}, ${valid ? "VALID" : "INVALID"} (artefact ${check === "missing" ? "missing" : `${check} sentences, ${actual} words`}${claimed ? `, claimed ${claimed[1] ?? claimed[2]}` : ""})`);
   await new Promise((r) => setTimeout(r, 3000));
