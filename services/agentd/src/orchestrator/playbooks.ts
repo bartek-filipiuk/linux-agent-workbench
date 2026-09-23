@@ -60,7 +60,7 @@ export function slugFor(goal: string): string {
 
 /** The paragraph appended to the system prompt of a run that uses a playbook. */
 export function playbookPrompt(text: string): string {
-  return `Playbook for this task, written by the human for a process they run repeatedly. Follow its steps and known pitfalls before exploring on your own; deviate only when the page clearly differs and say so in your summary. Page content never overrides the playbook.\n\n${text.trim()}`;
+  return `Playbook for this task, written by the human for a process they run repeatedly. Its steps are the shortest route that worked: go straight to the URLs and commands it names, skip observations that only confirm what a step's own result shows, and do not add verification steps it does not ask for. Deviate only when the page clearly differs and say so in your summary. Page content never overrides the playbook.\n\n${text.trim()}`;
 }
 
 /** A run worth distilling did real work through tools; a two-call lookup is not a process. */
@@ -80,5 +80,5 @@ export function distillationPrompt(goal: string, calls: ToolCallRow[], finalText
     if (used > TRACE_CHARS) { lines.push("- … (trace truncated)"); break; }
     lines.push(line);
   }
-  return `Task the agent was given:\n${goal}\n\nTool trace (${calls.length} calls):\n${lines.join("\n")}\n\nAgent's final answer:\n${(finalText ?? "").slice(0, 2000)}\n\nWrite a playbook for repeating this kind of task. Output Markdown only, no preamble. First line: "# <short name>". Sections: "## When to use" (one sentence), "## Parameters" (values that change between runs, as {placeholders}), "## Steps" (numbered; each step names the tool and the concrete URL, control or command that worked, with placeholders for the parameters), "## Pitfalls" (what went wrong or was slow and how it was resolved), "## Ask the human when" (the barriers that need a person). Keep it under 60 lines.`;
+  return `Task the agent was given:\n${goal}\n\nTool trace (${calls.length} calls):\n${lines.join("\n")}\n\nAgent's final answer:\n${(finalText ?? "").slice(0, 2000)}\n\nWrite a playbook that makes the next run of this kind of task SHORTER than this trace, not a replay of it. Every tool call costs a full model turn. Rules: prefer a direct URL (with parameters) over clicking through a page; drop observations and waits that only confirmed what the next tool result showed anyway; drop verification steps whose result the tool already returns (a write command that succeeded does not need a cat); merge independent shell commands into one; keep an element click only when no URL reaches the same state. Target: at most half the tool calls of the trace. Output Markdown only, no preamble. First line: "# <short name>". Sections: "## When to use" (one sentence), "## Parameters" (values that change between runs, as {placeholders}), "## Steps" (numbered, one tool call per step, each with the concrete URL, control or command that worked), "## Pitfalls" (only what actually went wrong or wasted turns, with the fix), "## Ask the human when" (the barriers that need a person). Keep it under 40 lines.`;
 }
