@@ -12,6 +12,7 @@ export type { RunControllerDeps, RunInput, RunOutcome } from "./orchestrator/run
 export { BudgetTracker, BudgetExceededError, costOf } from "./orchestrator/budgets.js";
 export type { PriceTable, BudgetLimit } from "./orchestrator/budgets.js";
 export { SYSTEM_PROMPT } from "./orchestrator/system-prompt.js";
+export { PLAYBOOK_SLUG, Playbooks } from "./orchestrator/playbooks.js";
 export { allowAllPolicy } from "./policy/types.js";
 export type { Policy, PolicyDecision, PolicyContext } from "./policy/types.js";
 export { PodmanRuntime, buildRunArgs, sessionIdFor, validateWorkspacePath, containerName } from "./runtime/podman.js";

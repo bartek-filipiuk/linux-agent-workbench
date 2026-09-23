@@ -38,6 +38,16 @@ export const TaskComposer = memo(function TaskComposer({ workspace, ready, expan
   const savedGoal = useDraftStorage(key, goal);
   const savedPreferences = useDraftStorage(TASK_PREFERENCES_KEY, JSON.stringify(preferences));
   const picker = useModelPicker();
+  type PlaybookEntry = { slug: string; name: string; draft: boolean };
+  const [playbooks, setPlaybooks] = useState<PlaybookEntry[]>([]);
+  const [playbookError, setPlaybookError] = useState("");
+  const playbookAction = useCallback(async (action: () => Promise<PlaybookEntry[]>) => {
+    try { setPlaybooks(await action()); setPlaybookError(""); } catch (e) { setPlaybookError(String(e)); }
+  }, []);
+  useEffect(() => {
+    void playbookAction(() => window.workbench.listPlaybooks());
+    return window.workbench.onPlaybookDraft(() => void playbookAction(() => window.workbench.listPlaybooks()));
+  }, [playbookAction]);
   const validation = taskLimits(preferences);
   const engineReady = preferences.browserEngine === "classic" || picker.catalog?.jevAvailable === true;
   const change = (patch: Partial<TaskPreferences>) => setPreferences(p => ({ ...p, ...patch }));
@@ -62,7 +72,7 @@ export const TaskComposer = memo(function TaskComposer({ workspace, ready, expan
     if (!validation.limits || !goal.trim() || !ready || !picker.canStart || !engineReady || starting) return;
     savedGoal.flush(); savedPreferences.flush(); setStarting(true);
     try {
-      await window.workbench.startRun(goal, { browserEngine: preferences.browserEngine, profile: preferences.profile, limits: validation.limits, modelSelection: picker.runSelection });
+      await window.workbench.startRun(goal, { browserEngine: preferences.browserEngine, profile: preferences.profile, limits: validation.limits, modelSelection: picker.runSelection, ...(preferences.playbook ? { playbook: preferences.playbook } : {}) });
       onStarted();
     } catch (e) { setActionError(String(e)); }
     finally { setStarting(false); }
@@ -82,6 +92,19 @@ export const TaskComposer = memo(function TaskComposer({ workspace, ready, expan
     </select>
     <p className="composer-help" id="style-description">{STYLES[preferences.profile].description}</p>
     <details className="style-legend"><summary>Compare working styles</summary><dl>{Object.entries(STYLES).map(([id, style]) => <div key={id}><dt>{style.name}</dt><dd>{style.description}</dd></div>)}</dl><p className="composer-help">Styles guide the approach. Model and reasoning effort are selected separately.</p></details>
+    <label className="composer-label" htmlFor="task-playbook">Playbook</label>
+    <select id="task-playbook" value={playbooks.some(p => !p.draft && p.slug === preferences.playbook) ? preferences.playbook : ""} disabled={starting} onChange={e => change({ playbook: e.target.value })} aria-describedby="playbook-help">
+      <option value="">None</option>{playbooks.filter(p => !p.draft).map(p => <option key={p.slug} value={p.slug}>{p.name}</option>)}
+    </select>
+    <p className="composer-help" id="playbook-help">A playbook is your saved recipe for a repeated process; the agent follows its steps and pitfalls instead of rediscovering them. {preferences.playbook && <button className="btn link" type="button" onClick={() => void window.workbench.openPlaybook(preferences.playbook, false)}>Edit file</button>}</p>
+    {playbooks.some(p => p.draft) && <div className="playbook-drafts" role="region" aria-label="Playbook drafts">
+      <p className="composer-help">Drafts written from finished tasks. Review the file before accepting: it was distilled from page text, which is untrusted.</p>
+      <ul>{playbooks.filter(p => p.draft).map(p => <li key={p.slug}><span>{p.name}</span>
+        <button className="btn" type="button" onClick={() => void window.workbench.openPlaybook(p.slug, true)}>Open</button>
+        <button className="btn primary" type="button" onClick={() => void playbookAction(() => window.workbench.acceptPlaybook(p.slug))}>Accept</button>
+        <button className="btn danger" type="button" onClick={() => void playbookAction(() => window.workbench.discardPlaybook(p.slug))}>Discard</button></li>)}</ul>
+    </div>}
+    {playbookError && <p className="error" role="alert">{playbookError}</p>}
     <label className="composer-label" htmlFor="browser-engine">Browser engine</label>
     <select id="browser-engine" value={preferences.browserEngine} disabled={starting} onChange={e => change({ browserEngine: e.target.value as TaskPreferences["browserEngine"] })} aria-describedby="browser-engine-help">
       <option value="classic">Classic</option><option value="jev-hybrid">Jev Hybrid · experimental</option><option value="jev-first">Jev First · experimental</option><option value="jev-auto">Jev Auto · experimental</option>

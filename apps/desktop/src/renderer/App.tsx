@@ -53,7 +53,12 @@ declare global {
       getTerminalStalled(): Promise<boolean>;
       onTerminalStalled(cb: (stalled: boolean) => void): () => void;
       onTerminalReset(cb: () => void): () => void;
-      startRun(goal: string, opts?: { browserEngine?: "classic" | "jev-hybrid" | "jev-first" | "jev-auto"; profile?: "quick" | "research" | "project"; maxTurns?: number; modelSelection?: ModelSelection; limits?: RunLimits }): Promise<void>;
+      startRun(goal: string, opts?: { browserEngine?: "classic" | "jev-hybrid" | "jev-first" | "jev-auto"; profile?: "quick" | "research" | "project"; maxTurns?: number; modelSelection?: ModelSelection; limits?: RunLimits; playbook?: string }): Promise<void>;
+      listPlaybooks(): Promise<Array<{ slug: string; name: string; draft: boolean }>>;
+      acceptPlaybook(slug: string): Promise<Array<{ slug: string; name: string; draft: boolean }>>;
+      discardPlaybook(slug: string): Promise<Array<{ slug: string; name: string; draft: boolean }>>;
+      openPlaybook(slug: string, draft: boolean): Promise<string>;
+      onPlaybookDraft(cb: (draft: { slug: string; name: string }) => void): () => void;
       stopRun(): Promise<void>;
       continueBudget(runId: string, action: BudgetAction): Promise<void>;
       resumeRun(): Promise<void>;

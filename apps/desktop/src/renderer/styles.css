@@ -243,6 +243,11 @@ button, select, summary { -webkit-tap-highlight-color: transparent; }
 .task-composer select:disabled, .limit-number input:disabled { opacity: 0.6; }
 .composer-help { font-size: 12px; line-height: 1.5; color: var(--muted); margin: 6px 0; }
 .style-legend { margin: 8px 0 18px; font-size: 12px; }
+.playbook-drafts { margin: 6px 0 14px; padding: 10px 12px; border: 1px solid var(--accent, #d99a2b); border-radius: 6px; font-size: 12px; }
+.playbook-drafts ul { list-style: none; margin: 0; padding: 0; }
+.playbook-drafts li { display: flex; gap: 8px; align-items: center; margin: 6px 0; }
+.playbook-drafts li span { flex: 1; }
+.btn.link { background: none; border: none; padding: 0; color: var(--accent, #d99a2b); text-decoration: underline; cursor: pointer; font-size: inherit; }
 .style-legend summary, .composer-model summary, .active-task summary { cursor: pointer; }
 .style-legend dl { margin: 12px 0; }
 .style-legend dt { font-weight: 650; }

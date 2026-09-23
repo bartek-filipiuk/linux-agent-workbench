@@ -5,7 +5,7 @@ import { isRendererUrl, isTrustedRenderer } from "./renderer-security";
 import os from "node:os";
 import path from "node:path";
 import { RunLimits, BudgetAction, ModelSelection, validateModelSelection, type ModelCatalog, type BrowserControl, type BrowserInfo } from "@law/protocol";
-import { appDirectoryName, instanceName } from "@law/agentd";
+import { appDirectoryName, instanceName, PLAYBOOK_SLUG } from "@law/agentd";
 import { jevConfig } from "./jev-config";
 import type { AgentdToMain, MainToAgentd, SessionStatus } from "@law/agentd";
 import { TerminalDelivery } from "./terminal-delivery";
@@ -54,13 +54,13 @@ let handoffReason: string | null = null;
 let runSequence = 0;
 let querySequence = 0;
 const queries = new Map<string, { resolve: (value: unknown) => void; reject: (e: Error) => void; timer: NodeJS.Timeout }>();
-function queryDaemon(kind: "history" | "detail" | "browser" | "browser_restart" | "conversation" | "followup" | "pause", runId?: string, command?: BrowserControl, message?: string): Promise<unknown> {
+function queryDaemon(kind: "history" | "detail" | "browser" | "browser_restart" | "conversation" | "followup" | "pause" | "playbooks" | "playbook_accept" | "playbook_discard", runId?: string, command?: BrowserControl, message?: string, slug?: string): Promise<unknown> {
   if (!port) return Promise.reject(new Error("Agent service is unavailable. Recheck setup first."));
   const requestId = String(++querySequence);
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => { queries.delete(requestId); reject(new Error(`${kind.replaceAll("_", " ")} request timed out. Check the current state before retrying.`)); }, ["browser", "browser_restart", "followup", "pause"].includes(kind) ? 90000 : 10000);
     queries.set(requestId, { resolve, reject, timer });
-    toAgentd({ type: "ui.query", requestId, kind, ...(runId ? { runId } : {}), ...(command ? { command } : {}), ...(message ? { message } : {}) });
+    toAgentd({ type: "ui.query", requestId, kind, ...(runId ? { runId } : {}), ...(command ? { command } : {}), ...(message ? { message } : {}), ...(slug ? { slug } : {}) });
   });
 }
 function publishRun(event: RunEvent) {
@@ -160,6 +160,7 @@ function xdg(name: "XDG_DATA_HOME" | "XDG_RUNTIME_DIR", fallback: string): strin
 }
 const dbPath = () => path.join(xdg("XDG_DATA_HOME", path.join(os.homedir(), ".local", "share")), appDirectoryName(), "state.sqlite");
 const runtimeRoot = () => path.join(xdg("XDG_RUNTIME_DIR", path.join(os.tmpdir(), `law-${os.userInfo().uid}`)), appDirectoryName());
+const playbooksDir = () => path.join(path.dirname(dbPath()), "playbooks");
 
 function readImageId(name: "terminal" | "browser" = "terminal"): string | undefined {
   try {
@@ -190,6 +191,9 @@ function onAgentd(msg: AgentdToMain) {
       if (q) { clearTimeout(q.timer); queries.delete(msg.requestId); if (msg.error) q.reject(new Error(msg.error)); else q.resolve(msg.result); }
       return;
     }
+    case "playbook.draft":
+      send("playbooks:draft", { slug: msg.slug, name: msg.name });
+      return;
     case "agentd.ready":
     case "agentd.error":
       status = msg.type === "agentd.ready" ? { ...msg, ...keyInfo } : msg;
@@ -329,7 +333,7 @@ function startAgentd() {
   const profileModels = provider.provider === "openai" && env.LAW_RESEARCH_MODEL
     ? { research: { model: env.LAW_RESEARCH_MODEL, ...(Number.isFinite(rin) && Number.isFinite(rout) && env.LAW_RESEARCH_PRICE_INPUT_PER_MTOK ? { prices: { inputUsdPerMTok: rin, outputUsdPerMTok: rout } } : {}) } }
     : undefined;
-  toAgentd({ type: "config.init", ...(jev ? { jev } : {}), apiKey, ...provider, dbPath: dbPath(), imageId, runtimeRoot: runtimeRoot(), ...(provider.provider === "openai" && prices ? { prices } : {}), ...(browserImageId ? { browserImageId } : {}), ...(notify ? { notify } : {}), ...(profileModels ? { profileModels } : {}) });
+  toAgentd({ type: "config.init", ...(jev ? { jev } : {}), apiKey, ...provider, dbPath: dbPath(), imageId, runtimeRoot: runtimeRoot(), ...(provider.provider === "openai" && prices ? { prices } : {}), ...(browserImageId ? { browserImageId } : {}), ...(notify ? { notify } : {}), ...(profileModels ? { profileModels } : {}), playbooksDir: playbooksDir(), playbooksSeed: path.join(repoRoot(), "playbooks") });
   child.on("exit", (code) => onAgentdExit(code));
 }
 
@@ -420,7 +424,8 @@ handleTrusted("models:list", (_e, refresh: unknown) => getModels(refresh === tru
 handleTrusted("run:start", async (_e, goal: unknown, opts: unknown) => {
   if (activeRun) throw new Error("A run is already active");
   if (typeof goal !== "string" || !goal.trim()) return;
-  const o = (opts ?? {}) as { profile?: unknown; maxTurns?: unknown; modelSelection?: unknown; limits?: unknown; browserEngine?: unknown };
+  const o = (opts ?? {}) as { profile?: unknown; maxTurns?: unknown; modelSelection?: unknown; limits?: unknown; browserEngine?: unknown; playbook?: unknown };
+  const playbook = typeof o.playbook === "string" && PLAYBOOK_SLUG.test(o.playbook) ? o.playbook : undefined;
   const browserEngine = o.browserEngine ?? "classic";
   if (browserEngine !== "classic" && browserEngine !== "jev-hybrid" && browserEngine !== "jev-first" && browserEngine !== "jev-auto") throw new Error("Choose Classic, Jev Hybrid, Jev First or Jev Auto");
   if (browserEngine !== "classic" && !loadJevKey(loadEnv().env, loadEnv().file)) throw new Error("Configure TYPESAFE_API_KEY on the host or choose Classic");
@@ -435,8 +440,14 @@ handleTrusted("run:start", async (_e, goal: unknown, opts: unknown) => {
   const profile = o.profile === "research" || o.profile === "project" || o.profile === "quick" ? o.profile : undefined;
   const maxTurns = Number.isInteger(o.maxTurns) && (o.maxTurns as number) >= 5 && (o.maxTurns as number) <= 400 ? (o.maxTurns as number) : undefined;
   currentGoal = goal.trim().slice(0, 4000);
-  toAgentd({ type: "run.start", browserEngine, goal: goal.trim().slice(0, 4000), ...(profile ? { profile } : {}), ...(maxTurns ? { maxTurns } : {}), modelSelection, ...(limits ? { limits } : {}) });
+  toAgentd({ type: "run.start", browserEngine, goal: goal.trim().slice(0, 4000), ...(profile ? { profile } : {}), ...(maxTurns ? { maxTurns } : {}), modelSelection, ...(limits ? { limits } : {}), ...(playbook ? { playbook } : {}) });
 });
+const playbookSlug = (slug: unknown): string => { if (typeof slug !== "string" || !PLAYBOOK_SLUG.test(slug)) throw new Error("Invalid playbook name"); return slug; };
+handleTrusted("playbooks:list", () => queryDaemon("playbooks"));
+handleTrusted("playbooks:accept", (_e, slug: unknown) => queryDaemon("playbook_accept", undefined, undefined, undefined, playbookSlug(slug)));
+handleTrusted("playbooks:discard", (_e, slug: unknown) => queryDaemon("playbook_discard", undefined, undefined, undefined, playbookSlug(slug)));
+// Editing stays in the user's own editor: the file is host data the sandbox never sees.
+handleTrusted("playbooks:open", (_e, slug: unknown, draft: unknown) => shell.openPath(path.join(playbooksDir(), draft === true ? "drafts" : "", `${playbookSlug(slug)}.md`)));
 handleTrusted("run:get", () => ({ run: currentRun, goal: currentGoal, handoff: handoffReason, sequence: runSequence }));
 handleTrusted("run:history", () => queryDaemon("history"));
 handleTrusted("conversation:get", () => queryDaemon("conversation"));

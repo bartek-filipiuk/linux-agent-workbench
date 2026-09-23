@@ -18,7 +18,7 @@ afterEach(async () => {
   fw = undefined;
 });
 
-async function bootWith(adapter: FakeModelAdapter, prepareWorkspace?: (dir: string) => void, browser?: BrowserSessionManager, provider?: "codex") {
+async function bootWith(adapter: FakeModelAdapter, prepareWorkspace?: (dir: string) => void, browser?: BrowserSessionManager, provider?: "codex", extraConfig: Record<string, unknown> = {}) {
   const posted: Array<Record<string, unknown>> = [];
   const runtimeRoot = tmpDir("law-rt-");
   const workspace = tmpDir("law-ws-");
@@ -38,7 +38,7 @@ async function bootWith(adapter: FakeModelAdapter, prepareWorkspace?: (dir: stri
     ...(browser ? { makeBrowser: () => browser } : {}),
     post: (m) => posted.push(m as Record<string, unknown>),
   });
-  await d.handle({ type: "config.init", provider, apiKey: "sk-x", model: "fake", dbPath: ":memory:", imageId: "sha256:x", runtimeRoot });
+  await d.handle({ type: "config.init", provider, apiKey: "sk-x", model: "fake", dbPath: ":memory:", imageId: "sha256:x", runtimeRoot, ...extraConfig });
   await d.handle({ type: "session.start", workspacePath: workspace, networkMode: "open" });
   const last = (type: string) => [...posted].reverse().find((p) => p.type === type);
   return { d, posted, last, workspace, adapterCalls };
@@ -79,6 +79,32 @@ describe("Daemon run flow", () => {
     await settle(() => last("run.state")?.state === "completed");
     expect(last("run.state")).toMatchObject({ runId, budget: { limits: { maxTurns: null, maxToolCalls: null, maxDurationMs: 1800000 } } });
     expect(adapterCalls).toHaveLength(1);
+  });
+
+  it("follows a chosen playbook and distills an unguided run into a draft the human accepts", async () => {
+    const seed = tmpDir("law-seed-");
+    fs.writeFileSync(path.join(seed, "allegro-search.md"), "# Allegro search\n1. open the listing URL\n");
+    const playbooksDir = path.join(tmpDir("law-pb-"), "playbooks");
+    const observe = { toolCalls: [{ name: "terminal_observe", args: {} }] };
+    const adapter = new FakeModelAdapter([{ text: "done" }, observe, observe, observe, { text: "finished" }, { text: "# Check the screen\n## Steps\n1. terminal_observe\n" }]);
+    const { d, last, posted } = await bootWith(adapter, undefined, undefined, undefined, { playbooksDir, playbooksSeed: seed });
+    await d.handle({ type: "ui.query", requestId: "q1", kind: "playbooks" });
+    expect(last("ui.reply")).toMatchObject({ requestId: "q1", result: [{ slug: "allegro-search", name: "Allegro search", draft: false }] });
+    await d.handle({ type: "run.start", goal: "missing", playbook: "nope" });
+    expect(last("agentd.error")?.message).toContain("not found");
+    await d.handle({ type: "run.start", goal: "search", playbook: "allegro-search" });
+    await settle(() => last("run.state")?.state === "completed");
+    expect(adapter.contexts[0]!.system).toMatch(/Playbook for this task[\s\S]*open the listing URL$/);
+    await new Promise(r => setTimeout(r, 50));
+    expect(posted.some(p => p.type === "playbook.draft")).toBe(false); // a guided run is not distilled
+    await d.handle({ type: "run.start", goal: "Look at the screen three times" });
+    await settle(() => posted.some(p => p.type === "playbook.draft"));
+    expect(last("playbook.draft")).toMatchObject({ slug: "look-at-the-screen-three-times", name: "Check the screen" });
+    expect(adapter.contexts.at(-1)).toMatchObject({ tools: [] });
+    expect(adapter.inputs.at(-1)).toMatchObject({ goal: expect.stringMatching(/Tool trace \(3 calls\)[\s\S]*terminal_observe done/) });
+    expect(fs.readFileSync(path.join(playbooksDir, "drafts", "look-at-the-screen-three-times.md"), "utf8")).toContain("# Check the screen");
+    await d.handle({ type: "ui.query", requestId: "q2", kind: "playbook_accept", slug: "look-at-the-screen-three-times" });
+    expect(last("ui.reply")).toMatchObject({ requestId: "q2", result: [{ slug: "allegro-search", draft: false }, { slug: "look-at-the-screen-three-times", draft: false }] });
   });
 
   it("routes per-run model choices without changing defaults for later runs", async () => {

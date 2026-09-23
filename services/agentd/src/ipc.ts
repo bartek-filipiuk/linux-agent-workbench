@@ -17,6 +17,7 @@ import { markSessionUsed, stopOrphans, type ContainerLister } from "./maintenanc
 import { makeEgressDecider } from "./egress/host-gate.js";
 import { HostAllowlist } from "./policy/host-allowlist.js";
 import { buildSystemPrompt, type RunProfile as RunProfileName } from "./orchestrator/system-prompt.js";
+import { DISTILL_SYSTEM, PLAYBOOK_SLUG, Playbooks, distillationPrompt, playbookPrompt, shouldDistill, slugFor } from "./orchestrator/playbooks.js";
 
 // Turns per conversation chain before the context is compacted to a summary (0 = never).
 const COMPACT_EVERY: Record<RunProfileName, number> = { quick: 0, research: 12, project: 20 };
@@ -59,6 +60,9 @@ export const ConfigInit = z.object({
   profileModels: z
     .object({ quick: ProfileModel.optional(), research: ProfileModel.optional(), project: ProfileModel.optional() })
     .optional(),
+  /** Host directory of the human's playbooks; playbooksSeed holds the ones shipped with the app. */
+  playbooksDir: z.string().min(1).optional(),
+  playbooksSeed: z.string().min(1).optional(),
 }).refine((c) => c.provider === "codex" || c.apiKey.length > 0, { message: "API provider requires an API key", path: ["apiKey"] });
 export type ConfigInit = z.infer<typeof ConfigInit>;
 
@@ -78,8 +82,9 @@ export const RunStart = z.object({
   limits: RunLimits.optional(),
   browserEngine: z.enum(["classic", "jev-hybrid", "jev-first", "jev-auto"]).optional(),
   maxTurns: z.number().int().min(5).max(400).optional(),
+  playbook: z.string().regex(PLAYBOOK_SLUG).optional(),
 });
-export const UiQuery = z.object({ type: z.literal("ui.query"), requestId: z.string(), kind: z.enum(["history", "detail", "browser", "browser_restart", "conversation", "followup", "pause"]), runId: z.string().optional(), message: z.string().trim().min(1).max(4000).optional(), command: BrowserControl.optional() });
+export const UiQuery = z.object({ type: z.literal("ui.query"), requestId: z.string(), kind: z.enum(["history", "detail", "browser", "browser_restart", "conversation", "followup", "pause", "playbooks", "playbook_accept", "playbook_discard"]), runId: z.string().optional(), message: z.string().trim().min(1).max(4000).optional(), command: BrowserControl.optional(), slug: z.string().regex(PLAYBOOK_SLUG).optional() });
 export const RunBudgetContinue = z.object({ type: z.literal("run.budget"), runId: z.string().min(1), action: BudgetAction });
 export const RunStop = z.object({ type: z.literal("run.stop") });
 export const RunResume = z.object({ type: z.literal("run.resume") });
@@ -123,8 +128,10 @@ export type GateEventMsg = { type: "gate.event" } & GateEvent;
 export type RunRestored = { type: "run.restored"; runId: string; ok: boolean; message?: string };
 export type BrowserStateMsg = { type: "browser.state" } & BrowserStatus;
 export type BrowserFrameMsg = { type: "browser.frame"; id: number; generation: number; width: number; height: number; data: Uint8Array };
+export type PlaybookDraftMsg = { type: "playbook.draft"; slug: string; name: string; runId: string };
 export type AgentdToMain =
   | { type: "ui.reply"; requestId: string; result?: unknown; error?: string }
+  | PlaybookDraftMsg
   | AgentdReady | AgentdError | SessionStateMsg | TerminalData | RunStateMsg | RunCommentary | RunTool | RunHandoff | LeaseStateMsg
   | ApprovalRequestMsg | ApprovalResolved | GateEventMsg | RunRestored | BrowserStateMsg | BrowserFrameMsg;
 
@@ -197,6 +204,7 @@ export class Daemon {
   private egress: SessionEgress | undefined;
   private lastUsedTimer: NodeJS.Timeout | undefined;
   private notifier: Notifier | undefined;
+  private playbooks: Playbooks | undefined;
   private startingRun = false;
   private changingNetwork = false;
   private profileModels: { [K in RunProfileName]?: { model: string; prices?: { inputUsdPerMTok: number; outputUsdPerMTok: number } | undefined } | undefined } = {};
@@ -227,6 +235,10 @@ export class Daemon {
         const { reply, runtime } = handleConfigInit(msg, this.deps.openStore);
         if (runtime) {
           this.runtime = runtime;
+          if (msg.playbooksDir) {
+            this.playbooks = new Playbooks(msg.playbooksDir);
+            try { if (msg.playbooksSeed) this.playbooks.seed(msg.playbooksSeed); } catch (e) { console.error(`[agentd] playbook seed failed: ${e instanceof Error ? e.message : String(e)}`); }
+          }
           this.manager = this.deps.makeManager(msg.imageId, msg.runtimeRoot);
           this.manager.on("data", (data: Uint8Array) => {
             this.terminalUnacked += data.byteLength;
@@ -326,6 +338,15 @@ export class Daemon {
             const result = await this.conversationCommand(msg);
             this.deps.post({ type: "ui.reply", requestId: msg.requestId, result });
           } catch (error) { this.deps.post({ type: "ui.reply", requestId: msg.requestId, error: error instanceof Error ? error.message : String(error) }); }
+          return;
+        }
+        if (msg.kind === "playbooks" || msg.kind === "playbook_accept" || msg.kind === "playbook_discard") {
+          try {
+            if (!this.playbooks) throw new Error("Playbooks are not configured");
+            if (msg.kind === "playbook_accept") { if (!msg.slug) throw new Error("Playbook name is required"); this.playbooks.accept(msg.slug); }
+            if (msg.kind === "playbook_discard") { if (!msg.slug) throw new Error("Playbook name is required"); this.playbooks.discard(msg.slug); }
+            this.deps.post({ type: "ui.reply", requestId: msg.requestId, result: this.playbooks.list() });
+          } catch (e) { this.deps.post({ type: "ui.reply", requestId: msg.requestId, error: e instanceof Error ? e.message : String(e) }); }
           return;
         }
         if (msg.kind === "browser") {
@@ -429,7 +450,7 @@ export class Daemon {
         await this.requireManager().refresh();
         return;
       case "run.start":
-        await this.startRun(msg.goal, { ...(msg.profile ? { profile: msg.profile } : {}), ...(msg.maxTurns ? { maxTurns: msg.maxTurns } : {}), ...(msg.modelSelection ? { modelSelection: msg.modelSelection } : {}), ...(msg.limits ? { limits: msg.limits } : {}), ...(msg.browserEngine ? { browserEngine: msg.browserEngine } : {}) });
+        await this.startRun(msg.goal, { ...(msg.profile ? { profile: msg.profile } : {}), ...(msg.maxTurns ? { maxTurns: msg.maxTurns } : {}), ...(msg.modelSelection ? { modelSelection: msg.modelSelection } : {}), ...(msg.limits ? { limits: msg.limits } : {}), ...(msg.browserEngine ? { browserEngine: msg.browserEngine } : {}), ...(msg.playbook ? { playbook: msg.playbook } : {}) });
         return;
       case "browser.frameAck":
         if (this.frameInFlight !== msg.id) return;
@@ -546,7 +567,7 @@ export class Daemon {
     });
   }
 
-  private async startRun(goal: string, opts: { browserEngine?: "classic" | "jev-hybrid" | "jev-first" | "jev-auto"; profile?: RunProfileName; maxTurns?: number; modelSelection?: ModelSelection; limits?: RunLimits; parentId?: string; continuation?: Continuation; context?: string } = {}): Promise<void> {
+  private async startRun(goal: string, opts: { browserEngine?: "classic" | "jev-hybrid" | "jev-first" | "jev-auto"; profile?: RunProfileName; maxTurns?: number; modelSelection?: ModelSelection; limits?: RunLimits; parentId?: string; continuation?: Continuation; context?: string; playbook?: string } = {}): Promise<void> {
     if (this.browserHumanOnly) return this.deps.post({ type: "agentd.error", message: "Finish manual login before starting the agent" });
     const manager = this.manager;
     const runtime = this.runtime;
@@ -585,6 +606,8 @@ export class Daemon {
       executors.push(browserExecutor(browser, status.workspacePath));
     }
     const profile: RunProfileName = opts.profile ?? "quick";
+    const playbook = opts.playbook ? this.playbooks?.read(opts.playbook) : undefined;
+    if (opts.playbook && playbook === undefined) { this.deps.post({ type: "agentd.error", message: `Playbook "${opts.playbook}" was not found` }); return; }
     const profileModel = this.profileModels[profile];
     const model = opts.modelSelection?.model ?? profileModel?.model ?? runtime.model;
     const provider = { ...runtime, ...(opts.modelSelection?.effort ? { effort: opts.modelSelection.effort } : {}) };
@@ -602,7 +625,7 @@ export class Daemon {
         tools: composeExecutors(...executors),
         policy: composePolicies(...policies),
         prices: runtime.prices,
-        systemPrompt: buildSystemPrompt({ nestedAutonomy: this.nestedAutonomy, profile }),
+        systemPrompt: buildSystemPrompt({ nestedAutonomy: this.nestedAutonomy, profile }) + (playbook ? `\n\n${playbookPrompt(playbook)}` : ""),
         provider: runtime.provider ?? "openai",
         ...(opts.continuation ? { continuation: opts.continuation } : {}),
         budgets: opts.continuation?.limits ?? { maxTurns, maxToolCalls, maxDurationMs, maxCostUsd: runtime.provider === "codex" && (opts.browserEngine ?? "classic") === "classic" ? null : DEFAULT_BUDGETS.maxCostUsd },
@@ -611,7 +634,7 @@ export class Daemon {
       },
       { workspaceId, goal, ...(opts.context ? { prompt: `${opts.context}\n\nNew user message:\n${goal}` } : {}), networkMode: status.networkMode ?? "open", ...(snapshot ? { snapshot } : {}) },
     );
-    runtime.store.linkRun(rc.runId, opts.parentId, { browserEngine: opts.browserEngine ?? "classic", profile, modelSelection: { model, ...(provider.effort ? { effort: provider.effort } : {}) }, provider: runtime.provider ?? "openai" });
+    runtime.store.linkRun(rc.runId, opts.parentId, { browserEngine: opts.browserEngine ?? "classic", profile, modelSelection: { model, ...(provider.effort ? { effort: provider.effort } : {}) }, provider: runtime.provider ?? "openai", ...(opts.playbook ? { playbook: opts.playbook } : {}) });
     runtime.store.appendEvent(rc.runId, "user.message", { text: goal });
     console.error(`[agentd] run ${rc.runId.slice(0, 8)}: profile ${profile}, model ${model}, effort ${opts.modelSelection?.effort ?? "configured"}, maxTurns ${maxTurns ?? "unlimited"}, compact every ${COMPACT_EVERY[profile] || "never"}`);
     this.run = rc;
@@ -635,7 +658,28 @@ export class Daemon {
     void rc.start().then((out) => {
       postState(out.state, { ...(out.endReason ? { endReason: out.endReason } : {}), ...(out.finalText !== undefined ? { finalText: out.finalText } : {}) });
       void this.notifier?.publish({ title: `Run ${out.state}`, body: (out.finalText ?? out.endReason ?? goal).slice(0, 1000), tags: [out.state === "completed" ? "white_check_mark" : "warning"] });
+      // A run that followed a playbook is not distilled again; refining a playbook is the human's edit.
+      if (out.state === "completed" && !opts.playbook && !opts.parentId) void this.distill(rc.runId, goal, out.finalText, model, provider).catch(e => console.error(`[agentd] playbook draft failed: ${e instanceof Error ? e.message : String(e)}`));
     });
+  }
+
+  /** One tool-less model turn over the finished run's trace; the result is a draft until the human accepts it. */
+  private async distill(runId: string, goal: string, finalText: string | undefined, model: string, provider: ProviderConfig): Promise<void> {
+    const runtime = this.runtime;
+    if (!this.playbooks || !runtime) return;
+    const calls = runtime.store.listToolCalls(runId);
+    if (!shouldDistill(calls)) return;
+    const adapter = this.deps.makeAdapter(this.profileModels.research?.model ?? model, runtime.apiKey, provider);
+    try {
+      const turn = await adapter.turn({ goal: distillationPrompt(goal, calls, finalText) }, { tools: [], system: DISTILL_SYSTEM, signal: AbortSignal.timeout(180_000) });
+      const text = turn.text.trim();
+      if (!text.startsWith("# ")) throw new Error("model did not return a playbook");
+      const slug = this.playbooks.writeDraft(slugFor(goal), `${text}\n`);
+      const name = /^#\s+(.+)$/m.exec(text)?.[1]?.trim() ?? slug;
+      runtime.store.appendEvent(runId, "playbook.draft", { slug, name });
+      this.deps.post({ type: "playbook.draft", slug, name, runId });
+      console.error(`[agentd] run ${runId.slice(0, 8)}: playbook draft "${slug}"`);
+    } finally { adapter.close?.(); }
   }
 
   private async conversationCommand(msg: z.infer<typeof UiQuery>): Promise<unknown> {

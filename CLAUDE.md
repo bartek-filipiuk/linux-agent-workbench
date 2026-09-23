@@ -15,6 +15,7 @@
 ### Critical flows
 - Run: renderer `run.start {goal, profile, limits, modelSelection}` → `Daemon` (profile → prompt rules, model, compactEvery) → `RunController` (context compaction every N turns) → `CodexAppServerAdapter` (default) or explicit `OpenAIResponsesAdapter` → tool call → policies (`LeasePolicy`, `CommandGate`, `NestedPromptPolicy`, `BrowserActionPolicy`) → executor (`tools/terminal-tools.ts` | `tools/browser-tools.ts`) → worker socket → result back to the model; events to `Store` and the UI.
 - Approval: policy → `ApprovalManager.request` (TTL 120 s) → `approval.request` to the UI → `ApprovalCard` (y/n, once/session/deny) → `approval.decide`.
+- Playbook: `run.start {playbook}` → `Daemon.startRun` reads `<dataDir>/playbooks/<slug>.md` (`orchestrator/playbooks.ts`) and appends it to the system prompt; a completed run without a playbook and ≥3 done tool calls → `Daemon.distill` (one tool-less model turn over `tool_calls`) → `playbooks/drafts/<slug>.md` + `playbook.draft` to the UI → `ui.query playbook_accept` renames it into place. Shipped playbooks in `playbooks/` are seeded once at `config.init`.
 - Handoff: a policy returns `LEASE_DENIED` with `handoff`, or the model calls `request_human` → run state `handoff`, both leases go to the human, no observations reach the model until "Give control back".
 - Browser observe: `BrowserSession.walkFrames` (main frame, then every iframe, refs `e<n>` bound to `revision`) → `observationHints` (login_form, captcha, two_factor) appended by `browserExecutor`.
 - Shell gate: bash DEBUG trap → `/opt/law/gate` (static C, ~2 ms round trip) → worker → agentd `classify` (auto/log/approval/deny) → `ApprovalManager`; the gate waits `LAW_GATE_TIMEOUT_MS` (605 s), longer than any approval TTL.
@@ -42,6 +43,7 @@
 ### Extending the application
 - New model tool: spec + executor in `services/agentd/src/tools/`, `previewOf` label, a policy if it has side effects, a test with a fake manager.
 - New approval rule: `Rule` in the right policy file, a test in `services/agentd/test/*-policy.test.ts`, a label if the category is new.
+- New shipped playbook: a Markdown file in `playbooks/<slug>.md` (slug `[a-z0-9-]`, first line `# Name`); sections When to use / Parameters / Steps / Pitfalls / Ask the human when.
 - New UI state: `apps/desktop/src/renderer/App.tsx` owns state; panels are `TerminalPanel`, `BrowserPanel`, `RunDrawer`.
 
 ### Verification

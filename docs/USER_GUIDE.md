@@ -46,6 +46,12 @@ The goal supports up to 4,000 characters. It grows as you type; **Expand editor*
 
 **Compare working styles** displays the legend. These are prompt instructions, not guaranteed outcomes or fixed numbers of steps. They do not select the Codex model or reasoning effort. The third style requires the nested coding agent's own installation, login, quota and permissions; it is not another selectable operator provider.
 
+### Playbooks
+
+A playbook is a Markdown recipe for a process you repeat: parameters, the steps that worked, known pitfalls and when to hand over to you. Choose one under **Playbook** and its text is appended to the operator's instructions for that task, so the model follows the known route instead of rediscovering it. The app ships `allegro-search`; your own live in `~/.local/share/linux-agent-workbench/playbooks/*.md` (the file name is the playbook id, the first `# heading` is its name). **Edit file** opens the selected playbook in your editor.
+
+After a task completes without a playbook and used at least three tools, the app asks the research model (or the task's model) to distill the run's tool trace into a draft. Drafts appear above the browser engine setting with **Open**, **Accept** and **Discard**; nothing uses a draft until you accept it. Review it first: it was written from page text and command output, which are untrusted, and it must not contain passwords or personal data. A task that followed a playbook is not distilled again; refine that playbook by editing its file.
+
 ### Model and reasoning
 
 Expand **Model & reasoning**. With Codex, the model list comes from the authenticated account. Choose a model, then a supported effort level. For example, select Astra and `medium` if your account exposes them. Unsupported models/efforts block Start instead of silently choosing something else. **Refresh** reloads the catalog.
